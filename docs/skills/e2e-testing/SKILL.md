@@ -30,3 +30,61 @@ When creating new specs in `tests/e2e/specs/`, follow these critical patterns:
 
 ## Example Test Structure
 Refer to `tests/e2e/specs/single-click-translation.spec.ts` for a complete, working example of testing a translation flow against the real local backend.
+
+## Troubleshooting & Best Practices (AI Agents Specific)
+
+### 1. Robust Browser Launch
+When launching the browser context, always use these flags to ensure the extension loads correctly and doesn't crash:
+
+```typescript
+const EXTENSION_ENABLED_FLAGS = [
+    '--enable-unsafe-extension-debugging',
+    '--disable-features=DisableLoadExtensionCommandLineSwitch',
+    '--disable-extensions-except=' + EXTENSION_DIST_PATH,
+    '--load-extension=' + EXTENSION_DIST_PATH,
+];
+
+const context = await chromium.launchPersistentContext(userDataDir, {
+    headless: false, // Recommended for extensions to ensure proper rendering
+    args: EXTENSION_ENABLED_FLAGS,
+});
+```
+
+### 2. Service Worker Verification
+Instead of a blind `waitForTimeout(2000)`, verify the service worker is actually running. Use this helper:
+
+```typescript
+async function waitForExtensionServiceWorker(context: any): Promise<string> {
+    const startTime = Date.now();
+    while (Date.now() - startTime < 15000) {
+        const serviceWorkers = context.serviceWorkers();
+        const extensionServiceWorker = serviceWorkers.find((worker) => worker.url().startsWith('chrome-extension://'));
+        if (extensionServiceWorker) return extensionServiceWorker.url();
+        await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    return '';
+}
+```
+
+### 3. Debugging Content Scripts
+Always attach console listeners to see logs from the extension's content scripts inside the test runner output. This is critical for diagnosing why a translation might not trigger (e.g., selection validation failures).
+
+```typescript
+const page = await context.newPage();
+page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+page.on('pageerror', err => console.log('PAGE ERROR:', err.message));
+```
+
+### 4. HTML Fixtures
+When creating reproduction HTML files in `tests/html/`, prefer generating them dynamically within the test or using `create_file` if they don't exist. Ensure `body` styles are explicitly set if testing theme-related issues, as defaults can vary.
+
+### 5. Screenshot Reliability & Viewport Issues
+When validating visual elements (like tooltips or highlights), the page might auto-scroll or render async content, moving elements out of the viewport.
+- **Always re-center before screenshot**: Use `scrollIntoView` or custom JS scrolling logic immediately before `page.screenshot()`.
+- **Use clip screenshots**: Compute the bounding box of relevant elements (e.g., `anchor + tooltip`) and use the `clip` option in `screenshot()` to guarantee they are captured, regardless of viewport position.
+- **Avoid fullPage screenshots for large pages**: They can be slow and cause timeouts. Prefer viewport or clipped screenshots for specific element validation.
+
+### 6. Test Timeouts
+Network operations or live site tests may exceed the default timeout (30s).
+- Use `test.setTimeout(120_000)` inside specific long-running tests.
+- Always explicitly close the browser context (`await context.close()`) in a `finally` block to prevent "Worker teardown timeout" errors.
