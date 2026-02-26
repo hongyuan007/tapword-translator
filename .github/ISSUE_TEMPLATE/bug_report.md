@@ -20,5 +20,5 @@ If applicable, add screenshots to help explain your problem.
 如果有截图，请上传以帮助我们定位问题。
 
 **Environment 环境信息**
-- Browser (Chrome/Edge/Brave/etc):
-- Extension Version (e.g. 0.4.0):
+- Browser: Chrome/Edge/Brave/etc
+- Extension Version: x.x.x
