@@ -3,7 +3,7 @@ name: Bug report 错误报告
 about: Create a report to help us improve 提交问题报告帮助我们改进
 title: "[BUG] "
 labels: bug
-assignees: ''
+assignees: []
 
 ---
 
