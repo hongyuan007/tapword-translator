@@ -1,6 +1,6 @@
 {
     "name": "tapword-translator",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "A smart AI-powered translation browser extension that provides context-aware translations",
     "type": "module",
     "scripts": {

@@ -11,6 +11,47 @@ import * as contentIndex from "@/1_content/index"
 
 const logger = loggerModule.createLogger("styleCalculator")
 
+interface RgbaColor {
+    r: number
+    g: number
+    b: number
+    a: number
+}
+
+const BLACK_TEXT_COLOR = "rgb(0, 0, 0)"
+const WHITE_TEXT_COLOR = "rgb(255, 255, 255)"
+const DARK_THEME_CLASS = "dark"
+const DARK_COLOR_SCHEME = "dark"
+const MIN_VISIBLE_ALPHA = 0.01
+const DEFAULT_PAGE_BACKGROUND: RgbaColor = {
+    r: 255,
+    g: 255,
+    b: 255,
+    a: 1,
+}
+const BLACK_COLOR: RgbaColor = {
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 1,
+}
+const WHITE_COLOR: RgbaColor = {
+    r: 255,
+    g: 255,
+    b: 255,
+    a: 1,
+}
+
+function isDarkThemeContext(): boolean {
+    const rootElement = document.documentElement
+    if (rootElement.classList.contains(DARK_THEME_CLASS)) {
+        return true
+    }
+
+    const colorScheme = window.getComputedStyle(rootElement).colorScheme
+    return colorScheme.includes(DARK_COLOR_SCHEME)
+}
+
 // ============================================================================
 // Color Manipulation
 // ============================================================================
@@ -20,7 +61,7 @@ const logger = loggerModule.createLogger("styleCalculator")
  * @param colorString - The CSS color string.
  * @returns An object with r, g, b, a properties, or null if parsing fails.
  */
-function parseColor(colorString: string): { r: number; g: number; b: number; a: number } | null {
+function parseColor(colorString: string): RgbaColor | null {
     if (!colorString) return null
 
     // RGB or RGBA
@@ -61,50 +102,106 @@ function parseColor(colorString: string): { r: number; g: number; b: number; a: 
 }
 
 /**
- * Lightens a color by a given amount and sets its alpha transparency.
- *
- * @param colorString - The initial CSS color string (e.g., 'rgb(255, 0, 0)', '#ff0000').
- * @param lightenAmount - A value between 0 and 1 to control lightness (0 = no change, 1 = white).
- * @param alpha - The desired alpha transparency (0 to 1).
- * @returns A new rgba color string, or the original color if parsing fails.
+ * Composites a foreground color over a background color.
  */
-function lightenColor(colorString: string, lightenAmount: number, alpha: number): string {
-    const color = parseColor(colorString)
-    if (!color) {
-        return colorString // Return original if parsing fails
+function compositeForegroundOverBackground(foreground: RgbaColor, background: RgbaColor): RgbaColor {
+    const alpha = foreground.a + background.a * (1 - foreground.a)
+    if (alpha <= 0) {
+        return {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 0,
+        }
     }
 
-    // Clamp lightenAmount and alpha to be between 0 and 1
-    const lightAmount = Math.max(0, Math.min(1, lightenAmount))
-    const finalAlpha = Math.max(0, Math.min(1, alpha))
-
-    // Calculate the new color by interpolating towards white
-    const r = Math.round(color.r + (255 - color.r) * lightAmount)
-    const g = Math.round(color.g + (255 - color.g) * lightAmount)
-    const b = Math.round(color.b + (255 - color.b) * lightAmount)
-
-    return `rgba(${r}, ${g}, ${b}, ${finalAlpha})`
+    return {
+        r: Math.round((foreground.r * foreground.a + background.r * background.a * (1 - foreground.a)) / alpha),
+        g: Math.round((foreground.g * foreground.a + background.g * background.a * (1 - foreground.a)) / alpha),
+        b: Math.round((foreground.b * foreground.a + background.b * background.a * (1 - foreground.a)) / alpha),
+        a: alpha,
+    }
 }
 
-/**
- * Determines whether to use black or white text based on the brightness of the reference color.
- * If the reference color is dark (implies light background), returns black.
- * If the reference color is light (implies dark background), returns white.
- */
-function getHighContrastColor(colorString: string): string {
-    const color = parseColor(colorString)
-    if (!color) return "rgb(0, 0, 0)"
+function isVisibleBackground(color: RgbaColor | null): color is RgbaColor {
+    return !!color && color.a > MIN_VISIBLE_ALPHA
+}
 
-    // Calculate perceived brightness (luminance)
-    // Formula: (R * 299 + G * 587 + B * 114) / 1000
-    // Range: 0 (black) to 255 (white)
-    const brightness = (color.r * 299 + color.g * 587 + color.b * 114) / 1000
+function collectBackgroundLayers(startElement: HTMLElement | null): RgbaColor[] {
+    const layers: RgbaColor[] = []
+    let currentElement: HTMLElement | null = startElement
 
-    // Threshold of 150 biases slightly towards using black text on mid-tones,
-    // which is generally safer for readability on most web pages.
-    // < 150: Dark text -> Light background -> Use Black tooltip
-    // >= 150: Light text -> Dark background -> Use White tooltip
-    return brightness < 150 ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)"
+    while (currentElement) {
+        const backgroundColor = parseColor(window.getComputedStyle(currentElement).backgroundColor)
+        if (isVisibleBackground(backgroundColor)) {
+            layers.push(backgroundColor)
+        }
+        currentElement = currentElement.parentElement
+    }
+
+    if (layers.length > 0) {
+        return layers
+    }
+
+    const bodyBackgroundColor = document.body ? parseColor(window.getComputedStyle(document.body).backgroundColor) : null
+    if (isVisibleBackground(bodyBackgroundColor)) {
+        layers.push(bodyBackgroundColor)
+    }
+
+    const htmlBackgroundColor = parseColor(window.getComputedStyle(document.documentElement).backgroundColor)
+    if (isVisibleBackground(htmlBackgroundColor)) {
+        layers.push(htmlBackgroundColor)
+    }
+
+    return layers
+}
+
+function getEffectiveBackgroundColor(startElement: HTMLElement | null): RgbaColor {
+    const backgroundLayers = collectBackgroundLayers(startElement)
+
+    if (backgroundLayers.length === 0) {
+        return isDarkThemeContext() ? BLACK_COLOR : DEFAULT_PAGE_BACKGROUND
+    }
+
+    let composedBackground = DEFAULT_PAGE_BACKGROUND
+    for (let index = backgroundLayers.length - 1; index >= 0; index--) {
+        const layer = backgroundLayers[index]
+        if (!layer) {
+            continue
+        }
+        composedBackground = compositeForegroundOverBackground(layer, composedBackground)
+    }
+
+    return composedBackground
+}
+
+function toLinearColorSpace(channel: number): number {
+    const normalized = channel / 255
+    if (normalized <= 0.03928) {
+        return normalized / 12.92
+    }
+    return Math.pow((normalized + 0.055) / 1.055, 2.4)
+}
+
+function getRelativeLuminance(color: RgbaColor): number {
+    const linearRed = toLinearColorSpace(color.r)
+    const linearGreen = toLinearColorSpace(color.g)
+    const linearBlue = toLinearColorSpace(color.b)
+    return 0.2126 * linearRed + 0.7152 * linearGreen + 0.0722 * linearBlue
+}
+
+function calculateContrastRatio(colorA: RgbaColor, colorB: RgbaColor): number {
+    const luminanceA = getRelativeLuminance(colorA)
+    const luminanceB = getRelativeLuminance(colorB)
+    const lighter = Math.max(luminanceA, luminanceB)
+    const darker = Math.min(luminanceA, luminanceB)
+    return (lighter + 0.05) / (darker + 0.05)
+}
+
+function getHighContrastColor(backgroundColor: RgbaColor): string {
+    const blackContrast = calculateContrastRatio(BLACK_COLOR, backgroundColor)
+    const whiteContrast = calculateContrastRatio(WHITE_COLOR, backgroundColor)
+    return blackContrast >= whiteContrast ? BLACK_TEXT_COLOR : WHITE_TEXT_COLOR
 }
 
 // ============================================================================
@@ -280,13 +377,10 @@ export function calculateTooltipStyle(
     const computedStyle = originalElement ? window.getComputedStyle(originalElement) : null
     const originalFontSize = computedStyle ? parseFloat(computedStyle.fontSize) : fallbackFontSize
 
-    // Use anchor for color if available, as it captures the specific text color (e.g. inline styles)
     const colorElement = anchor ?? originalElement
-    const colorStyle = colorElement ? window.getComputedStyle(colorElement) : null
-    const originalColor = colorStyle ? colorStyle.color : "rgb(0, 0, 0)"
-
+    const effectiveBackgroundColor = getEffectiveBackgroundColor(colorElement)
     const result = calculateOptimalTranslationFontSize(originalElement, originalFontSize, anchor, minFontSize)
-    const color = getHighContrastColor(originalColor)
+    const color = getHighContrastColor(effectiveBackgroundColor)
 
     return {
         fontSize: result.fontSize,
