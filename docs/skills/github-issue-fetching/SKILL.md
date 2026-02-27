@@ -34,7 +34,8 @@ gh issue view <issue-number> --repo <owner>/<repo> --json number,title,body,crea
 Analyze the `body` field (and `body` field within `comments` array) in `issue.json` to find image URLs. These are typically in Markdown (`![alt](url)`) or HTML (`<img src="url">`) format.
 Use `curl` to download each image locally.
 ```bash
-curl -L -o screenshot-1.png "<image-url>"
+# Use -L to follow redirects. Add -k if you encounter SSL errors.
+curl -L -k -o screenshot-1.png "<image-url>"
 ```
 
 ### 4. Generate Markdown Summary
@@ -60,3 +61,8 @@ Create a `README.md` file in the directory that reconstructs the issue content.
 - **Directory Naming**: Use a consistent naming convention like `issue-<number>-<short-slug>`.
 - **Image Naming**: Rename downloaded images sequentially (e.g., `screenshot-1.png`, `screenshot-2.png`) for clarity.
 - **Privacy**: Be mindful of sensitive data in screenshots or logs within the issue.
+
+## Troubleshooting
+- **SSL Errors**: If `curl` fails with SSL errors (e.g., `SSL_ERROR_SYSCALL`), verify you are using the `-k` (insecure) flag.
+- **Directory Access**: Use absolute paths (`/Users/.../docs/plan/...`) when creating directories or moving files to ensure reliability across terminal sessions.
+

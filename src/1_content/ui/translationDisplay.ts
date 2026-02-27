@@ -146,6 +146,31 @@ export function removeTranslationResult(anchorId: string): void {
     }
 }
 
+/**
+ * Remove all translation results from the current page.
+ *
+ * This is primarily used for SPA navigations where host pages reuse DOM nodes
+ * (e.g. YouTube next/previous video) and previously injected anchors/tooltips
+ * must be fully cleaned.
+ */
+export function removeAllTranslationResults(): void {
+    try {
+        const trackedAnchorIds = Array.from(activeTranslations.keys())
+        for (const anchorId of trackedAnchorIds) {
+            const anchor = document.getElementById(anchorId)
+            cleanupTranslationById(anchorId, anchor, "remove")
+        }
+
+        removeUntrackedAnchorElements()
+        removeUntrackedTooltipElements()
+        translationModal.closeTranslationModal()
+
+        logger.info("All translation results removed")
+    } catch (error) {
+        logger.error("Error removing all translations:", error)
+    }
+}
+
 // ============================================================================
 // Internal Helpers
 // ============================================================================
@@ -306,6 +331,58 @@ function cleanupTranslationById(anchorId: string, anchorElement?: HTMLElement | 
         logger.warn("[translationDisplay] Orphan tooltip cleaned and state removed:", anchorId, `anchor=${tag}`)
     } else {
         logger.info("Translation removed:", anchorId)
+    }
+}
+
+function removeUntrackedAnchorElements(): void {
+    const anchors = Array.from(document.querySelectorAll(`.${constants.CSS_CLASSES.ANCHOR}`))
+    for (const anchor of anchors) {
+        if (!(anchor instanceof HTMLElement)) {
+            continue
+        }
+
+        const anchorId = anchor.id
+        if (anchorId && !activeTranslations.has(anchorId)) {
+            unwrapAnchorElement(anchor)
+            continue
+        }
+
+        if (!anchorId) {
+            unwrapAnchorElement(anchor)
+        }
+    }
+}
+
+function removeUntrackedTooltipElements(): void {
+    const trackedTooltips = new Set<HTMLElement>()
+    for (const tooltips of activeTranslations.values()) {
+        for (const tooltip of tooltips) {
+            trackedTooltips.add(tooltip)
+        }
+    }
+
+    const tooltipNodes = Array.from(document.querySelectorAll(`.${constants.CSS_CLASSES.TOOLTIP}`))
+    for (const node of tooltipNodes) {
+        if (!(node instanceof HTMLElement)) {
+            continue
+        }
+        if (!trackedTooltips.has(node)) {
+            node.remove()
+        }
+    }
+}
+
+function unwrapAnchorElement(anchorElement: HTMLElement): void {
+    if (!anchorElement.parentNode) {
+        return
+    }
+
+    const parent = anchorElement.parentNode
+    try {
+        anchorElement.replaceWith(...Array.from(anchorElement.childNodes))
+        parent.normalize()
+    } catch (error) {
+        logger.warn("[translationDisplay] Failed to unwrap untracked anchor:", error)
     }
 }
 

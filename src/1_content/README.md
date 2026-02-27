@@ -1,10 +1,10 @@
-Last updated on: 2025-11-07
+Last updated on: 2026-02-27
 
 # 1_content: Content Script Module
 
 ## Module Overview
 
-This module is the core of the extension that runs on web pages. It is responsible for detecting user text selections, displaying a translation icon, extracting the context of the selected text, and rendering the final translation in an unobtrusive floating card.
+This module is the core of the extension that runs on web pages. It is responsible for detecting user interactions (text selections, single clicks, double clicks), displaying translation UI elements (icon, floating tooltip, modal, toast notifications), extracting contextual information from the page, and orchestrating the translation workflow.
 
 ## File Structure
 
@@ -14,75 +14,72 @@ This module is the core of the extension that runs on web pages. It is responsib
 ├── index.ts                        # Main entry point for the content script
 ├── constants/
 │   ├── index.ts                    # Module constants exports
-│   └── cssClasses.ts               # CSS class names for UI elements
+│   ├── cssClasses.ts               # CSS class names for UI elements
+│   └── iconColors.ts               # Constants for icon colors
 ├── handlers/
-│   └── selectionHandler.ts         # Handles user interactions (selection, clicks)
+│   ├── InputListener.ts            # Detects DOM events (clicks, selections)
+│   ├── TranslationPipeline.ts      # Core translation logic and routing
+│   └── utils/                      # Interaction-specific utilities
+│       ├── editableElementDetector.ts # Detects if an element is interactive/editable
+│       ├── rangeAdjuster.ts        # Adjusts selection boundaries
+│       ├── rangeSplitter.ts        # Splits selection across block elements
+│       ├── selectionClassifier.ts  # Classifies selection as word or fragment
+│       ├── selectionValidator.ts   # Validates if a selection should trigger translation
+│       ├── tapWordDetector.ts      # Resolves word range from a pointer coordinate
+│       └── translationOverlapDetector.ts # Handles overlapping translations
 ├── resources/                      # Static resources (HTML templates, CSS)
-│   ├── content.css                 # CSS for the translation icon and display card
-│   ├── modal.css                   # CSS for the translation modal
-│   ├── modal-error-fragment.html   # Error state template for fragments
-│   ├── modal-error.html            # Error state template for words
-│   ├── modal-loading-fragment.html # Loading state template for fragments
-│   ├── modal-loading.html          # Loading state template for words
-│   ├── modal-success-fragment.html # Success state template for fragments
-│   ├── modal-success.html          # Success state template for words
-│   ├── section-dictionary.html     # Dictionary section template
-│   ├── section-original-sentence.html # Original sentence section template
-│   └── section-sentence-fragment.html # Sentence section template for fragments
 ├── services/
-│   └── translationRequest.ts       # Communicates with the background script for translation
+│   └── translationRequest.ts       # Communicates with the background script
 ├── ui/
 │   ├── iconManager.ts              # Manages the translation icon's lifecycle
-│   ├── modalTemplates.ts           # Loads and renders HTML templates for the modal
-│   ├── translationDisplay.ts       # Manages the display of translation results
-│   └── translationModal.ts         # Manages the translation detail modal
-└── utils/
-    ├── contextExtractorV2.ts       # Extracts sentence-level context around the selection
-    ├── domSanitizer.ts             # Cleans DOM selections from extension's UI elements
-    ├── languageDetector.ts         # Detects the source language of the selected text
-    ├── lineHeightAdjuster.ts       # Dynamically adjusts line-height for better tooltip display
-    ├── modalPositioner.ts          # Calculates optimal position for the translation modal
-    ├── rangeAdjuster.ts            # Trims and expands selection ranges to word boundaries
-    ├── selectionClassifier.ts      # Classifies selection as a word or fragment
-    ├── styleCalculator.ts          # Calculates tooltip styles based on context
-    └── translationOverlapDetector.ts # Detects and handles overlapping translations
+│   ├── modalTemplates.ts           # Loads HTML templates for the modal
+│   ├── toastNotification.ts        # Displays temporary toast notifications
+│   ├── translationDisplay.ts       # Manages translation tooltips and inline styling
+│   └── translationModal.ts         # Manages the detailed translation modal
+└── utils/                          # General utilities
+    ├── styleCalculator/            # UI positioning and style calculations
+    ├── concurrencyLimiter.ts       # Limits parallel translation requests
+    ├── contextExtractorV2.ts       # Extracts sentence-level context around text
+    ├── domSanitizer.ts             # Cleans DOM selections from extension UI
+    ├── languageDetector.ts         # Detects the source language of the text
+    ├── languageValidator.ts        # "Native Speaker Suppression" logic
+    ├── lineHeightAdjuster.ts       # Adjusts line-height for tooltip display
+    ├── modalPositioner.ts          # Calculates optimal modal position
+    └── versionStatus.ts            # Caches version check results
 ```
 
 ## Core Components
 
 ### 1. Entry Point (`index.ts`)
 
-- **`index.ts`**: Initializes the content script, setting up all necessary event listeners for user interactions like `dblclick`, `mouseup`, `mousedown`, and `scroll`. It orchestrates the functionality of the other components in this module.
+- **`index.ts`**: Initializes the content script, loads user settings, applies dynamic styles (like customized underline colors and offsets), and registers global DOM event listeners for `dblclick`, `click`, `mouseup`, and `scroll`.
 
-### 2. Constants (`constants/`)
+### 2. Event Handling & Translation Pipeline (`handlers/`)
 
-- **`cssClasses.ts`**: Defines all CSS class names used by the content script UI elements (icon, anchor, tooltip, modal). Centralized constant definitions ensure consistency across the module.
+This directory captures user intent and orchestrates the translation sequence.
 
-### 3. User Interaction (`handlers/`)
+- **`InputListener.ts`**: The first line of defense. It captures single-clicks, double-clicks, and drag selections. It uses validators to verify if an interaction is valid (e.g., ignoring modifier keys or clicks inside text inputs) before forwarding the request to the pipeline.
+- **`TranslationPipeline.ts`**: The core orchestrator. It accepts a validated text range, splits it if crossing block boundaries, detects the language, expands boundaries appropriately for space-delimited vs. CJK languages, and routes the request to either the word or fragment translation path. It also manages request concurrency limits.
+- **`handlers/utils/`**: Specific helpers such as `selectionValidator.ts` (checks if a selection meets translation criteria), `editableElementDetector.ts` (prevents translating text inside editable fields or interactive buttons), and `tapWordDetector.ts` (extracts a precise text range from a single point coordinate).
 
-- **`selectionHandler.ts`**: This is the central hub for handling user actions.
-  - It detects user selections and decides whether to show the translation icon or trigger an immediate translation (on double-click).
-  - It uses `selectionClassifier` to distinguish between a single word and a text fragment and `rangeAdjuster` to refine the selection boundaries before requesting a translation.
+### 3. UI Management (`ui/`)
 
-### 4. UI Management (`ui/`)
+Manages all DOM modifications and visual feedback injected into the host page.
 
-- **`iconManager.ts`**: Manages the creation, positioning, and removal of the small translation icon that appears next to selected text.
-- **`translationDisplay.ts`**: Responsible for rendering the translation results. It creates an underlined anchor for the selected text and displays a floating card (tooltip) with the translation. It handles different states (`loading`, `success`, `error`) and manages clicks on the anchor to open the detail modal.
-- **`translationModal.ts`**: Manages the detailed translation modal that appears when a user clicks on a translated word. It displays comprehensive information like definitions and sentence context, and provides actions such as re-translating, deleting the annotation, and text-to-speech.
-- **`modalTemplates.ts`**: Loads and renders the HTML content for the translation modal. It manages different templates for loading, success, and error states for both word and fragment translations, separating the view logic from the modal's state management.
+- **`iconManager.ts`**: Displays the translation trigger icon next to manual selections.
+- **`translationDisplay.ts`**: Renders inline translation results (underlines and floating tooltips) and manages their various states (loading, success, error).
+- **`translationModal.ts`**: Controls the detailed popup modal containing comprehensive dictionary definitions, original sentences, and text-to-speech functionality.
+- **`toastNotification.ts`**: Displays temporary, auto-dismissing notifications (e.g., error alerts or status updates) at the top of the viewport.
 
-### 5. Backend Communication (`services/`)
+### 4. Backend Communication (`services/`)
 
-- **`translationRequest.ts`**: Contains functions (`requestTranslation`, `requestFragmentTranslation`) that send the extracted text and its context to the background script (`2_background`) for processing by the AI translation service.
+- **`translationRequest.ts`**: Serializes and sends the extracted text, context, and language metadata to the background service worker (`2_background`), which communicates with the AI APIs.
 
-### 6. Utilities (`utils/`)
+### 5. Utilities (`utils/`)
 
-- **`contextExtractorV2.ts`**: A sophisticated utility that analyzes the DOM around the selected text to extract the full sentence, as well as preceding and succeeding sentences. This provides crucial context to the AI for more accurate translations.
-- **`domSanitizer.ts`**: Provides functions to filter out the extension's own UI elements from DOM operations, ensuring that text extraction doesn't accidentally include content from tooltips or icons.
-- **`languageDetector.ts`**: A utility to detect the source language of the text, using `chrome.i18n.detectLanguage` with a fallback to a lightweight library.
-- **`lineHeightAdjuster.ts`**: Dynamically adjusts the line-height of text blocks to ensure translation tooltips have adequate space without overlapping surrounding content.
-- **`modalPositioner.ts`**: A helper class that computes the optimal position for the translation modal, ensuring it remains visible within the viewport.
-- **`rangeAdjuster.ts`**: Provides functions to trim whitespace from the boundaries of a selection range and expand it to encompass full words.
-- **`selectionClassifier.ts`**: An intelligent utility that classifies a selection as a "word" or a "fragment" and determines if the selection boundaries are complete.
-- **`styleCalculator.ts`**: Calculates the optimal font size and color for the translation tooltip based on the styles of the original selected text.
-- **`translationOverlapDetector.ts`**: A utility to detect when a new selection overlaps with an existing translation anchor, allowing for cleanup to prevent nested or duplicate translations.
+General-purpose helpers used across the content script to improve robustness and translation quality.
+
+- **`languageValidator.ts`**: Implements "Native Speaker Suppression". Analyzes selected text and context to determine if it is already in the user's native language, suppressing the translation UI to avoid unnecessary interruptions.
+- **`contextExtractorV2.ts`**: A sophisticated DOM traversal utility that extracts the complete surrounding sentences of a text selection, providing the necessary context to the AI for highly accurate translations.
+- **`concurrencyLimiter.ts`**: A FIFO queue that restricts the number of parallel translation requests to prevent rate-limiting or overwhelming the background service during bulk actions.
+- **`versionStatus.ts`**: Caches extension update status checks to minimize repetitive messaging overhead to the background script.
