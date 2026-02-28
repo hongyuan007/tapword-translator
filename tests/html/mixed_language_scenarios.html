@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixed Language Translation Scenarios</title>
+    <style>
+        body { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; padding: 40px; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+        section { margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        h1 { margin-bottom: 20px; }
+        h2 { font-size: 1.2rem; color: #444; margin-top: 0; }
+        .scenario-desc { color: #666; font-style: italic; margin-bottom: 10px; font-size: 0.9rem; }
+        .test-case { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #007bff; margin-bottom: 20px; }
+        .highlight { background-color: #fff3cd; padding: 2px 4px; border-radius: 2px; cursor: text; }
+    </style>
+</head>
+<body>
+    <h1>Mixed Language & Formatting Tests</h1>
+    <p>Use this page to verify the fix for Issue #24 and the enhancement for mixed CJK/Latin phrases.</p>
+
+    <section>
+        <h2>Scenario 1: English Word in Chinese Context (Issue #24)</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Selecting "performance" should detect source="en" (not "zh" from context) and translate to Chinese.<br>
+            <strong>Expected:</strong> "performance" -> "性能" (Target: ZH)
+        </div>
+        <div class="test-case">
+            <p id="case-1-block">
+                在软件工程中，系统的 <span id="target-1-word" class="highlight">performance</span> 是至关重要的指标。
+                如果不进行优化，可能会导致用户流失。
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 2: Mixed CJK + Latin Phrases (Enhancement)</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Phrases containing both scripts should override "zh" detection to "en" to avoid "zh->en" fallback loop.<br>
+            <strong>Expected:</strong> "you什么时候来" -> "你什么时候来" (Target: ZH)
+        </div>
+        <div class="test-case">
+            <p id="case-2-block">
+                <span id="target-2-phrase1" class="highlight">you什么时候来</span> 参加我们的会议？
+                <br><br>
+                这个 <span id="target-2-phrase2" class="highlight">App的体验</span> 非常流畅。
+                <br><br>
+                请检查 <span id="target-2-phrase3" class="highlight">CPU的速度</span> 是否正常。
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 3: Chinese Word in English Context</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Selecting "你好" should detect source="zh" (not "en" from context) and translate to English.<br>
+            <strong>Expected:</strong> "你好" -> "Hello" (Target: ZH - fallback triggers)
+        </div>
+        <div class="test-case">
+            <p id="case-3-block">
+                My friend from Beijing taught me to say <span id="target-3-word" class="highlight">你好</span> yesterday.
+                It means "Hello" in Chinese.
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 4: Pure Language Controls</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Verify baseline functionality remains intact.
+        </div>
+        <div class="test-case">
+            <p>
+                <span id="target-4-zh" class="highlight">这是一个纯中文的句子。</span>
+            </p>
+            <p>
+                <span id="target-4-en" class="highlight">This is a pure English sentence.</span>
+            </p>
+        </div>
+    </section>
+    
+    <div style="margin-top: 50px; font-size: 0.8rem; color: #999;">
+        Generated for TapWord Translator E2E Testing
+    </div>
+</body>
+</html>

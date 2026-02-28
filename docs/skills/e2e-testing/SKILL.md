@@ -12,29 +12,18 @@ This skill provides instructions for writing and running Playwright E2E tests fo
 - When debugging failing E2E tests.
 - When verifying UI interactions, background service initialization, and DOM manipulations that unit tests cannot capture.
 
-## Running Tests
+## 1. Running Tests
+- **Build Extension (CRITICAL)**: `npm run build` must be run before any E2E tests, otherwise Playwright will load an outdated or missing `dist/` folder.
 - **Run all E2E tests (Headed)**: `npm run test:e2e:headed` (Recommended for debugging)
 - **Run specific test**: `npm run test:e2e:headed -- tests/e2e/specs/your-test.spec.ts`
 - **Screenshots**: Saved in `tests/e2e/screenshots/` upon failure or manual capture.
 
-## Writing Tests for AI Agents
+## 2. Writing Tests: Critical Patterns for AI Agents
 
-When creating new specs in `tests/e2e/specs/`, follow these critical patterns:
+When creating new specs in `tests/e2e/specs/`, you **MUST** follow these architectural patterns to avoid common extension-testing pitfalls.
 
-1. **Local Server**: Use `createLocalHtmlServer()` to serve `tests/html/test_page.html`.
-2. **Extension Loading**: Use `chromium.launchPersistentContext` with extension args to load the unpacked extension.
-3. **Initialization Wait (CRITICAL)**: Always wait for the background service to warm up (`await page.waitForTimeout(2000)`) before interacting with the page. If you don't wait, you will encounter "API service not initialized" errors because the background worker needs time to initialize `AuthService` and `APIService`.
-4. **UI Verification**: Use `page.locator()` to find extension UI elements (e.g., `.ai-translator-icon`, `.ai-translator-tooltip`).
-5. **Handling Loading States**: When waiting for a translation to complete, wait for the loading indicator to disappear using `expect(locator).toHaveCount(0, { timeout: 15000 })` (e.g., waiting for `.ai-translator-loading` or `.ai-translator-tooltip.loading` to be removed).
-6. **Screenshots**: Capture screenshots for visual verification at the end of the test.
-
-## Example Test Structure
-Refer to `tests/e2e/specs/single-click-translation.spec.ts` for a complete, working example of testing a translation flow against the real local backend.
-
-## Troubleshooting & Best Practices (AI Agents Specific)
-
-### 1. Robust Browser Launch
-When launching the browser context, always use these flags to ensure the extension loads correctly and doesn't crash:
+### 2.1 Browser Context & Locale
+Always force `zh-CN` locale. This ensures the extension defaults `targetLanguage` to `zh` (Chinese) without needing manual storage seeding.
 
 ```typescript
 const EXTENSION_ENABLED_FLAGS = [
@@ -42,49 +31,101 @@ const EXTENSION_ENABLED_FLAGS = [
     '--disable-features=DisableLoadExtensionCommandLineSwitch',
     '--disable-extensions-except=' + EXTENSION_DIST_PATH,
     '--load-extension=' + EXTENSION_DIST_PATH,
+    '--lang=zh-CN', // Force locale to Chinese so targetLanguage defaults to 'zh'
 ];
 
 const context = await chromium.launchPersistentContext(userDataDir, {
-    headless: false, // Recommended for extensions to ensure proper rendering
+    headless: false,
     args: EXTENSION_ENABLED_FLAGS,
+    locale: 'zh-CN', // Set Playwright context locale as well
 });
 ```
 
-### 2. Service Worker Verification
-Instead of a blind `waitForTimeout(2000)`, verify the service worker is actually running. Use this helper:
+### 2.2 Initialization Wait Strategy
+The extension has two layers of initialization. You must wait for **both**:
+1. **Service Worker**: Wait for it to start.
+2. **Content Script**: Wait for it to inject CSS variables into the page.
 
+**Do NOT use `waitForTimeout(2000)` alone.**
+
+```typescript
+// 1. Wait for Service Worker
+await waitForExtensionServiceWorker(context);
+
+// 2. Wait for Content Script (check for injected CSS variable)
+await page.waitForFunction(() => {
+    const val = getComputedStyle(document.documentElement).getPropertyValue('--ai-translator-underline-offset');
+    return val && val.trim() !== '';
+}, null, { timeout: 8000 });
+```
+
+### 2.3 Accessing Extension APIs (`chrome.*`)
+The test page (`page`) is a regular web page and **cannot** access `chrome.*` APIs. You must run these in the Service Worker context.
+
+**❌ Wrong:**
+```typescript
+await page.evaluate(() => chrome.storage.sync.set({ ... })); // Throws Error
+```
+
+**✅ Correct:**
+```typescript
+const worker = context.serviceWorkers().find(w => w.url().startsWith('chrome-extension://'));
+await worker.evaluate(() => chrome.storage.sync.set({ ... }));
+// RELOAD page after changing settings so content script picks them up!
+await page.reload();
+```
+
+### 2.4 Precise Text Selection
+`click({ clickCount: 3 })` often selects the whole paragraph. Use the **JS Selection API** to strictly select the target word.
+
+```typescript
+await page.evaluate(() => {
+    const el = document.getElementById('target-word');
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+});
+// Trigger the extension's mouseup handler
+await page.locator('#target-word').dispatchEvent('mouseup');
+```
+
+## 3. Debugging & Logging
+
+### 3.1 Content Script Logs (Fully Capturable)
+Attach listeners immediately after creating the page.
+```typescript
+page.on('console', msg => console.log(`[PAGE ${msg.type().toUpperCase()}] ${msg.text()}`));
+page.on('pageerror', err => console.log(`[PAGE ERROR] ${err.message}`));
+```
+
+### 3.2 Background Logs (NOT Capturable in Console)
+**Limitation**: Playwright cannot capture `console.log` from MV3 Service Workers in Chrome/Edge channels.
+- **Workaround**: Rely on Content Script logs. The content script logs the full request/response payloads exchanged with the background.
+- **Status check**: You CAN capture `worker.on('close')` to detect crashes/restarts.
+
+## 4. Helper Functions Reference
+
+### `waitForExtensionServiceWorker`
 ```typescript
 async function waitForExtensionServiceWorker(context: any): Promise<string> {
     const startTime = Date.now();
     while (Date.now() - startTime < 15000) {
-        const serviceWorkers = context.serviceWorkers();
-        const extensionServiceWorker = serviceWorkers.find((worker) => worker.url().startsWith('chrome-extension://'));
-        if (extensionServiceWorker) return extensionServiceWorker.url();
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        const worker = context.serviceWorkers().find(w => w.url().startsWith('chrome-extension://'));
+        if (worker) return worker.url();
+        await new Promise(r => setTimeout(r, 500));
     }
     return '';
 }
 ```
 
-### 3. Debugging Content Scripts
-Always attach console listeners to see logs from the extension's content scripts inside the test runner output. This is critical for diagnosing why a translation might not trigger (e.g., selection validation failures).
+## 5. HTML Fixtures
+- Store fixtures in `tests/html/`.
+- Use **`<span id="target-word">`** to wrap test targets for precise selection.
+- Use `createLocalHtmlServer()` to serve them (file:// protocol is often restricted).
 
-```typescript
-const page = await context.newPage();
-page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-page.on('pageerror', err => console.log('PAGE ERROR:', err.message));
-```
-
-### 4. HTML Fixtures
-When creating reproduction HTML files in `tests/html/`, prefer generating them dynamically within the test or using `create_file` if they don't exist. Ensure `body` styles are explicitly set if testing theme-related issues, as defaults can vary.
-
-### 5. Screenshot Reliability & Viewport Issues
-When validating visual elements (like tooltips or highlights), the page might auto-scroll or render async content, moving elements out of the viewport.
-- **Always re-center before screenshot**: Use `scrollIntoView` or custom JS scrolling logic immediately before `page.screenshot()`.
-- **Use clip screenshots**: Compute the bounding box of relevant elements (e.g., `anchor + tooltip`) and use the `clip` option in `screenshot()` to guarantee they are captured, regardless of viewport position.
-- **Avoid fullPage screenshots for large pages**: They can be slow and cause timeouts. Prefer viewport or clipped screenshots for specific element validation.
-
-### 6. Test Timeouts
-Network operations or live site tests may exceed the default timeout (30s).
-- Use `test.setTimeout(120_000)` inside specific long-running tests.
-- Always explicitly close the browser context (`await context.close()`) in a `finally` block to prevent "Worker teardown timeout" errors.
+## 6. Common Pitfalls Checklist
+- [ ] Did you reload the page after changing `chrome.storage`?
+- [ ] Did you use `test.setTimeout(120_000)` for long tests?
+- [ ] Did you close the `context` in a `finally` block?
+- [ ] Are you using clipped screenshots (`screenshot({ clip: ... })`) to avoid viewport scrolling issues?

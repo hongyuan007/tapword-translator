@@ -14,7 +14,7 @@ This skill provides a standard procedure for downloading GitHub issues, includin
 
 ## Prerequisites
 - **GitHub CLI (`gh`)**: Must be installed and authenticated (`gh auth login`).
-- **cURL**: Used for downloading images.
+- **wget**: Used for downloading images.
 
 ## Step-by-Step Instructions
 
@@ -32,10 +32,10 @@ gh issue view <issue-number> --repo <owner>/<repo> --json number,title,body,crea
 
 ### 3. Parse and Download Attachments
 Analyze the `body` field (and `body` field within `comments` array) in `issue.json` to find image URLs. These are typically in Markdown (`![alt](url)`) or HTML (`<img src="url">`) format.
-Use `curl` to download each image locally.
+Use `wget` to download each image locally.
 ```bash
-# Use -L to follow redirects. Add -k if you encounter SSL errors.
-curl -L -k -o screenshot-1.png "<image-url>"
+# Use -O to specify the output filename.
+wget -O screenshot-1.png "<image-url>"
 ```
 
 ### 4. Generate Markdown Summary
@@ -54,7 +54,7 @@ Create a `README.md` file in the directory that reconstructs the issue content.
 1.  **Creates directory**: `mkdir -p "docs/plan/y2026/m02-issue-20-youtube-title-bug"`
 2.  **Fetches JSON**: `gh issue view 20 ... > issue.json`
 3.  **Reads JSON**: Parses `issue.json` to extract `body` and find image URLs.
-4.  **Downloads Images**: Runs `curl` for each image found.
+4.  **Downloads Images**: Runs `wget` for each image found.
 5.  **Writes Summary**: Creates `README.md` with the issue content and local image references.
 
 ## Best Practices
@@ -63,6 +63,6 @@ Create a `README.md` file in the directory that reconstructs the issue content.
 - **Privacy**: Be mindful of sensitive data in screenshots or logs within the issue.
 
 ## Troubleshooting
-- **SSL Errors**: If `curl` fails with SSL errors (e.g., `SSL_ERROR_SYSCALL`), verify you are using the `-k` (insecure) flag.
+- **Network/SSL Errors**: If `wget` fails, verify your network connection.
 - **Directory Access**: Use absolute paths (`/Users/.../docs/plan/...`) when creating directories or moving files to ensure reliability across terminal sessions.
 

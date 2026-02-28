@@ -8,6 +8,7 @@
 const LANGUAGE_NAMES: Record<string, string> = {
     en: "English",
     zh: "Chinese",
+    auto: "Auto-Detect",
     "zh-CN": "Chinese",
     "zh-TW": "Chinese",
     ja: "Japanese",
