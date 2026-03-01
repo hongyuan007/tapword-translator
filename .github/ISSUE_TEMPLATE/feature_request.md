@@ -3,7 +3,7 @@ name: Feature request 功能建议
 about: Suggest an idea for this project 提出新功能建议或改进想法
 title: "[FEATURE] "
 labels: enhancement
-assignees: ''
+assignees: []
 
 ---
 
