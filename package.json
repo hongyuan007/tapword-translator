@@ -1,6 +1,6 @@
 {
     "name": "tapword-translator",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "A smart AI-powered translation browser extension that provides context-aware translations",
     "type": "module",
     "scripts": {
@@ -27,6 +27,8 @@
         "type-check": "tsc --noEmit",
         "clean": "rm -rf dist",
         "test": "vitest --config config/vitest.config.ts",
+        "test:e2e": "playwright test -c config/playwright.config.ts",
+        "test:e2e:headed": "playwright test -c config/playwright.config.ts --headed",
         "format": "prettier --config config/.prettierrc.json --write \"src/**/*.ts\"",
         "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --config config/.eslintrc.json \"src/**/*.ts\""
     },
@@ -36,6 +38,7 @@
         "openai": "6.15.0"
     },
     "devDependencies": {
+        "@playwright/test": "1.51.0",
         "@types/chrome": "^0.0.268",
         "@types/crypto-js": "4.2.2",
         "@types/jsdom": "27.0.0",

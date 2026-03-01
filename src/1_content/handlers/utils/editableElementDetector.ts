@@ -134,7 +134,19 @@ function isTextContentException(element: HTMLElement): boolean {
     // 1. Must check cursor style. 'text' or 'auto' or 'default' usually implies non-clickable text.
     // 'pointer' implies it's meant to be clicked.
     const style = window.getComputedStyle(element)
-    return TEXT_CURSOR_ALLOWLIST.has(style.cursor)
+    
+    if (TEXT_CURSOR_ALLOWLIST.has(style.cursor)) {
+        return true
+    }
+
+    // Special compatibility for "iPad Cursor Simulator" script
+    // When the script is active, everything is cursor:none, so we must treat it as valid text
+    // to prevent disabling translation on all weak interactive elements.
+    if (style.cursor === "none" && document.querySelector(".__tapword_ipad_cursor_sim_v1")) {
+        return true
+    }
+
+    return false
 }
 interface InteractiveResult {
     isInteractive: boolean

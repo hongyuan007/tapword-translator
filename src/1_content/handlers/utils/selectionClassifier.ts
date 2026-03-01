@@ -6,9 +6,9 @@
  */
 
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
+import * as wordBoundaryModule from "@/1_content/handlers/utils/wordBoundary"
 
 // Keep boundary logic in sync with rangeAdjuster
-const WORD_BOUNDARY_REGEX = /[\s\p{P}\p{S}]/u
 const HYPHEN = "-"
 
 export interface SelectionClassification {
@@ -73,7 +73,7 @@ export function detectSelectionType(range: Range): SelectionClassification {
 
 function isWordBoundary(char: string): boolean {
     if (char === HYPHEN) return false
-    return WORD_BOUNDARY_REGEX.test(char)
+    return wordBoundaryModule.WORD_BOUNDARY_REGEX.test(char)
 }
 
 function getCharAt(node: Node, offset: number): string | null {

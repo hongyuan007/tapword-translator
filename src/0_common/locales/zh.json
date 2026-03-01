@@ -127,8 +127,7 @@
     "update.brand_version": "触词翻译 0.4.0 版本",
     "update.heading": "新增<span class=\"highlight\">单击翻译单词</span>，更快更便捷",
     "update.demo_placeholder": "(演示动图占位符) <br> 单击单词，即刻翻译",
-    "update.description": "新年好呀，我们新增了单击翻译功能，现在只需单击单词，翻译即刻呈现！",
-    "update.status_combined": "当前状态：✅ 单击翻译单词 (已开启)  🚫 双击翻译单词 (已关闭)",
+    "update.description": "新年好呀，我们新增了单击翻译功能，只需单击单词，翻译即刻呈现！",
     "update.btn_close": "我知道了",
     "contact.title": "找到我们：",
     "contact.xhs_group.text": "小红书群聊",
@@ -137,7 +136,5 @@
     "contact.twitter.alt": "Twitter",
     "contact.email.alt": "Gmail",
     "update.btn_restore_single": "切换回单击模式",
-    "update.toast_revert": "已恢复双击翻译",
-    "update.toast_single": "已开启单击翻译",
-    "update.status_double": "当前状态：⚠️ 双击翻译"
+    "update.toast_single": "已开启单击翻译"
 }

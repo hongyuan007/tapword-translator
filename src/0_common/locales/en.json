@@ -128,7 +128,6 @@
     "update.heading": "New: <span class=\"highlight\">Single-Click Translate</span>",
     "update.demo_placeholder": "(GIF Placeholder) <br> Single-click to translate",
     "update.description": "Happy New Year! We've added Single-Click Translate. Now simply click a word for an instant translation!",
-    "update.status_combined": "Current Status: ✅ Single-Click (On)  🚫 Double-Click (Off)",
     "update.btn_close": "Got it",
     "contact.title": "Find us on:",
     "contact.xhs_group.text": "Xiaohongshu Group",
@@ -137,7 +136,5 @@
     "contact.twitter.alt": "Twitter",
     "contact.email.alt": "Gmail",
     "update.btn_restore_single": "Switch to Single-Click",
-    "update.toast_revert": "Restored Double-Click Translate",
-    "update.toast_single": "Enabled Single-Click Translate",
-    "update.status_double": "Current Status: ⚠️ Double-Click Translate"
+    "update.toast_single": "Enabled Single-Click Translate"
 }

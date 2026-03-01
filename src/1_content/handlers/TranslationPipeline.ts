@@ -114,15 +114,25 @@ async function processTranslation(
     const sanitizedText = rawText.trim()
     logger.info(`[${triggerSource}] Translation requested for:`, sanitizedText)
 
-    // Get surrounding text from block ancestor for more accurate language detection
-    const textForDetection = domSanitizer.getSurroundingTextForDetection(range, 30)
+    // Get surrounding text from block ancestor for routing (CJK vs space-delimited) decisions only
+    const textForRouting = domSanitizer.getSurroundingTextForDetection(range, 30)
 
-    // Detect language to determine handling strategy
-    const detectedLang = await languageDetector.detectSourceLanguageAsync(textForDetection)
-    logger.info(`[${triggerSource}] Detected language:`, detectedLang)
+    // routingLang: determined from block context, used only to decide word-boundary strategy
+    const routingLang = await languageDetector.detectSourceLanguageAsync(textForRouting)
+    logger.info(`[${triggerSource}] Routing language (block context):`, routingLang)
+
+    // selectionLang: determined from the selected text itself, sent to the translation API.
+    // False positives and mixed-language string overrides are handled within detectSourceLanguageAsync.
+    const selectionLang = await languageDetector.detectSourceLanguageAsync(sanitizedText)
+    logger.info(`[${triggerSource}] Selection language (selected text):`, selectionLang)
+
+    // Check if the selection actually contains CJK characters.
+    // This is more reliable for classification structure routing (Word vs Fragment path).
+    const hasCJK = languageDetector.hasCJKCharacters(sanitizedText)
 
     // Check if the language is CJK (Chinese, Japanese, Korean) or similar non-space-delimited languages
-    const isCJKLanguage = ["zh", "ja", "ko"].includes(detectedLang)
+    // Use hasCJK check for selection to strictly prevent false positives
+    const isCJKLanguage = ["zh", "ja", "ko"].includes(routingLang) || hasCJK
 
     if (isCJKLanguage) {
         // For CJK languages: Trust user's selection, skip classification and expansion
@@ -131,7 +141,7 @@ async function processTranslation(
         const trimRes = rangeAdjuster.trimBoundaryWhitespace(range)
         const workingRange = trimRes.range
         const fragment = domSanitizer.getCleanTextFromRange(workingRange).trim()
-        await translateFragmentPath(workingRange, fragment, detectedLang, limiter, loadingVariant)
+        await translateFragmentPath(workingRange, fragment, selectionLang, limiter, loadingVariant)
     } else {
         // For space-delimited languages (English, etc.): Use existing classification and expansion logic
         logger.info(`[${triggerSource}] [Space-delimited Language] Using classification and boundary expansion`)
@@ -150,7 +160,7 @@ async function processTranslation(
                 workingRange = exp.range
             }
             const word = domSanitizer.getCleanTextFromRange(workingRange).trim()
-            await translateWordPath(workingRange, word, detectedLang, limiter, loadingVariant)
+            await translateWordPath(workingRange, word, selectionLang, limiter, loadingVariant)
         } else {
             // Fragment: if boundary whitespace was trimmed, skip expansion; else expand to word boundaries
             if (!cls.isComplete) {
@@ -158,7 +168,7 @@ async function processTranslation(
                 workingRange = exp.range
             }
             const fragment = domSanitizer.getCleanTextFromRange(workingRange).trim()
-            await translateFragmentPath(workingRange, fragment, detectedLang, limiter, loadingVariant)
+            await translateFragmentPath(workingRange, fragment, selectionLang, limiter, loadingVariant)
         }
     }
 }

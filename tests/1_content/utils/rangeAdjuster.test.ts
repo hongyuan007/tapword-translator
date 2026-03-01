@@ -6,7 +6,7 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { trimBoundaryWhitespace, expandToWordBoundaries, adjustSelectionRange, type TrimResult } from '@/1_content/utils/rangeAdjuster';
+import { trimBoundaryWhitespace, expandToWordBoundaries, adjustSelectionRange, type TrimResult } from '@/1_content/handlers/utils/rangeAdjuster';
 import { createRangeFromText, createTestDOM, cleanupDOM } from './test-helpers';
 
 /**

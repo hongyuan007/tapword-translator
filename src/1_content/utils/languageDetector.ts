@@ -22,6 +22,9 @@ export async function detectSourceLanguageAsync(text: string): Promise<string> {
     const fallback = "en"
     if (trimmed.length === 0) return fallback
 
+    let detectedLang = fallback
+    let isDetected = false
+
     try {
         if (typeof chrome !== "undefined" && chrome.i18n && typeof chrome.i18n.detectLanguage === "function") {
             logger.info("Using chrome.i18n.detectLanguage")
@@ -34,7 +37,8 @@ export async function detectSourceLanguageAsync(text: string): Promise<string> {
                     const norm = normalizeLangCode(top.language)
                     if (norm) {
                         logger.info(`Chrome detected language: ${norm}`)
-                        return norm
+                        detectedLang = norm
+                        isDetected = true
                     }
                 }
             }
@@ -43,22 +47,48 @@ export async function detectSourceLanguageAsync(text: string): Promise<string> {
         logger.error("chrome.i18n.detectLanguage failed, falling back to franc", error)
     }
 
-    try {
-        logger.info("Using franc for language detection")
-        const iso3 = franc(trimmed, { minLength: 3 })
-        if (iso3 && iso3 !== "und") {
-            const iso1 = iso3to1(iso3)
-            if (iso1) {
-                logger.info(`Franc detected language: ${iso1}`)
-                return iso1
+    if (!isDetected) {
+        try {
+            logger.info("Using franc for language detection")
+            const iso3 = franc(trimmed, { minLength: 3 })
+            if (iso3 && iso3 !== "und") {
+                const iso1 = iso3to1(iso3)
+                if (iso1) {
+                    logger.info(`Franc detected language: ${iso1}`)
+                    detectedLang = iso1
+                    isDetected = true
+                }
             }
+        } catch (error) {
+            logger.error("Franc detection failed", error)
         }
-    } catch (error) {
-        logger.error("Franc detection failed", error)
     }
 
-    logger.info(`Falling back to default language: ${fallback}`)
-    return fallback
+    if (!isDetected) {
+        logger.info(`Falling back to default language: ${fallback}`)
+    }
+
+    // Post-processing optimization specifically for our primary demographic: 
+    // Chinese users reading English (or other Latin-script) content.
+    if (["zh", "ja", "ko"].includes(detectedLang)) {
+        const hasCJK = hasCJKCharacters(trimmed)
+        const hasLatin = /[a-zA-Z]/.test(trimmed)
+
+        if (!hasCJK && hasLatin) {
+            // False positive: Detector claims CJK, but text only has Latin characters (no CJK).
+            // Example: short English words like "having", "influence" misidentified as "ko" or "zh".
+            logger.info(`Correcting false positive CJK detection (${detectedLang}) -> 'en'`)
+            detectedLang = "en"
+        } else if (hasCJK && hasLatin) {
+            // Mixed content: Text has both CJK and Latin characters (e.g. "you什么时候来", "CPU速度").
+            // We use "auto" so the Translation Pipeline doesn't trigger same-language fallbacks
+            // and lets the backend LLM handle the code-switching.
+            logger.info(`Treating mixed CJK/Latin text as 'auto' instead of ${detectedLang}`)
+            detectedLang = "auto"
+        }
+    }
+
+    return detectedLang
 }
 
 function normalizeLangCode(code: string): string | null {
@@ -168,6 +198,13 @@ export function resolveTargetLanguage(sourceLanguage: string, targetLanguage: st
     const srcLang = (sourceLanguage || "").toLowerCase()
     const tgtLang = (targetLanguage || "").toLowerCase()
 
+    // If source is "auto" (code-switching text), skip fallback and trust user's target language.
+    // Let the backend LLM decide how to handle mixed-language input.
+    if (srcLang === "auto") {
+        logger.info(`Source language is "auto", skipping fallback, using target: ${targetLanguage}`)
+        return targetLanguage
+    }
+
     // If source and target are the same, apply fallback rules
     if (srcLang === tgtLang) {
         logger.info(`Source language (${srcLang}) matches target language (${tgtLang}), applying fallback`)
@@ -189,4 +226,23 @@ export function resolveTargetLanguage(sourceLanguage: string, targetLanguage: st
 
     // No conflict, use original target language
     return targetLanguage
+}
+
+/**
+ * Checks if the text contains any CJK (Chinese, Japanese, Korean) characters.
+ * Used to robustly determine if the CJK fragmentation path should be used,
+ * avoiding false positives from language detectors on short non-CJK words.
+ *
+ * @param text - The text to check
+ * @returns True if CJK characters are found
+ */
+export function hasCJKCharacters(text: string): boolean {
+    // Range includes:
+    // \u4e00-\u9fff: CJK Unified Ideographs (Common Chinese)
+    // \u3400-\u4dbf: CJK Unified Ideographs Extension A
+    // \u3040-\u30ff: Hiragana and Katakana (Japanese)
+    // \uac00-\ud7af: Hangul Syllables (Korean)
+    // \u3130-\u318f: Hangul Compatibility Jamo
+    const cjkRegex = /[\u4e00-\u9fff\u3400-\u4dbf\u3040-\u30ff\uac00-\ud7af\u3130-\u318f]/
+    return cjkRegex.test(text)
 }

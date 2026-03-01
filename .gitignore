@@ -71,3 +71,11 @@ other/
 #other
 GEMINI.md
 CLAUDE.md
+# Playwright
+playwright-report/
+test-results/
+tests/e2e/test-results/
+tests/e2e/screenshots/
+
+# Agent related files
+.agents/

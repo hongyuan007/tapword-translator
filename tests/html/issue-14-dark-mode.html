@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue 14: Dark Mode Test (Nuxt Green)</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000; 
+        }
+        
+        .theme-container {
+            background-color: #020420; /* Nuxt Dark Bg */
+            color: #00DC82; /* Nuxt Green - Brightness ~144 */
+            min-height: 100vh;
+            padding: 50px;
+            line-height: 1.6;
+        }
+        
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-container">
+        <div class="content">
+            <h1>Dark Mode Translation Test (Nuxt Green)</h1>
+            <p id="test-paragraph">
+                This text is Nuxt Green (#00DC82).
+                On dark background (#020420), it is legible.
+                But brightness is approx 144.
+                If threshold is 150, tooltip will be Black.
+                Black on #020420 is invisible.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

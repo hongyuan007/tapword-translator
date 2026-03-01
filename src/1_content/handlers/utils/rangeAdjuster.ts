@@ -7,8 +7,8 @@
 
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
 import * as selectionClassifier from "@/1_content/handlers/utils/selectionClassifier"
+import * as wordBoundaryModule from "@/1_content/handlers/utils/wordBoundary"
 
-const WORD_BOUNDARY_REGEX = /[\s\p{P}\p{S}]/u
 const NBSP = "\u00A0"
 const HYPHEN = "-"
 const MAX_BOUNDARY_SCAN_LENGTH = 50
@@ -283,7 +283,7 @@ export function adjustSelectionRange(range: Range): { range: Range; adjusted: bo
 
 function isWordBoundary(char: string): boolean {
     if (char === HYPHEN) return false
-    return WORD_BOUNDARY_REGEX.test(char)
+    return wordBoundaryModule.WORD_BOUNDARY_REGEX.test(char)
 }
 
 function isWhitespaceChar(char: string): boolean {
