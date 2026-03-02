@@ -28,6 +28,7 @@ vite.config.*.timestamp-*
 .env.development
 .env.production
 .env.firefox
+.env.firefox-development
 !.env.community
 
 # API keys and secrets (should never be committed)

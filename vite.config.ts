@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig(({ mode }) => {
-	const isFirefox = mode === 'firefox';
+	const isFirefox = mode.includes('firefox');
 	const browserTarget = isFirefox ? 'firefox-desktop' : 'chromium';
 	const manifestFile = isFirefox ? 'src/manifest-firefox.json' : 'src/manifest.json';
 
@@ -65,13 +65,24 @@ export default defineConfig(({ mode }) => {
 							service_worker: 'src/2_background/index.ts',
 							type: 'module',
 						};
+					} else {
+						// Firefox MV3: use scripts[] instead of service_worker.
+						// service_worker requires a hidden flag in stable Firefox;
+						// scripts[] is the officially supported event-driven background for Firefox MV3.
+						manifest.background = {
+							scripts: ['src/2_background/index.ts'],
+						};
 					}
 
 					return manifest;
 				},
 				watchFilePaths: ['src/manifest.json', 'src/manifest-firefox.json'],
 				printSummary: true,
-				additionalInputs: ['src/9_offscreen/offscreen.html', 'src/10_welcome/update_v0_4_0.html'],
+				// offscreen API is Chrome-only; Firefox MV3 does not support it
+				additionalInputs: [
+					...(isFirefox ? [] : ['src/9_offscreen/offscreen.html']),
+					'src/10_welcome/update_v0_4_0.html',
+				],
 				webExtConfig: {
 					target: browserTarget,
 					startUrl: ['https://en.wikipedia.org/wiki/A_Game_of_Thrones'],
@@ -86,6 +97,9 @@ export default defineConfig(({ mode }) => {
 				],
 			}),
 		],
+		define: {
+			__IS_FIREFOX__: isFirefox,
+		},
 		build: {
 			outDir: 'dist',
 			emptyOutDir: true,

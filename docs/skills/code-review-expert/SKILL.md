@@ -1,9 +1,9 @@
 ---
-name: chrome-extension-review-expert
-description: "Expert code review for Chrome Extensions (Manifest V3). Detects MV3 violations, security risks, performance issues, and architectural anti-patterns."
+name: code-review-expert
+description: Guide for expert code review of Chrome Extensions (Manifest V3). Detects MV3 violations, security risks, performance issues, and architectural anti-patterns.
 ---
 
-# Chrome Extension Review Expert
+# Code Review Expert
 
 ## Overview
 

@@ -7,6 +7,9 @@
 // Vite Environment Variables
 /// <reference types="vite/client" />
 
+// Build-time constants injected by vite.config.ts
+declare const __IS_FIREFOX__: boolean
+
 interface ImportMetaEnv {
     readonly VITE_API_BASE_URL: string
     // Add more env variables here as needed
