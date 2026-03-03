@@ -506,18 +506,19 @@
             </div>
           </div>
 
-          <div style="margin-bottom: 12px; padding-left: 2px;">
+          <div id="providerTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
             <h3 class="card-title" data-i18n-key="popup.section.customApi" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Translation Provider</h3>
             <p class="section-subtitle" data-i18n-key="popup.section.translationProvider.helper" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Select which translation service to use.</p>
           </div>
-          <div class="card settings-card">
+
+          <div class="card settings-card" id="providerSelectionCard">
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="translationProvider" data-i18n-key="popup.translationProvider.label">Translation Provider</label>
+                <label class="setting-label" for="customApiProvider" data-i18n-key="popup.translationProvider.label">Translation Provider</label>
                 <p class="setting-helper" data-i18n-key="popup.translationProvider.helper">Choose between official cloud API, custom LLM API, or self-hosted MTranServer.</p>
               </div>
               <div class="setting-control">
-                <select id="translationProvider" data-setting="translationProvider" class="select-input">
+                <select id="customApiProvider" data-setting="translationProvider" class="select-input">
                   <option value="official" data-i18n-key="popup.translationProvider.official">Official Cloud API</option>
                   <option value="customApi" data-i18n-key="popup.translationProvider.customApi">Custom LLM API</option>
                   <option value="mtranserver" data-i18n-key="popup.translationProvider.mtranserver">MTranServer (Self-hosted)</option>
@@ -526,9 +527,9 @@
             </div>
           </div>
 
-          <div style="margin-top: 20px; margin-bottom: 12px; padding-left: 2px;">
-            <h3 class="card-title" data-i18n-key="popup.section.customApi" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Custom LLM API</h3>
-            <p class="section-subtitle" data-i18n-key="popup.section.customApi.helper" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Use your own LLM API provider for translations.</p>
+          <div id="customApiTitleSection" style="margin-top: 20px; margin-bottom: 12px; padding-left: 2px;">
+            <h3 class="card-title" data-i18n-key="popup.customApi.title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Custom LLM API</h3>
+            <p class="section-subtitle" data-i18n-key="popup.customApi.description" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Use your own LLM API provider for translations.</p>
           </div>
           <div class="card settings-card" id="customApiCard">
             <div class="setting-item">
@@ -573,7 +574,7 @@
             </div>
           </div>
 
-          <div style="margin-top: 20px; margin-bottom: 12px; padding-left: 2px;">
+          <div id="mtranserverTitleSection" style="margin-top: 20px; margin-bottom: 12px; padding-left: 2px;">
             <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">MTranServer</h3>
             <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
               <span data-i18n-key="popup.mtranserver.description">A lightweight, self-hosted translation service with low resource consumption.</span>

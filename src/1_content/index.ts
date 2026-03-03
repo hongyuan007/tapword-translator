@@ -18,6 +18,7 @@ import * as inputListener from "@/1_content/handlers/InputListener"
 import "@/1_content/resources/content.css"
 import "@/1_content/resources/modal.css"
 import * as iconManager from "@/1_content/ui/iconManager"
+import * as spaNavigationHandler from "@/1_content/handlers/SpaNavigationHandler"
 
 const logger = loggerModule.createLogger("content-script")
 
@@ -92,6 +93,9 @@ async function init(): Promise<void> {
 
     // Listen for scroll to hide icon
     document.addEventListener("scroll", iconManager.removeTranslationIcon, { passive: true })
+
+    // Cleanup translation UI when SPA navigation changes core URL (ignores hash-only jumps)
+    spaNavigationHandler.setup()
 
     logger.info("AI Click Translator - Event listeners registered")
 }

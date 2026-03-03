@@ -110,6 +110,12 @@ function normalizeUserSettings(
     if (legacyUseCustomApi === true) {
         normalizedTranslationProvider = "customApi"
     }
+    
+    // Community edition: Default to customApi since official cloud API is not available
+    if (isCommunityEdition && settings.translationProvider === undefined) {
+        normalizedTranslationProvider = "customApi"
+    }
+    
     // Note: We don't auto-switch to mtranserver based on URL configuration
     // User must explicitly select mtranserver from the provider dropdown
 

@@ -10,6 +10,8 @@ import type { MTranserverSettings } from "@/0_common/types"
 
 const logger = createLogger("MTranServerService")
 
+const MTRANSERVER_TIMEOUT = 10000 // 10 seconds timeout
+
 /**
  * MTranServer language code mapping
  * Maps extension language codes to MTranServer language codes
@@ -143,6 +145,9 @@ export async function testMTranServerConnection(settings: MTranserverSettings): 
 
     const endpoint = `${url.replace(/\/$/, "")}/translate`
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), MTRANSERVER_TIMEOUT)
+
     try {
         const response = await fetch(endpoint, {
             method: "POST",
@@ -155,6 +160,7 @@ export async function testMTranServerConnection(settings: MTranserverSettings): 
                 to: "zh-Hans",
                 text: "hello",
             } as MTranTranslateRequest),
+            signal: controller.signal,
         })
 
         if (!response.ok) {
@@ -174,22 +180,26 @@ export async function testMTranServerConnection(settings: MTranserverSettings): 
         if (error instanceof MTranServerError) {
             throw error
         }
+        if (error instanceof Error && error.name === "AbortError") {
+            logger.error("MTranServer connection test timeout")
+            throw new MTranServerError(`Failed to connect to MTranServer: Connection timeout after ${MTRANSERVER_TIMEOUT / 1000}s`)
+        }
         logger.error("MTranServer connection test failed:", error)
         throw new MTranServerError(`Failed to connect to MTranServer: ${error instanceof Error ? error.message : String(error)}`)
+    } finally {
+        clearTimeout(timeoutId)
     }
 }
 
 /**
  * Translate text using MTranServer
  * @param text Text to translate
- * @param sourceLanguage Source language code (will use 'auto' regardless)
  * @param targetLanguage Target language code
  * @param settings MTranServer settings
  * @returns Translated text
  */
 export async function translateWithMTranServer(
     text: string,
-    sourceLanguage: string | undefined,
     targetLanguage: string,
     settings: MTranserverSettings
 ): Promise<string> {
@@ -211,6 +221,9 @@ export async function translateWithMTranServer(
 
     logger.info("Sending MTranServer translation request:", requestBody)
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), MTRANSERVER_TIMEOUT)
+
     try {
         const response = await fetch(endpoint, {
             method: "POST",
@@ -219,6 +232,7 @@ export async function translateWithMTranServer(
                 ...(key && key.trim() ? { Authorization: `Bearer ${key.trim()}` } : {}),
             },
             body: JSON.stringify(requestBody),
+            signal: controller.signal,
         })
 
         if (!response.ok) {
@@ -238,7 +252,13 @@ export async function translateWithMTranServer(
         if (error instanceof MTranServerError) {
             throw error
         }
+        if (error instanceof Error && error.name === "AbortError") {
+            logger.error("MTranServer translation timeout")
+            throw new MTranServerError(`Failed to translate: Connection timeout after ${MTRANSERVER_TIMEOUT / 1000}s`)
+        }
         logger.error("MTranServer translation error:", error)
         throw new MTranServerError(`Failed to translate: ${error instanceof Error ? error.message : String(error)}`)
+    } finally {
+        clearTimeout(timeoutId)
     }
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-theme-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tooltip Color Scenarios</title>
+    <style>
+        :root {
+            color-scheme: dark;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: Arial, sans-serif;
+        }
+
+        .page {
+            display: grid;
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .scenario {
+            border-radius: 8px;
+            padding: 16px;
+            line-height: 1.6;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        #scenario-light-on-light {
+            background-color: #ffffff;
+            color: #111111;
+        }
+
+        #scenario-light-text-on-dark {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        #scenario-dark-root-light-card {
+            background-color: #020420;
+            color: #cbd5e1;
+        }
+
+        #scenario-dark-root-light-card .light-card {
+            background-color: #ffffff;
+            color: #111111;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        #scenario-transparent-dark-fallback {
+            background: transparent;
+            color: #cbd5e1;
+        }
+
+        p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section id="scenario-light-on-light" class="scenario">
+            <p id="case-light-on-light">Select this sentence for light background case verification.</p>
+        </section>
+
+        <section id="scenario-light-text-on-dark" class="scenario">
+            <p id="case-light-text-on-dark">Select this sentence for dark background case verification.</p>
+        </section>
+
+        <section id="scenario-dark-root-light-card" class="scenario">
+            <div class="light-card">
+                <p id="case-dark-root-light-card">Select this sentence for dark-root with light-card case verification.</p>
+            </div>
+        </section>
+
+        <section id="scenario-transparent-dark-fallback" class="scenario">
+            <p id="case-transparent-dark-fallback">Select this sentence for transparent background fallback verification.</p>
+        </section>
+    </main>
+</body>
+</html>

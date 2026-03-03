@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Range.getClientRects() Precision Test</title>
+<style>
+body { font-family: -apple-system, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+h2 { margin-top: 40px; }
+.test-container { border: 1px solid #ccc; padding: 16px; margin: 10px 0; font-size: 18px; line-height: 1.8; }
+.narrow { width: 300px; }
+.wide { width: 600px; resize: horizontal; overflow: auto; }
+.overlay-rect { position: absolute; background: rgba(255, 0, 0, 0.15); border: 1px solid red; pointer-events: none; z-index: 999; }
+.tooltip-mock { position: absolute; background: rgba(0,0,0,0.75); color: white; font-size: 12px; padding: 2px 6px; border-radius: 3px; pointer-events: none; z-index: 1000; white-space: nowrap; border-top: 2px solid #4F46E5; }
+button { margin: 10px 5px; padding: 8px 16px; cursor: pointer; }
+#log { background: #f5f5f5; padding: 12px; font-family: monospace; font-size: 13px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Range.getClientRects() Precision Test</h1>
+<p>This page tests whether <code>Range.getClientRects()</code> can precisely locate a sub-string within a text node inside a div.</p>
+
+<!-- Test 1: Single line, partial text -->
+<h2>Test 1: Partial text in single line</h2>
+<div class="test-container wide" id="test1">
+The quick brown fox jumps over the lazy dog.
+</div>
+
+<!-- Test 2: Multi-line wrapping (narrow container) -->
+<h2>Test 2: Text wrapping across lines (narrow container)</h2>
+<div class="test-container narrow" id="test2">
+The quick brown fox jumps over the lazy dog. This is a longer sentence that will definitely wrap across multiple lines in this narrow container.
+</div>
+
+<!-- Test 3: Resizable container -->
+<h2>Test 3: Resizable container (drag bottom-right corner)</h2>
+<div class="test-container wide" id="test3" style="resize: both; overflow: auto;">
+Artificial Intelligence is transforming the way we work and live. From language models to computer vision, the rapid progress continues to surprise researchers and the general public alike.
+</div>
+
+<!-- Test 4: Nested elements (like a real webpage) -->
+<h2>Test 4: Text within nested elements (simulating a tweet)</h2>
+<div class="test-container" id="test4">
+<div style="display: flex; gap: 12px;">
+<div style="width: 40px; height: 40px; background: #1DA1F2; border-radius: 50%; flex-shrink: 0;"></div>
+<div>
+<div style="font-weight: bold;">@elonmusk</div>
+<div id="test4-text">Alright interns, the time has come. We need to ship this feature by Friday. No excuses. The future depends on it. Let's make it happen.</div>
+</div>
+</div>
+</div>
+
+<!-- Spacer to enable scrolling test -->
+<div style="height: 100px;"></div>
+
+<div style="position: sticky; bottom: 0; background: white; padding: 10px; border-top: 2px solid #333;">
+<button onclick="runTest(1, 'brown fox jumps')">Test 1: "brown fox jumps"</button>
+<button onclick="runTest(2, 'jumps over the lazy dog')">Test 2: "jumps over the lazy"</button>
+<button onclick="runTest(3, 'language models to computer vision')">Test 3: "language models..."</button>
+<button onclick="runTest(4, 'ship this feature by Friday', 'test4-text')">Test 4: "ship this feature..."</button>
+<button onclick="clearOverlays()">Clear All</button>
+<button onclick="repositionAll()">Reposition (after resize)</button>
+</div>
+
+<div id="log"></div>
+
+<script>
+const activeRanges = []; // Store ranges for repositioning test
+
+function log(msg) {
+    document.getElementById('log').textContent += msg + '\n';
+}
+
+function clearOverlays() {
+    document.querySelectorAll('.overlay-rect, .tooltip-mock').forEach(el => el.remove());
+    activeRanges.length = 0;
+    document.getElementById('log').textContent = '';
+}
+
+function findTextRange(container, searchText) {
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    let node;
+    while (node = walker.nextNode()) {
+        const text = node.textContent || '';
+        const idx = text.indexOf(searchText);
+        if (idx !== -1) {
+            const range = document.createRange();
+            range.setStart(node, idx);
+            range.setEnd(node, idx + searchText.length);
+            return range;
+        }
+    }
+    return null;
+}
+
+function drawRectsForRange(range, label) {
+    const rects = range.getClientRects();
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+
+    log(`--- ${label} ---`);
+    log(`Number of rects: ${rects.length}`);
+    
+    for (let i = 0; i < rects.length; i++) {
+        const r = rects[i];
+        log(`  Rect ${i}: top=${r.top.toFixed(1)} left=${r.left.toFixed(1)} width=${r.width.toFixed(1)} height=${r.height.toFixed(1)}`);
+
+        // Draw red overlay on the text
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay-rect';
+        overlay.style.top = (r.top + scrollY) + 'px';
+        overlay.style.left = (r.left + scrollX) + 'px';
+        overlay.style.width = r.width + 'px';
+        overlay.style.height = r.height + 'px';
+        document.body.appendChild(overlay);
+
+        // Draw mock tooltip below each rect line
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip-mock';
+        tooltip.textContent = `翻译文本 (line ${i})`;
+        tooltip.style.top = (r.bottom + scrollY + 2) + 'px';
+        // Center the tooltip under the rect
+        document.body.appendChild(tooltip);
+        const tooltipWidth = tooltip.offsetWidth;
+        const idealLeft = r.left + scrollX + (r.width - tooltipWidth) / 2;
+        tooltip.style.left = Math.max(8, idealLeft) + 'px';
+    }
+    
+    // Also test getBoundingClientRect for comparison
+    const bounding = range.getBoundingClientRect();
+    log(`  BoundingRect: top=${bounding.top.toFixed(1)} left=${bounding.left.toFixed(1)} width=${bounding.width.toFixed(1)} height=${bounding.height.toFixed(1)}`);
+    log('');
+}
+
+function runTest(testNum, searchText, containerId) {
+    clearOverlays();
+    const container = document.getElementById(containerId || `test${testNum}`);
+    const range = findTextRange(container, searchText);
+    
+    if (!range) {
+        log(`ERROR: Could not find "${searchText}" in test${testNum}`);
+        return;
+    }
+
+    drawRectsForRange(range, `Test ${testNum}: "${searchText}"`);
+    activeRanges.push({ range, label: `Test ${testNum}` });
+
+    log(`✅ Range stored. Try resizing the window or the container, then click "Reposition" to verify dynamic behavior.`);
+}
+
+function repositionAll() {
+    // Remove old overlays
+    document.querySelectorAll('.overlay-rect, .tooltip-mock').forEach(el => el.remove());
+    document.getElementById('log').textContent = '';
+
+    for (const { range, label } of activeRanges) {
+        // Check if range is still valid
+        if (!range.startContainer.isConnected) {
+            log(`⚠️ ${label}: Range is DETACHED (startContainer removed from DOM)`);
+            continue;
+        }
+        log(`🔄 Repositioning ${label}...`);
+        drawRectsForRange(range, `${label} (repositioned)`);
+    }
+}
+
+// Auto-reposition on scroll
+window.addEventListener('scroll', () => {
+    if (activeRanges.length > 0) {
+        // Just log, don't auto-reposition (would be too noisy)
+        // In real impl, this would use requestAnimationFrame
+    }
+});
+
+// Auto-reposition on resize
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (activeRanges.length > 0) {
+            repositionAll();
+        }
+    }, 200);
+});
+
+log('Click a test button to see Range.getClientRects() in action.');
+log('After running a test, try resizing the window and click "Reposition".');
+</script>
+
+</body>
+</html>

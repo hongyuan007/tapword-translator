@@ -32,7 +32,7 @@ function updateSuppressNativeLanguageLabel(targetLanguage: string): void {
 }
 
 function setTranslationControlsEnabled(enabled: boolean): void {
-    const dependentIds = ["showIcon", "singleClickTranslate", "doubleClickTranslateV2", "doubleClickSentenceTranslate", "doubleClickSentenceTriggerKey"]
+    const dependentIds = ["showIcon", "singleClickTranslate", "doubleClickSentenceTranslate", "doubleClickSentenceTriggerKey"]
 
     dependentIds.forEach((id) => {
         const input = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null
@@ -53,14 +53,16 @@ function setTranslationControlsEnabled(enabled: boolean): void {
 async function restoreDependentTogglesIfAllOff(): Promise<void> {
     const showIconInput = document.getElementById("showIcon") as HTMLInputElement | null
     const singleClickInput = document.getElementById("singleClickTranslate") as HTMLInputElement | null
-    const doubleClickInput = document.getElementById("doubleClickTranslateV2") as HTMLInputElement | null
     const sentenceTranslateInput = document.getElementById("doubleClickSentenceTranslate") as HTMLInputElement | null
 
-    if (!showIconInput || !singleClickInput || !doubleClickInput || !sentenceTranslateInput) {
+    if (!showIconInput || !singleClickInput || !sentenceTranslateInput) {
         return
     }
 
-    const allDisabled = !showIconInput.checked && !singleClickInput.checked && !doubleClickInput.checked && !sentenceTranslateInput.checked
+    const currentSettings = await storageManagerModule.getUserSettings()
+    const isDoubleClickEnabled = currentSettings.doubleClickTranslateV2
+
+    const allDisabled = !showIconInput.checked && !singleClickInput.checked && !sentenceTranslateInput.checked && !isDoubleClickEnabled
     if (!allDisabled) {
         return
     }
@@ -205,19 +207,9 @@ export function setupSettingChangeListeners(): void {
             const input = event.target as HTMLInputElement
             const settingKey = input.dataset.setting as keyof types.UserSettings
             if (settingKey) {
-                // Implement mutual exclusion between single-click and double-click (V2)
+                // Keep mutual exclusion in data model even after removing double-click toggle from popup
                 if (settingKey === "singleClickTranslate" && input.checked) {
-                    const doubleClickInput = document.getElementById("doubleClickTranslateV2") as HTMLInputElement
-                    if (doubleClickInput && doubleClickInput.checked) {
-                        doubleClickInput.checked = false
-                        await saveSetting("doubleClickTranslateV2", false)
-                    }
-                } else if (settingKey === "doubleClickTranslateV2" && input.checked) {
-                    const singleClickInput = document.getElementById("singleClickTranslate") as HTMLInputElement
-                    if (singleClickInput && singleClickInput.checked) {
-                        singleClickInput.checked = false
-                        await saveSetting("singleClickTranslate", false)
-                    }
+                    await saveSetting("doubleClickTranslateV2", false)
                 }
 
                 await saveSetting(settingKey, input.checked)

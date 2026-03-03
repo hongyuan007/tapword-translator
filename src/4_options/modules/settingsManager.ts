@@ -17,7 +17,6 @@ import type { LLMConfig } from "@/8_generate"
 import { testMTranServerConnection } from "@/6_translate/services/MTranServerService"
 
 const logger = loggerModule.createLogger("Options/Settings")
-const CUSTOM_API_CONTROL_SELECTOR = '[data-custom-api-control="true"]'
 const isCommunityEdition = APP_EDITION === "community"
 const AUTO_PLAY_AUDIO_SETTING_ID = "autoPlayAudio"
 const FEATURE_DOT_OFF_CLASS = "feature-dot-off"
@@ -231,7 +230,7 @@ export async function loadSettings(): Promise<void> {
         }
 
         // Load translation provider selection
-        setValue("translationProvider", settings.translationProvider)
+        setValue("customApiProvider", settings.translationProvider)
 
         // Load Custom API settings
         setValue("customApiBaseUrl", customApi.baseUrl)
@@ -629,16 +628,37 @@ export function setupCustomApiValidation(): void {
  * Update UI based on selected translation provider
  */
 function updateProviderDependentUI(provider: types.TranslationProvider): void {
+    const providerTitleSection = document.getElementById("providerTitleSection")
+    const providerSelectionCard = document.getElementById("providerSelectionCard")
+    const customApiTitleSection = document.getElementById("customApiTitleSection")
     const customApiCard = document.getElementById("customApiCard")
+    const mtranserverTitleSection = document.getElementById("mtranserverTitleSection")
     const mtranserverCard = document.getElementById("mtranserverCard")
 
-    // Show/hide cards based on provider selection
-    if (customApiCard) {
-        customApiCard.style.display = provider === "customApi" ? "block" : "none"
+    // Provider selection is always visible
+    if (providerTitleSection) {
+        providerTitleSection.style.display = "block"
+    }
+    if (providerSelectionCard) {
+        providerSelectionCard.style.display = "block"
     }
 
+    // Show/hide Custom API section
+    const showCustomApi = provider === "customApi"
+    if (customApiTitleSection) {
+        customApiTitleSection.style.display = showCustomApi ? "block" : "none"
+    }
+    if (customApiCard) {
+        customApiCard.style.display = showCustomApi ? "block" : "none"
+    }
+
+    // Show/hide MTranServer section
+    const showMtranserver = provider === "mtranserver"
+    if (mtranserverTitleSection) {
+        mtranserverTitleSection.style.display = showMtranserver ? "block" : "none"
+    }
     if (mtranserverCard) {
-        mtranserverCard.style.display = provider === "mtranserver" ? "block" : "none"
+        mtranserverCard.style.display = showMtranserver ? "block" : "none"
     }
 }
 

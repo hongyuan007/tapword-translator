@@ -261,12 +261,11 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
             }
 
             logger.info("Translating word using MTranServer")
-            const { word, leadingText, trailingText, sourceLanguage, targetLanguage = "zh", contextInfo } = params
+            const { word, leadingText, trailingText, targetLanguage = "zh" } = params
 
             // Translate the word itself
             const wordTranslation = await translateWithMTranServer(
                 word,
-                sourceLanguage,
                 targetLanguage,
                 mtranserverSettings
             )
@@ -277,7 +276,6 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
                 const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
                 sentenceTranslation = await translateWithMTranServer(
                     fullSentence,
-                    sourceLanguage,
                     targetLanguage,
                     mtranserverSettings
                 )
@@ -380,12 +378,11 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
             }
 
             logger.info("Translating fragment using MTranServer")
-            const { fragment, leadingText, trailingText, sourceLanguage, targetLanguage = "zh" } = params
+            const { fragment, leadingText, trailingText, targetLanguage = "zh" } = params
 
             // Translate the selected fragment
             const translation = await translateWithMTranServer(
                 fragment,
-                sourceLanguage,
                 targetLanguage,
                 mtranserverSettings
             )
@@ -396,7 +393,6 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
                 const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
                 sentenceTranslation = await translateWithMTranServer(
                     fullSentence,
-                    sourceLanguage,
                     targetLanguage,
                     mtranserverSettings
                 )

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Issue 24 - 中英混合页面翻译测试</title>
+    <style>
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 18px;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+            background: #fff;
+            color: #333;
+        }
+        h1 { font-size: 24px; margin-bottom: 24px; }
+        p { margin-bottom: 16px; }
+        /* Wrap the target English word in a span for easy Playwright selection */
+        #target-word {
+            background: #fffbe6;
+            border-bottom: 2px dashed #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>软件工程中的性能优化</h1>
+
+    <!--
+        This paragraph is intentionally Chinese-heavy so that
+        getSurroundingTextForDetection returns Chinese text to the language
+        detector. The embedded English word "performance" is the target
+        we want to translate INTO Chinese.
+    -->
+    <p id="mixed-paragraph">
+        在现代软件系统的设计与实现过程中，系统的可扩展性和稳定性是工程师们首要关注的问题。
+        随着用户规模的不断扩大，如何在高并发场景下保证系统的
+        <span id="target-word">performance</span>
+        成为了架构设计中的核心挑战。工程团队需要通过多维度的测量与分析，
+        才能制定出切实可行的优化方案，从而满足日益增长的业务需求。
+        据统计，超过60%的系统瓶颈都与数据库查询效率密切相关，因此优化数据访问层
+        往往是提升整体响应速度最直接有效的手段之一。
+    </p>
+
+    <p>
+        此外，前端渲染的效率同样不可忽视。现代单页应用（SPA）在交互体验上带来了质的飞跃，
+        但随之而来的是 JavaScript 包体积和首屏加载时间的增加。
+        如何在功能丰富性与加载速度之间找到平衡点，是每一位前端工程师都必须面对的课题。
+        通过合理的代码分割、懒加载策略以及服务端渲染（SSR），
+        可以显著改善用户的首屏体验，降低跳出率，进而提升整体转化率。
+    </p>
+
+    <p>
+        总而言之，高质量的软件产品离不开对性能的持续关注与投入。
+        从架构设计阶段的合理规划，到运行时的实时监控与告警，
+        再到事后的复盘与迭代优化，每一个环节都至关重要。
+        只有将性能意识贯穿于整个软件开发生命周期之中，
+        才能打造出真正经得起考验的系统。
+    </p>
+</body>
+</html>

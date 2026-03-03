@@ -118,3 +118,10 @@ The project uses a custom utility at `src/0_common/utils/i18n.ts` for in-app UI 
 ### Architecture Principles
 - **Infrastructure Purity**: Infrastructure code MUST be agnostic of business logic and environment state.
 - **Inject, Don't Fetch**: Pass configuration via arguments (Dependency Injection). NEVER import business logic or state managers into infrastructure layers.
+
+## Automated E2E Testing (Playwright)
+
+Use Playwright to verify extension functionality in a real browser environment. 
+
+**For detailed instructions on running, writing, and debugging E2E tests, AI agents MUST refer to the dedicated skill document:**
+`docs/skills/e2e-testing/SKILL.md`
