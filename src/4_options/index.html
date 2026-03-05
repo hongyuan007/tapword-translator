@@ -522,6 +522,7 @@
                   <option value="official" data-i18n-key="popup.translationProvider.official">Official Cloud API</option>
                   <option value="customApi" data-i18n-key="popup.translationProvider.customApi">Custom LLM API</option>
                   <option value="mtranserver" data-i18n-key="popup.translationProvider.mtranserver">MTranServer (Self-hosted)</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate (Free)</option>
                 </select>
               </div>
             </div>
@@ -610,6 +611,26 @@
               <div class="setting-control validation-control">
                 <button class="secondary-button" id="testMtranserverButton" data-i18n-key="popup.mtranserver.test.button">Test Translation</button>
                 <p class="validation-status" id="testMtranserverStatus"></p>
+              </div>
+            </div>
+          </div>
+
+          <div id="bingTranslateTitleSection" style="margin-top: 20px; margin-bottom: 12px; padding-left: 2px;">
+            <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Bing Translate</h3>
+            <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
+              <span data-i18n-key="popup.bingTranslate.description">Free translation service powered by Bing Translator. No API key required.</span>
+              <a href="https://github.com/plainheart/bing-translate-api" target="_blank" rel="noopener noreferrer" class="link" data-i18n-key="popup.bingTranslate.learnMore">Learn more →</a>
+            </p>
+          </div>
+          <div class="card settings-card" id="bingTranslateCard">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="popup.bingTranslate.note.label">Note</label>
+                <p class="setting-helper" data-i18n-key="popup.bingTranslate.note.helper">Bing Translate is free and requires no configuration. Simply select it from the provider dropdown above.</p>
+              </div>
+              <div class="setting-control">
+                <button class="secondary-button" id="testBingTranslateButton" data-i18n-key="popup.bingTranslate.test.button">Test Translation</button>
+                <p class="validation-status" id="testBingTranslateStatus"></p>
               </div>
             </div>
           </div>

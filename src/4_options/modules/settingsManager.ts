@@ -15,6 +15,7 @@ import { getPlatformOS, PLATFORMS } from "@/0_common/utils/platformDetector"
 import { translateWord as translateWordWithLLM } from "@/8_generate"
 import type { LLMConfig } from "@/8_generate"
 import { testMTranServerConnection } from "@/6_translate/services/MTranServerService"
+import { testBingTranslateConnection } from "@/6_translate/services/BingTranslateService"
 
 const logger = loggerModule.createLogger("Options/Settings")
 const isCommunityEdition = APP_EDITION === "community"
@@ -634,6 +635,8 @@ function updateProviderDependentUI(provider: types.TranslationProvider): void {
     const customApiCard = document.getElementById("customApiCard")
     const mtranserverTitleSection = document.getElementById("mtranserverTitleSection")
     const mtranserverCard = document.getElementById("mtranserverCard")
+    const bingTranslateTitleSection = document.getElementById("bingTranslateTitleSection")
+    const bingTranslateCard = document.getElementById("bingTranslateCard")
 
     // Provider selection is always visible
     if (providerTitleSection) {
@@ -659,6 +662,15 @@ function updateProviderDependentUI(provider: types.TranslationProvider): void {
     }
     if (mtranserverCard) {
         mtranserverCard.style.display = showMtranserver ? "block" : "none"
+    }
+
+    // Show/hide Bing Translate section
+    const showBingTranslate = provider === "bingTranslate"
+    if (bingTranslateTitleSection) {
+        bingTranslateTitleSection.style.display = showBingTranslate ? "block" : "none"
+    }
+    if (bingTranslateCard) {
+        bingTranslateCard.style.display = showBingTranslate ? "block" : "none"
     }
 }
 
@@ -687,6 +699,40 @@ export function setupMTranServerTest(): void {
 
         try {
             const result = await testMTranServerConnection(mtranserverSettings)
+            if (result) {
+                setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
+            } else {
+                setValidationStatus(statusElement, "error", "Connection failed.")
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Connection failed"
+            setValidationStatus(statusElement, "error", message)
+        } finally {
+            testButton.disabled = false
+        }
+    })
+}
+
+/**
+ * Setup Bing Translate connection test
+ */
+export function setupBingTranslateTest(): void {
+    const testButton = document.getElementById("testBingTranslateButton") as HTMLButtonElement | null
+    const statusElement = document.getElementById("testBingTranslateStatus")
+
+    if (!testButton) {
+        return
+    }
+
+    testButton.addEventListener("click", async () => {
+        const settings = await storageManagerModule.getUserSettings()
+        const bingTranslateSettings = settings.bingTranslate
+
+        setValidationStatus(statusElement, "loading", "Testing connection...")
+        testButton.disabled = true
+
+        try {
+            const result = await testBingTranslateConnection(bingTranslateSettings)
             if (result) {
                 setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
             } else {

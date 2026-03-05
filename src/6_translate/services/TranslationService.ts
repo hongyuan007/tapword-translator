@@ -23,6 +23,7 @@ import type { UserSettings } from "@/0_common/types"
 import type { LLMConfig } from "@/8_generate/types/GenerateTypes"
 import { CUSTOM_API_FIXED_PARAMS } from "@/0_common/constants/customApi"
 import { translateWithMTranServer, MTranServerError } from "./MTranServerService"
+import { translateWithBingTranslate, BingTranslateError } from "./BingTranslateService"
 
 const logger = createLogger("TranslationService")
 
@@ -307,6 +308,41 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
             return await translateWordWithLocal(params, localConfig)
         }
 
+        // Bing Translate
+        if (provider === "bingTranslate") {
+            logger.info("Translating word using Bing Translate")
+            const { word, leadingText, trailingText, targetLanguage = "zh" } = params
+
+            // Translate the word itself
+            const wordTranslation = await translateWithBingTranslate(
+                word,
+                targetLanguage,
+                userSettings.bingTranslate
+            )
+
+            // Translate full sentence if context is available
+            let sentenceTranslation: string | undefined
+            if (leadingText || trailingText) {
+                const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
+                sentenceTranslation = await translateWithBingTranslate(
+                    fullSentence,
+                    targetLanguage,
+                    userSettings.bingTranslate
+                )
+            }
+
+            return {
+                wordTranslation: wordTranslation,
+                sentenceTranslation: sentenceTranslation,
+                chineseDefinition: undefined,
+                englishDefinition: undefined,
+                targetDefinition: undefined,
+                lemma: undefined,
+                phonetic: undefined,
+                lemmaPhonetic: undefined,
+            }
+        }
+
         // Official Cloud API (default)
         logger.info("Translating word using cloud API translation")
         return await translateWordWithCloud(params)
@@ -322,6 +358,15 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
             throw new TranslationError(
                 error.message,
                 i18nModule.translate("error.short.mtranserverError")
+            )
+        }
+
+        // Handle BingTranslateError
+        if (error instanceof BingTranslateError) {
+            logger.error("Bing Translate translation error:", error.message)
+            throw new TranslationError(
+                error.message,
+                i18nModule.translate("error.short.bingTranslateError")
             )
         }
 
@@ -418,6 +463,35 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
             return await translateFragmentWithLocal(params, localConfig)
         }
 
+        // Bing Translate
+        if (provider === "bingTranslate") {
+            logger.info("Translating fragment using Bing Translate")
+            const { fragment, leadingText, trailingText, targetLanguage = "zh" } = params
+
+            // Translate the selected fragment
+            const translation = await translateWithBingTranslate(
+                fragment,
+                targetLanguage,
+                userSettings.bingTranslate
+            )
+
+            // Translate full sentence if context is available
+            let sentenceTranslation: string | undefined
+            if (leadingText || trailingText) {
+                const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
+                sentenceTranslation = await translateWithBingTranslate(
+                    fullSentence,
+                    targetLanguage,
+                    userSettings.bingTranslate
+                )
+            }
+
+            return {
+                translation: translation,
+                sentenceTranslation: sentenceTranslation,
+            }
+        }
+
         // Official Cloud API (default)
         const { fragment, leadingText, trailingText, sourceLanguage, targetLanguage = "zh", upgradeModel, contextInfo } = params
 
@@ -463,6 +537,15 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
             throw new TranslationError(
                 error.message,
                 i18nModule.translate("error.short.mtranserverError")
+            )
+        }
+
+        // Handle BingTranslateError
+        if (error instanceof BingTranslateError) {
+            logger.error("Bing Translate fragment translation error:", error.message)
+            throw new TranslationError(
+                error.message,
+                i18nModule.translate("error.short.bingTranslateError")
             )
         }
 

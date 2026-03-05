@@ -231,8 +231,9 @@ export type NetworkRegion = "auto" | "china" | "global"
  * - official: Official cloud API (default)
  * - customApi: User-provided LLM API
  * - mtranserver: Self-hosted MTranServer
+ * - bingTranslate: Bing Translate API (free, no key required)
  */
-export type TranslationProvider = "official" | "customApi" | "mtranserver"
+export type TranslationProvider = "official" | "customApi" | "mtranserver" | "bingTranslate"
 
 export interface CustomApiSettings {
     /** Custom API base URL */
@@ -249,6 +250,11 @@ export interface MTranserverSettings {
     /** MTranserver API key */
     key: string
     /** Whether to enable MTranserver */
+    enabled: boolean
+}
+
+export interface BingTranslateSettings {
+    /** Whether to enable Bing Translate */
     enabled: boolean
 }
 
@@ -308,6 +314,8 @@ export interface UserSettings {
     customApi: CustomApiSettings
     /** MTranserver settings */
     mtranserver: MTranserverSettings
+    /** Bing Translate settings */
+    bingTranslate: BingTranslateSettings
     /** Whether to suppress translation when the detected source language matches the target language */
     suppressNativeLanguage: boolean
     /** Network region preference for API calls (auto, china, global) */
@@ -353,6 +361,9 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
         url: "http://127.0.0.1:8989",
         key: "",
         enabled: false,
+    },
+    bingTranslate: {
+        enabled: true,
     },
     suppressNativeLanguage: false,
     networkRegion: "auto",
