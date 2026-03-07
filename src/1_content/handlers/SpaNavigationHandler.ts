@@ -15,7 +15,7 @@
 
 import * as loggerModule from "@/0_common/utils/logger"
 import * as iconManager from "@/1_content/ui/iconManager"
-import * as translationDisplay from "@/1_content/ui/translationDisplay"
+import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
 
 const logger = loggerModule.createLogger("1_content/handlers/SpaNavigationHandler")
 

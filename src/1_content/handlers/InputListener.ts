@@ -131,7 +131,7 @@ export function handleDocumentClick(event: Event): void {
     const target = event.target as Element
 
     // Don't hide if clicking on our icon or tooltip
-    if (target.closest(`.${constants.CSS_CLASSES.ICON}`) || target.closest(`.${constants.CSS_CLASSES.ANCHOR}`)) {
+    if (target.closest(`.${constants.CSS_CLASSES.ICON}`) || target.closest(`.${constants.CSS_CLASSES.TOOLTIP}`)) {
         return
     }
 

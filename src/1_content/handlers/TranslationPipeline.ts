@@ -12,14 +12,14 @@ import * as loggerModule from "@/0_common/utils/logger"
 import * as contentIndex from "@/1_content/index"
 import * as translationRequest from "@/1_content/services/translationRequest"
 import * as iconManager from "@/1_content/ui/iconManager"
-import * as translationDisplay from "@/1_content/ui/translationDisplay"
+import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
 import { extractContextV2 } from "@/1_content/utils/contextExtractorV2"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
 import * as languageDetector from "@/1_content/utils/languageDetector"
 import * as rangeSplitter from "@/1_content/handlers/utils/rangeSplitter"
 import * as rangeAdjuster from "@/1_content/handlers/utils/rangeAdjuster"
 import * as selectionClassifier from "@/1_content/handlers/utils/selectionClassifier"
-import * as translationOverlapDetector from "@/1_content/handlers/utils/translationOverlapDetector"
+import * as translationOverlapDetector from "@/1_content/handlers/utils/translationOverlapDetectorV2"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
 import { createConcurrencyLimiter, type RequestLimiter } from "@/1_content/utils/concurrencyLimiter"
 
@@ -283,10 +283,13 @@ async function translateWordPath(
         }
     }
 
-    // Detect overlapping translations BEFORE wrapping (collect IDs only)
-    const preWrapOverlappingIds = translationOverlapDetector.detectOverlappingTranslations(range)
+    // V2: detect overlapping translations via Range-vs-Range comparison
+    const activeRanges = translationDisplay.getActiveRanges()
+    logger.info("[Word Path] Active ranges before overlap check:", activeRanges.size)
+    const preOverlappingIds = translationOverlapDetector.detectOverlappingTranslations(range, activeRanges)
+    logger.info("[Word Path] Pre-overlapping IDs:", preOverlappingIds)
 
-    // Show loading state with full context and refresh callback (this wraps the selection)
+    // Show loading state with full context and refresh callback
     const refreshCallback = async () => {
         logger.info("[Word Path] Refreshing translation for:", word)
         await performRequest(true)
@@ -301,26 +304,19 @@ async function translateWordPath(
         },
         context,
         refreshCallback,
-        "word", // Specify this is a word translation
+        "word",
         displaySettings
     )
 
-    // After wrapping, remove ALL instances of pre-detected overlapping anchors by ID
-    // This handles cases where a previous anchor was split and duplicated (nested clone + leftover)
+    // Remove overlapping translations (V2: no anchor elements, just remove by ID)
     try {
-        const toRemove = preWrapOverlappingIds.filter((id) => id !== anchorId)
+        const toRemove = preOverlappingIds.filter((id) => id !== anchorId)
         if (toRemove.length > 0) {
-            logger.info("[Word Path] Removing overlapping translations after wrap:", toRemove)
-            toRemove.forEach((id) => {
-                // Remove every instance with this ID until none remain
-                // (defensive: in case partial overlaps created duplicates)
-                while (document.getElementById(id)) {
-                    translationDisplay.removeTranslationResult(id)
-                }
-            })
+            logger.info("[Word Path] Removing overlapping translations:", toRemove)
+            toRemove.forEach((id) => translationDisplay.removeTranslationResult(id))
         }
     } catch (e) {
-        logger.warn("[Word Path] Overlap cleanup after wrap failed:", e)
+        logger.warn("[Word Path] Overlap cleanup failed:", e)
     }
 
     // Begin async language detection and then request translation
@@ -439,10 +435,13 @@ async function translateFragmentPath(
         }
     }
 
-    // Detect overlapping translations BEFORE wrapping (collect IDs only)
-    const preWrapOverlappingIds = translationOverlapDetector.detectOverlappingTranslations(range)
+    // V2: detect overlapping translations via Range-vs-Range comparison
+    const activeRanges = translationDisplay.getActiveRanges()
+    logger.info("[Fragment Path] Active ranges before overlap check:", activeRanges.size)
+    const preOverlappingIds = translationOverlapDetector.detectOverlappingTranslations(range, activeRanges)
+    logger.info("[Fragment Path] Pre-overlapping IDs:", preOverlappingIds)
 
-    // Show loading state with full context and refresh callback (this wraps the selection)
+    // Show loading state with full context and refresh callback
     const refreshCallback = async () => {
         logger.info("[Fragment Path] Refreshing translation for:", fragment)
         await performFragmentRequest(true)
@@ -457,24 +456,19 @@ async function translateFragmentPath(
         },
         context,
         refreshCallback,
-        "fragment", // Specify this is a fragment translation
+        "fragment",
         displaySettings
     )
 
-    // After wrapping, remove ALL instances of pre-detected overlapping anchors by ID
-    // This handles cases where a previous anchor was split and duplicated (nested clone + leftover)
+    // Remove overlapping translations (V2: no anchor elements, just remove by ID)
     try {
-        const toRemove = preWrapOverlappingIds.filter((id) => id !== anchorId)
+        const toRemove = preOverlappingIds.filter((id) => id !== anchorId)
         if (toRemove.length > 0) {
-            logger.info("[Fragment Path] Removing overlapping translations after wrap:", toRemove)
-            toRemove.forEach((id) => {
-                while (document.getElementById(id)) {
-                    translationDisplay.removeTranslationResult(id)
-                }
-            })
+            logger.info("[Fragment Path] Removing overlapping translations:", toRemove)
+            toRemove.forEach((id) => translationDisplay.removeTranslationResult(id))
         }
     } catch (e) {
-        logger.warn("[Fragment Path] Overlap cleanup after wrap failed:", e)
+        logger.warn("[Fragment Path] Overlap cleanup failed:", e)
     }
 
     // Begin async language detection and then request translation
