@@ -3,6 +3,10 @@
         "message": "TapWord Translator - ノート感覚で翻訳",
         "description": "The name of the extension displayed in Chrome"
     },
+    "extNameFirefox": {
+        "message": "TapWord Translator",
+        "description": "The name of the extension displayed in Firefox"
+    },
     "extDescription": {
         "message": "翻訳を原文の下に埋め込み、バイリンガル字幕のような没入感のある読書体験を提供します。",
         "description": "The description of the extension displayed in Chrome Web Store"

@@ -225,11 +225,12 @@ h1 {
     display: none; /* Default hidden */
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 0.75rem; /* Reduced horizontal padding */
     background: #f8fafc;
     border-radius: var(--rounded-lg);
     border: 1px solid #e2e8f0;
     width: fit-content;
+    /* margin-left removed to align border with title */
 }
 
 .contact-section.visible {

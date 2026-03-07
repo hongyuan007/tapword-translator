@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "__MSG_extName__",
+    "name": "__MSG_extNameFirefox__",
     "version": "0.4.1",
     "description": "__MSG_extDescription__",
     "default_locale": "en",
@@ -54,7 +54,7 @@
     ],
     "browser_specific_settings": {
         "gecko": {
-            "id": "tapword-translator@example.com",
+            "id": "tapword-translator@tapword.cc",
             "strict_min_version": "128.0",
             "data_collection_permissions": {
                 "required": ["none"]

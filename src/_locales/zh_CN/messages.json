@@ -3,6 +3,10 @@
         "message": "触词翻译 - 像做笔记一样翻译单词",
         "description": "The name of the extension displayed in Chrome"
     },
+    "extNameFirefox": {
+        "message": "触词翻译",
+        "description": "The name of the extension displayed in Firefox"
+    },
     "extDescription": {
         "message": "将翻译嵌入原文下面，带来双语字幕般的沉浸式阅读体验",
         "description": "The description of the extension displayed in Chrome Web Store"
