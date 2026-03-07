@@ -6,10 +6,10 @@
  * Uses native fetch for browser extension compatibility
  */
 
-import { createLogger } from "@/0_common/utils/logger"
+import * as loggerModule from "@/0_common/utils/logger"
 import type { BingTranslateSettings } from "@/0_common/types"
 
-const logger = createLogger("BingTranslateService")
+const logger = loggerModule.createLogger("BingTranslateService")
 
 const BING_TRANSLATE_TIMEOUT = 10000 // 10 seconds timeout
 
@@ -99,6 +99,7 @@ interface BingGlobalConfig {
 }
 
 let globalConfig: BingGlobalConfig | null = null
+let fetchConfigPromise: Promise<BingGlobalConfig> | null = null
 
 /**
  * Fetch global config from Bing Translator page
@@ -133,13 +134,18 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
 
             const body = await response.text()
 
+            if (!body) {
+                logger.warn(`Bing returned empty response from ${subdomain} — likely blocked or host permission missing`)
+                continue
+            }
+
             // Extract IG
             const igMatch = body.match(/IG:"([^"]+)"/)
             if (!igMatch) {
                 logger.warn(`Failed to extract IG from ${subdomain}`)
                 continue
             }
-            const IG = igMatch[1]
+            const IG = igMatch[1]!
 
             // Extract IID
             const iidMatch = body.match(/data-iid="([^"]+)"/)
@@ -147,7 +153,7 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
                 logger.warn(`Failed to extract IID from ${subdomain}`)
                 continue
             }
-            const IID = iidMatch[1]
+            const IID = iidMatch[1]!
 
             // Extract key and token from params_AbusePreventionHelper
             const paramsMatch = body.match(/params_AbusePreventionHelper\s?=\s?(\[[^\]]+\])/)
@@ -156,13 +162,18 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
                 continue
             }
 
-            const params = JSON.parse(paramsMatch[1])
+            const params = JSON.parse(paramsMatch[1]!)
             const key = params[0]
             const token = params[1]
             const tokenExpiryInterval = params[2]
 
-            // Cache the working subdomain
-            currentSubdomain = subdomain
+            // Use the FINAL URL after redirects to get the actual subdomain
+            // e.g. cn.bing.com may redirect to www.bing.com under VPN/proxy
+            const finalUrl = new URL(response.url)
+            const actualSubdomain = finalUrl.hostname
+
+            // Cache the actual subdomain (may differ from original if redirected)
+            currentSubdomain = actualSubdomain
 
             globalConfig = {
                 IG,
@@ -174,8 +185,9 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
                 count: 0,
             }
 
-            logger.info("Fetched Bing global config from", subdomain, ":", { IG, IID, tokenExpiryInterval })
-            return globalConfig
+            logger.info("Fetched Bing global config from", actualSubdomain, "(attempted:", subdomain + ")", ":", { IG, IID, tokenExpiryInterval })
+            clearTimeout(timeoutId)
+            return globalConfig!
         } catch (error) {
             logger.warn(`Failed to fetch config from ${subdomain}:`, error instanceof Error ? error.message : String(error))
             lastError = error instanceof Error ? error : new Error(String(error))
@@ -195,16 +207,19 @@ function isConfigExpired(): boolean {
 }
 
 /**
- * Get valid config (refresh if needed)
+ * Get valid config (refresh if needed).
+ * Deduplicates concurrent config fetches so only one in-flight request runs at a time.
  */
 async function getValidConfig(): Promise<BingGlobalConfig> {
-    if (isConfigExpired()) {
-        await fetchGlobalConfig()
+    if (!isConfigExpired()) {
+        return globalConfig!
     }
-    if (!globalConfig) {
-        throw new BingTranslateError("Global config not available")
+    if (!fetchConfigPromise) {
+        fetchConfigPromise = fetchGlobalConfig().finally(() => {
+            fetchConfigPromise = null
+        })
     }
-    return globalConfig
+    return await fetchConfigPromise
 }
 
 /**
@@ -233,7 +248,7 @@ export async function translateWithBingTranslate(
 
         // Use the cached working subdomain
         const subdomain = currentSubdomain || BING_SUBDOMAINS[0]
-        const url = `https://${subdomain}/ttranslatev3?IG=${config.IG}&IID=${config.IID}&SFX=${config.count}&ref=TThis&edgepdftranslator=1`
+        const url = `https://${subdomain}/ttranslatev3?IG=${config.IG}&IID=${config.IID}&SFX=${config.count}`
 
         const formData = new URLSearchParams()
         formData.append("fromLang", fromLang)
@@ -248,6 +263,7 @@ export async function translateWithBingTranslate(
 
         const response = await fetch(url, {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json, text/plain, */*",
@@ -268,9 +284,17 @@ export async function translateWithBingTranslate(
         logger.debug("Bing Translate response status:", response.status, response.statusText)
 
         const responseText = await response.text()
-        
+
         // Log raw response for debugging
         logger.debug("Bing raw response:", responseText.substring(0, 1000))
+
+        if (!responseText || responseText.trim() === "") {
+            const headersObj: Record<string, string> = {}
+            response.headers.forEach((value, key) => { headersObj[key] = value })
+            logger.warn("Bing ttranslatev3 returned empty body for subdomain:", subdomain,
+                "status:", response.status,
+                "headers:", headersObj)
+        }
 
         if (!response.ok) {
             throw new BingTranslateError(
@@ -325,7 +349,7 @@ export async function testBingTranslateConnection(_settings: BingTranslateSettin
     try {
         // Reset config to force refresh
         globalConfig = null
-        const result = await translateWithBingTranslate("hello", "en", {})
+        const result = await translateWithBingTranslate("hello", "zh", { enabled: true })
         logger.info("Bing Translate connection test successful:", result)
         return true
     } catch (error) {

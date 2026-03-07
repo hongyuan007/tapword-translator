@@ -12,7 +12,8 @@
     "permissions": [
         "storage",
         "https://*.tapword.cc/*",
-        "https://local.tapword.cc/*"
+        "https://local.tapword.cc/*",
+        "https://*.bing.com/*"
     ],
     "background": {
         "scripts": ["src/2_background/index.ts"]

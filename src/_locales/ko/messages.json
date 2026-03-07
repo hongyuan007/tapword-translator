@@ -3,6 +3,10 @@
         "message": "TapWord Translator - 노트 필기하는 느낌으로 번역",
         "description": "The name of the extension displayed in Chrome"
     },
+    "extNameFirefox": {
+        "message": "TapWord Translator",
+        "description": "The name of the extension displayed in Firefox"
+    },
     "extDescription": {
         "message": "번역을 원문 아래에 삽입하여, 마치 이중 언어 자막과 같은 몰입형 독서 경험을 제공합니다.",
         "description": "The description of the extension displayed in Chrome Web Store"

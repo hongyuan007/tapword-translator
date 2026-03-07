@@ -5,10 +5,10 @@
  * @see https://github.com/xxnuo/MTranServer
  */
 
-import { createLogger } from "@/0_common/utils/logger"
+import * as loggerModule from "@/0_common/utils/logger"
 import type { MTranserverSettings } from "@/0_common/types"
 
-const logger = createLogger("MTranServerService")
+const logger = loggerModule.createLogger("MTranServerService")
 
 const MTRANSERVER_TIMEOUT = 10000 // 10 seconds timeout
 

@@ -14,8 +14,8 @@ import * as storageManagerModule from "@/0_common/utils/storageManager"
 import { getPlatformOS, PLATFORMS } from "@/0_common/utils/platformDetector"
 import { translateWord as translateWordWithLLM } from "@/8_generate"
 import type { LLMConfig } from "@/8_generate"
-import { testMTranServerConnection } from "@/6_translate/services/MTranServerService"
-import { testBingTranslateConnection } from "@/6_translate/services/BingTranslateService"
+import * as mtranServerServiceModule from "@/6_translate/services/MTranServerService"
+import * as bingTranslateServiceModule from "@/6_translate/services/BingTranslateService"
 
 const logger = loggerModule.createLogger("Options/Settings")
 const isCommunityEdition = APP_EDITION === "community"
@@ -255,7 +255,7 @@ export async function loadSettings(): Promise<void> {
         })
 
         setTranslationControlsEnabled(settings.enableTapWord)
-        updateProviderDependentUI(settings.translationProvider)
+        updateProviderDependentUI(settings.translationProvider, false)
         lockAutoPlayAudioToggle()
         syncSingleClickFeatureDotState(settings.singleClickTranslate)
     } catch (error) {
@@ -580,7 +580,7 @@ function updateCustomSelectUI(wrapper: HTMLElement, value: string): void {
 export function setupCustomApiValidation(): void {
     const validateButton = document.getElementById("validateCustomApiButton") as HTMLButtonElement | null
     const statusElement = document.getElementById("validateCustomApiStatus")
-    const translationProviderSelect = document.getElementById("translationProvider") as HTMLSelectElement | null
+    const translationProviderSelect = document.getElementById("customApiProvider") as HTMLSelectElement | null
     const targetLanguageSelect = document.getElementById("targetLanguage") as HTMLSelectElement | null
 
     if (!validateButton) {
@@ -626,51 +626,97 @@ export function setupCustomApiValidation(): void {
 }
 
 /**
- * Update UI based on selected translation provider
+ * Animate the provider-panels container to a target height, then clear inline style.
  */
-function updateProviderDependentUI(provider: types.TranslationProvider): void {
-    const providerTitleSection = document.getElementById("providerTitleSection")
-    const providerSelectionCard = document.getElementById("providerSelectionCard")
-    const customApiTitleSection = document.getElementById("customApiTitleSection")
-    const customApiCard = document.getElementById("customApiCard")
-    const mtranserverTitleSection = document.getElementById("mtranserverTitleSection")
-    const mtranserverCard = document.getElementById("mtranserverCard")
-    const bingTranslateTitleSection = document.getElementById("bingTranslateTitleSection")
-    const bingTranslateCard = document.getElementById("bingTranslateCard")
+function animateContainerHeight(container: HTMLElement, targetHeight: number): void {
+    container.style.height = `${targetHeight}px`
+    const onEnd = (): void => {
+        // Only clear if height hasn't changed mid-animation (not interrupted)
+        if (container.style.height === `${targetHeight}px`) {
+            if (targetHeight === 0) {
+                // Collapsed — CSS default height:0 is correct, can clear
+                container.style.height = ""
+            }
+            // If expanded, leave the explicit pixel height so the absolutely-positioned
+            // panels remain visible. Height will be updated on next provider switch.
+        }
+        container.removeEventListener("transitionend", onEnd)
+    }
+    container.addEventListener("transitionend", onEnd)
+}
 
-    // Provider selection is always visible
-    if (providerTitleSection) {
-        providerTitleSection.style.display = "block"
-    }
-    if (providerSelectionCard) {
-        providerSelectionCard.style.display = "block"
-    }
-
-    // Show/hide Custom API section
-    const showCustomApi = provider === "customApi"
-    if (customApiTitleSection) {
-        customApiTitleSection.style.display = showCustomApi ? "block" : "none"
-    }
-    if (customApiCard) {
-        customApiCard.style.display = showCustomApi ? "block" : "none"
-    }
-
-    // Show/hide MTranServer section
-    const showMtranserver = provider === "mtranserver"
-    if (mtranserverTitleSection) {
-        mtranserverTitleSection.style.display = showMtranserver ? "block" : "none"
-    }
-    if (mtranserverCard) {
-        mtranserverCard.style.display = showMtranserver ? "block" : "none"
+/**
+ * Switch the visible provider sub-panel with a height-animated container + opacity crossfade.
+ * Pass animate=false for initial render (no animation).
+ */
+function updateProviderDependentUI(provider: types.TranslationProvider, animate = true): void {
+    const container = document.getElementById("providerPanelsContainer") as HTMLElement | null
+    if (!container) {
+        return
     }
 
-    // Show/hide Bing Translate section
-    const showBingTranslate = provider === "bingTranslate"
-    if (bingTranslateTitleSection) {
-        bingTranslateTitleSection.style.display = showBingTranslate ? "block" : "none"
+    const allPanels = Array.from(container.querySelectorAll<HTMLElement>(".provider-panel"))
+    const oldPanel = allPanels.find((p) => p.classList.contains("is-active")) ?? null
+    const newPanel = allPanels.find((p) => p.dataset.provider === provider) ?? null
+
+    if (oldPanel === newPanel) {
+        return
     }
-    if (bingTranslateCard) {
-        bingTranslateCard.style.display = showBingTranslate ? "block" : "none"
+
+    if (!animate) {
+        // Instant apply for initial load — no transition
+        allPanels.forEach((p) => p.classList.remove("is-active"))
+        if (newPanel) {
+            newPanel.classList.add("is-active")
+            // Set container height synchronously — skip CSS transition
+            container.style.transition = "none"
+            container.style.height = `${newPanel.scrollHeight + 20}px` // 20px = panel padding-top
+            // Re-enable transition on next frame
+            requestAnimationFrame(() => {
+                container.style.transition = ""
+                container.style.height = ""
+            })
+        } else {
+            container.style.transition = "none"
+            container.style.height = "0px"
+            requestAnimationFrame(() => {
+                container.style.transition = ""
+            })
+        }
+        return
+    }
+
+    // Lock container at current rendered height before any DOM change
+    const lockedHeight = container.offsetHeight
+    container.style.height = `${lockedHeight}px`
+    // Remove transition briefly so the lock is instant
+    container.style.transition = "none"
+    // Force reflow
+    void container.offsetHeight
+    container.style.transition = ""
+
+    // Fade out old panel
+    oldPanel?.classList.remove("is-active")
+
+    if (newPanel) {
+        // Measure new panel's natural height while it's transparent + absolute
+        // (offsetHeight works on absolutely positioned elements regardless of opacity)
+        const panelContentHeight = newPanel.scrollHeight
+        const PADDING_TOP = 20 // matches .provider-panel padding-top in CSS
+        const targetHeight = panelContentHeight + PADDING_TOP
+
+        // Activate the new panel (triggers opacity + transform transition)
+        newPanel.classList.add("is-active")
+
+        // Animate container to new height
+        requestAnimationFrame(() => {
+            animateContainerHeight(container, targetHeight)
+        })
+    } else {
+        // "official" has no sub-panel — collapse to 0
+        requestAnimationFrame(() => {
+            animateContainerHeight(container, 0)
+        })
     }
 }
 
@@ -698,7 +744,7 @@ export function setupMTranServerTest(): void {
         testButton.disabled = true
 
         try {
-            const result = await testMTranServerConnection(mtranserverSettings)
+            const result = await mtranServerServiceModule.testMTranServerConnection(mtranserverSettings)
             if (result) {
                 setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
             } else {
@@ -732,7 +778,7 @@ export function setupBingTranslateTest(): void {
         testButton.disabled = true
 
         try {
-            const result = await testBingTranslateConnection(bingTranslateSettings)
+            const result = await bingTranslateServiceModule.testBingTranslateConnection(bingTranslateSettings)
             if (result) {
                 setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
             } else {

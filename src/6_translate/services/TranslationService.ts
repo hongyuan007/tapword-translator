@@ -264,23 +264,15 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
             logger.info("Translating word using MTranServer")
             const { word, leadingText, trailingText, targetLanguage = "zh" } = params
 
-            // Translate the word itself
-            const wordTranslation = await translateWithMTranServer(
-                word,
-                targetLanguage,
-                mtranserverSettings
-            )
+            const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
 
-            // Translate full sentence if context is available
-            let sentenceTranslation: string | undefined
-            if (leadingText || trailingText) {
-                const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
-                sentenceTranslation = await translateWithMTranServer(
-                    fullSentence,
-                    targetLanguage,
-                    mtranserverSettings
-                )
-            }
+            const [wordTranslation, sentenceTranslation] = await Promise.all([
+                translateWithMTranServer(word, targetLanguage, mtranserverSettings),
+                hasContext
+                    ? translateWithMTranServer(fullSentence, targetLanguage, mtranserverSettings)
+                    : Promise.resolve(undefined),
+            ])
 
             return {
                 wordTranslation: wordTranslation,
@@ -313,23 +305,15 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
             logger.info("Translating word using Bing Translate")
             const { word, leadingText, trailingText, targetLanguage = "zh" } = params
 
-            // Translate the word itself
-            const wordTranslation = await translateWithBingTranslate(
-                word,
-                targetLanguage,
-                userSettings.bingTranslate
-            )
+            const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
 
-            // Translate full sentence if context is available
-            let sentenceTranslation: string | undefined
-            if (leadingText || trailingText) {
-                const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
-                sentenceTranslation = await translateWithBingTranslate(
-                    fullSentence,
-                    targetLanguage,
-                    userSettings.bingTranslate
-                )
-            }
+            const [wordTranslation, sentenceTranslation] = await Promise.all([
+                translateWithBingTranslate(word, targetLanguage, userSettings.bingTranslate),
+                hasContext
+                    ? translateWithBingTranslate(fullSentence, targetLanguage, userSettings.bingTranslate)
+                    : Promise.resolve(undefined),
+            ])
 
             return {
                 wordTranslation: wordTranslation,
@@ -425,23 +409,15 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
             logger.info("Translating fragment using MTranServer")
             const { fragment, leadingText, trailingText, targetLanguage = "zh" } = params
 
-            // Translate the selected fragment
-            const translation = await translateWithMTranServer(
-                fragment,
-                targetLanguage,
-                mtranserverSettings
-            )
+            const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
 
-            // Translate full sentence if context is available
-            let sentenceTranslation: string | undefined
-            if (leadingText || trailingText) {
-                const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
-                sentenceTranslation = await translateWithMTranServer(
-                    fullSentence,
-                    targetLanguage,
-                    mtranserverSettings
-                )
-            }
+            const [translation, sentenceTranslation] = await Promise.all([
+                translateWithMTranServer(fragment, targetLanguage, mtranserverSettings),
+                hasContext
+                    ? translateWithMTranServer(fullSentence, targetLanguage, mtranserverSettings)
+                    : Promise.resolve(undefined),
+            ])
 
             return {
                 translation: translation,
@@ -468,23 +444,15 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
             logger.info("Translating fragment using Bing Translate")
             const { fragment, leadingText, trailingText, targetLanguage = "zh" } = params
 
-            // Translate the selected fragment
-            const translation = await translateWithBingTranslate(
-                fragment,
-                targetLanguage,
-                userSettings.bingTranslate
-            )
+            const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
 
-            // Translate full sentence if context is available
-            let sentenceTranslation: string | undefined
-            if (leadingText || trailingText) {
-                const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
-                sentenceTranslation = await translateWithBingTranslate(
-                    fullSentence,
-                    targetLanguage,
-                    userSettings.bingTranslate
-                )
-            }
+            const [translation, sentenceTranslation] = await Promise.all([
+                translateWithBingTranslate(fragment, targetLanguage, userSettings.bingTranslate),
+                hasContext
+                    ? translateWithBingTranslate(fullSentence, targetLanguage, userSettings.bingTranslate)
+                    : Promise.resolve(undefined),
+            ])
 
             return {
                 translation: translation,

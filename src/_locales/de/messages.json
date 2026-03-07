@@ -3,6 +3,10 @@
         "message": "TapWord Translator - Übersetzen, als wären es Notizen",
         "description": "The name of the extension displayed in Chrome"
     },
+    "extNameFirefox": {
+        "message": "TapWord Translator",
+        "description": "The name of the extension displayed in Firefox"
+    },
     "extDescription": {
         "message": "Bettet Übersetzungen unter dem Originaltext ein und sorgt so für ein immersives Leseerlebnis, das zweisprachigen Untertiteln ähnelt.",
         "description": "The description of the extension displayed in Chrome Web Store"
