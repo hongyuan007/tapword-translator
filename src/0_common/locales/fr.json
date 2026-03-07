@@ -76,8 +76,6 @@
     "popup.section.customApi.helper": "Utilisez un service de traduction tiers compatible avec le format OpenAI",
     "popup.section.customApi.helper.community": "L'édition communautaire nécessite la configuration d'une API LLM (format compatible OpenAI) pour la traduction.",
     "popup.autoPlayAudio.communityNote": "Édition communautaire : la lecture audio n'est pas prise en charge.",
-    "popup.useCustomApi.label": "Activer l'API personnalisée",
-    "popup.useCustomApi.helper": "Une fois activé, les requêtes de traduction seront envoyées à votre API configurée au lieu des serveurs de TapWord",
     "popup.customApi.baseUrl.label": "Endpoint",
     "popup.customApi.baseUrl.helper": "Ex: https://api.openai.com/v1 (ou autre endpoint compatible avec OpenAI)",
     "popup.customApi.apiKey.label": "Clé API (API Key)",

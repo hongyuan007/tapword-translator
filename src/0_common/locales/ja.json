@@ -75,8 +75,6 @@
     "popup.section.customApi.helper": "OpenAI形式と互換性のあるサードパーティの翻訳サービスを使用する",
     "popup.section.customApi.helper.community": "コミュニティ版では、翻訳のためにLLM API（OpenAI互換形式）を設定する必要があります。",
     "popup.autoPlayAudio.communityNote": "コミュニティ版：音声再生はサポートされていません。",
-    "popup.useCustomApi.label": "カスタムAPIを有効にする",
-    "popup.useCustomApi.helper": "有効にすると、翻訳リクエストはTapWordのサーバーではなく、設定したAPIに送信されます",
     "popup.customApi.baseUrl.label": "エンドポイント (Endpoint)",
     "popup.customApi.baseUrl.helper": "例: https://api.openai.com/v1 (または他のOpenAI互換API)",
     "popup.customApi.apiKey.label": "APIキー (API Key)",

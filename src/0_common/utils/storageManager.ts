@@ -104,14 +104,8 @@ function normalizeUserSettings(
         enabled: mergedMTranserver.enabled ?? DEFAULT_USER_SETTINGS.mtranserver.enabled,
     }
 
-    // Migration: Convert legacy useCustomApi to translationProvider
-    let normalizedTranslationProvider: types.TranslationProvider = "official"
-    const legacyUseCustomApi = (settings.customApi as any)?.useCustomApi
-    if (legacyUseCustomApi === true) {
-        normalizedTranslationProvider = "customApi"
-    }
-    
     // Community edition: Default to customApi since official cloud API is not available
+    let normalizedTranslationProvider: types.TranslationProvider = "official"
     if (isCommunityEdition && settings.translationProvider === undefined) {
         normalizedTranslationProvider = "customApi"
     }

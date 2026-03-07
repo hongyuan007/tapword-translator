@@ -78,8 +78,6 @@
     "popup.section.customApi": "Custom API",
     "popup.section.customApi.helper": "Use a third-party translation service compatible with the OpenAI format",
     "popup.section.customApi.helper.community": "Community edition requires an LLM API (OpenAI-compatible format) to be configured for translation.",
-    "popup.useCustomApi.label": "Enable Custom API",
-    "popup.useCustomApi.helper": "When enabled, translation requests will be sent to your configured API instead of TapWord's servers",
     "popup.customApi.baseUrl.label": "Endpoint",
     "popup.customApi.baseUrl.helper": "E.g., https://api.openai.com/v1 (or other OpenAI-compatible endpoints)",
     "popup.customApi.apiKey.label": "API Key",

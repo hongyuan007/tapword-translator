@@ -73,6 +73,15 @@ All critical and major issues resolved. Branch is ready for final testing and me
 
 ---
 
+## Post-Merge Cleanup (Completed 2026-03-07)
+
+| Item | Change | Result |
+|---|---|---|
+| Remove legacy `useCustomApi` migration block | Deleted 4-line block from `normalizeUserSettings()` in `storageManager.ts`; moved `let normalizedTranslationProvider` declaration to before community-edition block | type-check: 0 errors |
+| Remove orphaned locale keys | Deleted `popup.useCustomApi.label` + `popup.useCustomApi.helper` from all 8 locale files (en, zh, de, es, fr, ja, ko, ru) | 16 dead entries removed |
+
+---
+
 ## Remaining (Not Addressed)
 
 | Item | Reason |

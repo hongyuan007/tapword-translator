@@ -76,8 +76,6 @@
     "popup.section.customApi.helper": "Используйте сторонний сервис перевода, совместимый с форматом OpenAI",
     "popup.section.customApi.helper.community": "Для перевода в Community-версии требуется настройка LLM API (совместимого с форматом OpenAI).",
     "popup.autoPlayAudio.communityNote": "Community-версия: воспроизведение речи не поддерживается.",
-    "popup.useCustomApi.label": "Включить свой API",
-    "popup.useCustomApi.helper": "Когда включено, запросы на перевод будут отправляться на ваш API, а не на серверы TapWord",
     "popup.customApi.baseUrl.label": "Endpoint",
     "popup.customApi.baseUrl.helper": "Например: https://api.openai.com/v1 (или другой, совместимый с OpenAI)",
     "popup.customApi.apiKey.label": "Ключ API (API Key)",

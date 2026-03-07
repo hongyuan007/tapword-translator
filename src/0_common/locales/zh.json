@@ -78,8 +78,6 @@
     "popup.section.customApi": "自定义 API",
     "popup.section.customApi.helper": "使用兼容 OpenAI 格式的第三方翻译服务",
     "popup.section.customApi.helper.community": "社区版需配置大模型API接口（兼容OpenAI格式），以实现翻译功能",
-    "popup.useCustomApi.label": "启用自定义接口",
-    "popup.useCustomApi.helper": "启用后，翻译请求将发送至你配置的接口，不再经过 TapWord 服务器",
     "popup.customApi.baseUrl.label": "接口地址 (Endpoint)",
     "popup.customApi.baseUrl.helper": "例如: https://api.openai.com/v1 (或其他兼容 OpenAI 的接口)",
     "popup.customApi.apiKey.label": "密钥 (API Key)",

@@ -76,8 +76,6 @@
     "popup.section.customApi": "사용자 지정 API",
     "popup.section.customApi.helper": "OpenAI 형식과 호환되는 타사 번역 서비스 사용",
     "popup.section.customApi.helper.community": "커뮤니티 에디션은 번역을 위해 LLM API(OpenAI 호환 형식)를 구성해야 합니다.",
-    "popup.useCustomApi.label": "사용자 지정 API 활성화",
-    "popup.useCustomApi.helper": "활성화하면 번역 요청이 TapWord 서버 대신 설정한 API로 전송됩니다",
     "popup.customApi.baseUrl.label": "엔드포인트 (Endpoint)",
     "popup.customApi.baseUrl.helper": "예: https://api.openai.com/v1 (또는 다른 OpenAI 호환 API)",
     "popup.customApi.apiKey.label": "API 키 (API Key)",
