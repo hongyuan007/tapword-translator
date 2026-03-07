@@ -1,7 +1,7 @@
 {
-    "manifest_version": 2,
-    "name": "TapWord Translator",
-    "version": "0.3.5",
+    "manifest_version": 3,
+    "name": "__MSG_extName__",
+    "version": "0.4.1",
     "description": "__MSG_extDescription__",
     "default_locale": "en",
     "icons": {
@@ -10,12 +10,10 @@
         "128": "icons/icon-128.png"
     },
     "permissions": [
-        "storage",
-        "https://*.tapword.cc/*",
-        "https://local.tapword.cc/*"
+        "storage"
     ],
     "background": {
-        "scripts": ["src/2_background/index.ts"]
+        "scripts": ["background.js"]
     },
     "content_scripts": [
         {
@@ -30,7 +28,7 @@
             ]
         }
     ],
-    "browser_action": {
+    "action": {
         "default_popup": "popup.html",
         "default_icon": {
             "16": "icons/icon-16.png",
@@ -43,9 +41,16 @@
         "open_in_tab": true
     },
     "web_accessible_resources": [
-        "assets/*",
-        "icons/*",
-        "resources/*"
+        {
+            "resources": [
+                "assets/*",
+                "icons/*",
+                "resources/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
     ],
     "browser_specific_settings": {
         "gecko": {

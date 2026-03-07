@@ -13,6 +13,7 @@
 
         "build": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode development",
         "build:firefox": "npm run clean && npm run prebuild:prod && NODE_ENV=production vite build -c vite.config.ts --mode firefox",
+        "build:firefox-dev": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode firefox-development",
         "build:prod": "npm run clean && npm run prebuild:prod && NODE_ENV=production vite build -c vite.config.ts --mode production",
 
         "package": "npm run build:prod && node scripts/package-with-version.mjs",
