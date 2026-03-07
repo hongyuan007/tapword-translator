@@ -4,9 +4,9 @@
     "description": "A smart AI-powered translation browser extension that provides context-aware translations",
     "type": "module",
     "scripts": {
-        "prebuild:dev": "KEY_ENV=dev node other/scripts/inject-secrets-simple.mjs",
-        "prebuild:prod": "KEY_ENV=prod node other/scripts/inject-secrets-simple.mjs",
-        
+        "prebuild:dev": "cross-env KEY_ENV=dev node other/scripts/inject-secrets-simple.mjs",
+        "prebuild:prod": "cross-env KEY_ENV=prod node other/scripts/inject-secrets-simple.mjs",
+
         "dev": "npm run prebuild:dev && vite -c vite.config.ts --mode development",
         "dev:firefox": "npm run prebuild:dev && vite -c vite.config.ts --mode firefox",
         "dev:prod": "npm run prebuild:prod && vite -c vite.config.ts --mode production",
@@ -20,11 +20,11 @@
         "package:firefox": "npm run build:firefox && node scripts/package-with-version.mjs firefox",
         "package:source": "node scripts/package-source-with-version.mjs",
         "package:community": "npm run build:community && node scripts/package-with-version.mjs community",
-        
+
         "prebuild:community": "node scripts/prepare-community-credentials.mjs",
         "dev:community": "npm run prebuild:community && vite -c vite.config.ts --mode community",
-        "build:community": "npm run clean && npm run prebuild:community && NODE_ENV=production vite build -c vite.config.ts --mode community",
-
+        "build:community": "npm run clean && npm run prebuild:community && cross-env NODE_ENV=production vite build -c vite.config.ts --mode community",
+        
         "type-check": "tsc --noEmit",
         "clean": "rm -rf dist",
         "test": "vitest --config config/vitest.config.ts",
@@ -47,6 +47,7 @@
         "@typescript-eslint/eslint-plugin": "8.46.2",
         "@typescript-eslint/parser": "8.46.2",
         "@vitest/ui": "4.0.3",
+        "cross-env": "10.1.0",
         "eslint": "9.38.0",
         "eslint-config-prettier": "10.1.8",
         "eslint-plugin-prettier": "5.5.4",

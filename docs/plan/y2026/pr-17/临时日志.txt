@@ -1,0 +1,137 @@
+logger.ts:79 [MessageRouter] Message received in background: {
+  "type": "SPEECH_STOP_REQUEST"
+}
+logger.ts:79 [MessageRouter] Message received in background: {
+  "type": "TRANSLATE_REQUEST",
+  "data": {
+    "word": "submitted",
+    "leadingText": " He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and ",
+    "trailingText": " them to his agent, originally planning the novel as a trilogy.",
+    "originalSentence": "He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy.",
+    "previousSentences": [
+      "It was Martin's fourth novel and his return to writing prose fiction after a long period working in television."
+    ],
+    "bookName": "网页<<A Game of Thrones - Wikipedia>>",
+    "sourceLanguage": "en",
+    "targetLanguage": "zh"
+  }
+}
+logger.ts:79 [TranslationRequestHandler] Translating word: submitted with context
+logger.ts:70 [QuotaManager] Translation quota check: 0/300
+logger.ts:79 [TranslationService] Translating word using Bing Translate
+logger.ts:79 [BingTranslateService] Sending Bing Translate request: {
+  "text": "submitted",
+  "fromLang": "auto-detect",
+  "toLang": "zh-Hans"
+}
+logger.ts:79 [BingTranslateService] Sending Bing Translate request: {
+  "text": " He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy.",
+  "fromLang": "auto-detect",
+  "toLang": "zh-Hans"
+}
+logger.ts:70 [BingTranslateService] Bing Translate URL: https://cn.bing.com/ttranslatev3?IG=D6B2246CA0754ACEA5E5F1A3C9A3E2C7&IID=translator.5023&SFX=3&ref=TThis&edgepdftranslator=1
+logger.ts:70 [BingTranslateService] Bing Translate body: {
+  "fromLang": "auto-detect",
+  "to": "zh-Hans",
+  "text": "submitted",
+  "token": "oPFHFx7OwWeFVs6un5-OhCTWHwpm5RfA",
+  "key": "1772877540078",
+  "tryFetchingGenderDebiasedTranslations": "true"
+}
+logger.ts:70 [BingTranslateService] Bing Translate URL: https://cn.bing.com/ttranslatev3?IG=D6B2246CA0754ACEA5E5F1A3C9A3E2C7&IID=translator.5023&SFX=4&ref=TThis&edgepdftranslator=1
+logger.ts:70 [BingTranslateService] Bing Translate body: {
+  "fromLang": "auto-detect",
+  "to": "zh-Hans",
+  "text": " He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy.",
+  "token": "oPFHFx7OwWeFVs6un5-OhCTWHwpm5RfA",
+  "key": "1772877540078",
+  "tryFetchingGenderDebiasedTranslations": "true"
+}
+logger.ts:70 [BingTranslateService] Bing Translate response status: 200 
+logger.ts:70 [BingTranslateService] Bing raw response: 
+logger.ts:88 [BingTranslateService] Bing ttranslatev3 returned empty body for subdomain: cn.bing.com status: 200 headers: {
+  "alt-svc": "h3=\":443\"; ma=3600",
+  "cache-control": "private",
+  "content-encoding": "gzip",
+  "content-length": "0",
+  "content-security-policy": "script-src https: 'strict-dynamic' 'report-sample' 'wasm-unsafe-eval' 'nonce-MrK7cU16hGHaI8YSkpKUknSuOpXT7KKERnZO5L+xG0s='; base-uri 'self';report-to csp-endpoint",
+  "date": "Sat, 07 Mar 2026 09:59:29 GMT",
+  "permissions-policy": "unload=()",
+  "report-to": "{\"group\":\"csp-endpoint\",\"max_age\":86400,\"endpoints\":[{\"url\":\"https://aefd.nelreports.net/api/report?cat=bingcsp\"}]}",
+  "useragentreductionoptout": "A7kgTC5xdZ2WIVGZEfb1hUoNuvjzOZX3VIV/BA6C18kQOOF50Q0D3oWoAm49k3BQImkujKILc7JmPysWk3CSjwUAAACMeyJvcmlnaW4iOiJodHRwczovL3d3dy5iaW5nLmNvbTo0NDMiLCJmZWF0dXJlIjoiU2VuZEZ1bGxVc2VyQWdlbnRBZnRlclJlZHVjdGlvbiIsImV4cGlyeSI6MTY4NDg4NjM5OSwiaXNTdWJkb21haW4iOnRydWUsImlzVGhpcmRQYXJ0eSI6dHJ1ZX0=",
+  "vary": "Accept-Encoding",
+  "x-cache": "CONFIG_NOCACHE",
+  "x-eventid": "69abf701013c4fc381a064e7acc0a2c8",
+  "x-msedge-ref": "Ref A: A948DA2532684E9181352A4ACAAC97C1 Ref B: BJ1EDGE0810 Ref C: 2026-03-07T09:59:29Z"
+}
+warn @ logger.ts:88
+warn @ logger.ts:119
+translateWithBingTranslate @ BingTranslateService.ts:288
+await in translateWithBingTranslate
+translateWord @ TranslationService.ts:312
+await in translateWord
+handleTranslationRequest @ TranslationRequestHandler.ts:36
+await in handleTranslationRequest
+(anonymous) @ MessageRouter.ts:31
+logger.ts:97 [BingTranslateService] Failed to parse Bing response as JSON: 
+error @ logger.ts:97
+error @ logger.ts:120
+translateWithBingTranslate @ BingTranslateService.ts:306
+await in translateWithBingTranslate
+translateWord @ TranslationService.ts:312
+await in translateWord
+handleTranslationRequest @ TranslationRequestHandler.ts:36
+await in handleTranslationRequest
+(anonymous) @ MessageRouter.ts:31
+logger.ts:97 [TranslationService] Bing Translate translation error: Failed to parse Bing response: Unexpected end of JSON input
+error @ logger.ts:97
+error @ logger.ts:120
+translateWord @ TranslationService.ts:350
+await in translateWord
+handleTranslationRequest @ TranslationRequestHandler.ts:36
+await in handleTranslationRequest
+(anonymous) @ MessageRouter.ts:31
+logger.ts:97 [TranslationRequestHandler] Translation error: Failed to parse Bing response: Unexpected end of JSON input TranslationError: Failed to parse Bing response: Unexpected end of JSON input
+    at translateWord (chrome-extension://deidnlkkpkodibhngnanoepldncgffhe/src/2_background/index.js:17072:15)
+    at async handleTranslationRequest (chrome-extension://deidnlkkpkodibhngnanoepldncgffhe/src/2_background/index.js:17525:22)
+error @ logger.ts:97
+error @ logger.ts:120
+handleTranslationRequest @ TranslationRequestHandler.ts:73
+await in handleTranslationRequest
+(anonymous) @ MessageRouter.ts:31
+logger.ts:70 [BingTranslateService] Bing Translate response status: 200 
+logger.ts:70 [BingTranslateService] Bing raw response: 
+logger.ts:88 [BingTranslateService] Bing ttranslatev3 returned empty body for subdomain: cn.bing.com status: 200 headers: {
+  "alt-svc": "h3=\":443\"; ma=3600",
+  "cache-control": "private",
+  "content-encoding": "gzip",
+  "content-length": "0",
+  "content-security-policy": "script-src https: 'strict-dynamic' 'report-sample' 'wasm-unsafe-eval' 'nonce-+cse4Z7G6i20hN+3/flMjurcIRKEJkIXqAb0cOwN5ro='; base-uri 'self';report-to csp-endpoint",
+  "date": "Sat, 07 Mar 2026 09:59:29 GMT",
+  "permissions-policy": "unload=()",
+  "report-to": "{\"group\":\"csp-endpoint\",\"max_age\":86400,\"endpoints\":[{\"url\":\"https://aefd.nelreports.net/api/report?cat=bingcsp\"}]}",
+  "useragentreductionoptout": "A7kgTC5xdZ2WIVGZEfb1hUoNuvjzOZX3VIV/BA6C18kQOOF50Q0D3oWoAm49k3BQImkujKILc7JmPysWk3CSjwUAAACMeyJvcmlnaW4iOiJodHRwczovL3d3dy5iaW5nLmNvbTo0NDMiLCJmZWF0dXJlIjoiU2VuZEZ1bGxVc2VyQWdlbnRBZnRlclJlZHVjdGlvbiIsImV4cGlyeSI6MTY4NDg4NjM5OSwiaXNTdWJkb21haW4iOnRydWUsImlzVGhpcmRQYXJ0eSI6dHJ1ZX0=",
+  "vary": "Accept-Encoding",
+  "x-cache": "CONFIG_NOCACHE",
+  "x-eventid": "69abf701c25a4cdfbf9047c97ddb05fb",
+  "x-msedge-ref": "Ref A: B2C89D0F5EC2436CBCD4CED23E2E7259 Ref B: BJ1EDGE0810 Ref C: 2026-03-07T09:59:29Z"
+}
+warn @ logger.ts:88
+warn @ logger.ts:119
+translateWithBingTranslate @ BingTranslateService.ts:288
+await in translateWithBingTranslate
+translateWord @ TranslationService.ts:314
+await in translateWord
+handleTranslationRequest @ TranslationRequestHandler.ts:36
+await in handleTranslationRequest
+(anonymous) @ MessageRouter.ts:31
+logger.ts:97 [BingTranslateService] Failed to parse Bing response as JSON: 
+error @ logger.ts:97
+error @ logger.ts:120
+translateWithBingTranslate @ BingTranslateService.ts:306
+await in translateWithBingTranslate
+translateWord @ TranslationService.ts:314
+await in translateWord
+handleTranslationRequest @ TranslationRequestHandler.ts:36
+await in handleTranslationRequest
+(anonymous) @ MessageRouter.ts:31

@@ -10,7 +10,10 @@
         "128": "icons/icon-128.png"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "https://*.tapword.cc/*",
+        "https://local.tapword.cc/*",
+        "https://*.bing.com/*"
     ],
     "background": {
         "scripts": ["background.js"]
