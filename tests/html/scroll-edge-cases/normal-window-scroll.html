@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+  EXPECTED: Tooltip should NOT drift when scrolling.
+  Mechanism: window.scrollY accumulates normally.
+             The fix formula: winScrollY + (winScrollY===0 ? body.scrollTop : 0)
+             simplifies to window.scrollY here, which is correct.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 01 — Normal Window Scroll</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f0fdf4;
+      color: #1a2e1a;
+      padding-top: 80px; /* room for sticky banner */
+    }
+
+    /* ── Sticky test banner ── */
+    #test-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #166534;
+      color: #dcfce7;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: baseline;
+    }
+    #test-banner .name  { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    #test-banner .sep   { color: #4ade80; }
+    #test-banner .pass  { color: #86efac; }
+    #test-banner .fail  { color: #fca5a5; }
+
+    /* ── Article content ── */
+    article {
+      max-width: 760px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem;
+      line-height: 1.8;
+    }
+    h2 { margin: 2rem 0 0.75rem; font-size: 1.3rem; }
+    p  { margin-bottom: 1rem; }
+
+    /* ── Translatable words ── */
+    .translatable {
+      color: #065f46;
+      font-weight: 700;
+      text-decoration: underline wavy #10b981;
+      cursor: pointer;
+    }
+
+    /* ── Scroll indicator ── */
+    #scroll-debug {
+      position: fixed;
+      bottom: 12px; right: 12px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="test-banner">
+    <span class="name">TEST 01 — Normal Window Scroll</span>
+    <span class="sep">|</span>
+    <span>Scroll type: <strong>window.scrollY</strong></span>
+    <span class="sep">|</span>
+    <span class="pass">✅ PASS: tooltip stays directly below its anchor word at all scroll positions</span>
+    <span class="sep">|</span>
+    <span class="fail">❌ FAIL: tooltip drifts upward / downward as you scroll</span>
+  </div>
+
+  <div id="scroll-debug">window.scrollY: <span id="wy">0</span> · body.scrollTop: <span id="bt">0</span></div>
+
+  <article>
+    <h2>Instructions</h2>
+    <p>
+      1. Double-click (or select) one of the highlighted words below to trigger a translation tooltip.<br>
+      2. Scroll the page vertically.<br>
+      3. Watch whether the tooltip stays attached to the word or drifts away.
+    </p>
+
+    <h2>Sample Text with Translatable Words</h2>
+    <p>
+      The concept of <span class="translatable">algorithm</span> is fundamental to computer science.
+      An algorithm is a step-by-step procedure for solving a problem or accomplishing a task.
+      Modern machine learning relies heavily on the <span class="translatable">transformer</span>
+      architecture, which uses self-attention to model long-range dependencies in sequences.
+      Another key concept is <span class="translatable">inference</span>, the process of
+      running a trained model on new data to produce predictions.
+    </p>
+
+    <div id="filler"></div>
+  </article>
+
+  <script>
+    // Generate filler content (≥ 3× viewport height)
+    const filler = document.getElementById('filler');
+    const paragraphs = [
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+      'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis molestie dictum semper, lorem augue commodo orci.',
+      'Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue.',
+      'Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus.',
+    ];
+    let html = '';
+    // Repeat to get well over 3× viewport height
+    for (let i = 0; i < 40; i++) {
+      html += `<p>${paragraphs[i % paragraphs.length]}</p>`;
+    }
+    filler.innerHTML = html;
+
+    // Live scroll readout
+    const wyEl = document.getElementById('wy');
+    const btEl = document.getElementById('bt');
+    window.addEventListener('scroll', () => {
+      wyEl.textContent = Math.round(window.scrollY);
+      btEl.textContent = Math.round(document.body.scrollTop);
+    }, { passive: true });
+  </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!--
+  EXPECTED: Tooltip should appear at the correct horizontal position below the anchor word.
+
+  This is the same body-scroll layout as Test 02, but with dir="rtl" on <body>.
+  Tests the scrollX / scrollLeft calculation under RTL + body-scroll conditions.
+
+  In RTL body-scroll layouts with horizontal overflow:
+    - window.scrollX = 0 (the window does not scroll horizontally)
+    - document.body.scrollLeft accumulates the horizontal scroll amount
+    - The fix formula: scrollX = 0 + (0===0 ? body.scrollLeft : 0) = body.scrollLeft  ✓
+
+  Firefox edge case (low priority, noted in review):
+    In older Firefox with RTL, body.scrollLeft can be negative.
+    Chrome uses non-negative scrollLeft for RTL with scrollLeft=0 at right edge.
+    This test primarily targets Chrome behavior.
+
+  PASS: Tooltip appears directly below the anchor word at all horizontal scroll positions.
+  FAIL: Tooltip appears at a wrong horizontal offset (too far left or right).
+-->
+<html lang="en" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 06 — RTL Body Scroll</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      position: relative;   /* body is positioned ancestor for absolute children */
+      overflow-y: auto;     /* body is the vertical scroll container */
+      overflow-x: auto;     /* body is also the horizontal scroll container for RTL test */
+      height: 100vh;
+      font-family: system-ui, sans-serif;
+      background: #fdf4ff;
+      color: #3b0764;
+      padding-top: 88px;
+      direction: rtl;
+    }
+
+    #test-banner {
+      position: sticky;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #7e22ce;
+      color: #e9d5ff;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: baseline;
+      margin: -88px 0 0;
+      direction: ltr; /* keep banner LTR for readability */
+    }
+    #test-banner .name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    #test-banner .sep  { color: #c084fc; }
+    #test-banner .pass { color: #e9d5ff; }
+    #test-banner .fail { color: #fca5a5; }
+
+    article {
+      max-width: 760px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 4rem;
+      line-height: 1.8;
+      /* intentionally wide to allow horizontal scrolling test */
+      min-width: 1200px;
+    }
+    h2 { margin: 2rem 0 0.75rem; font-size: 1.3rem; }
+    p  { margin-bottom: 1rem; }
+
+    .translatable {
+      color: #7e22ce;
+      font-weight: 700;
+      text-decoration: underline wavy #a855f7;
+      cursor: pointer;
+    }
+
+    #scroll-debug {
+      position: fixed;
+      bottom: 12px; left: 12px; /* left side for RTL */
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 9999;
+      line-height: 1.6;
+      direction: ltr;
+    }
+    .highlight { color: #fbbf24; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div id="test-banner">
+    <span class="name">TEST 06 — RTL Body Scroll</span>
+    <span class="sep">|</span>
+    <span>dir="rtl" + body-scroll layout (same as Test 02)</span>
+    <span class="sep">|</span>
+    <span>window.scrollX = 0; <strong>body.scrollLeft</strong> accumulates</span>
+    <span class="sep">|</span>
+    <span class="pass">✅ PASS: tooltip at correct horizontal position below anchor word</span>
+    <span class="sep">|</span>
+    <span class="fail">❌ FAIL: tooltip offset horizontally from its anchor word</span>
+  </div>
+
+  <article>
+    <h2>Instructions (read left-to-right)</h2>
+    <p dir="ltr">
+      1. The page is in RTL mode (<code>dir="rtl"</code>) and uses body-scroll layout.<br>
+      2. Scroll vertically to verify the tooltip stays below the anchor word (same as Test 02).<br>
+      3. If the article is wider than the viewport, also scroll horizontally.<br>
+      4. The debug widget shows both scroll dimensions.
+    </p>
+
+    <h2>نمونه متن با کلمات قابل ترجمه (Sample RTL text)</h2>
+    <p>
+      <!-- Mix of RTL prose with English translatable words -->
+      مفهوم <span class="translatable">synthesis</span> در پردازش زبان طبیعی به فرآیند
+      تولید متن جدید از روی اطلاعات موجود اشاره دارد. مدل‌های مدرن بر پایه معماری
+      <span class="translatable">attention</span> ساخته شده‌اند که امکان وابستگی‌های
+      بلند-برد را فراهم می‌کند. یکی دیگر از مفاهیم کلیدی <span class="translatable">tokenization</span>
+      است که متن خام را به واحدهای کوچک‌تر برای پردازش تبدیل می‌کند.
+    </p>
+    <p dir="ltr">
+      (English translation of above: The concept of <em>synthesis</em> in NLP refers to
+      generating new text from existing information. Modern models are built on
+      <em>attention</em> architectures enabling long-range dependencies.
+      Another key concept is <em>tokenization</em>, converting raw text into smaller units.)
+    </p>
+
+    <div id="filler"></div>
+  </article>
+
+  <div id="scroll-debug">
+    window.scrollY: <span id="wy">0</span>  window.scrollX: <span id="wx">0</span><br>
+    body.scrollTop: <span id="bt" class="highlight">0</span>  body.scrollLeft: <span id="bl" class="highlight">0</span>
+  </div>
+
+  <script>
+    const filler = document.getElementById('filler');
+    const rtlParagraphs = [
+      'در یادگیری ماشین، بیش‌برازش زمانی رخ می‌دهد که مدل الگوهای داده‌های آموزشی را حفظ کند به جای اینکه آن‌ها را تعمیم دهد.',
+      'شبکه‌های عصبی عمیق از لایه‌های متعدد تبدیل‌های غیرخطی برای یادگیری نمایش‌های سلسله‌مراتبی از داده استفاده می‌کنند.',
+      'بهینه‌ساز آدام از میانگین‌های متحرک گرادیان‌های گذشته برای تطبیق نرخ یادگیری برای هر پارامتر استفاده می‌کند.',
+      'توجه چند-سر (Multi-head attention) موازی چندین عملیات توجه را اجرا می‌کند و سپس نتایج را الحاق می‌کند.',
+      'رمزگذار-رمزگشا (Encoder-Decoder) معماری استانداردی برای وظایف ترجمه ماشینی و خلاصه‌سازی است.',
+    ];
+    let html = '';
+    for (let i = 0; i < 35; i++) {
+      html += `<p>${rtlParagraphs[i % rtlParagraphs.length]}</p>`;
+    }
+    filler.innerHTML = html;
+
+    const wyEl = document.getElementById('wy');
+    const wxEl = document.getElementById('wx');
+    const btEl = document.getElementById('bt');
+    const blEl = document.getElementById('bl');
+
+    document.body.addEventListener('scroll', () => {
+      wyEl.textContent = Math.round(window.scrollY);
+      wxEl.textContent = Math.round(window.scrollX);
+      btEl.textContent = Math.round(document.body.scrollTop);
+      blEl.textContent = Math.round(document.body.scrollLeft);
+    }, { passive: true });
+  </script>
+</body>
+</html>

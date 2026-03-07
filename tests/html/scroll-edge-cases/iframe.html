@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+  EXPECTED: Tooltip should appear inside the iframe at the correct position.
+
+  This outer page hosts the iframe. The extension's content script runs INSIDE
+  the iframe, using the iframe's own coordinate system:
+    - window.scrollY → iframe viewport scroll
+    - document.body → iframe body
+    - getBoundingClientRect() → relative to iframe viewport
+
+  The tooltip is appended to the iframe's document.body, so all coordinates
+  are self-consistent within the iframe document. The outer page's scroll
+  position is irrelevant to the tooltip's computation.
+
+  PASS: Tooltip appears below the anchor word inside the iframe frame boundary.
+  FAIL: Tooltip appears in the wrong position or outside the iframe.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 05 — Iframe Coordinate Isolation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f0fdf4;
+      color: #14532d;
+      padding: 0;
+    }
+
+    #test-banner {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      background: #15803d;
+      color: #dcfce7;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: baseline;
+    }
+    #test-banner .name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    #test-banner .sep  { color: #4ade80; }
+    #test-banner .pass { color: #bbf7d0; }
+    #test-banner .fail { color: #fca5a5; }
+
+    #page-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      height: calc(100vh - 46px);
+    }
+
+    #sidebar {
+      background: #dcfce7;
+      border-right: 2px solid #4ade80;
+      padding: 1.25rem;
+      overflow-y: auto;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+    #sidebar h3 { font-size: 0.95rem; margin-bottom: 0.75rem; color: #15803d; }
+    #sidebar p  { margin-bottom: 0.6rem; color: #166534; }
+
+    #iframe-wrapper {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #iframe-label {
+      background: #bbf7d0;
+      border-bottom: 1px solid #4ade80;
+      padding: 0.35rem 1rem;
+      font-size: 0.78rem;
+      color: #14532d;
+    }
+    #content-frame {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="test-banner">
+    <span class="name">TEST 05 — Iframe Coordinate Isolation</span>
+    <span class="sep">|</span>
+    <span>Content is inside an <strong>&lt;iframe&gt;</strong> that loads <code>iframe-inner.html</code></span>
+    <span class="sep">|</span>
+    <span class="pass">✅ PASS: tooltip appears inside iframe, directly below anchor word</span>
+    <span class="sep">|</span>
+    <span class="fail">❌ FAIL: tooltip appears outside iframe or at wrong offset</span>
+  </div>
+
+  <div id="page-layout">
+    <div id="sidebar">
+      <h3>Instructions</h3>
+      <p>The translatable words are <strong>inside the iframe</strong> on the right.</p>
+      <p>Double-click a highlighted word in the iframe to trigger a tooltip.</p>
+      <p>Scroll the iframe content and verify the tooltip stays below the word.</p>
+      <p>The sidebar and outer page are irrelevant to the tooltip position — the extension
+         uses the iframe's own coordinate system.</p>
+    </div>
+    <div id="iframe-wrapper">
+      <div id="iframe-label">📄 iframe → iframe-inner.html</div>
+      <iframe id="content-frame" src="iframe-inner.html" title="TapWord iframe test content"></iframe>
+    </div>
+  </div>
+
+</body>
+</html>

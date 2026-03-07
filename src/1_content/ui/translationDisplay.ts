@@ -227,8 +227,14 @@ function positionTooltip(anchorId: string): void {
     const lineRects = rects.length > 0 ? rects : [anchor.getBoundingClientRect()]
     if (lineRects.length === 0) return
 
-    const scrollX = window.scrollX || document.documentElement.scrollLeft || 0
-    const scrollY = window.scrollY || document.documentElement.scrollTop || 0
+    // On pages where <body> is the scroll container (e.g. position:relative + overflow-y:auto),
+    // window.scrollY stays 0 while body.scrollTop accumulates.  We add body.scrollTop only
+    // when the window scroll is 0, avoiding double-counting in Quirks Mode pages where both
+    // window.scrollY and document.body.scrollTop reflect the same offset simultaneously.
+    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
+    const winScrollY = window.scrollY || document.documentElement.scrollTop  || 0
+    const scrollX = winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0)
+    const scrollY = winScrollY + (winScrollY === 0 ? (document.body?.scrollTop  || 0) : 0)
     const viewportWidth = document.documentElement.clientWidth
 
     const signature = buildRectsSignature(lineRects)

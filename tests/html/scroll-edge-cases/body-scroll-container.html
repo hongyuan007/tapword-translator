@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!--
+  EXPECTED: Tooltip should NOT drift upward when scrolling.
+  
+  This reproduces Issue #35 — the exact layout used by developers.openai.com/codex
+  and many Next.js / SPA documentation sites.
+
+  Mechanism:
+    <body> has { position:relative; overflow-y:auto; height:100vh }
+    → window.scrollY stays 0 throughout scrolling
+    → document.body.scrollTop accumulates the actual scroll amount
+    → The tooltip is position:absolute relative to <body>
+
+  Fix formula applied by the extension:
+    winScrollY = window.scrollY || documentElement.scrollTop || 0  → stays 0
+    scrollY    = 0 + (0===0 ? body.scrollTop : 0)  =  body.scrollTop  ✓
+
+  Before the fix (plain scrollY = window.scrollY):
+    scrollY = 0 always → top = rect.bottom + 0 → tooltip drifts upward as body scrolls
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 02 — Body Scroll Container (Issue #35)</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      height: 100%;
+      overflow: hidden; /* prevent html/window from scrolling */
+    }
+
+    /* Body IS the scroll container — the original Issue #35 layout */
+    body {
+      position: relative;   /* makes body the positioned ancestor for absolute children */
+      overflow-y: auto;     /* body itself is the scroll container */
+      height: 100vh;
+      font-family: system-ui, sans-serif;
+      background: #fff7ed;
+      color: #431407;
+      padding-top: 88px;
+    }
+
+    /* ── Sticky test banner ── */
+    #test-banner {
+      position: sticky;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #9a3412;
+      color: #ffedd5;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: baseline;
+      margin: -88px 0 0; /* offset the body padding so banner stays at top */
+    }
+    #test-banner .name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    #test-banner .sep  { color: #fb923c; }
+    #test-banner .pass { color: #fed7aa; }
+    #test-banner .fail { color: #fca5a5; }
+
+    article {
+      max-width: 760px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 4rem;
+      line-height: 1.8;
+    }
+    h2 { margin: 2rem 0 0.75rem; font-size: 1.3rem; }
+    p  { margin-bottom: 1rem; }
+
+    .translatable {
+      color: #9a3412;
+      font-weight: 700;
+      text-decoration: underline wavy #f97316;
+      cursor: pointer;
+    }
+
+    #scroll-debug {
+      position: fixed;
+      bottom: 12px; right: 12px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    #scroll-debug .highlight { color: #fbbf24; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div id="test-banner">
+    <span class="name">TEST 02 — Body Scroll Container (Issue #35)</span>
+    <span class="sep">|</span>
+    <span>Scroll type: <strong>body.scrollTop</strong> (window.scrollY stays 0)</span>
+    <span class="sep">|</span>
+    <span class="pass">✅ PASS: tooltip stays directly below anchor word while scrolling (no upward drift)</span>
+    <span class="sep">|</span>
+    <span class="fail">❌ FAIL: tooltip drifts upward — indicates the fix is not applied</span>
+  </div>
+
+  <article>
+    <h2>Instructions</h2>
+    <p>
+      1. Double-click (or select) one of the highlighted words below to trigger a translation tooltip.<br>
+      2. Scroll this page — notice that <strong>window.scrollY stays at 0</strong> (see the debug widget).<br>
+      3. Watch whether the tooltip stays attached to the word or drifts upward.
+    </p>
+    <p>
+      <em>Context</em>: This layout (<code>body { position:relative; overflow-y:auto; height:100vh }</code>)
+      is used by OpenAI Docs and many Next.js documentation sites.
+      Before fix, every scroll step reduced <code>rect.bottom</code> but <code>scrollY</code>
+      stayed 0, causing the computed <code>top</code> to shrink — the tooltip drifted up.
+    </p>
+
+    <h2>Sample Text with Translatable Words</h2>
+    <p>
+      The <span class="translatable">gradient</span> descent optimizer adjusts model
+      weights by following the slope of the loss surface toward a minimum.
+      <span class="translatable">Backpropagation</span> is the algorithm that efficiently
+      computes these gradients through the computational graph of a neural network.
+      The choice of <span class="translatable">hyperparameter</span> values such as learning
+      rate and batch size critically affects training dynamics.
+    </p>
+
+    <div id="filler"></div>
+  </article>
+
+  <div id="scroll-debug">
+    window.scrollY: <span id="wy">0</span> ·
+    body.scrollTop: <span id="bt" class="highlight">0</span>
+  </div>
+
+  <script>
+    const filler = document.getElementById('filler');
+    const paragraphs = [
+      'The autoregressive language model generates one token at a time, conditioning each prediction on all previously generated tokens in the sequence.',
+      'Attention mechanisms allow models to dynamically weight the importance of different parts of the input, enabling context-sensitive representation.',
+      'Fine-tuning adapts a pretrained model to a specific downstream task using a smaller, task-specific dataset and a lower learning rate.',
+      'Tokenization converts raw text into a sequence of integer indices that map to entries in the model vocabulary.',
+      'Perplexity measures how well a probability model predicts a sample and is commonly used to evaluate language model quality.',
+      'Embedding vectors represent discrete tokens as continuous, high-dimensional points in a learned semantic space.',
+      'The decoder stack in a transformer processes tokens causally, attending only to previous positions to preserve the autoregressive property.',
+    ];
+    let html = '';
+    for (let i = 0; i < 40; i++) {
+      html += `<p>${paragraphs[i % paragraphs.length]}</p>`;
+    }
+    filler.innerHTML = html;
+
+    const wyEl = document.getElementById('wy');
+    const btEl = document.getElementById('bt');
+    // body is the scroll container — listen on body (capture catches it)
+    document.body.addEventListener('scroll', () => {
+      wyEl.textContent = Math.round(window.scrollY);
+      btEl.textContent = Math.round(document.body.scrollTop);
+    }, { passive: true });
+  </script>
+</body>
+</html>
