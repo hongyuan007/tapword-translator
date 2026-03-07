@@ -179,25 +179,18 @@ export class AuthService {
             try {
                 logger.info("Auto-refresh timer triggered, checking token status...")
 
-                // Only refresh if we have a token and it's getting close to expiration
-                if (this.currentToken) {
+                // Fetch proactively if token is missing or near expiration
+                if (this.currentToken && this.isTokenValid(this.currentToken)) {
                     const now = Date.now()
                     const expiresAt = this.currentToken.obtainedAt + this.currentToken.expiresIn * 1000
                     const timeUntilExpiry = expiresAt - now
                     const minutesUntilExpiry = Math.floor(timeUntilExpiry / 1000 / 60)
-
-                    logger.info(`Token expires in ${minutesUntilExpiry} minutes`)
-
-                    // Refresh if token will expire within buffer time
-                    if (!this.isTokenValid(this.currentToken)) {
-                        logger.info("Token near expiration, refreshing...")
-                        await this.refreshToken()
-                        logger.info("Auto-refresh completed successfully")
-                    } else {
-                        logger.debug("Token still valid, no refresh needed")
-                    }
+                    logger.debug(`Auto-refresh: token still valid, expires in ${minutesUntilExpiry} minutes`)
                 } else {
-                    logger.info("No token cached, will be fetched on next API request")
+                    // Token is missing or near expiration — fetch proactively
+                    logger.info("Auto-refresh: token missing or near expiry, pre-fetching...")
+                    await this.getToken()
+                    logger.info("Auto-refresh: pre-fetch completed")
                 }
             } catch (error) {
                 logger.error("Auto-refresh failed:", error)

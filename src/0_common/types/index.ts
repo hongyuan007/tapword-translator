@@ -70,7 +70,14 @@ export interface SpeechSynthesisRequestData {
 /**
  * Message types for content-background communication
  */
-export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST"
+export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED"
+
+/**
+ * Page activated message (sent by content script on injection for token pre-warming)
+ */
+export interface PageActivatedMessage {
+    type: "PAGE_ACTIVATED"
+}
 
 /**
  * Popup bootstrap request/response
