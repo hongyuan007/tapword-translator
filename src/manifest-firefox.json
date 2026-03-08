@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "__MSG_extNameFirefox__",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "__MSG_extDescription__",
     "default_locale": "en",
     "icons": {
@@ -10,7 +10,10 @@
         "128": "icons/icon-128.png"
     },
     "permissions": [
-        "storage"
+        "storage",
+        "https://*.tapword.cc/*",
+        "https://local.tapword.cc/*",
+        "https://*.bing.com/*"
     ],
     "background": {
         "scripts": ["background.js"]
