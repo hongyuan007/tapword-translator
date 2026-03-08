@@ -51,7 +51,7 @@ export async function detectSourceLanguageAsync(text: string): Promise<LanguageD
 
     try {
         if (typeof chrome !== "undefined" && chrome.i18n && typeof chrome.i18n.detectLanguage === "function") {
-            logger.info("Using chrome.i18n.detectLanguage")
+            logger.debug("Using chrome.i18n.detectLanguage")
             const result = await new Promise<chrome.i18n.LanguageDetectionResult>((resolve) => {
                 chrome.i18n.detectLanguage(trimmed.slice(0, 1200), (res) => resolve(res))
             })
@@ -60,7 +60,7 @@ export async function detectSourceLanguageAsync(text: string): Promise<LanguageD
                 if (top && top.language) {
                     const norm = normalizeLangCode(top.language)
                     if (norm) {
-                        logger.info(`Chrome detected language: ${norm}`)
+                        logger.debug(`Chrome detected language: ${norm}`)
                         detectedLang = norm
                         isDetected = true
                     }
@@ -73,12 +73,12 @@ export async function detectSourceLanguageAsync(text: string): Promise<LanguageD
 
     if (!isDetected) {
         try {
-            logger.info("Using franc for language detection")
+            logger.debug("Using franc for language detection")
             const iso3 = franc(trimmed, { minLength: 3 })
             if (iso3 && iso3 !== "und") {
                 const iso1 = iso3to1(iso3)
                 if (iso1) {
-                    logger.info(`Franc detected language: ${iso1}`)
+                    logger.debug(`Franc detected language: ${iso1}`)
                     detectedLang = iso1
                     isDetected = true
                 }
@@ -89,7 +89,7 @@ export async function detectSourceLanguageAsync(text: string): Promise<LanguageD
     }
 
     if (!isDetected) {
-        logger.info(`Falling back to default language: ${fallback}`)
+        logger.debug(`Falling back to default language: ${fallback}`)
     }
 
     // Preserve the detected language before the "auto" override for Kana validation below.

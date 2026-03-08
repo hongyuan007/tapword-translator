@@ -20,7 +20,7 @@
 
 Before starting any task, analyze the user request and choose the appropriate workflow.
 
-### � INPUT ASSESSMENT (Perform FIRST)
+### INPUT ASSESSMENT (Perform FIRST)
 
 Identify what the user has provided:
 
@@ -31,7 +31,7 @@ Identify what the user has provided:
 
 ---
 
-### �🚦 DECISION MATRIX
+### DECISION MATRIX
 
 | Criteria | Workflow | Description |
 | :--- | :--- | :--- |
