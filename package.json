@@ -13,9 +13,9 @@
         "dev:prod": "npm run prebuild:prod && vite -c vite.config.ts --mode production",
 
         "build": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode development",
-        "build:firefox": "npm run clean && npm run prebuild:prod && NODE_ENV=production vite build -c vite.config.ts --mode firefox",
+        "build:firefox": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode firefox",
         "build:firefox-dev": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode firefox-development",
-        "build:prod": "npm run clean && npm run prebuild:prod && NODE_ENV=production vite build -c vite.config.ts --mode production",
+        "build:prod": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode production",
 
         "package": "npm run build:prod && node scripts/package-with-version.mjs",
         "package:firefox": "npm run build:firefox && node scripts/package-with-version.mjs firefox",
@@ -27,12 +27,12 @@
         "build:community": "npm run clean && npm run prebuild:community && cross-env NODE_ENV=production vite build -c vite.config.ts --mode community",
         
         "type-check": "tsc --noEmit",
-        "clean": "rm -rf dist",
+        "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
         "test": "vitest --config config/vitest.config.ts",
         "test:e2e": "playwright test -c config/playwright.config.ts",
         "test:e2e:headed": "playwright test -c config/playwright.config.ts --headed",
         "format": "prettier --config config/.prettierrc.json --write \"src/**/*.ts\"",
-        "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --config config/.eslintrc.json \"src/**/*.ts\""
+        "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --config config/.eslintrc.json \"src/**/*.ts\""
     },
     "dependencies": {
         "crypto-js": "4.2.0",
