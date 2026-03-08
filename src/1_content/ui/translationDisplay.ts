@@ -717,9 +717,6 @@ export function showTranslationResult(
             const segs = activeTranslations.get(anchorId) || []
             for (const seg of segs) seg.classList.add("visible")
             positionTooltip(anchorId)
-            if (didAdjustLineHeight) {
-                scheduleReposition()
-            }
         }, 10)
 
         logger.info("Translation displayed:", anchorId, state)
