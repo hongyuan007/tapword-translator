@@ -22,15 +22,28 @@ const PRINTABLE_ASCII_REGEX = /^[\x20-\x7E]+$/
  * @param text - The text to detect language for
  * @returns Language code (e.g., 'en', 'zh', 'es')
  */
-export async function detectSourceLanguageAsync(text: string): Promise<string> {
+/**
+ * Result of async language detection.
+ * `lang` is the effective routing language (may be "auto" for mixed CJK+Latin content).
+ * `blockContextLang` is the original detected language (before "auto" override), validated with
+ * a Kana check for Japanese: if Chrome detects "ja" but no Kana is present in the text, it falls
+ * back to `lang`. This guards against rare Chrome false-positives on CJK text that could
+ * incorrectly disable the zh→en same-language fallback in resolveTargetLanguage.
+ */
+export interface LanguageDetectionResult {
+    lang: string
+    blockContextLang: string
+}
+
+export async function detectSourceLanguageAsync(text: string): Promise<LanguageDetectionResult> {
     logger.debug("Starting async language detection:", text)
     const trimmed = (text || "").trim()
     const fallback = "en"
-    if (trimmed.length === 0) return fallback
+    if (trimmed.length === 0) return { lang: fallback, blockContextLang: fallback }
 
     if (trimmed.length <= SHORT_ASCII_THRESHOLD && PRINTABLE_ASCII_REGEX.test(trimmed)) {
         logger.debug(`Short ASCII text (${trimmed.length} chars) → assuming "en"`)
-        return "en"
+        return { lang: "en", blockContextLang: "en" }
     }
 
     let detectedLang = fallback
@@ -79,7 +92,10 @@ export async function detectSourceLanguageAsync(text: string): Promise<string> {
         logger.info(`Falling back to default language: ${fallback}`)
     }
 
-    // Post-processing optimization specifically for our primary demographic: 
+    // Preserve the detected language before the "auto" override for Kana validation below.
+    const rawLang = detectedLang
+
+    // Post-processing optimization specifically for our primary demographic:
     // Chinese users reading English (or other Latin-script) content.
     if (["zh", "ja", "ko"].includes(detectedLang)) {
         const hasCJK = hasCJKCharacters(trimmed)
@@ -99,7 +115,13 @@ export async function detectSourceLanguageAsync(text: string): Promise<string> {
         }
     }
 
-    return detectedLang
+    // blockContextLang: rawLang validated for Japanese — if rawLang is "ja" but no Kana is present,
+    // fall back to lang. This guards against Chrome misclassifying CJK-heavy text as Japanese,
+    // which would incorrectly disable the zh→en same-language fallback in resolveTargetLanguage.
+    const blockContextLang = (rawLang === "ja" && !/[\u3040-\u30FF]/.test(trimmed)) ? detectedLang : rawLang
+    logger.info(`Language detection result: lang=${detectedLang}, rawLang=${rawLang}, blockContextLang=${blockContextLang}`)
+
+    return { lang: detectedLang, blockContextLang }
 }
 
 function normalizeLangCode(code: string): string | null {
@@ -204,10 +226,11 @@ function iso3to1(code: string): string | null {
  * @param targetLanguage - The user's preferred target language code
  * @returns The resolved target language code to use for translation
  */
-export function resolveTargetLanguage(sourceLanguage: string, targetLanguage: string): string {
+export function resolveTargetLanguage(sourceLanguage: string, targetLanguage: string, blockContextLang?: string): string {
     // Normalize to lowercase for comparison
     const srcLang = (sourceLanguage || "").toLowerCase()
     const tgtLang = (targetLanguage || "").toLowerCase()
+    const blockLang = (blockContextLang || "").toLowerCase()
 
     // If source is "auto" (code-switching text), skip fallback and trust user's target language.
     // Let the backend LLM decide how to handle mixed-language input.
@@ -216,21 +239,30 @@ export function resolveTargetLanguage(sourceLanguage: string, targetLanguage: st
         return targetLanguage
     }
 
-    // If source and target are the same, apply fallback rules
-    if (srcLang === tgtLang) {
-        logger.info(`Source language (${srcLang}) matches target language (${tgtLang}), applying fallback`)
+    // Special case: pure-Kanji Japanese words contain no Kana and are script-indistinguishable
+    // from Chinese by Unicode range alone. If the block context (150 chars) has already
+    // identified the surrounding page as Japanese, trust that over the "zh" script guess to
+    // prevent a spurious zh→en fallback on Japanese pages.
+    const effectiveSrc = (srcLang === "zh" && blockLang === "ja") ? "ja" : srcLang
+    if (effectiveSrc !== srcLang) {
+        logger.info(`Block context (${blockLang}) overrides script-based source "${srcLang}" → "${effectiveSrc}"`)
+    }
 
-        if (srcLang === "zh") {
+    // If source and target are the same, apply fallback rules
+    if (effectiveSrc === tgtLang) {
+        logger.info(`Source language (${effectiveSrc}) matches target language (${tgtLang}), applying fallback`)
+
+        if (effectiveSrc === "zh") {
             // Chinese content with Chinese target -> English
             logger.info("Chinese -> English fallback applied")
             return "en"
-        } else if (srcLang === "en") {
+        } else if (effectiveSrc === "en") {
             // English content with English target -> Japanese
             logger.info("English -> Japanese fallback applied")
             return "ja"
         } else {
             // Other languages -> English
-            logger.info(`${srcLang} -> English fallback applied`)
+            logger.info(`${effectiveSrc} -> English fallback applied`)
             return "en"
         }
     }
@@ -256,4 +288,27 @@ export function hasCJKCharacters(text: string): boolean {
     // \u3130-\u318f: Hangul Compatibility Jamo
     const cjkRegex = /[\u4e00-\u9fff\u3400-\u4dbf\u3040-\u30ff\uac00-\ud7af\u3130-\u318f]/
     return cjkRegex.test(text)
+}
+
+/**
+ * Synchronously infers the primary script language of a text without any API call.
+ * Used to determine same-language fallback based on the *selected text* rather than
+ * the broader block context (which may return "auto" for mixed CJK+Latin content).
+ *
+ * Priority order: Japanese Kana → Korean Hangul → Cyrillic → Chinese Han
+ *
+ * @param text - The selected text
+ * @returns A BCP-47 language tag if a definitive script is found, or null for Latin/ambiguous text
+ */
+export function detectSelectionScriptLang(text: string): "zh" | "ja" | "ko" | "ru" | null {
+    if (/[\u3040-\u30ff]/.test(text)) return "ja"        // Hiragana / Katakana → Japanese
+    if (/[\uac00-\ud7af\u3130-\u318f]/.test(text)) return "ko" // Hangul → Korean
+    if (/[\u0400-\u04ff]/.test(text)) return "ru"        // Cyrillic → Russian
+    // Only return "zh" for pure CJK text (no Latin letters).
+    // Mixed CJK+Latin selections (e.g. "所有memory md全空") should fall back to
+    // the block-context "auto" value so the LLM translates the English parts to Chinese.
+    const hasCJK = /[\u4e00-\u9fff\u3400-\u4dbf]/.test(text)
+    const hasLatin = /[a-zA-Z]/.test(text)
+    if (hasCJK && !hasLatin) return "zh"
+    return null
 }

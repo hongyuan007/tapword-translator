@@ -340,7 +340,7 @@ async function handleSpeakClick(event: Event, text: string, isAutoPlay: boolean 
 
     // Prefer provided language from earlier detection (e.g., original sentence).
     // Only if missing, optionally detect as a fallback to keep previous behavior in rare cases.
-    const detectedLanguage = languageOverride || (await languageDetector.detectSourceLanguageAsync(text))
+    const detectedLanguage = languageOverride || (await languageDetector.detectSourceLanguageAsync(text)).lang
     logger.info(`[SpeechSynthesis] Using language for text "${text}": ${detectedLanguage}`)
 
     chrome.runtime.sendMessage(

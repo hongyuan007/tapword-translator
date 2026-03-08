@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本語翻訳シナリオテスト</title>
+    <style>
+        body { font-family: "Hiragino Kaku Gothic Pro", "Meiryo", "Yu Gothic", sans-serif; padding: 40px; line-height: 1.8; max-width: 800px; margin: 0 auto; }
+        section { margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        h1 { margin-bottom: 20px; }
+        h2 { font-size: 1.2rem; color: #444; margin-top: 0; }
+        .scenario-desc { color: #666; font-style: italic; margin-bottom: 10px; font-size: 0.9rem; }
+        .test-case { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #28a745; margin-bottom: 20px; }
+        .highlight { background-color: #fff3cd; padding: 2px 4px; border-radius: 2px; cursor: text; }
+        .note { background: #e8f4f8; border-left: 4px solid #17a2b8; padding: 8px 12px; font-size: 0.85rem; margin-bottom: 16px; }
+        .expected { font-size: 0.85rem; color: #555; margin-top: 8px; }
+        .expected strong { color: #28a745; }
+    </style>
+</head>
+<body>
+    <h1>日本語翻訳シナリオテスト</h1>
+    <p>このページは日本語Webページをシミュレートし、日本語テキストの翻訳動作を検証するためのものです。</p>
+    <div class="note">
+        ⚠ このページは <code>lang="ja"</code> を宣言しており、日本語ページとして認識されます。<br>
+        ターゲット言語は <strong>中国語（zh）</strong> に設定した状態でテストしてください。
+    </div>
+
+    <!-- Scenario 1: Pure Kanji (no Kana) — key edge case -->
+    <section>
+        <h2>シナリオ1：純漢字テキスト（カナなし）</h2>
+        <div class="scenario-desc">
+            目的：漢字のみの単語（カナなし）は中国語と区別できないが、ページコンテキスト（lang="ja"）により日本語と判定し、中国語に翻訳されるべき。
+        </div>
+        <div class="test-case">
+            <p id="case-1-block">
+                このシステムの<span id="target-1-word" class="highlight">変更</span>は、既存の機能に影響を与えません。
+                設計チームが詳細な分析を行い、最適な方法を選択しました。
+            </p>
+            <div class="expected">期待動作：「変更」→ 中国語翻訳（"变更" / "修改"）、zh→en fallbackは不要</div>
+        </div>
+        <div class="test-case">
+            <p id="case-1b-block">
+                <span id="target-1b-word" class="highlight">経済</span>の回復は、政府の施策に大きく依存しています。
+                専門家は来年の見通しについて慎重な楽観論を示しています。
+            </p>
+            <div class="expected">期待動作：「経済」→ 中国語翻訳（"经济"）、zh→en fallbackは不要</div>
+        </div>
+    </section>
+
+    <!-- Scenario 2: Kanji + Kana mixed (standard Japanese) -->
+    <section>
+        <h2>シナリオ2：漢字＋かなの混合（通常の日本語）</h2>
+        <div class="scenario-desc">
+            目的：助詞や活用形のカナが含まれる通常の日本語テキストは、明確に日本語と判定できる。
+        </div>
+        <div class="test-case">
+            <p id="case-2-block">
+                新しい<span id="target-2-word" class="highlight">ソフトウェア</span>のインストールが完了しました。
+                設定ファイルを確認して、必要に応じて調整してください。
+            </p>
+            <div class="expected">期待動作：「ソフトウェア」→ 中国語翻訳（"软件"）</div>
+        </div>
+        <div class="test-case">
+            <p id="case-2b-block">
+                <span id="target-2b-word" class="highlight">開発環境</span>の構築には、以下の手順に従ってください。
+                まず、依存関係をインストールし、次に設定ファイルを編集します。
+            </p>
+            <div class="expected">期待動作：「開発環境」→ 中国語翻訳（"开发环境"）</div>
+        </div>
+    </section>
+
+    <!-- Scenario 3: English words in Japanese text -->
+    <section>
+        <h2>シナリオ3：日本語文中の英単語</h2>
+        <div class="scenario-desc">
+            目的：日本語のコンテキスト中に現れる英単語は、中国語に翻訳されるべき（source="en", target="zh"）。
+        </div>
+        <div class="test-case">
+            <p id="case-3-block">
+                このプロジェクトでは、<span id="target-3-word" class="highlight">performance</span>の最適化が最重要課題です。
+                チームは様々なアプローチを検討し、最終的にキャッシュ戦略を採用しました。
+            </p>
+            <div class="expected">期待動作：「performance」→ 中国語翻訳（"性能"）</div>
+        </div>
+        <div class="test-case">
+            <p id="case-3b-block">
+                最新の<span id="target-3b-word" class="highlight">algorithm</span>を実装することで、処理速度が大幅に向上しました。
+                ベンチマークテストでは、従来比で3倍以上の改善が確認されました。
+            </p>
+            <div class="expected">期待動作：「algorithm」→ 中国語翻訳（"算法"）</div>
+        </div>
+    </section>
+
+    <!-- Scenario 4: Katakana loanwords -->
+    <section>
+        <h2>シナリオ4：カタカナ外来語</h2>
+        <div class="scenario-desc">
+            目的：カタカナのみの単語は日本語固有であり、中国語に翻訳されるべき。
+        </div>
+        <div class="test-case">
+            <p id="case-4-block">
+                このシステムは<span id="target-4-word" class="highlight">アーキテクチャ</span>の観点から見直す必要があります。
+                マイクロサービス化により、スケーラビリティが向上します。
+            </p>
+            <div class="expected">期待動作：「アーキテクチャ」→ 中国語翻訳（"架构"）</div>
+        </div>
+    </section>
+
+    <!-- Scenario 5: Pure Kanji sentence fragment -->
+    <section>
+        <h2>シナリオ5：純漢字の文章フラグメント</h2>
+        <div class="scenario-desc">
+            目的：複数の漢字からなるフラグメントも、ページコンテキストにより日本語と正しく判定されるべき。
+        </div>
+        <div class="test-case">
+            <p id="case-5-block">
+                今回のプロジェクトでは、<span id="target-5-fragment" class="highlight">品質管理体制</span>の強化が求められています。
+                各部門が連携して、包括的な品質保証プロセスを構築する予定です。
+            </p>
+            <div class="expected">期待動作：「品質管理体制」→ 中国語翻訳（"质量管理体制"）、zh→en fallbackは不要</div>
+        </div>
+        <div class="test-case">
+            <p id="case-5b-block">
+                来年度の<span id="target-5b-fragment" class="highlight">事業計画策定</span>に向けて、各部門から提案を募集しています。
+                革新的なアイデアを積極的に取り入れる方針です。
+            </p>
+            <div class="expected">期待動作：「事業計画策定」→ 中国語翻訳（"事业计划制定"）、zh→en fallbackは不要</div>
+        </div>
+    </section>
+
+    <!-- Scenario 6: Mixed Japanese + English technical text -->
+    <section>
+        <h2>シナリオ6：日英混合の技術文書</h2>
+        <div class="scenario-desc">
+            目的：日英混合テキスト中の各要素が正しく翻訳される。
+        </div>
+        <div class="test-case">
+            <p id="case-6-block">
+                新しい<span id="target-6-word" class="highlight">API</span>の実装により、フロントエンドとバックエンドの連携が改善されます。
+                RESTful設計に従い、エンドポイントを整理しました。
+            </p>
+            <div class="expected">期待動作：「API」→ 中国語翻訳（"接口" / "API"）</div>
+        </div>
+    </section>
+</body>
+</html>
