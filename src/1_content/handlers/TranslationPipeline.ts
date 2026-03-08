@@ -114,16 +114,19 @@ async function processTranslation(
     const sanitizedText = rawText.trim()
     logger.info(`[${triggerSource}] Translation requested for:`, sanitizedText)
 
-    // Get surrounding text from block ancestor for routing (CJK vs space-delimited) decisions only
+    // Get surrounding block text for language detection (used for both routingLang and selectionLang).
+    // Block context gives far more signal than the selected word alone, making detection reliable.
     const textForRouting = domSanitizer.getSurroundingTextForDetection(range, 30)
 
     // routingLang: determined from block context, used only to decide word-boundary strategy
     const routingLang = await languageDetector.detectSourceLanguageAsync(textForRouting)
     logger.info(`[${triggerSource}] Routing language (block context):`, routingLang)
 
-    // selectionLang: determined from the selected text itself, sent to the translation API.
-    // False positives and mixed-language string overrides are handled within detectSourceLanguageAsync.
-    const selectionLang = await languageDetector.detectSourceLanguageAsync(sanitizedText)
+    // selectionLang: determined from block context (same source as routingLang) for accuracy on short words.
+    // chrome.i18n.detectLanguage is unreliable on short strings (< ~15 chars), e.g. "nominated" → "la" (Latin).
+    // Using the surrounding paragraph text (textForRouting) provides far more signal and avoids such false positives.
+    // Mixed CJK/Latin context returns "auto", which resolveTargetLanguage handles correctly downstream.
+    const selectionLang = await languageDetector.detectSourceLanguageAsync(textForRouting)
     logger.info(`[${triggerSource}] Selection language (selected text):`, selectionLang)
 
     // Check if the selection actually contains CJK characters.
