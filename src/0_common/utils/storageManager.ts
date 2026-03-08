@@ -87,12 +87,31 @@ function normalizeUserSettings(
         ...(settings.customApi ?? {}),
     }
 
+    const mergedMTranserver = {
+        ...DEFAULT_USER_SETTINGS.mtranserver,
+        ...(settings.mtranserver ?? {}),
+    }
+
     const normalizedCustomApi: types.CustomApiSettings = {
-        useCustomApi: isCommunityEdition ? true : (mergedCustomApi.useCustomApi ?? DEFAULT_USER_SETTINGS.customApi.useCustomApi),
         baseUrl: normalizeString(mergedCustomApi.baseUrl),
         apiKey: normalizeString(mergedCustomApi.apiKey),
         model: normalizeString(mergedCustomApi.model),
     }
+
+    const normalizedMTranserver: types.MTranserverSettings = {
+        url: normalizeString(mergedMTranserver.url),
+        key: normalizeString(mergedMTranserver.key),
+        enabled: mergedMTranserver.enabled ?? DEFAULT_USER_SETTINGS.mtranserver.enabled,
+    }
+
+    // Community edition: Default to customApi since official cloud API is not available
+    let normalizedTranslationProvider: types.TranslationProvider = "official"
+    if (isCommunityEdition && settings.translationProvider === undefined) {
+        normalizedTranslationProvider = "customApi"
+    }
+    
+    // Note: We don't auto-switch to mtranserver based on URL configuration
+    // User must explicitly select mtranserver from the provider dropdown
 
     const platformDefaultTriggerKey = platformDefaults?.defaultTriggerKey ?? DEFAULT_USER_SETTINGS.doubleClickSentenceTriggerKey
     const platformOS = platformDefaults?.os ?? "unknown"
@@ -106,6 +125,7 @@ function normalizeUserSettings(
         ...platformAwareDefaults,
         ...settings,
         customApi: normalizedCustomApi,
+        translationProvider: settings.translationProvider ?? normalizedTranslationProvider,
     }
 
     const triggerKey = normalizeTriggerKey(mergedSettings.doubleClickSentenceTriggerKey, platformOS)
@@ -136,6 +156,7 @@ function normalizeUserSettings(
         textUnderlineOffsetPx: mergedSettings.textUnderlineOffsetPx ?? DEFAULT_USER_SETTINGS.textUnderlineOffsetPx,
         textUnderlineOffsetPxV2: mergedSettings.textUnderlineOffsetPxV2 ?? DEFAULT_USER_SETTINGS.textUnderlineOffsetPxV2,
         customApi: normalizedCustomApi,
+        mtranserver: normalizedMTranserver,
         doubleClickSentenceTriggerKey: validatedTriggerKey,
         // Ensure V2 key is always populated for internal usage
         doubleClickTranslateV2: mergedSettings.doubleClickTranslateV2 ?? DEFAULT_USER_SETTINGS.doubleClickTranslateV2,

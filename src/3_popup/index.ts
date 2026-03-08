@@ -67,11 +67,12 @@ async function initialize(): Promise<void> {
         })
     }
 
-    // Display version number
-    const version = chrome.runtime.getManifest().version
+    // Display version number (prefer version_name for descriptive labels)
+    const manifest = chrome.runtime.getManifest()
+    const versionText = manifest.version_name || manifest.version
     const versionDisplay = document.getElementById("versionDisplay")
     if (versionDisplay) {
-        versionDisplay.textContent = `${version}`
+        versionDisplay.textContent = `${versionText}`
     }
 
     // Show community edition subtitle for community builds

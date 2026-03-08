@@ -14,9 +14,10 @@ import * as storageManagerModule from "@/0_common/utils/storageManager"
 import { getPlatformOS, PLATFORMS } from "@/0_common/utils/platformDetector"
 import { translateWord as translateWordWithLLM } from "@/8_generate"
 import type { LLMConfig } from "@/8_generate"
+import * as mtranServerServiceModule from "@/6_translate/services/MTranServerService"
+import * as bingTranslateServiceModule from "@/6_translate/services/BingTranslateService"
 
 const logger = loggerModule.createLogger("Options/Settings")
-const CUSTOM_API_CONTROL_SELECTOR = '[data-custom-api-control="true"]'
 const isCommunityEdition = APP_EDITION === "community"
 const AUTO_PLAY_AUDIO_SETTING_ID = "autoPlayAudio"
 const FEATURE_DOT_OFF_CLASS = "feature-dot-off"
@@ -51,34 +52,6 @@ function setTranslationControlsEnabled(enabled: boolean): void {
     })
 }
 
-function setCustomApiControlsEnabled(enabled: boolean): void {
-    const controls = document.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLTextAreaElement>(CUSTOM_API_CONTROL_SELECTOR)
-    controls.forEach((element) => {
-        element.disabled = !enabled
-        const settingItem = element.closest(".setting-item")
-        if (settingItem) {
-            settingItem.classList.toggle("is-disabled", !enabled)
-        }
-    })
-}
-
-function lockUseCustomApiToggle(): void {
-    if (!isCommunityEdition) {
-        return
-    }
-
-    const toggle = document.getElementById("useCustomApi") as HTMLInputElement | null
-    const settingItem = document.getElementById("useCustomApiSettingItem")
-
-    if (!toggle) {
-        return
-    }
-
-    toggle.checked = true
-    toggle.disabled = true
-    settingItem?.classList.add("is-disabled")
-}
-
 function lockAutoPlayAudioToggle(): void {
     if (!isCommunityEdition) {
         return
@@ -102,21 +75,6 @@ async function ensureCommunityAutoPlayDisabled(settings: types.UserSettings): Pr
     }
 
     const updated = await storageManagerModule.updateUserSettings({ autoPlayAudio: false })
-    return updated
-}
-
-async function ensureCommunityCustomApiEnabled(settings: types.UserSettings): Promise<types.UserSettings> {
-    if (!isCommunityEdition || settings.customApi.useCustomApi) {
-        return settings
-    }
-
-    const updated = await storageManagerModule.updateUserSettings({
-        customApi: {
-            ...settings.customApi,
-            useCustomApi: true,
-        },
-    })
-
     return updated
 }
 
@@ -146,23 +104,6 @@ async function restoreDependentTogglesIfAllOff(): Promise<void> {
         singleClickTranslate: true,
         doubleClickTranslateV2: false,
         doubleClickSentenceTranslate: true,
-    })
-}
-
-async function saveCustomApiSettings(partial: Partial<types.CustomApiSettings>): Promise<void> {
-    const current = await storageManagerModule.getUserSettings()
-    const nextPartial = isCommunityEdition
-        ? {
-              ...partial,
-              useCustomApi: true,
-          }
-        : partial
-
-    await storageManagerModule.updateUserSettings({
-        customApi: {
-            ...current.customApi,
-            ...nextPartial,
-        },
     })
 }
 
@@ -218,7 +159,6 @@ export async function loadSettings(): Promise<void> {
         await populateTriggerKeyOptions()
 
         let settings = await storageManagerModule.getUserSettings()
-        settings = await ensureCommunityCustomApiEnabled(settings)
         settings = await ensureCommunityAutoPlayDisabled(settings)
 
         // TODO: Improve type safety. Instead of casting to unknown then Record, consider using keyof types.UserSettings type guards or maintaining the original type.
@@ -233,9 +173,7 @@ export async function loadSettings(): Promise<void> {
             const input = checkbox as HTMLInputElement
             const settingKey = input.dataset.setting
 
-            if (settingKey === "useCustomApi") {
-                input.checked = settings.customApi.useCustomApi
-            } else if (settingKey && settingKey in settings) {
+            if (settingKey && settingKey in settings) {
                 input.checked = settingsRecord[settingKey] as boolean
             }
         })
@@ -292,10 +230,19 @@ export async function loadSettings(): Promise<void> {
             }
         }
 
-        setValue("useCustomApi", customApi.useCustomApi)
+        // Load translation provider selection
+        setValue("customApiProvider", settings.translationProvider)
+
+        // Load Custom API settings
         setValue("customApiBaseUrl", customApi.baseUrl)
         setValue("customApiKey", customApi.apiKey)
         setValue("customApiModel", customApi.model)
+
+        // Load MTranserver settings
+        if (settings.mtranserver) {
+            setValue("mtranserverUrl", settings.mtranserver.url || "http://127.0.0.1:8989")
+            setValue("mtranserverKey", settings.mtranserver.key || "")
+        }
 
         // Initialize Custom Selects with loaded values
         const customSelects = document.querySelectorAll(".custom-select-wrapper[data-setting]")
@@ -306,10 +253,9 @@ export async function loadSettings(): Promise<void> {
                 updateCustomSelectUI(wrapper as HTMLElement, value)
             }
         })
-        
+
         setTranslationControlsEnabled(settings.enableTapWord)
-        setCustomApiControlsEnabled(isCommunityEdition ? true : customApi.useCustomApi)
-        lockUseCustomApiToggle()
+        updateProviderDependentUI(settings.translationProvider, false)
         lockAutoPlayAudioToggle()
         syncSingleClickFeatureDotState(settings.singleClickTranslate)
     } catch (error) {
@@ -337,19 +283,6 @@ export function setupSettingChangeListeners(): void {
             const input = event.target as HTMLInputElement
             const settingKey = input.dataset.setting
             if (!settingKey) {
-                return
-            }
-
-            if (settingKey === "useCustomApi") {
-                if (isCommunityEdition) {
-                    input.checked = true
-                    lockUseCustomApiToggle()
-                    setCustomApiControlsEnabled(true)
-                    return
-                }
-
-                await saveCustomApiSettings({ useCustomApi: input.checked })
-                setCustomApiControlsEnabled(input.checked)
                 return
             }
 
@@ -401,6 +334,10 @@ export function setupSettingChangeListeners(): void {
 
             if (settingKey === "targetLanguage") {
                 updateSuppressNativeLanguageLabel(value)
+            }
+
+            if (settingKey === "translationProvider") {
+                updateProviderDependentUI(value as types.TranslationProvider)
             }
 
             await saveSetting(settingKey as keyof types.UserSettings, value)
@@ -455,6 +392,7 @@ export function setupSettingChangeListeners(): void {
             const value = inputElement.value.trim()
 
             if (settingKey === "customApiBaseUrl" || settingKey === "customApiKey" || settingKey === "customApiModel") {
+                const current = await storageManagerModule.getUserSettings()
                 const partial: Partial<types.CustomApiSettings> = {}
 
                 if (settingKey === "customApiBaseUrl") {
@@ -467,7 +405,33 @@ export function setupSettingChangeListeners(): void {
                     partial.model = value
                 }
 
-                await saveCustomApiSettings(partial)
+                await storageManagerModule.updateUserSettings({
+                    customApi: {
+                        ...current.customApi,
+                        ...partial,
+                    },
+                })
+                return
+            }
+            
+            if (settingKey === "mtranserverUrl" || settingKey === "mtranserverKey") {
+                const current = await storageManagerModule.getUserSettings()
+                
+                if (settingKey === "mtranserverUrl") {
+                    await storageManagerModule.updateUserSettings({
+                        mtranserver: {
+                            ...current.mtranserver,
+                            url: value
+                        }
+                    })
+                } else if (settingKey === "mtranserverKey") {
+                    await storageManagerModule.updateUserSettings({
+                        mtranserver: {
+                            ...current.mtranserver,
+                            key: value
+                        }
+                    })
+                }
                 return
             }
 
@@ -616,18 +580,18 @@ function updateCustomSelectUI(wrapper: HTMLElement, value: string): void {
 export function setupCustomApiValidation(): void {
     const validateButton = document.getElementById("validateCustomApiButton") as HTMLButtonElement | null
     const statusElement = document.getElementById("validateCustomApiStatus")
-    const useCustomApiToggle = document.getElementById("useCustomApi") as HTMLInputElement | null
+    const translationProviderSelect = document.getElementById("customApiProvider") as HTMLSelectElement | null
     const targetLanguageSelect = document.getElementById("targetLanguage") as HTMLSelectElement | null
 
-    if (!validateButton || !useCustomApiToggle) {
+    if (!validateButton) {
         return
     }
 
     validateButton.addEventListener("click", async () => {
-        const useCustomApi = useCustomApiToggle.checked
+        const provider = translationProviderSelect?.value || "official"
 
-        if (!useCustomApi) {
-            setValidationStatus(statusElement, "error", "Enable custom API before validating.")
+        if (provider !== "customApi") {
+            setValidationStatus(statusElement, "error", "Select 'Custom LLM API' as translation provider before validating.")
             return
         }
 
@@ -656,7 +620,175 @@ export function setupCustomApiValidation(): void {
             const message = error instanceof Error ? error.message : "Validation failed"
             setValidationStatus(statusElement, "error", message)
         } finally {
-            validateButton.disabled = !useCustomApiToggle.checked
+            validateButton.disabled = false
+        }
+    })
+}
+
+/**
+ * Animate the provider-panels container to a target height, then clear inline style.
+ */
+function animateContainerHeight(container: HTMLElement, targetHeight: number): void {
+    container.style.height = `${targetHeight}px`
+    const onEnd = (): void => {
+        // Only clear if height hasn't changed mid-animation (not interrupted)
+        if (container.style.height === `${targetHeight}px`) {
+            if (targetHeight === 0) {
+                // Collapsed — CSS default height:0 is correct, can clear
+                container.style.height = ""
+            }
+            // If expanded, leave the explicit pixel height so the absolutely-positioned
+            // panels remain visible. Height will be updated on next provider switch.
+        }
+        container.removeEventListener("transitionend", onEnd)
+    }
+    container.addEventListener("transitionend", onEnd)
+}
+
+/**
+ * Switch the visible provider sub-panel with a height-animated container + opacity crossfade.
+ * Pass animate=false for initial render (no animation).
+ */
+function updateProviderDependentUI(provider: types.TranslationProvider, animate = true): void {
+    const container = document.getElementById("providerPanelsContainer") as HTMLElement | null
+    if (!container) {
+        return
+    }
+
+    const allPanels = Array.from(container.querySelectorAll<HTMLElement>(".provider-panel"))
+    const oldPanel = allPanels.find((p) => p.classList.contains("is-active")) ?? null
+    const newPanel = allPanels.find((p) => p.dataset.provider === provider) ?? null
+
+    if (oldPanel === newPanel) {
+        return
+    }
+
+    if (!animate) {
+        // Instant apply for initial load — no transition
+        allPanels.forEach((p) => p.classList.remove("is-active"))
+        if (newPanel) {
+            newPanel.classList.add("is-active")
+            // Set container height synchronously — skip CSS transition
+            container.style.transition = "none"
+            container.style.height = `${newPanel.scrollHeight + 20}px` // 20px = panel padding-top
+            // Re-enable transition on next frame
+            requestAnimationFrame(() => {
+                container.style.transition = ""
+                container.style.height = ""
+            })
+        } else {
+            container.style.transition = "none"
+            container.style.height = "0px"
+            requestAnimationFrame(() => {
+                container.style.transition = ""
+            })
+        }
+        return
+    }
+
+    // Lock container at current rendered height before any DOM change
+    const lockedHeight = container.offsetHeight
+    container.style.height = `${lockedHeight}px`
+    // Remove transition briefly so the lock is instant
+    container.style.transition = "none"
+    // Force reflow
+    void container.offsetHeight
+    container.style.transition = ""
+
+    // Fade out old panel
+    oldPanel?.classList.remove("is-active")
+
+    if (newPanel) {
+        // Measure new panel's natural height while it's transparent + absolute
+        // (offsetHeight works on absolutely positioned elements regardless of opacity)
+        const panelContentHeight = newPanel.scrollHeight
+        const PADDING_TOP = 20 // matches .provider-panel padding-top in CSS
+        const targetHeight = panelContentHeight + PADDING_TOP
+
+        // Activate the new panel (triggers opacity + transform transition)
+        newPanel.classList.add("is-active")
+
+        // Animate container to new height
+        requestAnimationFrame(() => {
+            animateContainerHeight(container, targetHeight)
+        })
+    } else {
+        // "official" has no sub-panel — collapse to 0
+        requestAnimationFrame(() => {
+            animateContainerHeight(container, 0)
+        })
+    }
+}
+
+/**
+ * Setup MTranServer connection test
+ */
+export function setupMTranServerTest(): void {
+    const testButton = document.getElementById("testMtranserverButton") as HTMLButtonElement | null
+    const statusElement = document.getElementById("testMtranserverStatus")
+
+    if (!testButton) {
+        return
+    }
+
+    testButton.addEventListener("click", async () => {
+        const settings = await storageManagerModule.getUserSettings()
+        const mtranserverSettings = settings.mtranserver
+
+        if (!mtranserverSettings.url || !mtranserverSettings.url.trim()) {
+            setValidationStatus(statusElement, "error", "MTranServer URL is required.")
+            return
+        }
+
+        setValidationStatus(statusElement, "loading", "Testing connection...")
+        testButton.disabled = true
+
+        try {
+            const result = await mtranServerServiceModule.testMTranServerConnection(mtranserverSettings)
+            if (result) {
+                setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
+            } else {
+                setValidationStatus(statusElement, "error", "Connection failed.")
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Connection failed"
+            setValidationStatus(statusElement, "error", message)
+        } finally {
+            testButton.disabled = false
+        }
+    })
+}
+
+/**
+ * Setup Bing Translate connection test
+ */
+export function setupBingTranslateTest(): void {
+    const testButton = document.getElementById("testBingTranslateButton") as HTMLButtonElement | null
+    const statusElement = document.getElementById("testBingTranslateStatus")
+
+    if (!testButton) {
+        return
+    }
+
+    testButton.addEventListener("click", async () => {
+        const settings = await storageManagerModule.getUserSettings()
+        const bingTranslateSettings = settings.bingTranslate
+
+        setValidationStatus(statusElement, "loading", "Testing connection...")
+        testButton.disabled = true
+
+        try {
+            const result = await bingTranslateServiceModule.testBingTranslateConnection(bingTranslateSettings)
+            if (result) {
+                setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
+            } else {
+                setValidationStatus(statusElement, "error", "Connection failed.")
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Connection failed"
+            setValidationStatus(statusElement, "error", message)
+        } finally {
+            testButton.disabled = false
         }
     })
 }
