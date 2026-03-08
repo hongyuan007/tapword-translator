@@ -80,3 +80,4 @@ tests/e2e/screenshots/
 
 # Agent related files
 .agents/
+.github/instructions
