@@ -207,3 +207,32 @@ logger.info(`[${triggerSource}] Selection language (block context):`, selectionL
 | 多语言混合页面语义偏差 | ⚠️ 低优先级，LLM 可容忍 |
 | 日志可读性 | ⚠️ 轻微误导，建议修正 |
 | CRITICAL/HIGH 规则违规 | ✅ 无 |
+
+---
+
+## GitHub Copilot PR Review (PR #38) — 260308
+
+### Inline Comment 1 — `languageDetector.ts` line 30
+**Author**: Copilot | **Severity**: Medium
+
+The new constants (`SHORT_ASCII_THRESHOLD`, `PRINTABLE_ASCII_REGEX`) and their comment block are inserted between the JSDoc and the function declaration, **breaking the JSDoc association**. IDEs and documentation tools will no longer link `@param`/`@returns` to `detectSourceLanguageAsync`.
+
+**Suggestion**: Move constants inside the function body (they're only used there).
+
+---
+
+### Inline Comment 2 — `TranslationPipeline.ts` line 129
+**Author**: Copilot | **Severity**: Medium
+
+Both `routingLang` and `selectionLang` now call `detectSourceLanguageAsync(textForRouting)` with **identical input** — two sequential async Chrome API roundtrips guaranteed to return the same value. Doubled latency + hidden invariant that's easy to accidentally break.
+
+**Suggestion**: Call once, assign result to both, or merge into a single `detectedLang`.
+
+---
+
+### Inline Comment 3 — `TranslationPipeline.ts` line 130
+**Author**: Copilot | **Severity**: Low
+
+Log message still says `"Selection language (selected text):"` but `selectionLang` now comes from `textForRouting`. Misleading for debugging.
+
+**Suggestion**: Change to `"Selection language (block context):"`.

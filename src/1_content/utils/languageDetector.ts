@@ -16,18 +16,17 @@ const logger = loggerModule.createLogger("languageDetector")
  * @param text - The text to detect language for
  * @returns Language code (e.g., 'en', 'zh', 'es')
  */
-// Short pure-ASCII text (≤10 chars, no CJK) is almost certainly English for our primary
-// demographic (Chinese users reading English content). Chrome's statistical detector is
-// unreliable at this length (e.g., "nominated" → "la"). Skip the API call entirely.
-const SHORT_ASCII_THRESHOLD = 10
-const PRINTABLE_ASCII_REGEX = /^[\x20-\x7E]+$/
-
 export async function detectSourceLanguageAsync(text: string): Promise<string> {
     logger.debug("Starting async language detection:", text)
     const trimmed = (text || "").trim()
     const fallback = "en"
     if (trimmed.length === 0) return fallback
 
+    // Short pure-ASCII text (≤10 chars, no CJK) is almost certainly English for our primary
+    // demographic (Chinese users reading English content). Chrome's statistical detector is
+    // unreliable at this length (e.g., "nominated" → "la"). Skip the API call entirely.
+    const SHORT_ASCII_THRESHOLD = 10
+    const PRINTABLE_ASCII_REGEX = /^[\x20-\x7E]+$/
     if (trimmed.length <= SHORT_ASCII_THRESHOLD && PRINTABLE_ASCII_REGEX.test(trimmed)) {
         logger.info(`Short ASCII text (${trimmed.length} chars) → assuming "en"`)
         return "en"
