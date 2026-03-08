@@ -4,6 +4,7 @@
     "description": "A smart AI-powered translation browser extension that provides context-aware translations",
     "type": "module",
     "scripts": {
+        "vscode-setup": "node scripts/vscode-setup.mjs",
         "prebuild:dev": "cross-env KEY_ENV=dev node other/scripts/inject-secrets-simple.mjs",
         "prebuild:prod": "cross-env KEY_ENV=prod node other/scripts/inject-secrets-simple.mjs",
 
