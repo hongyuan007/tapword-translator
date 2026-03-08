@@ -1,0 +1,184 @@
+<!-- NO DOCTYPE INTENTIONAL — forces Quirks Mode in Chrome -->
+<!--
+  EXPECTED: Tooltip should NOT double-drift when scrolling.
+
+  In Quirks Mode (no DOCTYPE), Chrome makes document.body.scrollTop mirror
+  window.scrollY — both are non-zero simultaneously when the window scrolls.
+
+  A naive fix (scrollY = window.scrollY + body.scrollTop) would compute
+  2 × actual scroll amount, causing the tooltip to drift TWICE as fast upward.
+
+  The safe fix uses a guard:
+    winScrollY = window.scrollY || documentElement.scrollTop || 0
+    scrollY    = winScrollY + (winScrollY === 0 ? body.scrollTop : 0)
+
+  Because winScrollY > 0 in Quirks Mode normal scroll, the guard sets
+  the body.scrollTop addition to 0, preventing double-counting.
+
+  PASS criterion: tooltip moves at the correct 1× rate (stays below word).
+  FAIL criterion: tooltip drifts upward at 2× speed while scrolling.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 03 — Quirks Mode (No DOCTYPE)</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #faf5ff;
+      color: #2e1065;
+      padding-top: 88px;
+    }
+
+    #test-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #581c87;
+      color: #e9d5ff;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: baseline;
+    }
+    #test-banner .name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    #test-banner .sep  { color: #c084fc; }
+    #test-banner .pass { color: #d8b4fe; }
+    #test-banner .fail { color: #fca5a5; }
+    #test-banner .warn { color: #fde68a; font-weight: 600; }
+
+    article {
+      max-width: 760px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem 4rem;
+      line-height: 1.8;
+    }
+    h2 { margin: 2rem 0 0.75rem; font-size: 1.3rem; }
+    p  { margin-bottom: 1rem; }
+
+    .translatable {
+      color: #6b21a8;
+      font-weight: 700;
+      text-decoration: underline wavy #a855f7;
+      cursor: pointer;
+    }
+
+    #scroll-debug {
+      position: fixed;
+      bottom: 12px; right: 12px;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 9999;
+      line-height: 1.6;
+    }
+    .quirks-badge {
+      display: inline-block;
+      background: #7c3aed;
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    #quirks-mode-indicator {
+      font-family: monospace;
+      font-size: 0.85rem;
+      background: #3b0764;
+      color: #e9d5ff;
+      border-radius: 6px;
+      padding: 0.5rem 0.9rem;
+      margin: 0.75rem 0;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="test-banner">
+    <span class="name">TEST 03 — Quirks Mode <span class="quirks-badge">NO DOCTYPE</span></span>
+    <span class="sep">|</span>
+    <span>Scroll type: <strong>window.scrollY</strong> (AND body.scrollTop mirrors it in Quirks Mode)</span>
+    <span class="sep">|</span>
+    <span class="pass">✅ PASS: tooltip tracks word at 1× scroll speed (guard prevents double-count)</span>
+    <span class="sep">|</span>
+    <span class="fail">❌ FAIL: tooltip drifts upward at 2× speed — double-counting bug present</span>
+  </div>
+
+  <article>
+    <h2>Instructions</h2>
+    <p>
+      1. Verify Quirks Mode is active (DevTools → Elements → check <code>&lt;!DOCTYPE&gt;</code> is absent; 
+         or open DevTools Console and run <code>document.compatMode</code> — it should say 
+         <code>"BackCompat"</code>, not <code>"CSS1Compat"</code>).<br>
+      2. Double-click (or select) one of the highlighted words to trigger a tooltip.<br>
+      3. Scroll the page vertically.<br>
+      4. Observe scroll values in the debug widget: both <strong>window.scrollY</strong> and
+         <strong>body.scrollTop</strong> will be non-zero simultaneously (the Quirks Mode behaviour).
+    </p>
+    <p id="quirks-mode-indicator">
+      document.compatMode = <span id="compat-mode">checking…</span>
+    </p>
+
+    <h2>Sample Text with Translatable Words</h2>
+    <p>
+      The <span class="translatable">neuron</span> is the fundamental unit of a neural
+      network, computing a weighted sum of its inputs followed by a non-linear activation.
+      The process of <span class="translatable">regularization</span> prevents overfitting
+      by adding penalty terms to the loss function that discourage overly complex models.
+      In NLP, the concept of <span class="translatable">embedding</span> maps discrete
+      tokens into a continuous vector space where semantic similarity is preserved.
+    </p>
+
+    <div id="filler"></div>
+  </article>
+
+  <div id="scroll-debug">
+    window.scrollY: <span id="wy">0</span><br>
+    body.scrollTop: <span id="bt">0</span><br>
+    <span id="mirror-warn" style="color:#fde68a;display:none">⚠ Both non-zero (Quirks)</span>
+  </div>
+
+  <script>
+    // Confirm quirks mode
+    document.getElementById('compat-mode').textContent = document.compatMode;
+
+    const filler = document.getElementById('filler');
+    const paragraphs = [
+      'A convolutional neural network extracts local spatial features through shared weight filters, reducing the number of learnable parameters.',
+      'Recurrent networks process sequences by maintaining a hidden state that summarises information from previous time steps.',
+      'The softmax function converts a vector of raw logit scores into a probability distribution over classes.',
+      'Dropout randomly zeroes a fraction of neuron activations during training, acting as an ensemble of many smaller networks.',
+      'Batch normalisation standardises activations across the training mini-batch, accelerating convergence and improving generalisation.',
+      'Transfer learning initialises model weights from a previously trained network, reusing representations learned on a different task.',
+      'The vanishing gradient problem occurs when gradients shrink exponentially during backpropagation through deep networks.',
+    ];
+    let html = '';
+    for (let i = 0; i < 40; i++) {
+      html += `<p>${paragraphs[i % paragraphs.length]}</p>`;
+    }
+    filler.innerHTML = html;
+
+    const wyEl = document.getElementById('wy');
+    const btEl = document.getElementById('bt');
+    const warnEl = document.getElementById('mirror-warn');
+    window.addEventListener('scroll', () => {
+      const wy = Math.round(window.scrollY);
+      const bt = Math.round(document.body.scrollTop);
+      wyEl.textContent = wy;
+      btEl.textContent = bt;
+      warnEl.style.display = (wy > 0 && bt > 0) ? 'block' : 'none';
+    }, { passive: true });
+  </script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!--
+  EXPECTED: Both tooltips should stay anchored to their respective words
+  regardless of which region is scrolled.
+
+  Layout:
+    - REGION A (left panel): body-scroll layout (overflow-y:auto on <body>).
+      Word "paradigm" lives here.
+      window.scrollY = 0; body.scrollTop accumulates.
+      Fix: scrollY = 0 + (0===0 ? body.scrollTop : 0) = body.scrollTop  ✓
+
+    - REGION B (right panel): inner-div scroll container (overflow-y:scroll on a fixed-height div).
+      Word "heuristic" lives here.
+      window.scrollY = 0; body.scrollTop = 0; div.scrollTop accumulates.
+      Fix: scrollY = 0 + (0===0 ? 0 : 0) = 0  ✓  (rect.bottom is already correct)
+
+  The two regions scroll independently. Each tooltip must remain anchored to its word.
+
+  PASS: Word in Region A has tooltip that doesn't drift while Region A scrolls.
+        Word in Region B has tooltip that doesn't drift while Region B scrolls.
+  FAIL: Either tooltip drifts away from its anchor word.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 07 — Multiple Scroll Regions</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Body IS the scroll container for Region A */
+    body {
+      position: relative;
+      overflow-y: auto;
+      height: 100vh;
+      font-family: system-ui, sans-serif;
+      background: #fff;
+      color: #111;
+    }
+
+    /* ── Sticky test banner ── */
+    #test-banner {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      background: #b91c1c;
+      color: #fee2e2;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: baseline;
+    }
+    #test-banner .name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    #test-banner .sep  { color: #fca5a5; }
+    #test-banner .pass { color: #fecaca; }
+    #test-banner .fail { color: #fbbf24; }
+
+    /* Two-column layout inside the scrolling body */
+    #layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(300vh); /* tall enough for body to scroll */
+      padding-bottom: 4rem;
+    }
+
+    /* ── Region A: body scroll (left column) ── */
+    #region-a {
+      background: #fff7ed;
+      border-right: 3px solid #f97316;
+      padding: 1.5rem;
+    }
+    #region-a .region-header {
+      background: #f97316;
+      color: #fff;
+      padding: 0.5rem 0.9rem;
+      border-radius: 6px;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    #region-a .region-meta {
+      font-size: 0.78rem;
+      color: #9a3412;
+      background: #ffedd5;
+      border-radius: 5px;
+      padding: 0.4rem 0.7rem;
+      margin-bottom: 1rem;
+    }
+    .translatable-a {
+      color: #c2410c;
+      font-weight: 700;
+      text-decoration: underline wavy #f97316;
+      cursor: pointer;
+    }
+
+    /* ── Region B: inner div scroll (right column) ── */
+    #region-b-outer {
+      background: #eff6ff;
+      padding: 1.5rem;
+      /* does NOT grow with the body — uses a fixed-height inner scroll container */
+      align-self: start;
+      position: sticky;
+      top: 46px; /* below the banner */
+      height: calc(100vh - 46px);
+      overflow: hidden;
+    }
+    #region-b-outer .region-header {
+      background: #2563eb;
+      color: #fff;
+      padding: 0.5rem 0.9rem;
+      border-radius: 6px;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+    }
+    #region-b-outer .region-meta {
+      font-size: 0.78rem;
+      color: #1e3a5f;
+      background: #dbeafe;
+      border-radius: 5px;
+      padding: 0.4rem 0.7rem;
+      margin-bottom: 0.75rem;
+    }
+    #inner-scroll-box {
+      height: calc(100vh - 200px);
+      overflow-y: scroll;
+      background: #dbeafe;
+      border: 2px solid #3b82f6;
+      border-radius: 6px;
+      padding: 1rem;
+    }
+    .translatable-b {
+      color: #1d4ed8;
+      font-weight: 700;
+      text-decoration: underline wavy #3b82f6;
+      cursor: pointer;
+    }
+
+    p  { margin-bottom: 1rem; line-height: 1.8; }
+    h3 { margin: 1.5rem 0 0.5rem; font-size: 1rem; }
+
+    #scroll-debug {
+      position: fixed;
+      bottom: 12px; right: 12px;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 9999;
+      line-height: 1.7;
+    }
+    .orange { color: #fb923c; }
+    .blue   { color: #60a5fa; }
+  </style>
+</head>
+<body>
+
+  <div id="test-banner">
+    <span class="name">TEST 07 — Multiple Scroll Regions</span>
+    <span class="sep">|</span>
+    <span>Left: body-scroll (orange) · Right: inner-div-scroll (blue)</span>
+    <span class="sep">|</span>
+    <span class="pass">✅ PASS: each tooltip stays below its own anchor word, independently</span>
+    <span class="sep">|</span>
+    <span class="fail">❌ FAIL: either tooltip drifts from its anchor</span>
+  </div>
+
+  <div id="layout">
+
+    <!-- ── REGION A: body-scroll ── -->
+    <div id="region-a">
+      <div class="region-header">🟠 Region A — Body Scroll</div>
+      <div class="region-meta">
+        Scroll mechanism: <strong>body.scrollTop</strong> (window.scrollY stays 0)<br>
+        Trigger a tooltip on the orange word, then scroll this column.
+      </div>
+
+      <h3>Instructions for Region A</h3>
+      <p>
+        Double-click the word <strong class="translatable-a">paradigm</strong> to get a
+        translation tooltip. Then scroll the page (left column drives body.scrollTop).
+        The tooltip should stay pinned below "paradigm".
+      </p>
+      <p>
+        A <span class="translatable-a">paradigm</span> in science is a fundamental model
+        or framework that guides thinking within a discipline. Thomas Kuhn described how
+        scientific revolutions occur when a dominant paradigm is replaced by a new one that
+        better explains anomalous observations.
+      </p>
+      <p>
+        Secondary translatable word: <span class="translatable-a">epistemology</span> —
+        the branch of philosophy studying the nature, origin, and limits of human knowledge.
+      </p>
+      <div id="filler-a"></div>
+    </div>
+
+    <!-- ── REGION B: inner div scroll ── -->
+    <div id="region-b-outer">
+      <div class="region-header">🔵 Region B — Inner Div Scroll</div>
+      <div class="region-meta">
+        Scroll mechanism: <strong>inner div.scrollTop</strong> (body.scrollTop = 0)<br>
+        Trigger a tooltip on the blue word, then scroll the blue box.
+      </div>
+
+      <div id="inner-scroll-box">
+        <h3>Instructions for Region B</h3>
+        <p>
+          Double-click the word <strong class="translatable-b">heuristic</strong> to get a
+          translation tooltip. Then scroll this blue box. The tooltip should stay below "heuristic".
+        </p>
+        <p>
+          A <span class="translatable-b">heuristic</span> is a practical problem-solving
+          strategy that is not guaranteed to be optimal, but is sufficient for immediate goals.
+          In AI search, heuristics guide the algorithm toward promising regions of the
+          search space without exploring every possibility.
+        </p>
+        <p>
+          Secondary word: <span class="translatable-b">conjecture</span> — a proposition
+          that is believed to be true but has not yet been formally proven.
+        </p>
+        <div id="filler-b"></div>
+      </div>
+    </div>
+
+  </div><!-- /#layout -->
+
+  <div id="scroll-debug">
+    <span class="orange">body.scrollTop: <span id="bt">0</span></span><br>
+    window.scrollY: <span id="wy">0</span><br>
+    <span class="blue">div.scrollTop:  <span id="dt">0</span></span>
+  </div>
+
+  <script>
+    // Fill Region A (body scroll)
+    const fillerA = document.getElementById('filler-a');
+    const paragraphsA = [
+      'Scientific progress is rarely linear; paradigm shifts disrupt established assumptions and open entirely new research directions.',
+      'Epistemological questions underpin the design of empirical studies: what counts as evidence, and how can we trust our measurements?',
+      'A conceptual framework organises observations and guides hypothesis formation within a research programme.',
+      'Falsifiability, as proposed by Karl Popper, distinguishes scientific claims from non-scientific ones by requiring the possibility of disproof.',
+      'Methodological pluralism acknowledges that different research questions may require fundamentally different investigative approaches.',
+      'Abductive reasoning selects the most likely hypothesis among competing explanations that are all consistent with the observed data.',
+    ];
+    let htmlA = '';
+    for (let i = 0; i < 30; i++) {
+      htmlA += `<p>${paragraphsA[i % paragraphsA.length]}</p>`;
+    }
+    fillerA.innerHTML = htmlA;
+
+    // Fill Region B (inner div scroll)
+    const fillerB = document.getElementById('filler-b');
+    const paragraphsB = [
+      'Greedy algorithms apply heuristics to make locally optimal choices at each step, hoping the global optimum results.',
+      'A* search combines path cost and a heuristic estimate of remaining cost to guide efficient graph traversal.',
+      'Admissible heuristics in search never overestimate the true cost, guaranteeing optimality of A* solutions.',
+      'Constraint propagation uses heuristic reasoning to prune the search space before exhaustive exploration.',
+      'Metaheuristics such as simulated annealing and genetic algorithms explore large spaces using probabilistic strategies.',
+      'The travelling salesman problem is NP-hard; practical solvers rely on heuristic approximations to find near-optimal tours.',
+    ];
+    let htmlB = '';
+    for (let i = 0; i < 25; i++) {
+      htmlB += `<p>${paragraphsB[i % paragraphsB.length]}</p>`;
+    }
+    fillerB.innerHTML = htmlB;
+
+    // Scroll debug
+    const btEl = document.getElementById('bt');
+    const wyEl = document.getElementById('wy');
+    const dtEl = document.getElementById('dt');
+    const innerBox = document.getElementById('inner-scroll-box');
+
+    document.body.addEventListener('scroll', () => {
+      btEl.textContent = Math.round(document.body.scrollTop);
+      wyEl.textContent = Math.round(window.scrollY);
+    }, { passive: true });
+
+    innerBox.addEventListener('scroll', () => {
+      dtEl.textContent = Math.round(innerBox.scrollTop);
+    }, { passive: true });
+  </script>
+</body>
+</html>
