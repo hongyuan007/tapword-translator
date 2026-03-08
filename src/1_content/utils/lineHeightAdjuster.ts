@@ -43,6 +43,11 @@ export interface SpaceCalculation {
     maxFontSize: number
 }
 
+export interface LineHeightAdjustmentResult {
+    blockElement: HTMLElement | null
+    didAdjustLineHeight: boolean
+}
+
 /**
  * Find the nearest block-level ancestor element.
  * Block-level elements are those that typically create new layout blocks.
@@ -216,17 +221,23 @@ export function restoreLineHeight(blockElement: HTMLElement, skipDomRestoration:
  * @param spaceCalc - Space calculation details from styleCalculator
  * @returns The block element that was adjusted, or null if no adjustment was made
  */
-export function adjustLineHeightIfNeeded(anchor: HTMLElement | null, spaceCalc: SpaceCalculation): HTMLElement | null {
+export function adjustLineHeightIfNeeded(anchor: HTMLElement | null, spaceCalc: SpaceCalculation): LineHeightAdjustmentResult {
     if (!anchor) {
         logger.warn("No anchor element provided")
-        return null
+        return {
+            blockElement: null,
+            didAdjustLineHeight: false,
+        }
     }
 
     // Find the nearest block ancestor
     const blockAncestor = findNearestBlockAncestor(anchor)
     if (!blockAncestor) {
         logger.warn("Could not find block ancestor for line-height adjustment")
-        return null
+        return {
+            blockElement: null,
+            didAdjustLineHeight: false,
+        }
     }
 
     // If this block is already adjusted, register a reference regardless of whether
@@ -237,7 +248,10 @@ export function adjustLineHeightIfNeeded(anchor: HTMLElement | null, spaceCalc: 
         const next = current + 1
         blockElementRefCount.set(blockAncestor, next)
         logger.info(`Existing adjusted block detected. Incrementing ref count to ${next} on <${blockAncestor.tagName.toLowerCase()}>`)
-        return blockAncestor
+        return {
+            blockElement: blockAncestor,
+            didAdjustLineHeight: false,
+        }
     }
 
     // Calculate required increase
@@ -246,10 +260,16 @@ export function adjustLineHeightIfNeeded(anchor: HTMLElement | null, spaceCalc: 
     // Apply adjustment if needed
     if (increase > 0) {
         applyLineHeightAdjustment(blockAncestor, increase)
-        return blockAncestor
+        return {
+            blockElement: blockAncestor,
+            didAdjustLineHeight: true,
+        }
     }
 
-    return null
+    return {
+        blockElement: null,
+        didAdjustLineHeight: false,
+    }
 }
 
 /**
