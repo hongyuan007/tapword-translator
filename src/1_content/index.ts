@@ -8,7 +8,7 @@
  * 4. Translation result rendering
  */
 
-import type { UserSettings } from "@/0_common/types"
+import type { PageActivatedMessage, UserSettings } from "@/0_common/types"
 import { DEFAULT_USER_SETTINGS } from "@/0_common/types"
 import { UNDERLINE_OPACITY } from "@/0_common/constants"
 import * as loggerModule from "@/0_common/utils/logger"
@@ -76,6 +76,12 @@ async function initializeUserSettings(): Promise<void> {
  * Initialize the content script
  */
 async function init(): Promise<void> {
+    // Pre-warm: fire-and-forget, non-blocking. Wakes up the
+    // background worker and triggers proactive token refresh.
+    chrome.runtime.sendMessage({ type: "PAGE_ACTIVATED" } as PageActivatedMessage).catch(() => {
+        // Ignore: background may not be ready yet on first install
+    })
+
     // Initialize user settings
     await initializeUserSettings()
 

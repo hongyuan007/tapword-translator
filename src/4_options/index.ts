@@ -374,6 +374,8 @@ async function initializeOptions(): Promise<void> {
         await settingsManagerModule.loadSettings()
         settingsManagerModule.setupSettingChangeListeners()
         settingsManagerModule.setupCustomApiValidation()
+        settingsManagerModule.setupMTranServerTest()
+        settingsManagerModule.setupBingTranslateTest()
         await setupTooltipSpacingPreview()
 
         const websiteUrl = await fetchWebsiteUrl()

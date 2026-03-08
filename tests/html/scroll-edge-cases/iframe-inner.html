@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--
+  EXPECTED: This is the inner iframe document loaded by iframe.html.
+  Tooltip should appear directly below the anchor word and stay there while
+  the iframe content is scrolled.
+
+  Coordinate system note:
+    All coordinates here are in the iframe's own frame:
+    - window.scrollY is the iframe's scroll position
+    - getBoundingClientRect() is relative to the iframe's viewport
+    - Tooltip is appended to THIS document's body
+    The outer page's scroll is invisible to this document.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iframe Inner Content — TapWord Test</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f8fff8;
+      color: #1a2e1a;
+      padding: 1rem 1.5rem 4rem;
+      line-height: 1.8;
+      /* Normal Standards-Mode window scroll inside the iframe */
+    }
+
+    .iframe-notice {
+      background: #dcfce7;
+      border: 1px solid #4ade80;
+      border-radius: 6px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.8rem;
+      color: #166534;
+      margin-bottom: 1.25rem;
+      font-style: italic;
+    }
+
+    h2 { margin: 1.5rem 0 0.6rem; font-size: 1.1rem; color: #14532d; }
+    p  { margin-bottom: 1rem; }
+
+    .translatable {
+      color: #15803d;
+      font-weight: 700;
+      text-decoration: underline wavy #22c55e;
+      cursor: pointer;
+    }
+
+    #scroll-debug {
+      position: fixed;
+      bottom: 8px; right: 8px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 5px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="iframe-notice">
+    📄 This document is loaded inside an &lt;iframe&gt; — you are viewing iframe-inner.html.
+    The extension runs in this frame's context.
+  </div>
+
+  <h2>Translatable content inside the iframe</h2>
+  <p>
+    The <span class="translatable">convolution</span> operation in deep learning slides
+    a filter kernel across spatial dimensions, computing dot products to detect local features.
+    <span class="translatable">Pooling</span> layers reduce spatial resolution by summarising
+    activations within local neighbourhoods, conferring translation invariance.
+    The concept of <span class="translatable">residual</span> connections allows gradients
+    to flow directly through skip paths, enabling training of very deep architectures.
+  </p>
+
+  <div id="filler"></div>
+
+  <div id="scroll-debug">iframe scrollY: <span id="wy">0</span></div>
+
+  <script>
+    const filler = document.getElementById('filler');
+    const paragraphs = [
+      'A feature map is the output of a convolutional layer applied to its input, representing detected patterns at each spatial location.',
+      'Stride controls how many positions the filter moves at each step, determining the spatial downsampling factor of a convolution.',
+      'Padding adds zeros (or replicated values) around the input boundary to control output spatial dimensions.',
+      'The receptive field of a neuron defines the region of the input that influences its activation.',
+      'Depthwise separable convolutions factorise standard convolutions into a depthwise stage and a pointwise stage, reducing computation.',
+      'Global average pooling replaces fully connected layers with a single average over each feature map channel.',
+      'Batch normalisation applied after convolution standardises activations to stabilise and accelerate training.',
+    ];
+    let html = '';
+    for (let i = 0; i < 35; i++) {
+      html += `<p>${paragraphs[i % paragraphs.length]}</p>`;
+    }
+    filler.innerHTML = html;
+
+    const wyEl = document.getElementById('wy');
+    window.addEventListener('scroll', () => {
+      wyEl.textContent = Math.round(window.scrollY);
+    }, { passive: true });
+  </script>
+</body>
+</html>

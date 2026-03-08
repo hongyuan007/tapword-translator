@@ -114,17 +114,23 @@ async function processTranslation(
     const sanitizedText = rawText.trim()
     logger.info(`[${triggerSource}] Translation requested for:`, sanitizedText)
 
-    // Get surrounding text from block ancestor for routing (CJK vs space-delimited) decisions only
-    const textForRouting = domSanitizer.getSurroundingTextForDetection(range, 30)
-
-    // routingLang: determined from block context, used only to decide word-boundary strategy
-    const routingLang = await languageDetector.detectSourceLanguageAsync(textForRouting)
-    logger.info(`[${triggerSource}] Routing language (block context):`, routingLang)
-
-    // selectionLang: determined from the selected text itself, sent to the translation API.
-    // False positives and mixed-language string overrides are handled within detectSourceLanguageAsync.
-    const selectionLang = await languageDetector.detectSourceLanguageAsync(sanitizedText)
-    logger.info(`[${triggerSource}] Selection language (selected text):`, selectionLang)
+    // Detect language from block context once; reuse for both routing decisions and API sourceLanguage.
+    // Block context (full paragraph) is far more reliable than the selected word alone —
+    // chrome.i18n.detectLanguage misidentifies short strings (e.g. "nominated" → "la").
+    // 150 chars provides enough context to reliably distinguish Japanese from Chinese in most cases.
+    // Note: selectionValidator uses a 300-char radius for suppress decisions. The difference is
+    // intentional — routing only needs to identify the dominant language, whereas suppress checks
+    // benefit from more context to detect sparse Kana on Japanese pages. In rare cases (Kana beyond
+    // 150 chars), rawLang may not detect "ja", but the suppress check will still allow translation
+    // through, so the user experience degrades gracefully (translation fires but may choose wrong
+    // fallback direction rather than silently suppressing).
+    // rawLang preserves the original detected language even when lang is overridden to "auto"
+    // (e.g. Japanese page with English terms), used by resolveTargetLanguage for fallback decisions.
+    const textForRouting = domSanitizer.getSurroundingTextForDetection(range, 150)
+    const { lang: detectedLang, blockContextLang } = await languageDetector.detectSourceLanguageAsync(textForRouting)
+    const routingLang = detectedLang
+    const selectionLang = detectedLang
+    logger.info(`[${triggerSource}] Detected language: lang=${detectedLang}, blockContextLang=${blockContextLang}`)
 
     // Check if the selection actually contains CJK characters.
     // This is more reliable for classification structure routing (Word vs Fragment path).
@@ -141,7 +147,7 @@ async function processTranslation(
         const trimRes = rangeAdjuster.trimBoundaryWhitespace(range)
         const workingRange = trimRes.range
         const fragment = domSanitizer.getCleanTextFromRange(workingRange).trim()
-        await translateFragmentPath(workingRange, fragment, selectionLang, limiter, loadingVariant)
+        await translateFragmentPath(workingRange, fragment, selectionLang, blockContextLang, limiter, loadingVariant)
     } else {
         // For space-delimited languages (English, etc.): Use existing classification and expansion logic
         logger.info(`[${triggerSource}] [Space-delimited Language] Using classification and boundary expansion`)
@@ -160,7 +166,7 @@ async function processTranslation(
                 workingRange = exp.range
             }
             const word = domSanitizer.getCleanTextFromRange(workingRange).trim()
-            await translateWordPath(workingRange, word, selectionLang, limiter, loadingVariant)
+            await translateWordPath(workingRange, word, selectionLang, blockContextLang, limiter, loadingVariant)
         } else {
             // Fragment: if boundary whitespace was trimmed, skip expansion; else expand to word boundaries
             if (!cls.isComplete) {
@@ -168,7 +174,7 @@ async function processTranslation(
                 workingRange = exp.range
             }
             const fragment = domSanitizer.getCleanTextFromRange(workingRange).trim()
-            await translateFragmentPath(workingRange, fragment, selectionLang, limiter, loadingVariant)
+            await translateFragmentPath(workingRange, fragment, selectionLang, blockContextLang, limiter, loadingVariant)
         }
     }
 }
@@ -183,11 +189,13 @@ async function processTranslation(
  * @param range - Selection range
  * @param word - The word to translate
  * @param detectedLang - Pre-detected source language from processTranslation
+ * @param blockContextLang - Raw detected language before "auto" override, for fallback decisions
  */
 async function translateWordPath(
     range: Range,
     word: string,
     detectedLang: string,
+    blockContextLang: string,
     limiter?: RequestLimiter,
     loadingVariant: "text" | "spinner" = "text"
 ): Promise<void> {
@@ -216,7 +224,12 @@ async function translateWordPath(
     const performRequest = async (upgradeModel: boolean = UPGRADE_MODEL_ENABLED) => {
         try {
             const userTargetLang = userSettings?.targetLanguage || contentIndex.getCachedUserSettings()?.targetLanguage || "zh" // Fallback to 'zh'
-            const targetLang = languageDetector.resolveTargetLanguage(detectedLang, userTargetLang)
+            // Use script-based detection on the actual word for same-language fallback (e.g. zh→en).
+            // The block-context detectedLang may be "auto" (mixed CJK+Latin), which would skip the fallback.
+            // blockContextLang is the raw detected language before "auto" override (e.g. "ja" for a Japanese
+            // page with English terms), so resolveTargetLanguage can prevent spurious zh→en fallback.
+            const langForFallback = languageDetector.detectSelectionScriptLang(word) || detectedLang
+            const targetLang = languageDetector.resolveTargetLanguage(langForFallback, userTargetLang, blockContextLang)
             logger.info("[Word Path] Target language:", targetLang, "(user setting:", userTargetLang, ")")
 
             const payload = {
@@ -333,11 +346,13 @@ async function translateWordPath(
  * @param range - Selection range (possibly expanded)
  * @param fragment - The text fragment to translate
  * @param detectedLang - Pre-detected source language from processTranslation
+ * @param blockContextLang - Raw detected language before "auto" override, for fallback decisions
  */
 async function translateFragmentPath(
     range: Range,
     fragment: string,
     detectedLang: string,
+    blockContextLang: string,
     limiter?: RequestLimiter,
     loadingVariant: "text" | "spinner" = "text"
 ): Promise<void> {
@@ -373,7 +388,13 @@ async function translateFragmentPath(
     const performFragmentRequest = async (upgradeModel: boolean = UPGRADE_MODEL_ENABLED) => {
         try {
             const userTargetLang = userSettings?.targetLanguage || contentIndex.getCachedUserSettings()?.targetLanguage || "zh" // Fallback to 'zh'
-            const targetLang = languageDetector.resolveTargetLanguage(detectedLang, userTargetLang)
+            // Use script-based detection on the actual fragment for same-language fallback (e.g. zh→en).
+            // The block-context detectedLang may be "auto" (mixed CJK+Latin), which would skip the fallback.
+            // blockContextLang is the raw detected language before "auto" override (e.g. "ja" for a Japanese
+            // page with English terms), so resolveTargetLanguage can prevent spurious zh→en fallback.
+            const selectionScriptLangFragment = languageDetector.detectSelectionScriptLang(fragment)
+            const langForFallback = selectionScriptLangFragment || detectedLang
+            const targetLang = languageDetector.resolveTargetLanguage(langForFallback, userTargetLang, blockContextLang)
             logger.info("[Fragment Path] Target language:", targetLang, "(user setting:", userTargetLang, ")")
 
             const requestPayload = {

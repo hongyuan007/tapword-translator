@@ -1,5 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多语言翻译场景测试</title>
+    <style>
+        body { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; padding: 40px; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+        section { margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        h1 { margin-bottom: 20px; }
+        h2 { font-size: 1.2rem; color: #444; margin-top: 0; }
+        .scenario-desc { color: #666; font-style: italic; margin-bottom: 10px; font-size: 0.9rem; }
+        .test-case { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #007bff; margin-bottom: 20px; }
+        .highlight { background-color: #fff3cd; padding: 2px 4px; border-radius: 2px; cursor: text; }
+        .note { background: #e8f4f8; border-left: 4px solid #17a2b8; padding: 8px 12px; font-size: 0.85rem; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <h1>多语言翻译场景测试</h1>
+    <p>本页面模拟真实中文网页，用于验证 Issue #24 修复及中英混合短语优化。</p>
+    <div class="note">
+        ⚠ 本页面声明 <code>lang="zh"</code>，模拟真实中文网页环境。<br>
+        测试「翻译行为」时请<strong>关闭</strong>目标语言禁用翻译开关；测试「抑制行为」时请<strong>开启</strong>该开关。
+    </div>
+
+    <section>
+        <h2>场景一：中文段落中的英文单词（Issue #24）</h2>
+        <div class="scenario-desc">
+            目标：选中"performance"应翻译成中文。预期结果：performance → 性能（目标语言：中文）
+        </div>
+        <div class="test-case">
+            <p id="case-1-block">
+                在软件工程中，系统的 <span id="target-1-word" class="highlight">performance</span> 是至关重要的指标。
+                如果不进行优化，可能会导致用户流失。
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景二：中英混合短语</h2>
+        <div class="scenario-desc">
+            目标：同时含有中文和英文的短语应翻译为中文，不触发 zh→en 回退。预期结果：you什么时候来 → 你什么时候来
+        </div>
+        <div class="test-case">
+            <p id="case-2-block">
+                <span id="target-2-phrase1" class="highlight">you什么时候来</span> 参加我们的会议？
+                <br><br>
+                这个 <span id="target-2-phrase2" class="highlight">App的体验</span> 非常流畅。
+                <br><br>
+                请检查 <span id="target-2-phrase3" class="highlight">CPU的速度</span> 是否正常。
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景三：英文段落中的中文单词（回退场景）</h2>
+        <div class="scenario-desc">
+            目标：选中"你好"应触发 zh→en 回退。预期结果：你好 → Hello（关闭禁用开关时测试）
+        </div>
+        <div class="test-case">
+            <p id="case-3-block">
+                我的朋友教我说 <span id="target-3-word" class="highlight">你好</span>，意思是"Hello"。
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景四：纯语言基准测试</h2>
+        <div class="scenario-desc">
+            目标：验证基础翻译功能正常工作。
+        </div>
+        <div class="test-case">
+            <p>
+                <span id="target-4-zh" class="highlight">这是一个纯中文的句子。</span>
+            </p>
+            <p>
+                <span id="target-4-en" class="highlight">This is a pure English sentence.</span>
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景五：单个英文单词（中文页面）</h2>
+        <div class="scenario-desc">
+            目标：选中单个英文词，无 CJK，应翻译为中文。预期结果：dashboard → 仪表盘
+        </div>
+        <div class="test-case">
+            <p>点击图标，打开 <span class="highlight">dashboard</span> 查看数据。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景六：多个英文单词短语（中文段落）</h2>
+        <div class="scenario-desc">
+            目标：选中多个英文词，选区无 CJK，应翻译为中文。预期结果：database management system → 数据库管理系统
+        </div>
+        <div class="test-case">
+            <p>这个项目的核心依赖是一个优秀的 <span class="highlight">database management system</span>，负责存储所有数据。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景七：纯中文片段（同语言回退）</h2>
+        <div class="scenario-desc">
+            目标：选区为纯中文（无 Latin 字符），应触发 zh→en 回退。预期结果：翻译为英文（关闭禁用开关时测试）
+        </div>
+        <div class="test-case">
+            <p>这种用主力设备玩，<span class="highlight">不整虚拟机和环境隔离</span>，给了AI全部权限的，只能评价为勇士。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景八：中英混合（无空格分隔）</h2>
+        <div class="scenario-desc">
+            目标：选区含 CJK 和 Latin → 混合内容，不触发回退，应翻译为中文。预期结果：所有memory md和soul indentity全空 → 中文翻译
+        </div>
+        <div class="test-case">
+            <p>openclaw的目录也几乎全空，<span class="highlight">所有memory md和soul indentity全空</span>，赶紧搞了个数据恢复软件试试。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景九：中英混合（空格分隔）</h2>
+        <div class="scenario-desc">
+            目标：选区中英文之间有空格，仍为混合内容，应翻译为中文，不触发回退。
+        </div>
+        <div class="test-case">
+            <p>顺手让claude帮忙 <span class="highlight">写脚本改 openclaw 的 dashboard 后台</span>，结果出了问题。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景十：英文段落中的纯中文词（回退）</h2>
+        <div class="scenario-desc">
+            目标：英文段落中选中纯中文词，触发 zh→en 回退。预期结果：效率 → efficiency（关闭禁用开关时测试）
+        </div>
+        <div class="test-case">
+            <p>团队聚焦于提升 <span class="highlight">效率</span> 来完成本季度目标。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景十一：纯英文句子片段</h2>
+        <div class="scenario-desc">
+            目标：选中多词英文片段，无 CJK，应翻译为中文。预期结果：翻译为中文
+        </div>
+        <div class="test-case">
+            <p>这项技术 <span class="highlight">can be used to boost performance</span> 在所有平台上都有显著提升。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>场景十二：中英文加数字符号混合</h2>
+        <div class="scenario-desc">
+            目标：含有 CJK + 数字 + 英文的混合选区，不触发回退，应翻译为中文。预期结果：中英文摘要翻译
+        </div>
+        <div class="test-case">
+            <p>本次迭代中，<span class="highlight">已完成3个API接口的refactor</span>，代码质量大幅提升。</p>
+        </div>
+    </section>
+
+    <div style="margin-top: 50px; font-size: 0.8rem; color: #999;">
+        TapWord Translator 测试页面
+    </div>
+</body>
+</html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,5 +245,93 @@
     <div style="margin-top: 50px; font-size: 0.8rem; color: #999;">
         Generated for TapWord Translator E2E Testing
     </div>
+
+    <section>
+        <h2>Scenario 5: Single English Word (no surrounding context)</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> A single Latin word with no CJK in selection should fall through to block-context "auto" and translate to user's target.<br>
+            <strong>Expected:</strong> "dashboard" → 中文翻译（Target: ZH）
+        </div>
+        <div class="test-case">
+            <p>点击图标，打开 <span class="highlight">dashboard</span> 查看数据。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 6: Multi-word English Phrase</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Selecting multiple English words in a Chinese paragraph; no CJK in selection → translate to ZH.<br>
+            <strong>Expected:</strong> "database management system" → "数据库管理系统" (Target: ZH)
+        </div>
+        <div class="test-case">
+            <p>这个项目的核心依赖是一个优秀的 <span class="highlight">database management system</span>，负责存储所有数据。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 7: Pure Chinese Fragment (same-language fallback)</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Selecting a pure Chinese fragment (no Latin) should trigger zh → en fallback.<br>
+            <strong>Expected:</strong> "不整虚拟机和环境隔离" → English (Target: ZH, fallback to EN)
+        </div>
+        <div class="test-case">
+            <p>这种用主力设备玩，<span class="highlight">不整虚拟机和环境隔离</span>，给了AI全部权限的，只能评价为勇士。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 8: Mixed Chinese + English (no space separator)</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Selection contains both CJK and Latin → mixed, no fallback, translate mixed content to ZH.<br>
+            <strong>Expected:</strong> "所有memory md和soul indentity全空" → Chinese translation (Target: ZH, no fallback)
+        </div>
+        <div class="test-case">
+            <p>openclaw的目录也几乎全空，<span class="highlight">所有memory md和soul indentity全空</span>，赶紧搞了个数据恢复软件试试。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 9: Mixed Chinese + English (space-separated)</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Selection has spaces between Chinese and English; still mixed → translate to ZH.<br>
+            <strong>Expected:</strong> "写脚本改 openclaw 的 dashboard 后台" → Chinese translation (Target: ZH, no fallback)
+        </div>
+        <div class="test-case">
+            <p>顺手让claude帮忙 <span class="highlight">写脚本改 openclaw 的 dashboard 后台</span>，结果出了问题。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 10: Single Chinese Word in English Context (fallback)</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Pure Chinese selection in an English paragraph → zh → en fallback.<br>
+            <strong>Expected:</strong> "效率" → "efficiency" (Target: ZH, fallback to EN)
+        </div>
+        <div class="test-case">
+            <p>The team focused on improving <span class="highlight">效率</span> to meet the quarterly goals.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 11: English Sentence Fragment</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Selecting a multi-word English sentence fragment; no CJK → translate to ZH target.<br>
+            <strong>Expected:</strong> "can be used to boost performance" → Chinese (Target: ZH)
+        </div>
+        <div class="test-case">
+            <p>This technique <span class="highlight">can be used to boost performance</span> significantly across all platforms.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Scenario 12: Mixed with Digits and Symbols</h2>
+        <div class="scenario-desc">
+            <strong>Goal:</strong> Mixed CJK + numbers/symbols + English → still mixed, translate to ZH target.<br>
+            <strong>Expected:</strong> "已完成3个API接口的refactor" → Chinese/English summary (Target: ZH, no fallback)
+        </div>
+        <div class="test-case">
+            <p>本次迭代中，<span class="highlight">已完成3个API接口的refactor</span>，代码质量大幅提升。</p>
+        </div>
+    </section>
 </body>
 </html>

@@ -35,21 +35,21 @@ describe("detectSourceLanguageAsync (with mocked chrome)", () => {
 
     it("uses chrome.i18n.detectLanguage when available", async () => {
         const chromeMock = mockChromeDetectLanguage("fr")
-        const lang = await detectSourceLanguageAsync("Ceci est une phrase de test.")
+        const { lang } = await detectSourceLanguageAsync("Ceci est une phrase de test.")
         expect(lang).toBe("fr")
         expect(chromeMock.i18n.detectLanguage).toHaveBeenCalled()
     })
 
     it("falls back to franc-min when chrome is unavailable", async () => {
         delete (globalThis as any).chrome
-        const lang = await detectSourceLanguageAsync("Ceci est une phrase de test.")
+        const { lang } = await detectSourceLanguageAsync("Ceci est une phrase de test.")
         // franc should detect French → fr
         expect(lang).toBe("fr")
     })
 
     it("returns 'en' for empty input without calling APIs", async () => {
         const chromeMock = mockChromeDetectLanguage("es")
-        const lang = await detectSourceLanguageAsync("")
+        const { lang } = await detectSourceLanguageAsync("")
         expect(lang).toBe("en")
         expect(chromeMock.i18n.detectLanguage).not.toHaveBeenCalled()
     })

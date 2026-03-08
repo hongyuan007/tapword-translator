@@ -1,7 +1,8 @@
 {
     "manifest_version": 3,
     "name": "__MSG_extName__",
-    "version": "0.4.1",
+    "version": "0.4.2",
+    "version_name": "0.4.2",
     "description": "__MSG_extDescription__",
     "default_locale": "en",
     "icons": {
@@ -12,6 +13,9 @@
     "permissions": [
         "storage",
         "offscreen"
+    ],
+    "host_permissions": [
+        "https://*.bing.com/*"
     ],
     "background": {
         "service_worker": "background.js",
@@ -27,7 +31,8 @@
             ],
             "css": [
                 "content.css"
-            ]
+            ],
+            "all_frames": true
         }
     ],
     "action": {

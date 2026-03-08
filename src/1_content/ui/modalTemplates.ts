@@ -8,6 +8,7 @@
 import type { TranslationDetailData } from "@/1_content/ui/translationModal"
 import { APP_EDITION } from "@/0_common/constants"
 import * as i18nModule from "@/0_common/utils/i18n"
+import { containsMeaningfulWords, isSingleWord } from "@/0_common/utils/textUtils"
 
 // Import HTML templates as raw strings
 import errorFragmentTemplate from "@/1_content/resources/modal-error-fragment.html?raw"
@@ -102,6 +103,7 @@ function createSentenceSection(
  */
 function createDictionarySection(
     dictionaryContent: string,
+    text: string,
     lemma?: string | null,
     lemmaPhonetic?: string,
     sourceLanguage?: string,
@@ -112,7 +114,9 @@ function createDictionarySection(
     const phoneticText = lemma ? (lemmaPhonetic ? `/${lemmaPhonetic}/` : "") : ""
 
     // Determine dictionary title based on source/target language pair
-    const isEnglishToChinese = sourceLanguage === "en" && targetLanguage === "zh"
+    // Treat "auto" as "en" if target is "zh" AND text is a valid single English word
+    const isSourceEnglish = sourceLanguage === "en" || (sourceLanguage === "auto" && isSingleWord(text))
+    const isEnglishToChinese = isSourceEnglish && targetLanguage === "zh"
     const dictionaryTitleKey = isEnglishToChinese ? "modal.section.dictionary.enZh" : "modal.section.dictionary"
     const dictionaryTitle = i18nModule.translate(dictionaryTitleKey)
 
@@ -124,19 +128,6 @@ function createDictionarySection(
         LEMMA_PHONETIC: escapeHtml(phoneticText),
         DICTIONARY_CONTENT: escapeHtml(dictionaryContent),
     })
-}
-
-/**
- * Check if text contains meaningful words (letters or numbers)
- * This matches the backend logic for determining if sentence translation should be shown
- */
-function containsMeaningfulWords(text: string | undefined): boolean {
-    if (!text) {
-        return false
-    }
-    // Check if the text contains any word characters (letters, numbers, etc.)
-    // This regex matches any alphanumeric character including Unicode letters
-    return /\p{L}|\p{N}/u.test(text)
 }
 
 /**
@@ -213,7 +204,14 @@ export function renderSuccessTemplate(data: TranslationDetailData, showUpdateLab
     const dictionaryContent = isChinese ? data.chineseDefinition : data.targetDefinition
 
     if (dictionaryContent) {
-        dictionarySection = createDictionarySection(dictionaryContent, data.lemma, data.lemmaPhonetic, data.sourceLanguage, data.targetLanguage)
+        dictionarySection = createDictionarySection(
+            dictionaryContent,
+            data.text,
+            data.lemma,
+            data.lemmaPhonetic,
+            data.sourceLanguage,
+            data.targetLanguage
+        )
     }
 
     // Format phonetic text with slashes if available

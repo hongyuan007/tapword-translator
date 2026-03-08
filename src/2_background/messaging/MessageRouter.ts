@@ -9,6 +9,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import * as FragmentTranslationRequestHandler from "../handlers/FragmentTranslationRequestHandler"
 import { buildPopupBootstrapResponse } from "../handlers/PopupBootstrapHandler"
 import * as SpeechSynthesisRequestHandler from "../handlers/SpeechSynthesisRequestHandler"
+import * as TokenWarmUpHandler from "../handlers/TokenWarmUpHandler"
 import * as TranslationRequestHandler from "../handlers/TranslationRequestHandler"
 
 const logger = loggerModule.createLogger("MessageRouter")
@@ -48,6 +49,10 @@ export function setupMessageListener(): void {
                 sendResponse(response)
                 return true
             }
+
+            case "PAGE_ACTIVATED":
+                TokenWarmUpHandler.handlePageActivated(sendResponse)
+                return true
 
             default:
                 logger.warn("Unknown message type:", messageType)

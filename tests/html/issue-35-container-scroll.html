@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue #35 - Tooltip Drift (Inner Container Scroll)</title>
+    <style>
+        *,
+        *::before,
+        *::after { box-sizing: border-box; }
+
+        /* html + body do NOT scroll — a common SPA/docs pattern */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.75;
+            color: #111;
+            background: #fff;
+        }
+
+        /* Fixed header sits outside the scroll container */
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            font-weight: 600;
+        }
+
+        /*
+         * The ONLY scrollable element — the window itself never scrolls.
+         * window.scrollY stays 0 while this container accumulates scrollTop.
+         * This is the key structure that may expose tooltip drift.
+         */
+        #scroll-container {
+            position: fixed;
+            top: 64px;   /* below fixed header */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Content inside the scrollable container */
+        .content {
+            max-width: 860px;
+            padding: 40px 48px 120px;
+        }
+
+        h2 { margin: 40px 0 16px; font-size: 22px; }
+
+        p {
+            margin: 0 0 24px;
+            line-height: 2;
+        }
+
+        .top-spacer    { height: 400px; }
+        .bottom-spacer { height: 1600px; }
+    </style>
+</head>
+<body>
+    <header id="header">Docs — Inner Container Scroll Test</header>
+
+    <div id="scroll-container">
+        <div class="content">
+            <div class="top-spacer"></div>
+
+            <h2>Overview</h2>
+            <p>
+                The <span id="target-word">configuration</span> file lets you specify global
+                instructions for every task your agent performs in this repository.
+            </p>
+            <p>
+                Place it at the root of your project, or inside a <code>.codex/</code> directory.
+                The agent reads this file at startup and uses its contents as persistent context.
+            </p>
+
+            <h2>Syntax</h2>
+            <p>
+                Each line beginning with a <code>#</code> character is treated as a comment and
+                ignored by the parser. All other non-blank lines are forwarded verbatim to the
+                language model as part of the system prompt.
+            </p>
+            <p>
+                Markdown headings, bullet lists, and fenced code blocks are rendered as plain
+                text, so you can use any formatting style you find readable.
+            </p>
+
+            <h2>Scope</h2>
+            <p>
+                Instructions defined here apply to every conversation in the current workspace.
+                You can override them per-conversation by adding inline instructions at the top
+                of your prompt.
+            </p>
+            <p>
+                If both a root-level file and a <code>.codex/</code> file exist, their contents
+                are merged in order: root file first, then the directory file.
+            </p>
+
+            <div class="bottom-spacer"></div>
+        </div>
+    </div>
+</body>
+</html>

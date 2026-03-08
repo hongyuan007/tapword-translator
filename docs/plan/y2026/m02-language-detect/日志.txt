@@ -1,0 +1,71 @@
+index.js:1 [selectionHandler] Selection validation failed: Empty selection
+index.js:1 [languageValidator] Chinese-target suppression context analysis {
+  "textSnippet": "refactor...",
+  "pageDeclaredLanguage": "",
+  "contextSnippet": "Scenario 12: Mixed with Digits and Symbols\n        \n        ...",
+  "contextChineseRatio": 0.14136125654450263,
+  "threshold": 0.15
+}
+index.js:1 [languageValidator] Allowing translation: Target is Chinese but no same-language suppression signal matched {
+  "textSnippet": "refactor...",
+  "pageDeclaredLanguage": ""
+}
+index.js:1 [selectionValidator] Single-click native-language check {
+  "text": "refactor",
+  "targetLang": "zh",
+  "suppressNativeLanguage": true,
+  "contextLength": 308,
+  "contextSnippet": "Scenario 12: Mixed with Digits and Symbols\n        \n            Goal: Mixed CJK ...",
+  "isNative": false
+}
+index.js:1 [selectionHandler] [Single Click] Translation requested for: refactor
+index.js:1 [languageDetector] Starting async language detection: Scenario 12: Mixed with Digits and Symbols
+        
+            Goal: Mixed CJK + numbers/symbols + English → still mixed, translate to ZH target.
+            Expected: "已完成3个API接口的refactor" → Chinese/English summary (Target: ZH, no fallback)
+        
+        
+            本次迭代中，已完成3个API接口的refactor，代码质量大幅提升。
+index.js:1 [languageDetector] Using chrome.i18n.detectLanguage
+index.js:1 [languageDetector] Chrome detected language: en
+index.js:1 [languageDetector] Language detection result: lang=en, rawLang=en, blockContextLang=en
+index.js:1 [selectionHandler] [Single Click] Detected language: lang=en, blockContextLang=en
+index.js:1 [selectionHandler] [Single Click] [Space-delimited Language] Using classification and boundary expansion
+index.js:1 [selectionHandler] [Word Path] Translating word: refactor | Language: en
+index.js:1 [i18n] Initialized with locale: zh
+index.js:1 [styleCalculator/layout] Calculating font size. Original: 16px {}
+index.js:1 [styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=25.60px, lineSpacing=9.60px, availableSpace=6.60px, effectiveAvailable=0.00px, safetyDelta=1, constraints(min=12, max=12.80)
+index.js:1 [lineHeightAdjuster] Found block ancestor: <p> with display: block
+index.js:1 [lineHeightAdjuster] Line-height increase needed: 12.40px (targetAvailable=19.00px, available=6.60px)
+index.js:1 [lineHeightAdjuster] Stored original line-height: 25.6px
+index.js:1 [lineHeightAdjuster] Line-height adjusted: 25.60px → 38.00px (increase: 12.40px) on <p>, ref count: 1
+index.js:1 [1_content/ui/translationDisplay] [Visibility Observer] Skipped for anchor: translation-anchor-0 (no scrollable parent, using viewport)
+index.js:1 [1_content/ui/translationDisplay] Translation displayed: translation-anchor-0 {
+  "status": "loading",
+  "text": "翻译中..",
+  "loadingVariant": "text"
+}
+index.js:1 [selectionHandler] [Word Path] Target language: zh (user setting: zh )
+index.js:1 [translationRequest] [RETRY_DEBUG] Sending message attempt 1 {
+  "type": "TRANSLATE_REQUEST",
+  "data": {
+    "word": "refactor",
+    "leadingText": "本次迭代中，已完成3个API接口的",
+    "trailingText": "，代码质量大幅提升。",
+    "originalSentence": "本次迭代中，已完成3个API接口的refactor，代码质量大幅提升。",
+    "bookName": "网页<<多语言翻译场景测试>>",
+    "sourceLanguage": "en",
+    "targetLanguage": "zh"
+  }
+}
+index.js:1 [translationRequest] [RETRY_DEBUG] Message successful on attempt 1 duration(ms)= 1803
+index.js:1 [styleCalculator/layout] Calculating font size. Original: 16px {}
+index.js:1 [styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=38.00px, lineSpacing=22.00px, availableSpace=19.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
+index.js:1 [1_content/ui/translationDisplay] Translation updated: translation-anchor-0 {
+  "status": "success",
+  "translation": "重构",
+  "sentenceTranslation": "本次迭代中，已完成3个API接口的重构，代码质量大幅提升。",
+  "chineseDefinition": "[网络] 重构；重构你的代码；代码重构",
+  "targetDefinition": "[网络] 重构；重构你的代码；代码重构",
+  "targetLanguage": "zh"
+}

@@ -697,6 +697,38 @@ body {
 }
 
 /* Custom Select Dropdown */
+/* Provider sub-panel container: height-animated wrapper for crossfade switching */
+.provider-panels-container {
+  position: relative;
+  overflow: hidden;
+  /* height is controlled by JS; start at 0 (no sub-panel for "official") */
+  height: 0;
+  transition: height 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.provider-panel {
+  /* Absolutely stacked so panels overlap while crossfading */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding-top: 20px;   /* visual gap between selector card and panels */
+  opacity: 0;
+  pointer-events: none;
+  /* exit: fade + gentle upward drift */
+  transform: translateY(-5px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.provider-panel.is-active {
+  /* entry: fade in + settle from below */
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
 .custom-select-wrapper {
   position: relative;
   user-select: none;

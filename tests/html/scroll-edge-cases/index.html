@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TapWord Scroll Edge-Case Test Menu</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.5rem; color: #f8fafc; }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 1rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .card:hover { border-color: #60a5fa; transform: translateY(-2px); }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-normal  { background: #166534; color: #bbf7d0; }
+    .badge-issue35 { background: #7c2d12; color: #fed7aa; }
+    .badge-quirks  { background: #581c87; color: #e9d5ff; }
+    .badge-inner   { background: #1e3a5f; color: #bae6fd; }
+    .badge-iframe  { background: #365314; color: #d9f99d; }
+    .badge-rtl     { background: #4a1d96; color: #ddd6fe; }
+    .badge-multi   { background: #7f1d1d; color: #fecaca; }
+    .card-num { font-size: 1.3rem; color: #475569; font-weight: 700; }
+    .card-title { font-size: 1rem; font-weight: 600; color: #f1f5f9; }
+    .card-file  { font-size: 0.75rem; color: #64748b; font-family: monospace; margin-bottom: 0.5rem; }
+    .card-desc  { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; }
+    .card-expected {
+      margin-top: 0.75rem;
+      font-size: 0.78rem;
+      color: #4ade80;
+      background: #052e16;
+      border-radius: 6px;
+      padding: 0.4rem 0.7rem;
+      border-left: 3px solid #16a34a;
+    }
+    .setup-note {
+      background: #1e293b;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+    .setup-note strong { color: #f1f5f9; }
+    .setup-note code { background: #0f172a; padding: 1px 5px; border-radius: 3px; font-size: 0.82rem; }
+    ol { padding-left: 1.2rem; }
+    ol li { margin-bottom: 0.3rem; }
+  </style>
+</head>
+<body>
+  <h1>🔍 TapWord — Scroll Edge-Case Manual Tests</h1>
+  <p class="subtitle">
+    Issue #35 · Tooltip scroll-drift fix verification ·
+    Load each page with the TapWord extension installed, then follow the on-page instructions.
+  </p>
+
+  <div class="setup-note">
+    <strong>How to use:</strong>
+    <ol>
+      <li>Install the <strong>TapWord Translator</strong> extension (load unpacked from <code>dist/</code>).</li>
+      <li>Open any test file via <code>File → Open</code> in Chrome (<code>file://</code> URLs work).</li>
+      <li>Select / double-click a highlighted word to trigger a translation tooltip.</li>
+      <li>Scroll the page (or the inner container) and observe whether the tooltip drifts.</li>
+      <li>Each page has a banner describing the PASS / FAIL criteria.</li>
+    </ol>
+  </div>
+
+  <div class="grid">
+
+    <a class="card" href="normal-window-scroll.html">
+      <div class="card-header">
+        <span class="card-num">01</span>
+        <span class="badge badge-normal">Baseline</span>
+      </div>
+      <div class="card-title">Normal Window Scroll</div>
+      <div class="card-file">normal-window-scroll.html</div>
+      <div class="card-desc">
+        Standard <code>&lt;!DOCTYPE html&gt;</code> page. <code>window.scrollY</code> accumulates.
+        Tooltip should follow its anchor word as you scroll.
+      </div>
+      <div class="card-expected">✅ EXPECTED: Tooltip stays below anchor word while scrolling</div>
+    </a>
+
+    <a class="card" href="body-scroll-container.html">
+      <div class="card-header">
+        <span class="card-num">02</span>
+        <span class="badge badge-issue35">Issue #35</span>
+      </div>
+      <div class="card-title">Body Scroll Container</div>
+      <div class="card-file">body-scroll-container.html</div>
+      <div class="card-desc">
+        Reproduces the OpenAI Docs layout. <code>&lt;body&gt;</code> has
+        <code>position:relative; overflow-y:auto; height:100vh</code>.
+        <code>window.scrollY</code> stays 0; <code>body.scrollTop</code> accumulates.
+        This was the broken case before the fix.
+      </div>
+      <div class="card-expected">✅ EXPECTED: Tooltip stays below anchor word (no upward drift)</div>
+    </a>
+
+    <a class="card" href="quirks-mode.html">
+      <div class="card-header">
+        <span class="card-num">03</span>
+        <span class="badge badge-quirks">Quirks Mode</span>
+      </div>
+      <div class="card-title">Quirks Mode (No DOCTYPE)</div>
+      <div class="card-file">quirks-mode.html</div>
+      <div class="card-desc">
+        No <code>&lt;!DOCTYPE&gt;</code> — Chrome enters Quirks Mode.
+        <code>body.scrollTop</code> mirrors <code>window.scrollY</code>, creating
+        a double-counting risk if the guard condition is absent.
+      </div>
+      <div class="card-expected">✅ EXPECTED: No double-drift — tooltip moves at 1× speed, not 2×</div>
+    </a>
+
+    <a class="card" href="inner-div-scroll.html">
+      <div class="card-header">
+        <span class="card-num">04</span>
+        <span class="badge badge-inner">Inner Scroll</span>
+      </div>
+      <div class="card-title">Inner Div Scroll Container</div>
+      <div class="card-file">inner-div-scroll.html</div>
+      <div class="card-desc">
+        A fixed-height <code>&lt;div&gt;</code> with <code>overflow-y:scroll</code>
+        contains the text. Neither the window nor <code>&lt;body&gt;</code> scroll.
+      </div>
+      <div class="card-expected">✅ EXPECTED: Tooltip stays below anchor word while inner div scrolls</div>
+    </a>
+
+    <a class="card" href="iframe.html">
+      <div class="card-header">
+        <span class="card-num">05</span>
+        <span class="badge badge-iframe">Iframe</span>
+      </div>
+      <div class="card-title">Iframe Coordinate Isolation</div>
+      <div class="card-file">iframe.html + iframe-inner.html</div>
+      <div class="card-desc">
+        An <code>&lt;iframe&gt;</code> loads <code>iframe-inner.html</code>, which
+        has scrollable translatable text. Tooltip must use the iframe's coordinate
+        system, not the outer page's.
+      </div>
+      <div class="card-expected">✅ EXPECTED: Tooltip appears inside iframe at correct position</div>
+    </a>
+
+    <a class="card" href="rtl-body-scroll.html">
+      <div class="card-header">
+        <span class="card-num">06</span>
+        <span class="badge badge-rtl">RTL</span>
+      </div>
+      <div class="card-title">RTL Body Scroll</div>
+      <div class="card-file">rtl-body-scroll.html</div>
+      <div class="card-desc">
+        Same body-scroll layout as test 02 but with <code>dir="rtl"</code>.
+        Tests that horizontal scroll offset (<code>scrollLeft</code>) is computed
+        correctly under RTL + body-scroll conditions.
+      </div>
+      <div class="card-expected">✅ EXPECTED: Tooltip appears at correct horizontal position below anchor</div>
+    </a>
+
+    <a class="card" href="multiple-scroll-regions.html">
+      <div class="card-header">
+        <span class="card-num">07</span>
+        <span class="badge badge-multi">Multi-Scroll</span>
+      </div>
+      <div class="card-title">Multiple Scroll Regions</div>
+      <div class="card-file">multiple-scroll-regions.html</div>
+      <div class="card-desc">
+        Body-scroll region <em>and</em> an inner div scroll region coexist.
+        One word lives in each region. Both tooltips must stay anchored independently.
+      </div>
+      <div class="card-expected">✅ EXPECTED: Both tooltips stay anchored to their respective words</div>
+    </a>
+
+  </div>
+</body>
+</html>

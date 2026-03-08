@@ -22,6 +22,8 @@ import * as storageManagerModule from "@/0_common/utils/storageManager"
 import type { UserSettings } from "@/0_common/types"
 import type { LLMConfig } from "@/8_generate/types/GenerateTypes"
 import { CUSTOM_API_FIXED_PARAMS } from "@/0_common/constants/customApi"
+import { translateWithMTranServer, MTranServerError } from "./MTranServerService"
+import { translateWithBingTranslate, BingTranslateError } from "./BingTranslateService"
 
 const logger = createLogger("TranslationService")
 
@@ -50,11 +52,12 @@ async function getCachedUserSettings(): Promise<UserSettings> {
 }
 
 function buildLocalLlmConfig(settings: UserSettings): LLMConfig | null {
-    const customApi = settings.customApi
-    if (!customApi.useCustomApi) {
+    // Only build LLM config when customApi provider is selected
+    if (settings.translationProvider !== "customApi") {
         return null
     }
 
+    const customApi = settings.customApi
     const apiKey = customApi.apiKey.trim()
     const baseUrl = customApi.baseUrl.trim()
     const model = customApi.model.trim()
@@ -244,9 +247,48 @@ async function translateWordWithCloud(params: TranslateParams): Promise<Translat
 export async function translateWord(params: TranslateParams): Promise<TranslationResult> {
     try {
         const userSettings = await getCachedUserSettings()
-        const localConfig = buildLocalLlmConfig(userSettings)
 
-        if (userSettings.customApi.useCustomApi) {
+        // Check translation provider selection
+        const provider = userSettings.translationProvider
+
+        // MTranServer
+        if (provider === "mtranserver") {
+            const mtranserverSettings = userSettings.mtranserver
+            if (!mtranserverSettings.url || !mtranserverSettings.url.trim()) {
+                throw new TranslationError(
+                    i18nModule.translate("error.mtranserverConfigMissing"),
+                    i18nModule.translate("error.short.mtranserverConfigMissing")
+                )
+            }
+
+            logger.info("Translating word using MTranServer")
+            const { word, leadingText, trailingText, targetLanguage = "zh" } = params
+
+            const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
+
+            const [wordTranslation, sentenceTranslation] = await Promise.all([
+                translateWithMTranServer(word, targetLanguage, mtranserverSettings),
+                hasContext
+                    ? translateWithMTranServer(fullSentence, targetLanguage, mtranserverSettings)
+                    : Promise.resolve(undefined),
+            ])
+
+            return {
+                wordTranslation: wordTranslation,
+                sentenceTranslation: sentenceTranslation,
+                chineseDefinition: undefined,
+                englishDefinition: undefined,
+                targetDefinition: undefined,
+                lemma: undefined,
+                phonetic: undefined,
+                lemmaPhonetic: undefined,
+            }
+        }
+
+        // Custom API
+        if (provider === "customApi") {
+            const localConfig = buildLocalLlmConfig(userSettings)
             if (!localConfig) {
                 throw new TranslationError(
                     i18nModule.translate("error.customApiConfigMissing"),
@@ -258,12 +300,58 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
             return await translateWordWithLocal(params, localConfig)
         }
 
+        // Bing Translate
+        if (provider === "bingTranslate") {
+            logger.info("Translating word using Bing Translate")
+            const { word, leadingText, trailingText, targetLanguage = "zh" } = params
+
+            const fullSentence = `${leadingText || ""}${word}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
+
+            const [wordTranslation, sentenceTranslation] = await Promise.all([
+                translateWithBingTranslate(word, targetLanguage, userSettings.bingTranslate),
+                hasContext
+                    ? translateWithBingTranslate(fullSentence, targetLanguage, userSettings.bingTranslate)
+                    : Promise.resolve(undefined),
+            ])
+
+            return {
+                wordTranslation: wordTranslation,
+                sentenceTranslation: sentenceTranslation,
+                chineseDefinition: undefined,
+                englishDefinition: undefined,
+                targetDefinition: undefined,
+                lemma: undefined,
+                phonetic: undefined,
+                lemmaPhonetic: undefined,
+            }
+        }
+
+        // Official Cloud API (default)
         logger.info("Translating word using cloud API translation")
         return await translateWordWithCloud(params)
     } catch (error: unknown) {
         // Re-throw TranslationError as-is
         if (error instanceof TranslationError) {
             throw error
+        }
+
+        // Handle MTranServerError
+        if (error instanceof MTranServerError) {
+            logger.error("MTranServer translation error:", error.message)
+            throw new TranslationError(
+                error.message,
+                i18nModule.translate("error.short.mtranserverError")
+            )
+        }
+
+        // Handle BingTranslateError
+        if (error instanceof BingTranslateError) {
+            logger.error("Bing Translate translation error:", error.message)
+            throw new TranslationError(
+                error.message,
+                i18nModule.translate("error.short.bingTranslateError")
+            )
         }
 
         // Convert APIError to TranslationError
@@ -304,9 +392,42 @@ export async function translateWord(params: TranslateParams): Promise<Translatio
 export async function translateFragment(params: TranslateFragmentParams): Promise<FragmentTranslationResult> {
     try {
         const userSettings = await getCachedUserSettings()
-        const localConfig = buildLocalLlmConfig(userSettings)
 
-        if (userSettings.customApi.useCustomApi) {
+        // Check translation provider selection
+        const provider = userSettings.translationProvider
+
+        // MTranServer
+        if (provider === "mtranserver") {
+            const mtranserverSettings = userSettings.mtranserver
+            if (!mtranserverSettings.url || !mtranserverSettings.url.trim()) {
+                throw new TranslationError(
+                    i18nModule.translate("error.mtranserverConfigMissing"),
+                    i18nModule.translate("error.short.mtranserverConfigMissing")
+                )
+            }
+
+            logger.info("Translating fragment using MTranServer")
+            const { fragment, leadingText, trailingText, targetLanguage = "zh" } = params
+
+            const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
+
+            const [translation, sentenceTranslation] = await Promise.all([
+                translateWithMTranServer(fragment, targetLanguage, mtranserverSettings),
+                hasContext
+                    ? translateWithMTranServer(fullSentence, targetLanguage, mtranserverSettings)
+                    : Promise.resolve(undefined),
+            ])
+
+            return {
+                translation: translation,
+                sentenceTranslation: sentenceTranslation,
+            }
+        }
+
+        // Custom API
+        if (provider === "customApi") {
+            const localConfig = buildLocalLlmConfig(userSettings)
             if (!localConfig) {
                 throw new TranslationError(
                     i18nModule.translate("error.customApiConfigMissing"),
@@ -318,6 +439,28 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
             return await translateFragmentWithLocal(params, localConfig)
         }
 
+        // Bing Translate
+        if (provider === "bingTranslate") {
+            logger.info("Translating fragment using Bing Translate")
+            const { fragment, leadingText, trailingText, targetLanguage = "zh" } = params
+
+            const fullSentence = `${leadingText || ""}${fragment}${trailingText || ""}`
+            const hasContext = Boolean(leadingText || trailingText)
+
+            const [translation, sentenceTranslation] = await Promise.all([
+                translateWithBingTranslate(fragment, targetLanguage, userSettings.bingTranslate),
+                hasContext
+                    ? translateWithBingTranslate(fullSentence, targetLanguage, userSettings.bingTranslate)
+                    : Promise.resolve(undefined),
+            ])
+
+            return {
+                translation: translation,
+                sentenceTranslation: sentenceTranslation,
+            }
+        }
+
+        // Official Cloud API (default)
         const { fragment, leadingText, trailingText, sourceLanguage, targetLanguage = "zh", upgradeModel, contextInfo } = params
 
         // Build API request
@@ -354,6 +497,24 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
         // Re-throw TranslationError as-is
         if (error instanceof TranslationError) {
             throw error
+        }
+
+        // Handle MTranServerError
+        if (error instanceof MTranServerError) {
+            logger.error("MTranServer fragment translation error:", error.message)
+            throw new TranslationError(
+                error.message,
+                i18nModule.translate("error.short.mtranserverError")
+            )
+        }
+
+        // Handle BingTranslateError
+        if (error instanceof BingTranslateError) {
+            logger.error("Bing Translate fragment translation error:", error.message)
+            throw new TranslationError(
+                error.message,
+                i18nModule.translate("error.short.bingTranslateError")
+            )
         }
 
         // Convert APIError to TranslationError

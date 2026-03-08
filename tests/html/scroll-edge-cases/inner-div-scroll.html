@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<!--
+  EXPECTED: Tooltip should stay below anchor word while the inner div scrolls.
+
+  Mechanism:
+    Neither window nor <body> scroll in this layout.
+    window.scrollY = 0, document.body.scrollTop = 0, documentElement.scrollTop = 0.
+    
+    Fix formula: scrollY = 0 + (0===0 ? body.scrollTop : 0) = 0 + 0 = 0
+
+    This is CORRECT: when an inner <div> scrolls, rect.bottom (from getBoundingClientRect)
+    is already viewport-relative and changes as the div scrolls, but since both window and 
+    body scroll are 0, the absolute coordinate is:
+      top = rect.bottom + 0 + offset
+    which equals the correct absolute position (relative to body, which is the positioned ancestor).
+
+    The IntersectionObserver in the extension detects the inner div as a scroll container
+    and hides the tooltip when the anchor scrolls out of view.
+
+  Separate concern: tooltip visibility (handled by IntersectionObserver) vs. tooltip position.
+  This test focuses on POSITION — the tooltip must stay directly below the anchor word.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 04 — Inner Div Scroll Container</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #eff6ff;
+      color: #1e3a5f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden; /* body does NOT scroll */
+      padding-top: 75px;
+    }
+
+    #test-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #1d4ed8;
+      color: #bfdbfe;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: baseline;
+    }
+    #test-banner .name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    #test-banner .sep  { color: #60a5fa; }
+    #test-banner .pass { color: #bfdbfe; }
+    #test-banner .fail { color: #fca5a5; }
+
+    #instructions {
+      max-width: 760px;
+      width: 100%;
+      padding: 0 1.5rem 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #1e3a5f;
+    }
+    #instructions h2 { margin-bottom: 0.4rem; font-size: 1rem; }
+
+    /* The inner scroll container */
+    #scroll-container {
+      width: 760px;
+      max-width: calc(100vw - 3rem);
+      height: calc(100vh - 200px);
+      overflow-y: scroll;
+      background: #dbeafe;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: relative; /* NOT body — inner div is the scroll container */
+    }
+
+    p  { margin-bottom: 1rem; line-height: 1.8; }
+    h3 { margin: 1.5rem 0 0.5rem; font-size: 1.1rem; color: #1e3a5f; }
+
+    .translatable {
+      color: #1d4ed8;
+      font-weight: 700;
+      text-decoration: underline wavy #3b82f6;
+      cursor: pointer;
+    }
+
+    #scroll-debug {
+      position: fixed;
+      bottom: 12px; right: 12px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      pointer-events: none;
+      z-index: 9999;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="test-banner">
+    <span class="name">TEST 04 — Inner Div Scroll Container</span>
+    <span class="sep">|</span>
+    <span>Scroll type: <strong>inner div</strong> (window.scrollY = 0, body.scrollTop = 0)</span>
+    <span class="sep">|</span>
+    <span class="pass">✅ PASS: tooltip stays below anchor word; disappears when word scrolls out of the box</span>
+    <span class="sep">|</span>
+    <span class="fail">❌ FAIL: tooltip stays in the wrong position while inner div scrolls</span>
+  </div>
+
+  <div id="instructions">
+    <h2>Instructions</h2>
+    <p>
+      Scroll the <strong>blue box below</strong> (not the page — the page itself is locked).
+      The translatable words are inside the box.
+      Trigger a tooltip, then scroll the box.
+    </p>
+  </div>
+
+  <div id="scroll-container">
+    <h3>Inner Scrollable Region</h3>
+    <p>
+      The study of <span class="translatable">cognition</span> examines how the brain
+      encodes, stores, and retrieves information. Researchers use computational
+      models to approximate the <span class="translatable">perception</span> pipeline,
+      from raw sensory input to structured symbolic representation.
+      The notion of <span class="translatable">abstraction</span> — hiding implementation
+      details behind a well-defined interface — is central to both cognitive science
+      and software engineering.
+    </p>
+    <div id="inner-filler"></div>
+  </div>
+
+  <div id="scroll-debug">
+    window.scrollY: <span id="wy">0</span><br>
+    body.scrollTop: <span id="bt">0</span><br>
+    div.scrollTop:  <span id="dt">0</span>
+  </div>
+
+  <script>
+    const innerFiller = document.getElementById('inner-filler');
+    const paragraphs = [
+      'Epistemology is the branch of philosophy concerned with the nature, sources, and limits of knowledge.',
+      'A heuristic is a practical problem-solving approach that is not guaranteed to be optimal but is sufficient for reaching an immediate goal.',
+      'Ontology in information science refers to the formal representation of entities, their properties, and the relationships between them.',
+      'Semantic parsing transforms natural language utterances into structured logical forms that computers can execute.',
+      'Entropy in information theory measures the average amount of information contained in each symbol of a message source.',
+      'A knowledge graph represents real-world entities as nodes and their relationships as labelled directed edges.',
+      'Compositional generalisation is the ability to understand and generate novel combinations of known components.',
+    ];
+    let html = '';
+    for (let i = 0; i < 30; i++) {
+      html += `<p>${paragraphs[i % paragraphs.length]}</p>`;
+    }
+    innerFiller.innerHTML = html;
+
+    const container = document.getElementById('scroll-container');
+    const wyEl = document.getElementById('wy');
+    const btEl = document.getElementById('bt');
+    const dtEl = document.getElementById('dt');
+
+    container.addEventListener('scroll', () => {
+      wyEl.textContent = Math.round(window.scrollY);
+      btEl.textContent = Math.round(document.body.scrollTop);
+      dtEl.textContent = Math.round(container.scrollTop);
+    }, { passive: true });
+  </script>
+</body>
+</html>

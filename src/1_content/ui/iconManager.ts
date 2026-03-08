@@ -46,9 +46,13 @@ function calculateIconPosition(range: Range): { top: number; left: number } {
         return { top: 0, left: 0 }
     }
 
-    // Position icon at bottom-right of selection
-    const top = rect.bottom + window.scrollY + 4 // 4px gap
-    const left = rect.right + window.scrollX + 4
+    // Position icon at bottom-right of selection.
+    // On body-scroll pages (window.scrollY stays 0, body.scrollTop accumulates) add
+    // body.scrollTop only when window scroll is 0 to avoid double-counting in Quirks Mode.
+    const winScrollY = window.scrollY || document.documentElement.scrollTop || 0
+    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
+    const top = rect.bottom + winScrollY + (winScrollY === 0 ? (document.body?.scrollTop  || 0) : 0) + 4
+    const left = rect.right  + winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0) + 4
 
     return { top, left }
 }
