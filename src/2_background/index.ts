@@ -15,6 +15,7 @@
 
 import * as loggerModule from "@/0_common/utils/logger"
 import { isLowerVersion } from "@/0_common/utils/version"
+import * as backendModule from "@/5_backend"
 import * as MessageRouter from "./messaging/MessageRouter"
 import * as ServiceInitializer from "./services/ServiceInitializer"
 
@@ -37,6 +38,9 @@ async function initialize(): Promise<void> {
     logger.info("[INIT_DEBUG] Starting services initialization")
     await ServiceInitializer.initializeServices()
     logger.info("[INIT_DEBUG] Services initialization finished")
+
+    // Proactive warm-up after cold start — complements the PAGE_ACTIVATED path
+    backendModule.getAuthService().getToken().catch((err) => logger.warn("Cold-start token warm-up failed:", err))
 
     logger.info("Background script loaded successfully")
 }

@@ -36,9 +36,3 @@ applyTo: '**'
 ## 5. Documentation Conventions
 - **Self-Contained**: Documents should be complete and not reference prior versions.
 - **Naming**: Prefer the format `YYMMDD-topic` (e.g., `251005-feature-analysis`) unless specified otherwise.
-
-## 6. Project Specific Context
-- **DNS Configuration**: The project uses split-brain DNS for `api.tapword.cc`:
-    - **China**: Resolves to Aliyun ECS.
-    - **International**: CNAMEs to `worker.tapword.online` (Cloudflare).
-    - **Note**: This causes issues for China users with VPNs.
