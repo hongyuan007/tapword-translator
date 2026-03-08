@@ -7,6 +7,35 @@ vi.mock("@/1_content/utils/languageDetector", () => ({
 }))
 import { detectSourceLanguageAsync } from "@/1_content/utils/languageDetector"
 
+function stubDocumentLanguageSignals(options: {
+    htmlLang?: string
+    xmlLang?: string
+    ogLocale?: string
+    contentLanguage?: string
+}) {
+    vi.stubGlobal("document", {
+        documentElement: {
+            lang: options.htmlLang ?? "",
+            getAttribute: (name: string) => (name === "xml:lang" ? options.xmlLang ?? "" : ""),
+        },
+        querySelector: (selector: string) => {
+            if (selector === 'meta[property="og:locale"]' && options.ogLocale) {
+                return {
+                    getAttribute: (name: string) => (name === "content" ? options.ogLocale ?? "" : ""),
+                }
+            }
+
+            if (selector === 'meta[http-equiv="content-language"]' && options.contentLanguage) {
+                return {
+                    getAttribute: (name: string) => (name === "content" ? options.contentLanguage ?? "" : ""),
+                }
+            }
+
+            return null
+        },
+    })
+}
+
 describe("shouldTriggerTranslationAsync", () => {
     it("returns true when target language is not Chinese", async () => {
         expect(await shouldTriggerTranslationAsync("有些中文", "en")).toBe(true)
@@ -41,12 +70,28 @@ describe("shouldTriggerTranslationAsync", () => {
         expect(await shouldTriggerTranslationAsync("iPhone", "zh", "我们正在讨论 iPhone 15 Pro 的新功能")).toBe(false)
     })
 
+    it("does not suppress English selection on mostly English context with a small Chinese snippet", async () => {
+        const mixedEnglishContext = [
+            "Release v0.4.2 ships translation latency improvements and iframe support.",
+            "Features include MTranServer and Bing Translate integration.",
+            "A linked PR title says 添加Mtranserver与必应翻译支持, but the page content is otherwise English.",
+        ].join(" ")
+
+        expect(await shouldTriggerTranslationAsync("support", "zh", mixedEnglishContext)).toBe(true)
+    })
+
     it("suppresses English selection if context is detected as 'auto' with high CJK density (Target: zh)", async () => {
         vi.mocked(detectSourceLanguageAsync).mockResolvedValue({ lang: "auto", blockContextLang: "zh" })
         // "openclaw" is English, context is a Chinese paragraph that also contains the Latin word.
         // detectSourceLanguageAsync returns "auto" (mixed CJK+Latin), but the context is CJK-dominant.
         const chineseParagraph = "这是一段关于openclaw这个话题的中文内容，大家都很感兴趣这个项目。"
         expect(await shouldTriggerTranslationAsync("openclaw", "zh", chineseParagraph)).toBe(false)
+    })
+
+    it("suppresses refactor inside a Chinese-dominant mixed phrase", async () => {
+        const mixedChineseContext = "本次迭代中，已完成3个API接口的refactor，代码质量大幅提升。"
+
+        expect(await shouldTriggerTranslationAsync("refactor", "zh", mixedChineseContext)).toBe(false)
     })
 
     it("does not suppress on Japanese context when target is zh and context is 'auto' with Kana", async () => {
@@ -64,6 +109,47 @@ describe("shouldTriggerTranslationAsync", () => {
 
     it("handles empty strings safely", async () => {
         expect(await shouldTriggerTranslationAsync("", "zh")).toBe(true)
+    })
+
+    describe("Page Metadata Detection", () => {
+        it("suppresses when html lang declares zh", async () => {
+            stubDocumentLanguageSignals({ htmlLang: "zh-CN" })
+
+            expect(await shouldTriggerTranslationAsync("Release", "zh")).toBe(false)
+            vi.unstubAllGlobals()
+        })
+
+        it("uses xml:lang when html lang is missing", async () => {
+            stubDocumentLanguageSignals({ xmlLang: "zh-TW" })
+
+            expect(await shouldTriggerTranslationAsync("Release", "zh")).toBe(false)
+            vi.unstubAllGlobals()
+        })
+
+        it("uses og:locale when html metadata is absent", async () => {
+            stubDocumentLanguageSignals({ ogLocale: "zh_CN" })
+
+            expect(await shouldTriggerTranslationAsync("Release", "zh")).toBe(false)
+            vi.unstubAllGlobals()
+        })
+
+        it("uses content-language when stronger metadata is absent", async () => {
+            stubDocumentLanguageSignals({ contentLanguage: "zh-CN, en" })
+
+            expect(await shouldTriggerTranslationAsync("Release", "zh")).toBe(false)
+            vi.unstubAllGlobals()
+        })
+
+        it("does not let weaker metadata override html lang", async () => {
+            stubDocumentLanguageSignals({
+                htmlLang: "en",
+                ogLocale: "zh_CN",
+                contentLanguage: "zh-CN",
+            })
+
+            expect(await shouldTriggerTranslationAsync("Release", "zh", "Mostly English page text")).toBe(true)
+            vi.unstubAllGlobals()
+        })
     })
 
     describe("Language Specific Suppression", () => {

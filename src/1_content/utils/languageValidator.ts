@@ -10,15 +10,29 @@ import { detectSourceLanguageAsync } from "@/1_content/utils/languageDetector"
 const logger = loggerModule.createLogger("languageValidator")
 
 const CHINESE_RATIO_THRESHOLD = 0.05
+const CONTEXT_CHINESE_RATIO_THRESHOLD = 0.10
 
-/**
- * Returns the BCP-47 base language tag declared by the page (e.g. "zh", "en", "fr").
- * Reads `<html lang="...">` and normalises "zh-CN" → "zh".
- * Returns an empty string when no lang attribute is set.
- */
 function getPageDeclaredLanguage(): string {
     if (typeof document === "undefined") return ""
-    return ((document.documentElement.lang || "").toLowerCase().split("-")[0]) ?? ""
+
+    const htmlLang = normalizeLanguageTag(document.documentElement.lang)
+    if (htmlLang) {
+        return htmlLang
+    }
+
+    const xmlLang = normalizeLanguageTag(document.documentElement.getAttribute("xml:lang"))
+    if (xmlLang) {
+        return xmlLang
+    }
+
+    const ogLocale = normalizeLocaleMeta(document.querySelector('meta[property="og:locale"]')?.getAttribute("content"))
+    const contentLanguage = normalizeLocaleMeta(document.querySelector('meta[http-equiv="content-language"]')?.getAttribute("content"))
+
+    if (ogLocale && contentLanguage && ogLocale === contentLanguage) {
+        return ogLocale
+    }
+
+    return ogLocale || contentLanguage || ""
 }
 
 // Script Regexes
@@ -26,6 +40,7 @@ const REGEX_KANA = /[\p{Script=Hiragana}\p{Script=Katakana}]/u
 const REGEX_HANGUL = /\p{Script=Hangul}/u
 const REGEX_CYRILLIC = /\p{Script=Cyrillic}/u
 const REGEX_HAN = /\p{Script=Han}/gu
+const REGEX_LATIN = /\p{Script=Latin}/gu
 
 /**
  * Determines whether to trigger translation (show icon or immediate translate) based on text content and target language.
@@ -47,6 +62,7 @@ const REGEX_HAN = /\p{Script=Han}/gu
  */
 export async function shouldTriggerTranslationAsync(text: string, targetLanguage: string, contextText?: string): Promise<boolean> {
     const tgtLang = (targetLanguage || "").toLowerCase().split("-")[0] // Normalize 'zh-CN' -> 'zh'
+    const pageDeclaredLanguage = getPageDeclaredLanguage()
 
     switch (tgtLang) {
         case "zh": {
@@ -77,21 +93,39 @@ export async function shouldTriggerTranslationAsync(text: string, targetLanguage
 
             // 2. Check page's declared language (fast, synchronous, reliable when set)
             // Covers cases where the selected text is pure Latin but the page is Chinese.
-            if (getPageDeclaredLanguage() === "zh") {
-                logger.debug("Suppressing translation: Target is Chinese and page declares Chinese via lang attribute")
-                return false
-            }
-
-            // 3. Check if the context contains any Chinese character.
-            // Even one CJK character in the surrounding text indicates a Chinese-dominant page.
-            // Guard: if context contains Japanese Kana, it is a Japanese page — don't suppress.
-            if (contextText && !REGEX_KANA.test(contextText) && REGEX_HAN.test(contextText)) {
-                logger.debug("Suppressing translation: Target is Chinese and context contains Chinese characters", {
-                    contextSnippet: contextText.substring(0, 20) + "...",
+            if (pageDeclaredLanguage === "zh") {
+                logger.debug("Suppressing translation: Target is Chinese and page metadata declares Chinese", {
+                    pageDeclaredLanguage,
                 })
                 return false
             }
 
+            // 3. Check whether the surrounding context is Chinese-dominant.
+            // A few Chinese characters (e.g. a translated link title on an otherwise English page)
+            // should not suppress translation. Require a meaningful Han ratio instead.
+            // Guard: if context contains Japanese Kana, it is a Japanese page — don't suppress.
+            if (contextText && !REGEX_KANA.test(contextText)) {
+                const contextChineseRatio = calculateHanRatioAgainstHanAndLatin(contextText)
+                logger.debug("Chinese-target suppression context analysis", {
+                    textSnippet: text.substring(0, 20) + "...",
+                    pageDeclaredLanguage,
+                    contextSnippet: contextText.substring(0, 60) + "...",
+                    contextChineseRatio,
+                    threshold: CONTEXT_CHINESE_RATIO_THRESHOLD,
+                })
+                if (contextChineseRatio >= CONTEXT_CHINESE_RATIO_THRESHOLD) {
+                    logger.debug("Suppressing translation: Target is Chinese and context is Chinese-dominant", {
+                        contextSnippet: contextText.substring(0, 20) + "...",
+                        ratio: contextChineseRatio,
+                    })
+                    return false
+                }
+            }
+
+            logger.debug("Allowing translation: Target is Chinese but no same-language suppression signal matched", {
+                textSnippet: text.substring(0, 20) + "...",
+                pageDeclaredLanguage,
+            })
             return true
         }
         case "ja": {
@@ -140,4 +174,29 @@ export async function shouldTriggerTranslationAsync(text: string, targetLanguage
             return true
         }
     }
+}
+
+function calculateHanRatioAgainstHanAndLatin(text: string): number {
+    if (!text) return 0
+
+    const hanCount = text.match(REGEX_HAN)?.length ?? 0
+    const latinCount = text.match(REGEX_LATIN)?.length ?? 0
+    const comparableCount = hanCount + latinCount
+
+    if (comparableCount === 0) return 0
+    return hanCount / comparableCount
+}
+
+function normalizeLanguageTag(tag: string | null | undefined): string {
+    if (!tag) return ""
+    return tag.toLowerCase().split("-")[0]?.trim() ?? ""
+}
+
+function normalizeLocaleMeta(content: string | null | undefined): string {
+    if (!content) return ""
+
+    const firstToken = content.split(",")[0]?.trim().toLowerCase() ?? ""
+    if (!firstToken) return ""
+
+    return firstToken.split(/[-_]/)[0]?.trim() ?? ""
 }

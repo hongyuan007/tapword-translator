@@ -4,6 +4,7 @@
  * Centralizes validation logic for text selections to determine if translation should be triggered.
  */
 import * as types from "@/0_common/types"
+import * as loggerModule from "@/0_common/utils/logger"
 import * as constants from "@/1_content/constants"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
@@ -13,6 +14,7 @@ import { shouldTriggerTranslationAsync } from "@/1_content/utils/languageValidat
 const ELEMENT_NODE = 1
 const SINGLE_WORD_WHITESPACE_REGEX = /\s/
 const MAX_SINGLE_CLICK_WORD_LENGTH = 30 // Reasonable max length for a single word
+const logger = loggerModule.createLogger("selectionValidator")
 
 export type ValidationTrigger = "icon" | "doubleClickWord" | "doubleClickSentence"
 
@@ -237,6 +239,14 @@ export async function validateSingleClickAsync(
 
     if (suppressNativeLanguage) {
         const isNative = await isNativeLanguageAsync(sanitizedText, targetLang, contextText)
+        logger.debug("Single-click native-language check", {
+            text: sanitizedText,
+            targetLang,
+            suppressNativeLanguage,
+            contextLength: contextText.length,
+            contextSnippet: contextText.substring(0, 80) + "...",
+            isNative,
+        })
         if (isNative) {
             return { isValid: false, text: sanitizedText, reason: "Single-click suppressed on native language", shouldCleanup: true }
         }
