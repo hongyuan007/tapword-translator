@@ -2,7 +2,8 @@
  * @file issue-35-repro-real-site.spec.ts
  *
  * Visual reproduction test for GitHub Issue #35:
- * "codex文档网页，悬浮翻译会随着页面滑动发生漂移"
+ * On the OpenAI Codex docs page, the floating tooltip drifts upward
+ * as the page scrolls (body-scroll layout, window.scrollY stays 0).
  *
  * This test opens the **real** OpenAI Codex docs page, selects "extra
  * instructions" from the subtitle, waits for the translation annotation to
@@ -13,6 +14,10 @@
  * hard-asserts on drift thresholds), this spec is intentionally a
  * **no-assertion reproduction** — it exists to capture screenshots that
  * confirm the bug is present before a fix is applied.
+ *
+ * NOTE: This test is skipped by default because it depends on a live
+ * external website and has no assertions. Run it explicitly with:
+ *   RUN_REAL_SITE_TESTS=1 npm run test:e2e:headed -- tests/e2e/specs/issue-35-repro-real-site.spec.ts
  */
 
 import fs from 'node:fs/promises';
@@ -79,9 +84,14 @@ async function waitForServiceWorker(
 
 test.setTimeout(120_000);
 
+const RUN_REAL_SITE = !!process.env['RUN_REAL_SITE_TESTS'];
+test.skip(!RUN_REAL_SITE, 'Skipped by default (live external site, no assertions). Set RUN_REAL_SITE_TESTS=1 to run.');
+
 test('Issue #35 [real site]: screenshot tooltip drift on openai.com/codex docs', async () => {
     // Verify the extension dist exists before launching the browser
     await fs.access(MANIFEST_PATH);
+    // Ensure screenshot directory exists (Playwright does not create it automatically)
+    await fs.mkdir(SCREENSHOT_DIR, { recursive: true });
 
     const channel     = process.env[BROWSER_CHANNEL_ENV_KEY] ?? DEFAULT_BROWSER_CHANNEL;
     const userDataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tapword-e2e-35-real-'));

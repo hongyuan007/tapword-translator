@@ -92,6 +92,11 @@ function normalizeUserSettings(
         ...(settings.mtranserver ?? {}),
     }
 
+    const mergedBingTranslate = {
+        ...DEFAULT_USER_SETTINGS.bingTranslate,
+        ...(settings.bingTranslate ?? {}),
+    }
+
     const normalizedCustomApi: types.CustomApiSettings = {
         baseUrl: normalizeString(mergedCustomApi.baseUrl),
         apiKey: normalizeString(mergedCustomApi.apiKey),
@@ -157,6 +162,7 @@ function normalizeUserSettings(
         textUnderlineOffsetPxV2: mergedSettings.textUnderlineOffsetPxV2 ?? DEFAULT_USER_SETTINGS.textUnderlineOffsetPxV2,
         customApi: normalizedCustomApi,
         mtranserver: normalizedMTranserver,
+        bingTranslate: mergedBingTranslate,
         doubleClickSentenceTriggerKey: validatedTriggerKey,
         // Ensure V2 key is always populated for internal usage
         doubleClickTranslateV2: mergedSettings.doubleClickTranslateV2 ?? DEFAULT_USER_SETTINGS.doubleClickTranslateV2,
