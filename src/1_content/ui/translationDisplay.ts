@@ -668,17 +668,24 @@ export function showTranslationResult(
         const styleResult = renderTooltipContent(tooltip, state, originalElement, anchor, userSettings)
 
         const autoAdjustHeight = userSettings?.autoAdjustHeight ?? contentIndex.getCachedUserSettings()?.autoAdjustHeight ?? true
+        let didAdjustLineHeight = false
         if (autoAdjustHeight && styleResult?.spaceCalculation) {
-            const adjustedBlock = lineHeightAdjuster.adjustLineHeightIfNeeded(anchor, styleResult.spaceCalculation)
-            if (adjustedBlock) {
-                anchorAdjustedBlocks.set(anchorId, adjustedBlock)
+            const adjustmentResult = lineHeightAdjuster.adjustLineHeightIfNeeded(anchor, styleResult.spaceCalculation)
+            if (adjustmentResult.blockElement) {
+                anchorAdjustedBlocks.set(anchorId, adjustmentResult.blockElement)
             }
+            didAdjustLineHeight = adjustmentResult.didAdjustLineHeight
         }
 
         document.body.appendChild(tooltip)
         activeTranslations.set(anchorId, [tooltip])
         ensureOrphanObserver()
         positionTooltip(anchorId)
+        if (didAdjustLineHeight) {
+            // A real line-height change can push lower anchors down immediately.
+            // Keep the new anchor on the fast path, then resync the rest on the next frame.
+            scheduleReposition()
+        }
         ensureGlobalRepositionListeners()
         setupVisibilityObserver(anchorId, anchor)
 
