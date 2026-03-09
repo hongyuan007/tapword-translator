@@ -312,7 +312,9 @@ function positionTooltip(id: string): void {
     }
 
     const cached = tooltipSegmentsCache.get(id) || []
-    const desiredCount = isSpinner ? 1 : Math.max(1, cached.length)
+    // In V2 each tooltip line also renders the underline, so we need one tooltip
+    // per selected source line even when the translated text fits into fewer lines.
+    const desiredCount = Math.max(1, lineRects.length)
     const segments = ensureTooltipSegmentCount(id, desiredCount, baseTooltip)
 
     const isSingleLine = segments.length === 1
@@ -339,6 +341,7 @@ function positionTooltip(id: string): void {
         const rectWidth = rect.width
         tooltip.style.minWidth = `${rectWidth}px`
         tooltip.style.maxWidth = `${rectWidth}px`
+        tooltip.style.textAlign = isSingleLine ? "center" : "left"
 
         if (!isSpinner) {
             setTooltipText(tooltip, cached[i] ?? "", rectWidth, isLastLine)
@@ -548,9 +551,9 @@ export function showTranslationResult(
         const autoAdjustHeight = userSettings?.autoAdjustHeight ?? contentIndex.getCachedUserSettings()?.autoAdjustHeight ?? true
         if (autoAdjustHeight && styleResult?.spaceCalculation) {
             const parentElement = storedRange.startContainer.parentElement
-            const adjustedBlock = lineHeightAdjuster.adjustLineHeightIfNeeded(parentElement, styleResult.spaceCalculation)
-            if (adjustedBlock) {
-                adjustedBlocks.set(id, adjustedBlock)
+            const adjustmentResult = lineHeightAdjuster.adjustLineHeightIfNeeded(parentElement, styleResult.spaceCalculation)
+            if (adjustmentResult.blockElement) {
+                adjustedBlocks.set(id, adjustmentResult.blockElement)
             }
         }
 

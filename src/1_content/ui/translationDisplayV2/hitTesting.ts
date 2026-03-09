@@ -12,6 +12,7 @@
 
 import * as loggerModule from "@/0_common/utils/logger"
 import { CLICK_DEBOUNCE_DELAY_MS, INTERACTION_GRACE_PERIOD_MS, RANGE_HIT_TEST_HORIZONTAL_PAD_PX } from "./types"
+import { getNormalizedLineRects } from "./tooltipLayout"
 
 const logger = loggerModule.createLogger("translationDisplayV2/hitTesting")
 
@@ -169,7 +170,7 @@ function findHitTranslationByPoint(x: number, y: number): string | null {
 export function isPointInsideTranslationZone(
     x: number, y: number, range: Range, tooltips: HTMLElement[]
 ): boolean {
-    const rangeRects = Array.from(range.getClientRects())
+    const rangeRects = getNormalizedLineRects(range)
 
     // 1. Range text rects (with horizontal padding)
     for (const rect of rangeRects) {
@@ -192,21 +193,26 @@ export function isPointInsideTranslationZone(
         }
     }
 
-    // 3. Bridge the vertical gap between each Range rect and its corresponding tooltip(s)
-    for (const rangeRect of rangeRects) {
+    // 3. Bridge the vertical gap between each source line and its corresponding tooltip.
+    // Avoid cross-combining every rect with every tooltip; that can create oversized
+    // hit zones extending into nearby, untranslated text.
+    for (let i = 0; i < rangeRects.length; i++) {
+        const rangeRect = rangeRects[i]
+        if (!rangeRect) continue
         if (rangeRect.width === 0 || rangeRect.height === 0) continue
-        for (const tooltip of tooltips) {
-            const tooltipRect = tooltip.getBoundingClientRect()
-            if (tooltipRect.width === 0 || tooltipRect.height === 0) continue
-            const gapTop = rangeRect.bottom
-            const gapBottom = tooltipRect.top
-            if (gapBottom <= gapTop) continue
-            if (y >= gapTop && y <= gapBottom) {
-                // Use the wider of range rect or tooltip rect, with padding
-                const hLeft = Math.min(rangeRect.left, tooltipRect.left) - RANGE_HIT_TEST_HORIZONTAL_PAD_PX
-                const hRight = Math.max(rangeRect.right, tooltipRect.right) + RANGE_HIT_TEST_HORIZONTAL_PAD_PX
-                if (x >= hLeft && x <= hRight) return true
-            }
+        const tooltip = tooltips[i]
+        if (!tooltip) continue
+
+        const tooltipRect = tooltip.getBoundingClientRect()
+        if (tooltipRect.width === 0 || tooltipRect.height === 0) continue
+
+        const gapTop = rangeRect.bottom
+        const gapBottom = tooltipRect.top
+        if (gapBottom <= gapTop) continue
+        if (y >= gapTop && y <= gapBottom) {
+            const hLeft = Math.min(rangeRect.left, tooltipRect.left) - RANGE_HIT_TEST_HORIZONTAL_PAD_PX
+            const hRight = Math.max(rangeRect.right, tooltipRect.right) + RANGE_HIT_TEST_HORIZONTAL_PAD_PX
+            if (x >= hLeft && x <= hRight) return true
         }
     }
 
