@@ -75,19 +75,61 @@ await worker.evaluate(() => chrome.storage.sync.set({ ... }));
 await page.reload();
 ```
 
-### 2.4 Precise Text Selection
-`click({ clickCount: 3 })` often selects the whole paragraph. Use the **JS Selection API** to strictly select the target word.
+### 2.4 Triggering Translation
+
+The extension has **two independent trigger paths**, and the correct approach depends on which one is active:
+
+#### Path A — `singleClickTranslate` (default ON): click a word directly
+This is the most reliable path for tests. The extension's `handleSingleClick` handler listens for trusted `click` events and detects the word at the cursor position automatically.
+
+**For local HTML fixtures** (word wrapped in `<span id="target-word">`):
+```typescript
+await page.locator('#target-word').click(); // trusted click → handleSingleClick fires
+```
+
+**For real websites** (no `id` wrapper available), find the text node's bounding rect first:
+```typescript
+const clickPoint = await page.evaluate((phrase) => {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+        const idx = (node as Text).nodeValue?.indexOf(phrase) ?? -1;
+        if (idx !== -1) {
+            const range = document.createRange();
+            range.setStart(node as Text, idx);
+            range.setEnd(node as Text, idx + phrase.split(' ')[0].length); // click the first word
+            const r = range.getBoundingClientRect();
+            return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        }
+    }
+    return null;
+}, 'target phrase');
+
+if (clickPoint) {
+    await page.mouse.click(clickPoint.x, clickPoint.y); // trusted physical click
+}
+```
+
+> **Why not `page.evaluate(() => el.dispatchEvent(new MouseEvent('click',...)))`?**
+> Events created with `new MouseEvent()` in the browser have `isTrusted === false`. The extension's click handler does NOT explicitly check `isTrusted`, but `page.locator.dispatchEvent()` and inline `element.dispatchEvent()` create synthetic events. Using `page.mouse.click()` or `page.locator().click()` always produces trusted events and is the safe choice.
+
+#### Path B — Icon flow (drag selection → click icon)
+When `showIcon: true` and `singleClickTranslate: false`, the user must drag-select text first and then click the floating icon.
+
+Use `page.mouse` for a trusted drag — do **NOT** use the JS Selection API + synthetic `mouseup`, because the async `handleTextSelection` handler may read an already-collapsed selection:
 
 ```typescript
-await page.evaluate(() => {
-    const el = document.getElementById('target-word');
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-});
-// Trigger the extension's mouseup handler
-await page.locator('#target-word').dispatchEvent('mouseup');
+// Get start/end coordinates of the text span
+const box = await page.locator('#target-word').boundingBox();
+await page.mouse.move(box!.x, box!.y + box!.height / 2);
+await page.mouse.down();
+await page.mouse.move(box!.x + box!.width, box!.y + box!.height / 2);
+await page.mouse.up(); // trusted mouseup → handleTextSelection fires
+
+// Wait for icon, then click it
+const icon = page.locator('.ai-translator-icon').first();
+await expect(icon).toBeVisible({ timeout: 5_000 });
+await icon.click();
 ```
 
 ## 3. Debugging & Logging
@@ -124,8 +166,36 @@ async function waitForExtensionServiceWorker(context: any): Promise<string> {
 - Use **`<span id="target-word">`** to wrap test targets for precise selection.
 - Use `createLocalHtmlServer()` to serve them (file:// protocol is often restricted).
 
-## 6. Common Pitfalls Checklist
+## 6. Scrolling in Tests
+
+Different pages use different scroll models. A naive `window.scrollBy()` will silently do nothing on sites where only an inner container scrolls (e.g. OpenAI docs, many Next.js / SPA layouts where `html` and `body` have `overflow: hidden`).
+
+**Universal approach — use `page.mouse.wheel()`:**
+```typescript
+// Works for both window scroll AND inner-container scroll
+await page.mouse.wheel(0, 200); // scroll 200px down
+await page.waitForTimeout(120); // let extension's rAF-debounced repositioning run
+```
+
+**When `window.scrollBy()` is appropriate** (only for pages you fully control, e.g. local HTML fixtures where `body` is the scroll root):
+```typescript
+await page.evaluate(() => window.scrollBy(0, 200));
+```
+
+**When scrolling an explicit container** (local fixtures like `issue-35-container-scroll.html`):
+```typescript
+await page.evaluate(() =>
+    document.getElementById('scroll-container')!.scrollBy(0, 200)
+);
+```
+
+> **Scroll amount matters for tooltip drift tests**: Use small steps (≤ 100 px) so the anchor element stays inside the viewport. Large steps (300 px+) will push the anchor off-screen, making drift impossible to observe visually.
+
+## 7. Common Pitfalls Checklist
 - [ ] Did you reload the page after changing `chrome.storage`?
 - [ ] Did you use `test.setTimeout(120_000)` for long tests?
 - [ ] Did you close the `context` in a `finally` block?
 - [ ] Are you using clipped screenshots (`screenshot({ clip: ... })`) to avoid viewport scrolling issues?
+- [ ] Are you using `page.mouse.click()` or `page.locator().click()` (trusted events) instead of `element.dispatchEvent()` (untrusted, unreliable)?
+- [ ] For scroll tests on real or SPA sites, are you using `page.mouse.wheel()` instead of `window.scrollBy()`?
+- [ ] Is your scroll step small enough (≤ 100 px) to keep the anchor element in the viewport?

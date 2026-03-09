@@ -70,7 +70,14 @@ export interface SpeechSynthesisRequestData {
 /**
  * Message types for content-background communication
  */
-export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST"
+export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED"
+
+/**
+ * Page activated message (sent by content script on injection for token pre-warming)
+ */
+export interface PageActivatedMessage {
+    type: "PAGE_ACTIVATED"
+}
 
 /**
  * Popup bootstrap request/response
@@ -226,15 +233,36 @@ export type TriggerKey = "meta" | "option" | "alt" | "ctrl"
 
 export type NetworkRegion = "auto" | "china" | "global"
 
+/**
+ * Translation provider type
+ * - official: Official cloud API (default)
+ * - customApi: User-provided LLM API
+ * - mtranserver: Self-hosted MTranServer
+ * - bingTranslate: Bing Translate API (free, no key required)
+ */
+export type TranslationProvider = "official" | "customApi" | "mtranserver" | "bingTranslate"
+
 export interface CustomApiSettings {
-    /** Whether to use user-provided LLM API instead of cloud translation */
-    useCustomApi: boolean
     /** Custom API base URL */
     baseUrl: string
     /** Custom API key/token */
     apiKey: string
     /** Custom API model name */
     model: string
+}
+
+export interface MTranserverSettings {
+    /** MTranserver URL */
+    url: string
+    /** MTranserver API key */
+    key: string
+    /** Whether to enable MTranserver */
+    enabled: boolean
+}
+
+export interface BingTranslateSettings {
+    /** Whether to enable Bing Translate */
+    enabled: boolean
 }
 
 export interface UserSettings {
@@ -287,8 +315,14 @@ export interface UserSettings {
     sentenceUnderlineColor: string
     /** Icon background color */
     iconColor: IconColor
+    /** Translation provider selection */
+    translationProvider: TranslationProvider
     /** Custom API settings */
     customApi: CustomApiSettings
+    /** MTranserver settings */
+    mtranserver: MTranserverSettings
+    /** Bing Translate settings */
+    bingTranslate: BingTranslateSettings
     /** Whether to suppress translation when the detected source language matches the target language */
     suppressNativeLanguage: boolean
     /** Network region preference for API calls (auto, china, global) */
@@ -324,11 +358,19 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     wordUnderlineColorV2: "#1F7FDB",
     sentenceUnderlineColor: "#E9C46A",
     iconColor: "pink",
+    translationProvider: "official",
     customApi: {
-        useCustomApi: false,
         baseUrl: "",
         apiKey: "",
         model: "",
+    },
+    mtranserver: {
+        url: "http://127.0.0.1:8989",
+        key: "",
+        enabled: false,
+    },
+    bingTranslate: {
+        enabled: true,
     },
     suppressNativeLanguage: false,
     networkRegion: "auto",

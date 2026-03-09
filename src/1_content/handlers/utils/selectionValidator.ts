@@ -4,6 +4,7 @@
  * Centralizes validation logic for text selections to determine if translation should be triggered.
  */
 import * as types from "@/0_common/types"
+import * as loggerModule from "@/0_common/utils/logger"
 import * as constants from "@/1_content/constants"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
@@ -14,6 +15,7 @@ import { shouldTriggerTranslationAsync } from "@/1_content/utils/languageValidat
 const ELEMENT_NODE = 1
 const SINGLE_WORD_WHITESPACE_REGEX = /\s/
 const MAX_SINGLE_CLICK_WORD_LENGTH = 30 // Reasonable max length for a single word
+const logger = loggerModule.createLogger("selectionValidator")
 
 export type ValidationTrigger = "icon" | "doubleClickWord" | "doubleClickSentence"
 
@@ -107,8 +109,9 @@ export async function validateSelectionAsync(
     // BUT user requirement says: "single-click and double-click, default closed under native text"
     
     const targetLang = settings?.targetLanguage || types.DEFAULT_USER_SETTINGS.targetLanguage
-    const contextText = domSanitizer.getSurroundingTextForDetection(range, 100)
-    
+    // Use a larger radius (300) to capture headings and other elements on the page,
+    // giving the suppress check a more representative sample of the page language.
+    const contextText = domSanitizer.getSurroundingTextForDetection(range, 300)
     const suppressNativeLanguage = settings?.suppressNativeLanguage ?? types.DEFAULT_SUPPRESS_NATIVE_LANGUAGE
 
     // Force suppression for doubleClick trigger if it is native language
@@ -256,15 +259,26 @@ export async function validateSingleClickAsync(
     }
 
     // 8. Language Suppression Check
-    // Requirement: Single-click (and double-click) default closed under native text
+    // Single-click respects the same suppressNativeLanguage setting as the icon trigger.
+    // Double-click has its own always-on suppression (see validateIconTriggerSelection).
     const targetLang = settings?.targetLanguage || types.DEFAULT_USER_SETTINGS.targetLanguage
-    const contextText = domSanitizer.getSurroundingTextForDetection(range, 100)
-    
-    // Always suppress native language for single-click, regardless of global suppressNativeLanguage setting
-    // Unless we want to introduce a specific setting for this later. Currently interpreted as "default closed".
-    const isNative = await isNativeLanguageAsync(sanitizedText, targetLang, contextText)
-    if (isNative) {
-         return { isValid: false, text: sanitizedText, reason: "Single-click suppressed on native language", shouldCleanup: true }
+    // Use a larger radius (300) to capture headings and other elements on the page.
+    const contextText = domSanitizer.getSurroundingTextForDetection(range, 300)
+    const suppressNativeLanguage = settings?.suppressNativeLanguage ?? types.DEFAULT_SUPPRESS_NATIVE_LANGUAGE
+
+    if (suppressNativeLanguage) {
+        const isNative = await isNativeLanguageAsync(sanitizedText, targetLang, contextText)
+        logger.debug("Single-click native-language check", {
+            text: sanitizedText,
+            targetLang,
+            suppressNativeLanguage,
+            contextLength: contextText.length,
+            contextSnippet: contextText.substring(0, 80) + "...",
+            isNative,
+        })
+        if (isNative) {
+            return { isValid: false, text: sanitizedText, reason: "Single-click suppressed on native language", shouldCleanup: true }
+        }
     }
     
     return { isValid: true, text: sanitizedText, range, reason: "Valid single click", shouldCleanup: true }

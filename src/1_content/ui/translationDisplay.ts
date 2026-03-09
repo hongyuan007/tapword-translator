@@ -227,8 +227,14 @@ function positionTooltip(anchorId: string): void {
     const lineRects = rects.length > 0 ? rects : [anchor.getBoundingClientRect()]
     if (lineRects.length === 0) return
 
-    const scrollX = window.scrollX || document.documentElement.scrollLeft || 0
-    const scrollY = window.scrollY || document.documentElement.scrollTop || 0
+    // On pages where <body> is the scroll container (e.g. position:relative + overflow-y:auto),
+    // window.scrollY stays 0 while body.scrollTop accumulates.  We add body.scrollTop only
+    // when the window scroll is 0, avoiding double-counting in Quirks Mode pages where both
+    // window.scrollY and document.body.scrollTop reflect the same offset simultaneously.
+    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
+    const winScrollY = window.scrollY || document.documentElement.scrollTop  || 0
+    const scrollX = winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0)
+    const scrollY = winScrollY + (winScrollY === 0 ? (document.body?.scrollTop  || 0) : 0)
     const viewportWidth = document.documentElement.clientWidth
 
     const signature = buildRectsSignature(lineRects)
@@ -662,17 +668,24 @@ export function showTranslationResult(
         const styleResult = renderTooltipContent(tooltip, state, originalElement, anchor, userSettings)
 
         const autoAdjustHeight = userSettings?.autoAdjustHeight ?? contentIndex.getCachedUserSettings()?.autoAdjustHeight ?? true
+        let didAdjustLineHeight = false
         if (autoAdjustHeight && styleResult?.spaceCalculation) {
-            const adjustedBlock = lineHeightAdjuster.adjustLineHeightIfNeeded(anchor, styleResult.spaceCalculation)
-            if (adjustedBlock) {
-                anchorAdjustedBlocks.set(anchorId, adjustedBlock)
+            const adjustmentResult = lineHeightAdjuster.adjustLineHeightIfNeeded(anchor, styleResult.spaceCalculation)
+            if (adjustmentResult.blockElement) {
+                anchorAdjustedBlocks.set(anchorId, adjustmentResult.blockElement)
             }
+            didAdjustLineHeight = adjustmentResult.didAdjustLineHeight
         }
 
         document.body.appendChild(tooltip)
         activeTranslations.set(anchorId, [tooltip])
         ensureOrphanObserver()
         positionTooltip(anchorId)
+        if (didAdjustLineHeight) {
+            // A real line-height change can push lower anchors down immediately.
+            // Keep the new anchor on the fast path, then resync the rest on the next frame.
+            scheduleReposition()
+        }
         ensureGlobalRepositionListeners()
         setupVisibilityObserver(anchorId, anchor)
 

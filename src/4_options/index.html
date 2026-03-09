@@ -506,62 +506,142 @@
             </div>
           </div>
 
-          <div style="margin-bottom: 12px; padding-left: 2px;">
-            <h3 class="card-title" data-i18n-key="popup.section.customApi" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Custom API</h3>
-            <p class="section-subtitle" data-i18n-key="popup.section.customApi.helper" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Use your own API for translations.</p>
+          <div id="providerTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
+            <h3 class="card-title" data-i18n-key="popup.section.customApi" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Translation Provider</h3>
+            <p class="section-subtitle" data-i18n-key="popup.section.translationProvider.helper" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Select which translation service to use.</p>
           </div>
-          <div class="card settings-card" id="customApiCard">
-            <div class="setting-item" id="useCustomApiSettingItem">
-              <div class="setting-info">
-                <label class="setting-label" for="useCustomApi">
-                  <span data-i18n-key="popup.useCustomApi.label">Use Custom API</span>
-                </label>
-                <p class="setting-helper" data-i18n-key="popup.useCustomApi.helper">Route translations through your own OpenAI-compatible endpoint.</p>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="useCustomApi" data-setting="useCustomApi">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
 
+          <div class="card settings-card" id="providerSelectionCard">
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="customApiBaseUrl" data-i18n-key="popup.customApi.baseUrl.label">API Base URL</label>
-                <p class="setting-helper" data-i18n-key="popup.customApi.baseUrl.helper">Example: https://api.openai.com/v1</p>
+                <label class="setting-label" for="customApiProvider" data-i18n-key="popup.translationProvider.label">Translation Provider</label>
+                <p class="setting-helper" data-i18n-key="popup.translationProvider.helper">Choose between official cloud API, custom LLM API, or self-hosted MTranServer.</p>
               </div>
               <div class="setting-control">
-                <input type="url" id="customApiBaseUrl" data-setting="customApiBaseUrl" data-custom-api-control="true" class="select-input" placeholder="https://api.example.com/v1" />
+                <select id="customApiProvider" data-setting="translationProvider" class="select-input">
+                  <option value="official" data-i18n-key="popup.translationProvider.official">Official Cloud API</option>
+                  <option value="customApi" data-i18n-key="popup.translationProvider.customApi">Custom LLM API</option>
+                  <option value="mtranserver" data-i18n-key="popup.translationProvider.mtranserver">MTranServer (Self-hosted)</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate (Free)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="providerPanelsContainer" class="provider-panels-container">
+            <!-- Custom LLM API panel -->
+            <div class="provider-panel" data-provider="customApi">
+              <div id="customApiTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
+                <h3 class="card-title" data-i18n-key="popup.customApi.title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Custom LLM API</h3>
+                <p class="section-subtitle" data-i18n-key="popup.customApi.description" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Use your own LLM API provider for translations.</p>
+              </div>
+              <div class="card settings-card" id="customApiCard">
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" for="customApiBaseUrl" data-i18n-key="popup.customApi.baseUrl.label">API Base URL</label>
+                    <p class="setting-helper" data-i18n-key="popup.customApi.baseUrl.helper">Example: https://api.openai.com/v1</p>
+                  </div>
+                  <div class="setting-control">
+                    <input type="url" id="customApiBaseUrl" data-setting="customApiBaseUrl" data-custom-api-control="true" class="select-input" placeholder="https://api.example.com/v1" />
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" for="customApiKey" data-i18n-key="popup.customApi.apiKey.label">API Key</label>
+                    <p class="setting-helper" data-i18n-key="popup.customApi.apiKey.helper">Your provider token (stored locally in browser storage).</p>
+                  </div>
+                  <div class="setting-control">
+                    <input type="password" id="customApiKey" data-setting="customApiKey" data-custom-api-control="true" class="select-input" placeholder="sk-..." autocomplete="new-password" />
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" for="customApiModel" data-i18n-key="popup.customApi.model.label">Model</label>
+                    <p class="setting-helper" data-i18n-key="popup.customApi.model.helper">Example: gpt-4o-mini, qwen-plus</p>
+                  </div>
+                  <div class="setting-control">
+                    <input type="text" id="customApiModel" data-setting="customApiModel" data-custom-api-control="true" class="select-input" placeholder="model-name" />
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" for="validateCustomApiButton" data-i18n-key="popup.customApi.validate.label">Validate Settings</label>
+                    <p class="setting-helper" data-i18n-key="popup.customApi.validate.helper">Run a quick test translation using your custom API.</p>
+                  </div>
+                  <div class="setting-control validation-control">
+                    <button class="secondary-button" id="validateCustomApiButton" data-custom-api-control="true" data-i18n-key="popup.customApi.validate.button">Validate</button>
+                    <p class="validation-status" id="validateCustomApiStatus"></p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="customApiKey" data-i18n-key="popup.customApi.apiKey.label">API Key</label>
-                <p class="setting-helper" data-i18n-key="popup.customApi.apiKey.helper">Your provider token (stored locally in browser storage).</p>
+            <!-- MTranServer panel -->
+            <div class="provider-panel" data-provider="mtranserver">
+              <div id="mtranserverTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
+                <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">MTranServer</h3>
+                <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
+                  <span data-i18n-key="popup.mtranserver.description">A lightweight, self-hosted translation service with low resource consumption.</span>
+                  <a href="https://github.com/xxnuo/MTranServer" target="_blank" rel="noopener noreferrer" class="link" data-i18n-key="popup.mtranserver.learnMore">Learn more →</a>
+                </p>
               </div>
-              <div class="setting-control">
-                <input type="password" id="customApiKey" data-setting="customApiKey" data-custom-api-control="true" class="select-input" placeholder="sk-..." autocomplete="new-password" />
+              <div class="card settings-card" id="mtranserverCard">
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" for="mtranserverUrl" data-i18n-key="popup.mtranserver.url.label">MTranServer URL</label>
+                    <p class="setting-helper" data-i18n-key="popup.mtranserver.url.helper">Your self-hosted MTranServer endpoint (e.g., http://127.0.0.1:8989).</p>
+                  </div>
+                  <div class="setting-control">
+                    <input type="url" id="mtranserverUrl" data-setting="mtranserverUrl" class="select-input" placeholder="http://127.0.0.1:8989" value="http://127.0.0.1:8989"/>
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" for="mtranserverKey" data-i18n-key="popup.mtranserver.key.label">API Key (Optional)</label>
+                    <p class="setting-helper" data-i18n-key="popup.mtranserver.key.helper">If your MTranServer requires authentication.</p>
+                  </div>
+                  <div class="setting-control">
+                    <input type="password" id="mtranserverKey" data-setting="mtranserverKey" class="select-input" placeholder="" value=""/>
+                  </div>
+                </div>
+
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" data-i18n-key="popup.mtranserver.test.label">Test Connection</label>
+                    <p class="setting-helper" data-i18n-key="popup.mtranserver.test.helper">Test your MTranServer connection with a sample translation.</p>
+                  </div>
+                  <div class="setting-control validation-control">
+                    <button class="secondary-button" id="testMtranserverButton" data-i18n-key="popup.mtranserver.test.button">Test Translation</button>
+                    <p class="validation-status" id="testMtranserverStatus"></p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="customApiModel" data-i18n-key="popup.customApi.model.label">Model</label>
-                <p class="setting-helper" data-i18n-key="popup.customApi.model.helper">Example: gpt-4o-mini, qwen-plus</p>
+            <!-- Bing Translate panel -->
+            <div class="provider-panel" data-provider="bingTranslate">
+              <div id="bingTranslateTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
+                <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Bing Translate</h3>
+                <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
+                  <span data-i18n-key="popup.bingTranslate.description">Free translation service powered by Bing Translator. No API key required.</span>
+                  <a href="https://github.com/plainheart/bing-translate-api" target="_blank" rel="noopener noreferrer" class="link" data-i18n-key="popup.bingTranslate.learnMore">Learn more →</a>
+                </p>
               </div>
-              <div class="setting-control">
-                <input type="text" id="customApiModel" data-setting="customApiModel" data-custom-api-control="true" class="select-input" placeholder="model-name" />
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="validateCustomApiButton" data-i18n-key="popup.customApi.validate.label">Validate Settings</label>
-                <p class="setting-helper" data-i18n-key="popup.customApi.validate.helper">Run a quick test translation using your custom API.</p>
-              </div>
-              <div class="setting-control validation-control">
-                <button class="secondary-button" id="validateCustomApiButton" data-custom-api-control="true" data-i18n-key="popup.customApi.validate.button">Validate</button>
-                <p class="validation-status" id="validateCustomApiStatus"></p>
+              <div class="card settings-card" id="bingTranslateCard">
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <label class="setting-label" data-i18n-key="popup.bingTranslate.note.label">Note</label>
+                    <p class="setting-helper" data-i18n-key="popup.bingTranslate.note.helper">Send a test request to verify Bing Translate is reachable.</p>
+                  </div>
+                  <div class="setting-control">
+                    <button class="secondary-button" id="testBingTranslateButton" data-i18n-key="popup.bingTranslate.test.button">Test Translation</button>
+                    <p class="validation-status" id="testBingTranslateStatus"></p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -3,6 +3,10 @@
         "message": "TapWord Translator - Traduce como quien toma apuntes",
         "description": "The name of the extension displayed in Chrome"
     },
+    "extNameFirefox": {
+        "message": "TapWord Translator",
+        "description": "The name of the extension displayed in Firefox"
+    },
     "extDescription": {
         "message": "Incrusta las traducciones debajo del texto original, proporcionando una experiencia de lectura inmersiva similar a la de los subtítulos bilingües.",
         "description": "The description of the extension displayed in Chrome Web Store"

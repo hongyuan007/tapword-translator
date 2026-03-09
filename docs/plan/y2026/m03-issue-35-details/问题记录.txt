@@ -1,0 +1,2 @@
+file:///Users/hongyuan/project/v2/tapword-translator/tests/html/scroll-edge-cases/iframe.html
+划词没有弹出icon，点击单词也不会触发翻译
