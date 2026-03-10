@@ -4,6 +4,7 @@ import { getQuotaManager } from "@/5_backend"
 import * as speechModule from "@/7_speech"
 import * as offscreenManager from "../services/OffscreenManager"
 import * as errorHandler from "./BackgroundErrorHandler"
+import * as serviceInitializer from "../services/ServiceInitializer"
 
 const logger = loggerModule.createLogger("SpeechSynthesisRequestHandler")
 
@@ -18,6 +19,9 @@ export async function handleSpeechSynthesisRequest(
     sendResponse: (response: SpeechSynthesisResponseMessage) => void
 ): Promise<void> {
     try {
+        await serviceInitializer.ensureCriticalServicesReady()
+        serviceInitializer.startBackgroundWarmUp()
+
         const { text, language } = message.data
 
         logger.info("Synthesizing speech for text:", text)

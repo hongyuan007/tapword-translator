@@ -1,0 +1,148 @@
+ start_content.js
+index.global.js:25 initContent执行：1
+index.global.js:40 [Violation] Permissions policy violation: unload is not allowed in this document.
+e.addListener @ index.global.js:40
+index.js:1 [content-script] AI Click Translator - Content script loaded
+index.js:1 [content-script] User settings loaded: {
+  "enableTapWord": true,
+  "showIcon": true,
+  "singleClickTranslate": true,
+  "doubleClickTranslate": false,
+  "doubleClickTranslateV2": false,
+  "doubleClickSentenceTranslate": true,
+  "doubleClickSentenceTriggerKey": "meta",
+  "autoAdjustHeight": true,
+  "restoreLineHeightOnClear": false,
+  "autoPlayAudio": true,
+  "targetLanguage": "zh",
+  "translationFontSizePreset": "medium",
+  "translationFontSize": 12,
+  "tooltipNextLineGapPx": 4,
+  "tooltipNextLineGapPxV2": 6,
+  "tooltipVerticalOffsetPx": 2,
+  "tooltipVerticalOffsetPxV2": 3,
+  "textUnderlineOffsetPx": 3,
+  "textUnderlineOffsetPxV2": 4,
+  "wordUnderlineColor": "#2A9D8F",
+  "wordUnderlineColorV2": "#1F7FDB",
+  "sentenceUnderlineColor": "#E9C46A",
+  "iconColor": "pink",
+  "translationProvider": "official",
+  "customApi": {
+    "baseUrl": "",
+    "apiKey": "",
+    "model": ""
+  },
+  "mtranserver": {
+    "url": "http://127.0.0.1:8989",
+    "key": "",
+    "enabled": false
+  },
+  "bingTranslate": {
+    "enabled": true
+  },
+  "suppressNativeLanguage": false,
+  "networkRegion": "auto"
+}
+index.js:1 [content-script] AI Click Translator - Event listeners registered
+index-d9d7cc0b.js:1 Could not find "window.__TAURI_METADATA__". The "appWindow" value will reference the "main" window label.
+Note that this is not an issue if running this frontend on a browser instead of a Tauri window.
+(anonymous) @ index-d9d7cc0b.js:1
+index.js:1 [selectionHandler] Selection validation failed: Empty selection
+index.js:1 [editableElementDetector] Editable element detected {
+  "tag": "INPUT"
+}
+index.js:1 [selectionHandler] [Single Click] Skipped: Interactive element
+index.js:1 [1_content/ui/translationDisplayV2] All translation results removed
+index.js:1 [1_content/handlers/SpaNavigationHandler] Cleared translation UI after navigation {
+  "trigger": "head-mutation",
+  "currentUrl": "https://x.com/search?q=Professor%20Jiang&src=typed_query"
+}
+index.js:1 [selectionHandler] Selection validation failed: Empty selection
+index.js:1 [editableElementDetector] Interactive element detected (path) {
+  "tag": "SPAN",
+  "reason": "cursor: pointer",
+  "level": "strong",
+  "targetIsNode": true,
+  "nodeClasses": "css-1jxf684 r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3"
+}
+index.js:1 [selectionHandler] [Single Click] Skipped: Interactive element
+index.js:1 [1_content/ui/translationDisplayV2] All translation results removed
+index.js:1 [1_content/handlers/SpaNavigationHandler] Cleared translation UI after navigation {
+  "trigger": "head-mutation",
+  "currentUrl": "https://x.com/romanhelmetguy/status/2031083784414568576"
+}
+2031083784414568576:1 Blocked aria-hidden on an element because its descendant retained focus. The focus must not be hidden from assistive technology users. Avoid using aria-hidden on a focused element or its ancestor. Consider using the inert attribute instead, which will also prevent focus. For more details, see the aria-hidden section of the WAI-ARIA specification at https://w3c.github.io/aria/#aria-hidden.
+Element with focus: <a.css-175oi2r r-1pi2tsx r-13qz1uu r-o7ynqc r-6416eg r-1ny4l3l r-1loqt21>
+Ancestor with aria-hidden: <a.css-175oi2r r-1pi2tsx r-13qz1uu r-o7ynqc r-6416eg r-1ny4l3l r-1loqt21> <a href=​"/​romanhelmetguy" aria-hidden=​"true" role=​"link" tabindex=​"-1" class=​"css-175oi2r r-1pi2tsx r-13qz1uu r-o7ynqc r-6416eg r-1ny4l3l r-1loqt21" style=​"background-color:​ rgba(0, 0, 0, 0)​;​">​…​</a>​flex
+index.global.js:25 [ImageUtils] 遍历深度达到限制(15)，可能存在性能问题
+getVisibleImageRect @ index.global.js:25
+index.global.js:25 [ImageUtils] 遍历深度达到限制(15)，可能存在性能问题
+getVisibleImageRect @ index.global.js:25
+index.global.js:25 [ImageUtils] 遍历深度达到限制(15)，可能存在性能问题
+getVisibleImageRect @ index.global.js:25
+index.js:1 [selectionHandler] Selection validation failed: Empty selection
+index.js:1 [editableElementDetector] Weak interactive element ignored (Text Exception) {
+  "elementTag": "DIV",
+  "elementReason": "tabindex: 0",
+  "targetIsNode": false
+}
+index.js:1 [selectionHandler] [Single Click] Translation requested for: fled
+index.js:1 [languageDetector] Starting async language detection: ‘Professor’ Jiang says Islam was created By Jews. He says Jews invented Islam after they were expelled from Jerusalem by the Romans and fled into Arabia. He says Muhammad was actually the Jewish messiah. He also says the Al-Aqsa mosque is actually the Jewish Third Temple.
+index.js:1 [languageDetector] Using chrome.i18n.detectLanguage
+index.js:1 [languageDetector] Chrome detected language: en
+index.js:1 [languageDetector] Language detection result: lang=en, rawLang=en, blockContextLang=en
+index.js:1 [selectionHandler] [Single Click] Detected language: lang=en, blockContextLang=en
+index.js:1 [selectionHandler] [Single Click] [Space-delimited Language] Using classification and boundary expansion
+index.js:1 [selectionHandler] [Word Path] Translating word: fled | Language: en
+index.js:1 [selectionHandler] [Word Path] Active ranges before overlap check: 0
+index.js:1 [translationOverlapDetectorV2] Overlap check: newRange vs 0 active range(s)
+index.js:1 [selectionHandler] [Word Path] Pre-overlapping IDs: []
+index.js:1 [i18n] Initialized with locale: zh
+index.js:1 [styleCalculator/layout] Calculating font size. Original: 17px {}
+index.js:1 [styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=17.00px, lineHeight=24.00px, lineSpacing=7.00px, availableSpace=4.00px, effectiveAvailable=0.00px, safetyDelta=1, constraints(min=12, max=13.60)
+index.js:1 [lineHeightAdjuster] Found block ancestor: <div> with display: block
+index.js:1 [lineHeightAdjuster] Line-height increase needed: 15.00px (targetAvailable=19.00px, available=4.00px)
+index.js:1 [lineHeightAdjuster] Stored original line-height: 24px
+index.js:1 [lineHeightAdjuster] Line-height adjusted: 24.00px → 39.00px (increase: 15.00px) on <div>, ref count: 1
+index.js:1 [translationDisplayV2/hitTesting] Global hit-test listeners attached
+index.js:1 [1_content/ui/translationDisplayV2] Translation displayed: translation-0 {
+  "status": "loading",
+  "text": "翻译中..",
+  "loadingVariant": "text"
+}
+index.js:1 [selectionHandler] [Word Path] Target language: zh (user setting: zh )
+index.js:1 [translationRequest] [RETRY_DEBUG] Sending message attempt 1 {
+  "type": "TRANSLATE_REQUEST",
+  "data": {
+    "word": "fled",
+    "leadingText": " He says Jews invented Islam after they were expelled from Jerusalem by the Romans and ",
+    "trailingText": " into Arabia.",
+    "originalSentence": "He says Jews invented Islam after they were expelled from Jerusalem by the Romans and fled into Arabia.",
+    "previousSentences": [
+      "‘Professor’ Jiang says Islam was created By Jews."
+    ],
+    "nextSentences": [
+      "He says Muhammad was actually the Jewish messiah."
+    ],
+    "bookName": "网页<<Roman Helmet Guy on X: \"‘Professor’ Jiang says Islam was created By Jews. He says Jews invented Islam after they were expelled from Jerusalem by the Romans and fled into Arabia. He says Muhammad was actually the Jewish messiah. He also says the Al-Aqsa mosque is actually the Jewish Third Temple. https://t.co/gV7Kc3GiEy\" / X>>",
+    "sourceLanguage": "en",
+    "targetLanguage": "zh"
+  }
+}
+blob:https://x.com/74cc7688-c016-4c80-8101-ca6716dd1518:1  Failed to load resource: net::ERR_FILE_NOT_FOUND
+index.js:1 [translationRequest] [RETRY_DEBUG] Message successful on attempt 1 duration(ms)= 1037
+index.js:1 [styleCalculator/layout] Calculating font size. Original: 17px {}
+index.js:1 [styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=17.00px, lineHeight=39.00px, lineSpacing=22.00px, availableSpace=19.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=13.60)
+index.js:1 [1_content/ui/translationDisplayV2] Translation updated: translation-0 {
+  "status": "success",
+  "translation": "逃往",
+  "sentenceTranslation": "他说犹太人被罗马人驱逐出耶路撒冷后，逃往阿拉伯。",
+  "chineseDefinition": "vt. 逃避, 逃跑, 逃走\nvi. 逃, 消失",
+  "englishDefinition": "verb: run away quickly",
+  "targetDefinition": "vt. 逃避, 逃跑, 逃走\nvi. 逃, 消失",
+  "targetLanguage": "zh",
+  "lemma": "flee",
+  "phonetic": "fled",
+  "lemmaPhonetic": "fli:"
+}
