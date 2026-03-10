@@ -10,7 +10,7 @@
 
 import type { PageActivatedMessage, UserSettings } from "@/0_common/types"
 import { DEFAULT_USER_SETTINGS } from "@/0_common/types"
-import { UNDERLINE_OPACITY } from "@/0_common/constants"
+import { UNDERLINE_OPACITY, UNDERLINE_OFFSET_INTERNAL_SHIFT_PX } from "@/0_common/constants"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as storageManager from "@/0_common/utils/storageManager"
 import * as colorUtils from "@/0_common/utils/colorUtils"
@@ -27,9 +27,16 @@ logger.info("AI Click Translator - Content script loaded")
 // Module-level user settings (loaded during init)
 let userSettings: UserSettings | null = null
 
+function resolveEffectiveUnderlineOffsetPx(value: number): number {
+    return value - UNDERLINE_OFFSET_INTERNAL_SHIFT_PX
+}
+
 function applyDynamicStyles(settings: UserSettings) {
     // Use CSS variable for better performance and cleaner code
-    document.documentElement.style.setProperty("--ai-translator-underline-offset", `${settings.textUnderlineOffsetPxV2}px`)
+    document.documentElement.style.setProperty(
+        "--ai-translator-underline-offset",
+        `${resolveEffectiveUnderlineOffsetPx(settings.tooltipUnderlineOffsetPxV3)}px`
+    )
     
     const wordColor = colorUtils.addOpacityToHex(settings.wordUnderlineColorV2, UNDERLINE_OPACITY)
     const sentenceColor = colorUtils.addOpacityToHex(settings.sentenceUnderlineColor, UNDERLINE_OPACITY)

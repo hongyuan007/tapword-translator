@@ -229,20 +229,15 @@ body {
 }
 
 .tooltip-preview-anchor {
-  text-decoration: underline;
-  text-decoration-color: #E59E47;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 2px;
+  text-decoration: none;
 }
 
 .tooltip-preview-anchor--word {
-  text-decoration-color: #1F7FDB;
-  /* Blue for words */
+  color: inherit;
 }
 
 .tooltip-preview-anchor--phrase {
-  text-decoration-color: #E59E47;
-  /* Yellow for phrases */
+  color: inherit;
 }
 
 .tooltip-preview-tooltip {
@@ -250,12 +245,72 @@ body {
   padding: 0;
   background: transparent;
   color: var(--text-color);
+  border-top: 1.5px solid #1F7FDB;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
+  text-align: center;
   opacity: 0.8;
   pointer-events: none;
   user-select: none;
+}
+
+.tooltip-preview-tooltip-content {
+  display: block;
+}
+
+.range-setting {
+  width: 320px;
+  max-width: 100%;
+}
+
+.range-setting-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.range-setting-value {
+  min-width: 44px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #eef2f6;
+  color: #475569;
+  font-weight: 700;
+  text-align: center;
+}
+
+.range-input {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: #d8dee7;
+  outline: none;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+  cursor: pointer;
+}
+
+.range-input::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+  cursor: pointer;
 }
 
 .setting-item {

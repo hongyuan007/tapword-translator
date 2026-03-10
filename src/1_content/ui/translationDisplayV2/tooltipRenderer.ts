@@ -46,7 +46,22 @@ export function resolveMinFontSizePx(userSettings?: DisplayUserSettings): number
 export function createTooltipElement(): HTMLElement {
     const tooltip = document.createElement("div")
     tooltip.className = constants.CSS_CLASSES.TOOLTIP
+
+    const content = document.createElement("div")
+    content.className = "ai-translator-tooltip-content"
+    tooltip.appendChild(content)
+
     return tooltip
+}
+
+function getTooltipContentElement(tooltip: HTMLElement): HTMLElement {
+    let content = tooltip.querySelector<HTMLElement>(".ai-translator-tooltip-content")
+    if (!content) {
+        content = document.createElement("div")
+        content.className = "ai-translator-tooltip-content"
+        tooltip.appendChild(content)
+    }
+    return content
 }
 
 /**
@@ -101,11 +116,34 @@ export function setTooltipText(tooltip: HTMLElement, rawText: string, _maxWidthP
     // Cap text length as a safety guard; CSS fade mask handles visual overflow gracefully.
     const MAX_TEXT_LENGTH = 200
     const textToSet = rawText.length > MAX_TEXT_LENGTH ? rawText.slice(0, MAX_TEXT_LENGTH) : rawText
-    tooltip.textContent = textToSet
+    const content = getTooltipContentElement(tooltip)
+    content.textContent = textToSet
 
     requestAnimationFrame(() => {
         checkTruncation(tooltip)
     })
+}
+
+/**
+ * Shift the translation text vertically inside the tooltip without moving the underline.
+ *
+ * @param tooltip - Tooltip root element containing the underline and content container.
+ * @param offsetPx - Top offset in pixels applied to the content container.
+ */
+export function setTooltipContentOffset(tooltip: HTMLElement, offsetPx: number): void {
+    const content = getTooltipContentElement(tooltip)
+    content.style.marginTop = `${Math.max(0, offsetPx)}px`
+}
+
+/**
+ * Add configurable blank space below the translation text.
+ *
+ * @param tooltip - Tooltip root element containing the content container.
+ * @param spacingPx - Bottom spacing in pixels.
+ */
+export function setTooltipBottomSpacing(tooltip: HTMLElement, spacingPx: number): void {
+    const content = getTooltipContentElement(tooltip)
+    content.style.paddingBottom = `${Math.max(0, spacingPx)}px`
 }
 
 // ============================================================================
@@ -155,7 +193,8 @@ export function renderTooltipContent(
     originalElement: HTMLElement | null,
     userSettings?: DisplayUserSettings
 ): styleCalculator.TooltipStyle {
-    tooltip.innerHTML = ""
+    const content = getTooltipContentElement(tooltip)
+    content.innerHTML = ""
 
     const minFontSize = resolveMinFontSizePx(userSettings)
     // V2: pass null for anchor — no anchor element exists in the Range-based architecture
@@ -178,7 +217,7 @@ export function renderTooltipContent(
             tooltip.dataset.sourceText = state.text
             ensureSpinnerStyles()
             tooltip.dataset.fullText = ""
-            tooltip.textContent = ""
+            content.textContent = ""
 
             const wrapper = document.createElement("div")
             wrapper.style.display = "flex"
@@ -197,25 +236,25 @@ export function renderTooltipContent(
             spinner.appendChild(hiddenText)
 
             wrapper.appendChild(spinner)
-            tooltip.appendChild(wrapper)
+            content.appendChild(wrapper)
         } else {
             delete tooltip.dataset.loadingVariant
             tooltip.dataset.sourceText = state.text
             tooltip.dataset.fullText = state.text
-            tooltip.textContent = state.text
+            content.textContent = state.text
         }
     } else if (state.status === "error") {
         delete tooltip.dataset.loadingVariant
         tooltip.dataset.sourceText = state.text
         tooltip.dataset.fullText = state.text
-        tooltip.textContent = state.text
+        content.textContent = state.text
         tooltip.classList.add("error")
         tooltip.classList.remove("loading")
     } else if (state.status === "success") {
         delete tooltip.dataset.loadingVariant
         tooltip.dataset.sourceText = state.translation
         tooltip.dataset.fullText = state.translation
-        tooltip.textContent = state.translation
+        content.textContent = state.translation
         tooltip.classList.remove("loading", "error")
     }
 

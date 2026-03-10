@@ -98,11 +98,12 @@ export function findNearestBlockAncestor(element: HTMLElement | null): HTMLEleme
 export function calculateRequiredLineHeightIncrease(spaceCalc: SpaceCalculation): number {
     const { availableSpace, minFontSize } = spaceCalc
     const cachedSettings = contentIndex.getCachedUserSettings()
-    const desiredGap = cachedSettings?.tooltipNextLineGapPxV2 ?? types.DEFAULT_USER_SETTINGS.tooltipNextLineGapPxV2
+    const textOffset = cachedSettings?.tooltipTextOffsetPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipTextOffsetPxV3
+    const bottomSpacing = cachedSettings?.tooltipBottomSpacingPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipBottomSpacingPxV3
 
     // Target: make available space just above the minimum font size by a small safety delta
     const safetyDelta = contentConstants.MIN_TOOLTIP_SAFETY_DELTA_PX
-    const targetAvailableSpace = Math.max(minFontSize + safetyDelta + desiredGap, 0)
+    const targetAvailableSpace = Math.max(minFontSize + safetyDelta + textOffset + bottomSpacing, 0)
 
     if (availableSpace >= targetAvailableSpace) {
         logger.info(`Available space (${availableSpace.toFixed(2)}px) already >= target (${targetAvailableSpace.toFixed(2)}px), no adjustment needed`)

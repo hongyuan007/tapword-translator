@@ -28,6 +28,7 @@ import * as contentIndex from "@/1_content/index"
 import type { TranslationDetailData } from "@/1_content/ui/translationModal"
 import * as translationModal from "@/1_content/ui/translationModal"
 import * as lineHeightAdjuster from "@/1_content/utils/lineHeightAdjuster"
+import { UNDERLINE_OFFSET_INTERNAL_SHIFT_PX } from "@/0_common/constants"
 import * as loggerModule from "@/0_common/utils/logger"
 
 import type { TranslationEntry, TranslationState, DisplayUserSettings } from "./translationDisplayV2/types"
@@ -37,6 +38,8 @@ import {
     createTooltipElement,
     syncTooltipStyles,
     setTooltipText,
+    setTooltipContentOffset,
+    setTooltipBottomSpacing,
     renderTooltipContent,
 } from "./translationDisplayV2/tooltipRenderer"
 import * as hitTesting from "./translationDisplayV2/hitTesting"
@@ -321,7 +324,10 @@ function positionTooltip(id: string): void {
     const segs = entry.tooltips
 
     const cachedSettings = contentIndex.getCachedUserSettings()
-    const verticalOffset = cachedSettings?.tooltipVerticalOffsetPxV2 ?? types.DEFAULT_USER_SETTINGS.tooltipVerticalOffsetPxV2
+    const underlineOffsetSetting = cachedSettings?.tooltipUnderlineOffsetPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipUnderlineOffsetPxV3
+    const underlineOffset = underlineOffsetSetting - UNDERLINE_OFFSET_INTERNAL_SHIFT_PX
+    const contentOffsetFromUnderline = cachedSettings?.tooltipTextOffsetPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipTextOffsetPxV3
+    const bottomSpacing = cachedSettings?.tooltipBottomSpacingPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipBottomSpacingPxV3
 
     for (let i = 0; i < segs.length; i++) {
         const tooltip = segs[i]
@@ -343,11 +349,15 @@ function positionTooltip(id: string): void {
         tooltip.style.maxWidth = `${rectWidth}px`
         tooltip.style.textAlign = isSingleLine ? "center" : "left"
 
+        const hasContent = isSpinner ? i === 0 : Boolean(cached[i] ?? "")
+        setTooltipContentOffset(tooltip, hasContent ? contentOffsetFromUnderline : 0)
+        setTooltipBottomSpacing(tooltip, hasContent ? bottomSpacing : 0)
+
         if (!isSpinner) {
             setTooltipText(tooltip, cached[i] ?? "", rectWidth, isLastLine)
         }
 
-        const top = rect.bottom + scrollY + verticalOffset
+        const top = rect.bottom + scrollY + underlineOffset
         const tooltipWidth = tooltip.offsetWidth || 0
 
         let left: number
