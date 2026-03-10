@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "vscode-setup": "node scripts/vscode-setup.mjs",
+        "check:prod-logger-disabled": "node scripts/check-production-logger-disabled.mjs",
         "prebuild:dev": "cross-env KEY_ENV=dev node other/scripts/inject-secrets-simple.mjs",
         "prebuild:prod": "cross-env KEY_ENV=prod node other/scripts/inject-secrets-simple.mjs",
 
@@ -17,8 +18,8 @@
         "build:firefox-dev": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode firefox-development",
         "build:prod": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode production",
 
-        "package": "npm run build:prod && node scripts/package-with-version.mjs",
-        "package:firefox": "npm run build:firefox && node scripts/package-with-version.mjs firefox",
+        "package": "npm run build:prod && npm run check:prod-logger-disabled && node scripts/package-with-version.mjs",
+        "package:firefox": "npm run build:firefox && npm run check:prod-logger-disabled && node scripts/package-with-version.mjs firefox",
         "package:source": "node scripts/package-source-with-version.mjs",
         "package:community": "npm run build:community && node scripts/package-with-version.mjs community",
 
