@@ -72,7 +72,10 @@ export async function initializeAPIService(): Promise<void> {
 }
 
 function initializeCriticalServices(): Promise<void> {
-    return initializeAPIService()
+    return Promise.all([
+        initializeAPIService(),
+        backendModule.getConfigService().ensureCacheLoaded(),
+    ]).then(() => undefined)
 }
 
 function setupNetworkRegionListener(credentials: { apiKey: string; apiSecret: string }, deviceUID: string): void {

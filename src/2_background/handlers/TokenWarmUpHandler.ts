@@ -17,8 +17,6 @@ const logger = loggerModule.createLogger("TokenWarmUpHandler")
  * Fire-and-forget from the content script side — no response payload needed.
  */
 export async function handlePageActivated(sendResponse: (response: { status: string }) => void): Promise<void> {
-    sendResponse({ status: "warming" })
-
     try {
         await serviceInitializer.ensureCriticalServicesReady()
         serviceInitializer.startBackgroundWarmUp()
@@ -26,8 +24,10 @@ export async function handlePageActivated(sendResponse: (response: { status: str
         const authService = getAuthService()
         await authService.getToken()
         logger.debug("Token pre-warm completed")
+        sendResponse({ status: "warmed" })
     } catch (error) {
         // Warm-up errors are non-fatal — the actual translate request will retry
         logger.warn("Token pre-warm failed (non-fatal):", error)
+        sendResponse({ status: "failed" })
     }
 }

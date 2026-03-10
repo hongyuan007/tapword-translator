@@ -31,8 +31,8 @@ This means the backend translation call is still the dominant cost, but the exte
 
 ### 1. Pre-warm exists, but it is not reliable enough
 
-The content script sends `PAGE_ACTIVATED` immediately on init ([index.ts](/Users/hongyuan/project/v4/tapword-translator/src/1_content/index.ts#L78)).  
-However, the warm-up handler exits early when `AuthService` is not initialized yet ([TokenWarmUpHandler.ts](/Users/hongyuan/project/v4/tapword-translator/src/2_background/handlers/TokenWarmUpHandler.ts#L18)).
+The content script sends `PAGE_ACTIVATED` immediately on init ([index.ts](../../../../src/1_content/index.ts#L78)).  
+However, the warm-up handler exits early when `AuthService` is not initialized yet ([TokenWarmUpHandler.ts](../../../../src/2_background/handlers/TokenWarmUpHandler.ts#L18)).
 
 That creates a race:
 
@@ -47,13 +47,13 @@ This is the most important structural gap.
 
 ### 2. Background startup still awaits non-critical work
 
-The background registers the listener early, which is correct ([index.ts](/Users/hongyuan/project/v4/tapword-translator/src/2_background/index.ts#L33)), but it still awaits:
+The background registers the listener early, which is correct ([index.ts](../../../../src/2_background/index.ts#L33)), but it still awaits:
 
 - API/auth initialization
 - config service initialization
 - quota manager initialization
 
-in sequence ([ServiceInitializer.ts](/Users/hongyuan/project/v4/tapword-translator/src/2_background/services/ServiceInitializer.ts#L122)).
+in sequence ([ServiceInitializer.ts](../../../../src/2_background/services/ServiceInitializer.ts#L122)).
 
 From the logs, the first translation request overlaps with:
 
@@ -65,7 +65,7 @@ Those are not all required before serving the first translation.
 
 ### 3. JWT token is memory-only, so service worker restarts reintroduce cold auth
 
-`AuthService` keeps the token only in memory via `currentToken` ([AuthService.ts](/Users/hongyuan/project/v4/tapword-translator/src/5_backend/services/AuthService.ts#L25)).  
+`AuthService` keeps the token only in memory via `currentToken` ([AuthService.ts](../../../../src/5_backend/services/AuthService.ts#L25)).  
 In MV3, the service worker is explicitly ephemeral and may be unloaded between requests. Chrome’s guidance is to persist state needed across worker runs rather than relying on globals:
 
 - [About extension service workers](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers)
@@ -76,9 +76,9 @@ Best-practice inference: hot auth/session state should survive service-worker re
 
 ### 4. Quota/config are mostly cache-friendly, but request-path still touches them cold
 
-`ConfigService` already supports cached/default synchronous reads ([ConfigService.ts](/Users/hongyuan/project/v4/tapword-translator/src/5_backend/services/ConfigService.ts#L97)), but initialization still awaits a remote fetch on cold start ([ConfigService.ts](/Users/hongyuan/project/v4/tapword-translator/src/5_backend/services/ConfigService.ts#L68)).
+`ConfigService` already supports cached/default synchronous reads ([ConfigService.ts](../../../../src/5_backend/services/ConfigService.ts#L97)), but initialization still awaits a remote fetch on cold start ([ConfigService.ts](../../../../src/5_backend/services/ConfigService.ts#L68)).
 
-`QuotaManager.checkTranslationQuota()` calls `ensureDataIsToday()` on the request path ([QuotaManager.ts](/Users/hongyuan/project/v4/tapword-translator/src/5_backend/services/QuotaManager.ts#L89)). If quota data is not warm yet, the first request may still trigger storage work.
+`QuotaManager.checkTranslationQuota()` calls `ensureDataIsToday()` on the request path ([QuotaManager.ts](../../../../src/5_backend/services/QuotaManager.ts#L89)). If quota data is not warm yet, the first request may still trigger storage work.
 
 These costs are small compared with the network call, but they are pure extension overhead and stack onto the cold path.
 
@@ -91,7 +91,7 @@ In the content pipeline, loading UI is shown only after:
 - selection classification / expansion
 - context extraction
 
-([TranslationPipeline.ts](/Users/hongyuan/project/v4/tapword-translator/src/1_content/handlers/TranslationPipeline.ts#L106), [TranslationPipeline.ts](/Users/hongyuan/project/v4/tapword-translator/src/1_content/handlers/TranslationPipeline.ts#L194), [TranslationPipeline.ts](/Users/hongyuan/project/v4/tapword-translator/src/1_content/handlers/TranslationPipeline.ts#L307))
+([TranslationPipeline.ts](../../../../src/1_content/handlers/TranslationPipeline.ts#L106), [TranslationPipeline.ts](../../../../src/1_content/handlers/TranslationPipeline.ts#L194), [TranslationPipeline.ts](../../../../src/1_content/handlers/TranslationPipeline.ts#L307))
 
 Even if this is only tens of milliseconds, users interpret it as “the first click did not take immediately”.
 
