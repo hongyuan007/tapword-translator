@@ -1,5 +1,5 @@
 # Automatic Word/Phrase Translation — Final Requirements
-*Last updated: 2026-03-10*
+*Last updated: 2026-03-11*
 *Product: tapword-translator*
 *Status: Finalized for implementation planning*
 
@@ -42,7 +42,7 @@ After manually translating one item, users may still face several nearby compreh
 2. Auto-translation runs only when the feature is enabled.
 3. Auto-translation is limited to the current block.
 4. The same block is scanned at most once.
-5. The system displays at most 3 auto-translated items per trigger.
+5. The system displays a dynamically budgeted number of auto-translated items based on block length, always within a capped upper bound.
 
 ### P0 — Personalization by Language Level
 **As a reader, I want to set my English proficiency level so that the system can better decide which words or phrases are worth auto-translating.**
@@ -76,10 +76,11 @@ After manually translating one item, users may still face several nearby compreh
 3. Each block can be auto-scanned only once.
 4. The system supports **word + phrase** candidates.
 5. If a phrase overlaps with a word, **phrase wins**.
-6. A single trigger returns and displays at most **3** items.
-7. Candidate selection uses **LLM + product hard rules**.
-8. The feature is configurable via settings.
-9. Failure is silent and must not break the manual translation flow.
+6. A single trigger returns and displays a **dynamic number of items based on block-length budget**, always within a capped upper bound.
+7. Candidate selection uses **LLM + product hard rules**, with explicit frontend/backend responsibility split.
+8. Auto-translation must **not override, replace, or duplicate** any existing manual translation record in the current block.
+9. The feature is configurable via settings.
+10. Failure is silent and must not break the manual translation flow.
 
 ### Explicitly Out of Scope for V1
 1. Whole-paragraph translation.
@@ -123,13 +124,36 @@ V1 uses **LLM + hard rules**, not pure LLM-only selection.
 - Covered words should not be translated again separately.
 
 ### Hard Rules
-The candidate selection layer must at least apply the following filters:
+The candidate selection layer must be split into **frontend deterministic rules**, **backend/LLM semantic rules**, and **shared defense-in-depth rules**.
+
+#### Frontend deterministic rules
+Frontend must directly enforce:
 1. Skip the word or phrase the user just manually translated.
-2. Skip words already covered by a longer selected phrase.
-3. Skip overly short tokens with no stable standalone meaning.
-4. Skip punctuation, numbers, URLs, and obvious noise tokens.
-5. Skip duplicate candidates within the same block.
-6. Truncate final output to at most **3** items.
+2. Skip any candidate already covered by an existing manual word translation record in the current block.
+3. Skip any candidate that falls inside a range already covered by a manual sentence translation in the current block.
+4. Skip any candidate already rendered as an auto-translation in the current block.
+5. Skip any candidate that conflicts with current page state, cannot be matched stably, or presents obvious rendering risk.
+
+#### Backend / LLM semantic rules
+Backend/LLM should decide:
+1. Which words or phrases are most helpful for maintaining reading continuity.
+2. Whether a candidate has **no stable standalone meaning** and should therefore be skipped.
+3. Whether a phrase should be preferred over decomposed single-word candidates.
+4. Ranking and quality ordering among remaining candidates.
+
+#### Shared defense-in-depth rules
+Both backend and frontend should filter:
+1. Punctuation.
+2. Numbers / pure numeric tokens.
+3. URLs.
+4. Obvious noise tokens.
+5. Duplicate candidates within the same block.
+6. Overlapping word candidates already covered by a selected phrase.
+
+### Final Display Authority
+- Frontend has the **final display veto**.
+- Any candidate that conflicts with user actions, cannot be matched stably, or has high display risk may be dropped by frontend.
+- Backend is responsible for improving candidate quality, but backend output is **not guaranteed** to be fully rendered.
 
 ### Product Quality Principle
 - Prefer **under-selection** over over-selection.
@@ -142,16 +166,17 @@ Auto-translation does **not** need to be visually identical to manual translatio
 
 ### Display Principles
 1. Reuse the existing translation UI system.
-2. Keep visual style consistent with manual translation.
-3. Make auto-translation **slightly distinguishable** from manual translation.
-4. Ensure auto-translation has **lower visual weight** than manual translation.
+2. Auto-translated **word** and **phrase** underlines both use the system-defined **Teal** color.
+3. Do not use color to distinguish “word” vs “phrase” in auto mode.
+4. Auto-translation may remain **slightly distinguishable** from manual translation, but must keep **lower visual weight** than manual translation.
 
 ### Noise-Control Rules
-1. Display at most **3** auto-translated items in the same block.
-2. Do not use attention-grabbing animation for multiple auto results.
-3. Avoid repeated overlapping highlights or stacked translations.
-4. If local layout becomes too dense, show fewer results rather than cluttering the page.
-5. Auto-translations must behave like supplemental reading aids, not the primary visual focus.
+1. Display count follows a **dynamic block budget** rather than a single fixed number.
+2. The dynamic budget must still respect a capped upper bound.
+3. Do not use attention-grabbing animation for multiple auto results.
+4. Avoid repeated overlapping highlights or stacked translations.
+5. If local layout becomes too dense, show fewer results rather than cluttering the page.
+6. Auto-translations must behave like supplemental reading aids, not the primary visual focus.
 
 ## 9. Settings
 
@@ -179,10 +204,11 @@ This feature is considered acceptable for V1 when:
 1. A successful manual translation can trigger one background auto-scan for the current block.
 2. Auto-translation is controlled by settings and language proficiency.
 3. The same block is scanned only once.
-4. At most 3 items are displayed.
+4. Display count follows the agreed dynamic block-budget strategy within a capped upper bound.
 5. Phrase-over-word priority is respected.
-6. Auto results are visually consistent with, but lighter than, manual results.
-7. Failures do not interrupt the main reading flow.
+6. Existing manual translation records are never overridden, replaced, or duplicated by auto results.
+7. Auto results use the agreed Teal underline treatment and remain visually lighter than manual results.
+8. Failures do not interrupt the main reading flow.
 
 ## 12. One-Sentence Product Definition
-After the user manually translates one item, the system should **carefully supplement a small number of key words/phrases within the current block** so the user can continue reading smoothly, instead of turning the page into an automatic machine-translation interface.
+After the user manually translates one item, the system should **carefully supplement a dynamically budgeted, low-noise set of key words/phrases within the current block** so the user can continue reading smoothly, instead of turning the page into an automatic machine-translation interface.

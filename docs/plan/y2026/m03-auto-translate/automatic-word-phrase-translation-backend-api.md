@@ -17,16 +17,17 @@ The agreed responsibility split is:
 - extracting the current block
 - one-time block processing state (`pending` / `done`)
 - mapping returned candidates back to DOM ranges
-- overlap filtering against rendered results
+- overlap filtering against rendered results and existing manual translation records
 - UI reuse and presentation
+- final display veto for unstable or conflicting candidates
 
 ### Backend owns
 - candidate identification using **LLM + hard rules**
 - stable request/response contract for candidate selection
-- result normalization, filtering, ranking, and degradation behavior
+- semantic candidate selection, result normalization, filtering, ranking, and degradation behavior
 
 Core principle:
-> Backend decides **what** should be suggested; frontend decides **where** and **how** it should be rendered.
+> Backend decides **what** is worth suggesting; frontend decides **where**, **how**, and **whether** it is safe to render.
 
 ---
 
@@ -75,7 +76,7 @@ Recommended V1 request shape:
   },
   "userLevel": "Intermediate",
   "excludedTexts": ["take off", "aircraft"],
-  "limit": 3
+  "limit": 5
 }
 ```
 
@@ -91,8 +92,9 @@ Recommended V1 request shape:
 - `limit?: number`
 
 ### Request notes
-- Even if frontend sends a larger `limit`, backend must enforce **`limit <= 3`**.
+- `limit` is a frontend budget hint, but backend must still enforce the agreed **capped upper bound**.
 - `excludedTexts` is used to suppress known overlaps, repeated terms, or already-rendered items.
+- `excludedTexts` should include the current manual trigger plus existing manual/auto translation texts in the current block.
 
 ---
 
@@ -118,7 +120,7 @@ Recommended V1 request shape:
   "meta": {
     "sourceLang": "en",
     "targetLang": "zh-CN",
-    "limitApplied": 3,
+    "limitApplied": 5,
     "degraded": false,
     "model": "llm-model-name"
   },
@@ -156,6 +158,7 @@ The LLM should:
 - identify words or phrases that are most useful to translate for reading continuity
 - consider the user’s `manualTrigger`
 - consider the user’s `userLevel`
+- decide when a candidate has **no stable standalone meaning** and should be skipped
 - prefer meaningful phrases where phrase-level interpretation better matches reading comprehension
 - provide translation suggestions and relative priority
 
@@ -173,7 +176,7 @@ Rules should include at minimum:
    - symbols
    - too-short fragments without semantic value
 5. prefer phrase over overlapping word
-6. enforce final output cap of **3**
+6. enforce the agreed capped upper bound, even when frontend asks for a larger dynamic budget
 
 ### 5.3 Suggested normalization order
 1. parse LLM output
@@ -183,7 +186,7 @@ Rules should include at minimum:
 5. remove excluded or overlapping items
 6. apply phrase-over-word precedence
 7. rank remaining items
-8. `slice(0, 3)`
+8. trim to the agreed capped upper bound
 
 ---
 
@@ -270,7 +273,7 @@ At minimum, cover:
 - phrase-over-word precedence
 - invalid candidate filtering
 - excluded text filtering
-- max 3 enforcement
+- capped dynamic-budget enforcement
 - degrade-to-empty behavior
 - matching candidates back to `blockText`
 
@@ -292,8 +295,9 @@ At minimum, cover:
 4. Implement hard-rule filtering and ranking.
 5. Add degrade-to-empty handling.
 6. Add rate limiting / concurrency protection.
-7. Add unit + integration coverage.
-8. Align with frontend on trace/debug fields.
+7. Align prompt/rules with frontend-owned exclusion semantics.
+8. Add unit + integration coverage.
+9. Align with frontend on trace/debug fields.
 
 ---
 
@@ -317,7 +321,7 @@ Possible V2 direction:
    - endpoint accepts agreed request shape and returns stable `traceId + candidates + meta + warnings` structure
 
 2. **Result containment**
-   - backend always enforces phrase priority, deduplication, filtering, and maximum 3 candidates
+   - backend always enforces phrase priority, deduplication, filtering, and the agreed capped upper bound
 
 3. **Safe degradation**
    - under timeout, parse failure, bad quality, or rate limiting, backend returns empty/degraded results without impacting the manual translation flow

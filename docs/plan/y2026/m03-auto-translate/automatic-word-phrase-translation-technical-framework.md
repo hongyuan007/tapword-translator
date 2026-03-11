@@ -10,7 +10,7 @@
 This document captures the agreed technical direction for implementing **Automatic Word/Phrase Translation** in `tapword-translator`.
 
 It translates the finalized product requirements into an implementation framework covering:
-- frontend/backed responsibility split
+- frontend/backend responsibility split
 - trigger timing and processing flow
 - data and state control
 - risk areas
@@ -38,17 +38,21 @@ Frontend owns:
 - extracting the current block
 - block-level one-time state management (`pending` / `done`)
 - sending candidate-identification requests
+- collecting block-scoped exclusion context from existing manual/auto translations
 - mapping returned candidate positions back to DOM ranges
-- overlap filtering and deduplication
-- rendering auto-translation results using existing translation UI with slight visual distinction
+- deterministic filtering against user actions and current rendered page state
+- final display veto for unstable / conflicting / risky candidates
+- rendering auto-translation results using existing translation UI, with auto word/phrase underlines unified to **Teal**
 - sequential rendering to reduce layout shifts
 
 ### 3.2 Backend Responsibilities
 
 Backend should own:
 - candidate identification using **LLM + hard rules**
+- semantic judgment of which candidates best support reading continuity
 - context-aware ranking/prioritization of word/phrase candidates
 - returning a stable candidate payload for frontend rendering
+- improving candidate quality, without assuming every returned candidate will be rendered
 
 Recommended principle:
 > Frontend should not guess which terms are “unknown”; backend should decide candidates, frontend should decide where and how to render them.
@@ -88,14 +92,17 @@ Auto-translation must be triggered only when all of the following are true:
    - if `pending` or `done`, stop
    - otherwise mark block as `pending`
 5. Frontend sends a candidate-identification request with block text and required settings/context.
-6. Backend returns up to N candidate items with offsets / text / type / priority.
+6. Backend returns a dynamically budgeted candidate set with offsets / text / type / priority, always within the agreed capped upper bound.
 7. Frontend maps candidates back to DOM ranges.
 8. Frontend filters invalid or conflicting candidates:
    - duplicate candidates
    - overlap with the manually translated selection
+   - overlap with existing manual word translation records in the current block
+   - overlap with ranges already covered by manual sentence translations
    - overlap with already-rendered auto results
    - word candidates covered by phrase candidates
-9. Frontend keeps at most 3 final candidates.
+   - unstable matches or high-risk render cases
+9. Frontend keeps only the final safe candidates allowed by the current block budget.
 10. Frontend renders candidates sequentially.
 11. Frontend marks the block as `done`.
 
@@ -118,11 +125,13 @@ Purpose:
 ### 6.2 Candidate Constraints
 
 Frontend filtering must enforce product constraints:
-- max **3** rendered auto items per block
+- rendered auto item count follows the agreed **dynamic block budget** within a capped upper bound
 - **phrase priority over word**
 - no duplicate candidates
 - no overlap with manual translation target
+- no overlap with existing manual translation records or sentence-translation-covered ranges
 - no overlap with existing auto results
+- any unstable, ambiguous, or high-risk candidate may be dropped by frontend
 
 ## 7. Candidate Interface Direction
 
@@ -140,10 +149,12 @@ candidates: Array<{
 
 Suggested request inputs:
 - `blockText`
-- `selectedText`
+- `manualTrigger`
+- `excludedTexts`
 - `sourceLanguage`
 - `targetLanguage`
 - `level`
+- optional block-budget hint fields if needed later
 
 This is the minimum interface required for the frontend plan currently agreed.
 
@@ -157,6 +168,7 @@ The feature should reuse the existing translation UI system rather than introduc
 
 Auto results should:
 - remain visually consistent with the current translation experience
+- use the system-defined **Teal** underline for both auto words and auto phrases
 - have **slightly lower visual weight** than manual translations
 - not create ambiguity about user intent
 
@@ -219,7 +231,7 @@ Why it matters:
 
 Mitigation:
 - keep V1 scoped
-- cap candidates to 3
+- enforce a conservative dynamic budget with capped upper bound
 - consider later optimization to combine candidate identification and translation if needed
 
 ## 11. Recommended Implementation Order
@@ -241,8 +253,8 @@ Minimum test focus for V1:
 - auto flow only affects the current block
 - same block is not processed twice
 - phrase candidates win over overlapping word candidates
-- at most 3 auto items are rendered
-- overlaps with manual translation are filtered out
+- dynamic block-budget limits are respected within the capped upper bound
+- overlaps with manual translation and existing manual records are filtered out
 - repeated text in one block still maps to the correct DOM range
 - proficiency level is passed correctly to the request
 - auto UI has lower visual emphasis than manual UI
@@ -254,6 +266,7 @@ The agreed V1 technical direction is:
 - add a controlled auto-follow-up layer after manual success
 - keep the feature local to one block and one pass
 - let backend own semantic candidate selection
-- let frontend own trigger control, DOM placement, and UI reuse
+- let frontend own trigger control, DOM placement, and final display safety decisions
+- keep manual translations strictly higher priority than auto results
 
 This is considered a feasible implementation path with manageable risk, provided the frontend/backend boundary stays clear and the offset-to-range mapping is handled carefully.

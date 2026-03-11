@@ -8,7 +8,7 @@ The "Automatic Word/Phrase Translation" feature aims to enhance the reading expe
 - **US-001**: As a user, when I manually translate a word, I want the system to automatically identify and translate other difficult words in the same paragraph, so I can read the rest of the text without interruption.
 - **US-002**: As a user, I want to be able to set my English proficiency level (e.g., Beginner, Intermediate, Advanced) so that the system correctly identifies words that are likely unknown to me.
 - **US-003**: As a user, I want to be able to enable or disable this feature in the settings, as I might not always want screen clutter.
-- **US-004**: As a user, I want the automatically translated words to look visually identical to manually translated words (highlight + floating note) for a consistent experience.
+- **US-004**: As a user, I want automatically translated words/phrases to stay visually consistent with the existing translation UI, while remaining a lower-priority assistive layer than my manual translations.
 
 ## 3. Functional Requirements
 
@@ -33,9 +33,11 @@ The "Automatic Word/Phrase Translation" feature aims to enhance the reading expe
 - **Output from LLM**: A list of identified words/phrases and their translations.
 
 ### 3.4. Translation Display
-- **Visual Style**: Auto-translated words must use the existing translation UI (highlighted text with a floating tooltip below).
+- **Visual Style**: Auto-translated words/phrases must use the existing translation UI (highlighted text with a floating tooltip below).
+- **Underline Style**: Auto-translated words and phrases should both use the system-defined **Teal** underline color.
+- **Display Priority**: Auto-translations are assistive and must remain visually lighter than manual translations.
 - **Batch Processing**: The system should iterate through the list of identified words, find their occurrences within the block, and apply the translation UI.
-    - *Note*: Care must be taken to avoid overlapping with the user's manual translation or other auto-translations.
+    - *Note*: Care must be taken to avoid overlapping with the user's manual translation, existing manual translation records, or other auto-translations.
 
 ### 3.5. Settings and Configuration
 - **New Settings Required**:
@@ -44,8 +46,10 @@ The "Automatic Word/Phrase Translation" feature aims to enhance the reading expe
 
 ## 4. Technical Constraints & Considerations
 - **Performance**: The "scanning" and LLM request should happen in the background without blocking the user interface.
-- **Concurrency**: Multiple words in the same block might be returned. The system needs to handle rendering multiple tooltips simultaneously (or sequentially with low latency).
-- **Cost**: To minimize LLM costs, strict caching (per block) is required.
+- **Concurrency**: Multiple words in the same block might be returned. The system needs to handle rendering multiple tooltips safely, preferably sequentially when needed for stability.
+- **Conflict Avoidance**: Auto-translation must never override, replace, or duplicate existing manual translation records in the current block.
+- **Responsibility Split**: Frontend should own deterministic filtering and final display safety checks; backend/LLM should own semantic candidate selection.
+- **Cost**: To minimize LLM costs, one-time-per-block control and conservative budgeting are required.
 
 ## 5. Future Improvements (Out of Scope for V1)
 - Adaptive proficiency learning based on user's translation history.
