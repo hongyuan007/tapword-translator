@@ -9,6 +9,7 @@ import * as constants from "@/1_content/constants"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
 import * as tapWordDetector from "@/1_content/handlers/utils/tapWordDetector"
+import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
 
 import { shouldTriggerTranslationAsync } from "@/1_content/utils/languageValidator"
 const ELEMENT_NODE = 1
@@ -135,8 +136,32 @@ export async function validateSelectionAsync(
         return { isValid: false, text: selectedText, reason: "Selection inside editable element", shouldCleanup: true }
     }
 
-    if (element?.closest(`.${constants.CSS_CLASSES.ICON}, .${constants.CSS_CLASSES.TOOLTIP}, .${constants.CSS_CLASSES.ANCHOR}`)) {
+    if (element?.closest(`.${constants.CSS_CLASSES.ICON}, .${constants.CSS_CLASSES.TOOLTIP}`)) {
         return { isValid: false, text: selectedText, reason: "Selection inside extension UI", shouldCleanup: false }
+    }
+
+    // V2: Check if the ENTIRE selection falls inside an active translation Range.
+    // If fully contained → block (prevents duplicate translation / ghost icon on double-click).
+    // If only partially overlapping → allow (overlap detector cleans up old translation later).
+    // Uses start-edge and end-edge of the selection rects rather than center points,
+    // so a selection like "after a long period" (partially overlapping "long period") is not falsely blocked.
+    {
+        const selectionRects = range.getClientRects()
+        const firstRect = selectionRects[0]
+        const lastRect = selectionRects[selectionRects.length - 1]
+        if (firstRect && lastRect) {
+            const startInside = translationDisplay.isPointInsideActiveTranslation(
+                firstRect.left,
+                firstRect.top + firstRect.height / 2
+            )
+            const endInside = translationDisplay.isPointInsideActiveTranslation(
+                lastRect.right,
+                lastRect.top + lastRect.height / 2
+            )
+            if (startInside && endInside) {
+                return { isValid: false, text: selectedText, reason: "Selection inside active translation", shouldCleanup: false }
+            }
+        }
     }
 
     return { isValid: true, text: selectedText, range, reason: "Valid selection", shouldCleanup: false }
@@ -194,12 +219,16 @@ export async function validateSingleClickAsync(
     if (
         target &&
         (target.closest(`.${constants.CSS_CLASSES.ICON}`) ||
-            target.closest(`.${constants.CSS_CLASSES.ANCHOR}`) ||
             target.closest(`.${constants.CSS_CLASSES.TOOLTIP}`) ||
             target.closest(`.${constants.CSS_CLASSES.MODAL}`) ||
             target.closest(`.${constants.CSS_CLASSES.MODAL_BACKDROP}`))
     ) {
         return { isValid: false, text: "", reason: "Extension UI element", shouldCleanup: false }
+    }
+
+    // V2: Check if click point falls inside an active translation Range (replaces V1 anchor check)
+    if (translationDisplay.isPointInsideActiveTranslation(event.clientX, event.clientY)) {
+        return { isValid: false, text: "", reason: "Click inside active translation", shouldCleanup: false }
     }
 
     // 4. Selection Check

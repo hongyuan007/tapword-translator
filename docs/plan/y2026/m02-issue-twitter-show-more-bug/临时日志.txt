@@ -1,0 +1,2 @@
+index.js:106 [selectionHandler] Selection validation failed: Selection inside active translation
+index.js:106 [selectionHandler] [Single Click] Skipped: Click inside active translation

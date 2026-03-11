@@ -196,13 +196,14 @@ export async function loadSettings(): Promise<void> {
             }
         })
 
-        const numberInputs = document.querySelectorAll('input[type="number"][data-setting]')
-        numberInputs.forEach((input) => {
+        const numericInputs = document.querySelectorAll('input[type="number"][data-setting], input[type="range"][data-setting]')
+        numericInputs.forEach((input) => {
             const inputElement = input as HTMLInputElement
             const settingKey = inputElement.dataset.setting
 
             if (settingKey && settingKey in settings) {
                 inputElement.value = String(settingsRecord[settingKey])
+                inputElement.dispatchEvent(new Event("input", { bubbles: true }))
             }
         })
 
@@ -355,8 +356,8 @@ export function setupSettingChangeListeners(): void {
         })
     })
 
-    const numberInputs = document.querySelectorAll('input[type="number"][data-setting]')
-    numberInputs.forEach((input) => {
+    const numericInputs = document.querySelectorAll('input[type="number"][data-setting], input[type="range"][data-setting]')
+    numericInputs.forEach((input) => {
         input.addEventListener("change", async (event) => {
             const inputElement = event.target as HTMLInputElement
             const settingKey = inputElement.dataset.setting
@@ -369,7 +370,11 @@ export function setupSettingChangeListeners(): void {
                 return
             }
 
-            if (settingKey === "tooltipNextLineGapPxV2" || settingKey === "tooltipVerticalOffsetPxV2" || settingKey === "textUnderlineOffsetPxV2") {
+            if (
+                settingKey === "tooltipUnderlineOffsetPxV3" ||
+                settingKey === "tooltipTextOffsetPxV3" ||
+                settingKey === "tooltipBottomSpacingPxV3"
+            ) {
                 parsed = Math.max(0, Math.min(20, parsed))
                 inputElement.value = String(parsed)
             }
