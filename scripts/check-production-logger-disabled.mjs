@@ -2,9 +2,14 @@ import fs from "node:fs/promises"
 import path from "node:path"
 import process from "node:process"
 
-const ENV_PATH = path.resolve(process.cwd(), ".env.production")
 const REQUIRED_KEY = "VITE_LOGGER_ENABLED"
 const REQUIRED_VALUE = "false"
+const MODE = process.argv[2] || "production"
+
+const MODE_ENV_FILE_MAP = {
+    production: ".env.production",
+    firefox: ".env.firefox",
+}
 
 function parseEnvValue(content, key) {
     const lines = content.split(/\r?\n/)
@@ -31,13 +36,25 @@ function parseEnvValue(content, key) {
     return null
 }
 
+function resolveEnvPath(mode) {
+    const envFile = MODE_ENV_FILE_MAP[mode]
+
+    if (!envFile) {
+        console.error(`[check-production-logger-disabled] Unsupported mode: ${mode}`)
+        process.exit(1)
+    }
+
+    return path.resolve(process.cwd(), envFile)
+}
+
 async function main() {
+    const envPath = resolveEnvPath(MODE)
     let content
 
     try {
-        content = await fs.readFile(ENV_PATH, "utf8")
+        content = await fs.readFile(envPath, "utf8")
     } catch (error) {
-        console.error(`[check-production-logger-disabled] Failed to read ${ENV_PATH}`)
+        console.error(`[check-production-logger-disabled] Failed to read ${envPath}`)
         console.error(error)
         process.exit(1)
     }
@@ -45,12 +62,12 @@ async function main() {
     const actualValue = parseEnvValue(content, REQUIRED_KEY)
 
     if (actualValue === REQUIRED_VALUE) {
-        console.log(`[check-production-logger-disabled] ${REQUIRED_KEY}=${REQUIRED_VALUE} confirmed in .env.production`)
+        console.log(`[check-production-logger-disabled] ${REQUIRED_KEY}=${REQUIRED_VALUE} confirmed in ${path.basename(envPath)}`)
         return
     }
 
     console.error(
-        `[check-production-logger-disabled] Refusing production build/package because ${REQUIRED_KEY} in .env.production is ${actualValue ?? "missing"}, expected ${REQUIRED_VALUE}.`
+        `[check-production-logger-disabled] Refusing ${MODE} package because ${REQUIRED_KEY} in ${path.basename(envPath)} is ${actualValue ?? "missing"}, expected ${REQUIRED_VALUE}.`
     )
     process.exit(1)
 }
