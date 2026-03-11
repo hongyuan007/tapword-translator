@@ -29,8 +29,11 @@ class Logger {
         minLevel: "debug",
         enabled: true,
     }
+    private readonly startMonotonicMs: number
 
     constructor() {
+        this.startMonotonicMs = this.getMonotonicNow()
+
         // Automatically configure logger based on environment variable
         const loggerEnabled = import.meta.env.VITE_LOGGER_ENABLED === "true"
         this.config.enabled = loggerEnabled
@@ -58,8 +61,27 @@ class Logger {
      * Format log message with prefix and serialize objects
      */
     private formatAndSerialize(prefix: string, ...args: unknown[]): unknown[] {
+        const timestampPrefix = this.formatTimestampPrefix(prefix)
         const serializedArgs = args.map((arg) => (typeof arg === "object" && arg !== null ? JSON.stringify(arg, null, 2) : arg))
-        return [`[${prefix}]`, ...serializedArgs]
+        return [timestampPrefix, ...serializedArgs]
+    }
+
+    private getMonotonicNow(): number {
+        if (typeof performance !== "undefined" && typeof performance.now === "function") {
+            return performance.now()
+        }
+        return Date.now()
+    }
+
+    private formatTimestampPrefix(prefix: string): string {
+        const now = new Date()
+        const hours = String(now.getHours()).padStart(2, "0")
+        const minutes = String(now.getMinutes()).padStart(2, "0")
+        const seconds = String(now.getSeconds()).padStart(2, "0")
+        const milliseconds = String(now.getMilliseconds()).padStart(3, "0")
+        const elapsedMs = Math.max(0, Math.round(this.getMonotonicNow() - this.startMonotonicMs))
+
+        return `[${hours}:${minutes}:${seconds}.${milliseconds}][+${elapsedMs}ms][${prefix}]`
     }
 
     /**

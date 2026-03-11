@@ -13,6 +13,8 @@ import type { UserSettings } from "@/0_common/types"
 import { isLikelyChineseUser } from "@/0_common/utils/regionDetector"
 
 const logger = loggerModule.createLogger("2_background/services/ServiceInitializer")
+let criticalServicesPromise: Promise<void> | null = null
+let backgroundWarmUpPromise: Promise<void> | null = null
 
 /**
  * Initialize API Service with configuration
@@ -69,6 +71,13 @@ export async function initializeAPIService(): Promise<void> {
     }
 }
 
+function initializeCriticalServices(): Promise<void> {
+    return Promise.all([
+        initializeAPIService(),
+        backendModule.getConfigService().ensureCacheLoaded(),
+    ]).then(() => undefined)
+}
+
 function setupNetworkRegionListener(credentials: { apiKey: string; apiSecret: string }, deviceUID: string): void {
     try {
         chrome.storage?.onChanged.addListener((changes, areaName) => {
@@ -120,10 +129,37 @@ function resolveFallbackBaseURL(settings: UserSettings): string | undefined {
  * This function should be called once when the background script loads
  */
 export async function initializeServices(): Promise<void> {
-    await initializeAPIService()
-    await initializeConfigService()
-    await initializeQuotaManager()
-    // Add other service initializations here in the future
+    await ensureCriticalServicesReady()
+    startBackgroundWarmUp()
+}
+
+export function ensureCriticalServicesReady(): Promise<void> {
+    if (!criticalServicesPromise) {
+        criticalServicesPromise = initializeCriticalServices().catch((error) => {
+            criticalServicesPromise = null
+            throw error
+        })
+    }
+
+    return criticalServicesPromise
+}
+
+export function startBackgroundWarmUp(): void {
+    if (backgroundWarmUpPromise) {
+        return
+    }
+
+    backgroundWarmUpPromise = ensureCriticalServicesReady()
+        .then(async () => {
+            await Promise.allSettled([
+                initializeConfigService(),
+                initializeQuotaManager(),
+            ])
+        })
+        .catch((error) => {
+            logger.error("Background warm-up failed:", error)
+            backgroundWarmUpPromise = null
+        })
 }
 
 /**

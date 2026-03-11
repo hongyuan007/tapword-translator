@@ -35,12 +35,17 @@ async function initialize(): Promise<void> {
     logger.info("[INIT_DEBUG] Registering message listener early")
     MessageRouter.setupMessageListener()
 
-    logger.info("[INIT_DEBUG] Starting services initialization")
-    await ServiceInitializer.initializeServices()
-    logger.info("[INIT_DEBUG] Services initialization finished")
+    logger.info("[INIT_DEBUG] Starting critical services initialization")
+    const criticalReadyPromise = ServiceInitializer.ensureCriticalServicesReady()
 
-    // Proactive warm-up after cold start — complements the PAGE_ACTIVATED path
-    backendModule.getAuthService().getToken().catch((err) => logger.warn("Cold-start token warm-up failed:", err))
+    void criticalReadyPromise
+        .then(() => {
+            logger.info("[INIT_DEBUG] Critical services initialization finished")
+            ServiceInitializer.startBackgroundWarmUp()
+            // Proactive warm-up after cold start — complements the PAGE_ACTIVATED path
+            return backendModule.getAuthService().getToken()
+        })
+        .catch((err) => logger.warn("Cold-start token warm-up failed:", err))
 
     logger.info("Background script loaded successfully")
 }

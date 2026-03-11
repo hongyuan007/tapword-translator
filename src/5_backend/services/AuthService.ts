@@ -18,6 +18,12 @@ import type { APIResponse } from "../types/APIResponse"
 import type { APICredentials, AuthHeaders, AuthRequestBody, AuthResponseData, JWTToken } from "../types/AuthTypes"
 
 const logger = createLogger("AuthService")
+const SESSION_TOKEN_STORAGE_KEY = "backendAuthSessionToken"
+
+interface PersistedAuthSessionToken extends JWTToken {
+    uid: string
+    baseURL: string
+}
 
 /**
  * Authentication Service Class
@@ -27,6 +33,8 @@ export class AuthService {
     private currentToken: JWTToken | null = null
     private uid: string | null = null
     private refreshPromise: Promise<string> | null = null
+    private restorePromise: Promise<void> | null = null
+    private hasLoadedPersistedToken: boolean = false
     private baseURL: string = ""
     private autoRefreshTimer: NodeJS.Timeout | null = null
 
@@ -80,6 +88,8 @@ export class AuthService {
         this.baseURL = baseURL
         this.currentToken = null
         this.refreshPromise = null
+        this.restorePromise = null
+        this.hasLoadedPersistedToken = false
 
         // Start auto-refresh timer
         this.startAutoRefresh()
@@ -96,6 +106,9 @@ export class AuthService {
         // Clear token to force re-authentication with new URL
         this.currentToken = null
         this.refreshPromise = null
+        this.restorePromise = null
+        this.hasLoadedPersistedToken = true
+        void this.clearPersistedToken()
     }
 
     /**
@@ -116,6 +129,8 @@ export class AuthService {
             logger.error("AuthService not initialized")
             throw new Error("AuthService not initialized")
         }
+
+        await this.restorePersistedTokenIfNeeded()
 
         // Check if we have a valid token
         if (this.currentToken && this.isTokenValid(this.currentToken)) {
@@ -157,7 +172,10 @@ export class AuthService {
         logger.info("Clearing token")
         this.currentToken = null
         this.refreshPromise = null
+        this.restorePromise = null
+        this.hasLoadedPersistedToken = true
         this.stopAutoRefresh()
+        void this.clearPersistedToken()
     }
 
     /**
@@ -228,6 +246,53 @@ export class AuthService {
         }
 
         return isValid
+    }
+
+    private async restorePersistedTokenIfNeeded(): Promise<void> {
+        if (this.hasLoadedPersistedToken) {
+            return
+        }
+
+        if (this.restorePromise) {
+            await this.restorePromise
+            return
+        }
+
+        this.restorePromise = (async () => {
+            this.hasLoadedPersistedToken = true
+
+            const persistedToken = await this.loadPersistedToken()
+            if (!persistedToken) {
+                return
+            }
+
+            if (persistedToken.uid !== this.uid || persistedToken.baseURL !== this.baseURL) {
+                logger.info("Discarding persisted token due to auth context mismatch")
+                await this.clearPersistedToken()
+                return
+            }
+
+            const restoredToken: JWTToken = {
+                token: persistedToken.token,
+                expiresIn: persistedToken.expiresIn,
+                obtainedAt: persistedToken.obtainedAt,
+            }
+
+            if (!this.isTokenValid(restoredToken)) {
+                logger.info("Discarding expired persisted token")
+                await this.clearPersistedToken()
+                return
+            }
+
+            this.currentToken = restoredToken
+            logger.info("Restored JWT token from session storage")
+        })()
+
+        try {
+            await this.restorePromise
+        } finally {
+            this.restorePromise = null
+        }
     }
 
     /**
@@ -303,14 +368,54 @@ export class AuthService {
                 expiresIn: expiresInSec,
                 obtainedAt: Date.now(),
             }
+            await this.persistCurrentToken()
 
             logger.info("JWT token obtained successfully")
             logger.debug("Token expires in:", expiresInSec, "seconds")
 
             return this.currentToken.token
         } catch (error) {
+            this.currentToken = null
+            await this.clearPersistedToken()
             logger.error("Failed to fetch token:", error)
             throw error
+        }
+    }
+
+    private async persistCurrentToken(): Promise<void> {
+        if (!this.currentToken || !this.uid || !this.baseURL) {
+            return
+        }
+
+        const payload: PersistedAuthSessionToken = {
+            ...this.currentToken,
+            uid: this.uid,
+            baseURL: this.baseURL,
+        }
+
+        try {
+            await chrome.storage.session.set({ [SESSION_TOKEN_STORAGE_KEY]: payload })
+        } catch (error) {
+            logger.warn("Failed to persist token into session storage", error)
+        }
+    }
+
+    private async loadPersistedToken(): Promise<PersistedAuthSessionToken | null> {
+        try {
+            const data = await chrome.storage.session.get(SESSION_TOKEN_STORAGE_KEY)
+            const token = data[SESSION_TOKEN_STORAGE_KEY] as PersistedAuthSessionToken | undefined
+            return token ?? null
+        } catch (error) {
+            logger.warn("Failed to load token from session storage", error)
+            return null
+        }
+    }
+
+    private async clearPersistedToken(): Promise<void> {
+        try {
+            await chrome.storage.session.remove(SESSION_TOKEN_STORAGE_KEY)
+        } catch (error) {
+            logger.warn("Failed to clear token from session storage", error)
         }
     }
 
