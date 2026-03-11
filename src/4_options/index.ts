@@ -94,6 +94,11 @@ function bindRangeValue(input: HTMLInputElement | null, valueElementId: string):
 
     const update = () => {
         valueElement.textContent = input.value
+        const min = Number(input.min || 0)
+        const max = Number(input.max || 100)
+        const value = Number(input.value)
+        const percent = max > min ? ((value - min) / (max - min)) * 100 : 0
+        input.style.setProperty("--range-progress", `${percent}%`)
     }
 
     update()
