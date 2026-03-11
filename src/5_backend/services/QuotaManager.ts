@@ -57,20 +57,33 @@ function getTodayDateString(): string {
 export class QuotaManager {
     private currentData: QuotaUsageData | null = null
     private isInitialized: boolean = false
+    private initializePromise: Promise<void> | null = null
 
     /**
      * Initialize the quota manager
      */
     async initialize(): Promise<void> {
         if (this.isInitialized) {
-            logger.warn("QuotaManager already initialized")
             return
         }
 
-        logger.info("Initializing QuotaManager...")
-        await this.loadQuotaData()
-        this.isInitialized = true
-        logger.info("QuotaManager initialized successfully")
+        if (this.initializePromise) {
+            await this.initializePromise
+            return
+        }
+
+        this.initializePromise = (async () => {
+            logger.info("Initializing QuotaManager...")
+            await this.loadQuotaData()
+            this.isInitialized = true
+            logger.info("QuotaManager initialized successfully")
+        })()
+
+        try {
+            await this.initializePromise
+        } finally {
+            this.initializePromise = null
+        }
     }
 
     /**
@@ -93,9 +106,11 @@ export class QuotaManager {
             return
         }
 
+        await this.ensureInitialized()
         await this.ensureDataIsToday()
 
         const configService = getConfigService()
+        await configService.ensureCacheLoaded()
         const dailyLimit = configService.getDailyFreeTranslations()
         const currentCount = this.currentData?.translationCount || 0
 
@@ -120,9 +135,11 @@ export class QuotaManager {
             return
         }
 
+        await this.ensureInitialized()
         await this.ensureDataIsToday()
 
         const configService = getConfigService()
+        await configService.ensureCacheLoaded()
         const dailyLimit = configService.getDailyFreeSpeech()
         const currentCount = this.currentData?.speechCount || 0
 
@@ -138,6 +155,7 @@ export class QuotaManager {
      * Increment translation count (call after successful translation)
      */
     async incrementTranslationCount(): Promise<void> {
+        await this.ensureInitialized()
         await this.ensureDataIsToday()
 
         if (!this.currentData) {
@@ -155,6 +173,7 @@ export class QuotaManager {
      * Increment speech synthesis count (call after successful speech synthesis)
      */
     async incrementSpeechCount(): Promise<void> {
+        await this.ensureInitialized()
         await this.ensureDataIsToday()
 
         if (!this.currentData) {
@@ -172,6 +191,7 @@ export class QuotaManager {
      * Get current quota usage (for debugging/UI display)
      */
     async getQuotaUsage(): Promise<{ translation: number; speech: number }> {
+        await this.ensureInitialized()
         await this.ensureDataIsToday()
 
         return {
@@ -232,6 +252,14 @@ export class QuotaManager {
         } catch (error) {
             logger.error("Failed to save quota data:", error)
         }
+    }
+
+    private async ensureInitialized(): Promise<void> {
+        if (this.isInitialized) {
+            return
+        }
+
+        await this.initialize()
     }
 
     /**

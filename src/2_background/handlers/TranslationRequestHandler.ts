@@ -9,6 +9,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import { getQuotaManager } from "@/5_backend"
 import * as translateModule from "@/6_translate"
 import * as errorHandler from "./BackgroundErrorHandler"
+import * as serviceInitializer from "../services/ServiceInitializer"
 
 const logger = loggerModule.createLogger("TranslationRequestHandler")
 
@@ -23,6 +24,9 @@ export async function handleTranslationRequest(
     sendResponse: (response: TranslateResponseMessage) => void
 ): Promise<void> {
     try {
+        await serviceInitializer.ensureCriticalServicesReady()
+        serviceInitializer.startBackgroundWarmUp()
+
         const { word, leadingText, trailingText, previousSentences, nextSentences, sourceLanguage, targetLanguage, upgradeModel, bookName } =
             message.data
 

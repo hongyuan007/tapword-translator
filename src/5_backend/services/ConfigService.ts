@@ -39,7 +39,9 @@ export class ConfigService {
     private refreshIntervalMs: number = 0
     private autoRefreshTimer: NodeJS.Timeout | null = null
     private currentConfig: CloudConfig | null = null
+    private cacheLoadPromise: Promise<void> | null = null
     private fetchPromise: Promise<CloudConfig> | null = null
+    private initializePromise: Promise<void> | null = null
     private isInitialized: boolean = false
 
     /**
@@ -53,34 +55,47 @@ export class ConfigService {
         refreshIntervalMs: number = 24 * 60 * 60 * 1000 // 24 hours
     ): Promise<void> {
         if (this.isInitialized) {
-            logger.warn("ConfigService already initialized")
             return
         }
 
-        logger.info("Initializing ConfigService...")
-        logger.info("Config endpoint:", configEndpoint)
-        logger.info("Refresh interval:", Math.floor(refreshIntervalMs / 1000 / 60), "minutes")
-
-        this.configEndpoint = configEndpoint
-        this.refreshIntervalMs = refreshIntervalMs
-        this.isInitialized = true
-
-        // Load cached config from storage
-        await this.loadCachedConfig()
-
-        // Fetch fresh config from cloud
-        try {
-            await this.fetchConfig()
-            logger.info("Initial config fetch completed")
-        } catch (error) {
-            logger.error("Initial config fetch failed, using cached or default config:", error)
-            // Continue with cached/default config
+        if (this.initializePromise) {
+            await this.initializePromise
+            return
         }
 
-        // Start auto-refresh timer
-        this.startAutoRefresh()
+        this.initializePromise = (async () => {
+            logger.info("Initializing ConfigService...")
+            logger.info("Config endpoint:", configEndpoint)
+            logger.info("Refresh interval:", Math.floor(refreshIntervalMs / 1000 / 60), "minutes")
 
-        logger.info("ConfigService initialized successfully")
+            this.configEndpoint = configEndpoint
+            this.refreshIntervalMs = refreshIntervalMs
+            this.isInitialized = true
+
+            // Load cached config from storage before exposing synchronous readers.
+            await this.ensureCacheLoaded()
+
+            // Start auto-refresh timer
+            this.startAutoRefresh()
+
+            // Fetch fresh config from cloud in the background. Cold-start request paths
+            // should rely on cached/default config and not wait for this network call.
+            void this.fetchConfig()
+                .then(() => {
+                    logger.info("Initial config fetch completed")
+                })
+                .catch((error) => {
+                    logger.error("Initial config fetch failed, using cached or default config:", error)
+                })
+
+            logger.info("ConfigService initialized successfully")
+        })()
+
+        try {
+            await this.initializePromise
+        } finally {
+            this.initializePromise = null
+        }
     }
 
     /**
@@ -88,6 +103,29 @@ export class ConfigService {
      */
     isReady(): boolean {
         return this.isInitialized
+    }
+
+    /**
+     * Ensure cached/default config is materialized in memory.
+     * This is safe to call before full service initialization.
+     */
+    async ensureCacheLoaded(): Promise<void> {
+        if (this.currentConfig) {
+            return
+        }
+
+        if (this.cacheLoadPromise) {
+            await this.cacheLoadPromise
+            return
+        }
+
+        this.cacheLoadPromise = this.loadCachedConfig()
+
+        try {
+            await this.cacheLoadPromise
+        } finally {
+            this.cacheLoadPromise = null
+        }
     }
 
     /**
@@ -158,6 +196,7 @@ export class ConfigService {
         logger.info("Shutting down ConfigService...")
         this.stopAutoRefresh()
         this.isInitialized = false
+        this.initializePromise = null
     }
 
     /**
