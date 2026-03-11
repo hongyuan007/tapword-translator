@@ -11,6 +11,7 @@ import { buildPopupBootstrapResponse } from "../handlers/PopupBootstrapHandler"
 import * as SpeechSynthesisRequestHandler from "../handlers/SpeechSynthesisRequestHandler"
 import * as TokenWarmUpHandler from "../handlers/TokenWarmUpHandler"
 import * as TranslationRequestHandler from "../handlers/TranslationRequestHandler"
+import * as serviceInitializer from "../services/ServiceInitializer"
 
 const logger = loggerModule.createLogger("MessageRouter")
 
@@ -45,8 +46,15 @@ export function setupMessageListener(): void {
                 return true
 
             case "POPUP_BOOTSTRAP_REQUEST": {
-                const response = buildPopupBootstrapResponse()
-                sendResponse(response)
+                void serviceInitializer.ensureCriticalServicesReady()
+                    .then(() => {
+                        const response = buildPopupBootstrapResponse()
+                        sendResponse(response)
+                    })
+                    .catch((error) => {
+                        logger.error("Failed to build popup bootstrap response:", error)
+                        sendResponse(buildPopupBootstrapResponse())
+                    })
                 return true
             }
 
