@@ -1,0 +1,22 @@
+[features]
+multi_agent = true
+
+[agents]
+max_threads = 6
+max_depth = 1
+
+[agents.researcher]
+description = "Use for codebase exploration, affected-file discovery, dependency tracing, and spec drafting."
+config_file = "agents/researcher.toml"
+
+[agents.implementer]
+description = "Use for targeted implementation after scope and affected files are already clear."
+config_file = "agents/implementer.toml"
+
+[agents.verifier]
+description = "Use for logic inspection, type-check, targeted tests, and confirming intended changes are present."
+config_file = "agents/verifier.toml"
+
+[agents.reviewer]
+description = "Use for code review focused on regressions, correctness, security, and maintainability."
+config_file = "agents/reviewer.toml"

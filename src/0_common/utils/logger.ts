@@ -29,8 +29,11 @@ class Logger {
         minLevel: "debug",
         enabled: true,
     }
+    private readonly startMonotonicMs: number
 
     constructor() {
+        this.startMonotonicMs = this.getMonotonicNow()
+
         // Automatically configure logger based on environment variable
         const loggerEnabled = import.meta.env.VITE_LOGGER_ENABLED === "true"
         this.config.enabled = loggerEnabled
@@ -55,47 +58,99 @@ class Logger {
     }
 
     /**
+     * Safely serialize a single argument for logging.
+     */
+    private safeSerialize(arg: unknown): unknown {
+        if (typeof arg === "bigint") {
+            return arg.toString()
+        }
+
+        if (typeof arg === "object" && arg !== null) {
+            try {
+                return JSON.stringify(arg, null, 2)
+            } catch {
+                try {
+                    return String(arg)
+                } catch {
+                    return "[Unserializable value]"
+                }
+            }
+        }
+
+        return arg
+    }
+
+    /**
      * Format log message with prefix and serialize objects
      */
     private formatAndSerialize(prefix: string, ...args: unknown[]): unknown[] {
-        const serializedArgs = args.map((arg) => (typeof arg === "object" && arg !== null ? JSON.stringify(arg, null, 2) : arg))
-        return [`[${prefix}]`, ...serializedArgs]
+        const timestampPrefix = this.formatTimestampPrefix(prefix)
+        const serializedArgs = args.map((arg) => this.safeSerialize(arg))
+        return [timestampPrefix, ...serializedArgs]
+    }
+
+    private getMonotonicNow(): number {
+        if (typeof performance !== "undefined" && typeof performance.now === "function") {
+            return performance.now()
+        }
+        return Date.now()
+    }
+
+    private formatTimestampPrefix(prefix: string): string {
+        const now = new Date()
+        const hours = String(now.getHours()).padStart(2, "0")
+        const minutes = String(now.getMinutes()).padStart(2, "0")
+        const seconds = String(now.getSeconds()).padStart(2, "0")
+        const milliseconds = String(now.getMilliseconds()).padStart(3, "0")
+        const elapsedMs = Math.max(0, Math.round(this.getMonotonicNow() - this.startMonotonicMs))
+
+        return `[${hours}:${minutes}:${seconds}.${milliseconds}][+${elapsedMs}ms][${prefix}]`
+    }
+
+    private fallbackLog(method: "log" | "warn" | "error", prefix: string, error: unknown): void {
+        try {
+            console[method](`[LoggerFallback][${prefix}] Logging failed`, error)
+        } catch {}
+    }
+
+    private emit(level: LogLevel, method: "log" | "warn" | "error", prefix: string, ...args: unknown[]): void {
+        if (!this.shouldLog(level)) {
+            return
+        }
+
+        try {
+            console[method](...this.formatAndSerialize(prefix, ...args))
+        } catch (error) {
+            this.fallbackLog(method, prefix, error)
+        }
     }
 
     /**
      * Debug level log (lowest priority)
      */
     debug(prefix: string, ...args: unknown[]): void {
-        if (this.shouldLog("debug")) {
-            console.log(...this.formatAndSerialize(prefix, ...args))
-        }
+        this.emit("debug", "log", prefix, ...args)
     }
 
     /**
      * Info level log (general information)
      */
     info(prefix: string, ...args: unknown[]): void {
-        if (this.shouldLog("info")) {
-            console.log(...this.formatAndSerialize(prefix, ...args))
-        }
+        this.emit("info", "log", prefix, ...args)
     }
 
     /**
      * Warning level log
      */
     warn(prefix: string, ...args: unknown[]): void {
-        if (this.shouldLog("warn")) {
-            console.warn(...this.formatAndSerialize(prefix, ...args))
-        }
+        this.emit("warn", "warn", prefix, ...args)
     }
 
     /**
      * Error level log (highest priority)
      */
     error(prefix: string, ...args: unknown[]): void {
-        if (this.shouldLog("error")) {
-            console.error(...this.formatAndSerialize(prefix, ...args))
-        }
+        this.emit("error", "error", prefix, ...args)
     }
 }
 
