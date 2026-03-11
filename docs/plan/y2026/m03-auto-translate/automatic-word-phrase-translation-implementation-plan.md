@@ -32,10 +32,12 @@ This document should be treated as the execution baseline for V1.
 - Each block may be processed **only once**
 - Candidate type supports **word + phrase**
 - **Phrase has priority** over overlapping word candidates
-- Maximum **3** auto-translated items per block
+- Auto-translated item count follows a **dynamic block budget** within a capped upper bound
 - Candidate selection uses **LLM + hard rules**
 - Reuse current translation UI with slight visual distinction
+- Auto word/phrase underlines are unified to system **Teal**
 - Auto-translation visual weight must not exceed manual translation
+- Auto-translation must not override, replace, or duplicate existing manual translation records
 - Settings include:
   - `enableAutoTranslate`
   - `userLevel` = `Beginner | Intermediate | Advanced`
@@ -116,8 +118,10 @@ This document should be treated as the execution baseline for V1.
 - Default content should include:
   - the current manual trigger text
   - already rendered manual translation texts in this block
+  - ranges/texts already covered by manual sentence translation in this block where representable
   - already rendered auto-translation texts in this block
 - Backend should exclude them during both candidate-identification handling and rule-based filtering
+- Frontend must still re-check all returned candidates against live page state before rendering
 
 ### 3.5 V1 contract restraint
 
@@ -143,10 +147,13 @@ Frontend owns:
 - current block extraction
 - block-scoped `pending / done` one-time control
 - sending request payload using locked contract
+- collecting block-scoped exclusion context from manual/auto translations
 - mapping `start/end` back to DOM range
-- filtering against current rendered state
+- deterministic filtering against current rendered state
+- final display veto for unstable / conflicting / risky candidates
 - sequential rendering
 - UI reuse and slight auto/manual visual distinction
+- unified Teal underline treatment for auto word/phrase results
 - settings UI and storage wiring
 - frontend unit/E2E coverage
 
@@ -154,10 +161,11 @@ Frontend owns:
 Backend owns:
 - new endpoint implementation
 - LLM-based candidate identification
+- semantic quality judgment for reading-helpful candidates
 - hard-rule enforcement
 - phrase-over-word precedence
 - deduplication and invalid-item filtering
-- max-3 enforcement
+- capped dynamic-budget enforcement
 - degrade-to-empty behavior
 - rate limiting / concurrency protection
 - backend test coverage
@@ -205,7 +213,7 @@ Tasks:
 
 Exit criteria:
 - endpoint returns stable schema
-- phrase priority / max-3 / excludedTexts work on backend side
+- phrase priority / capped dynamic budget / excludedTexts work on backend side
 - failure path does not break callers
 
 ### Phase 3 — Frontend auto-translation coordinator
@@ -230,9 +238,10 @@ Exit criteria:
 Tasks:
 - map `start/end` offsets back to DOM ranges
 - filter overlaps with current manual result
+- filter overlaps with existing manual word/sentence translation coverage
 - filter overlaps with existing auto results
 - render sequentially
-- apply slight visual distinction for auto results
+- apply slight visual distinction for auto results while keeping auto word/phrase underlines unified to Teal
 
 Exit criteria:
 - candidate placement is stable enough for V1
