@@ -1,4 +1,4 @@
-Last updated on: 2026-02-27
+Last updated on: 2026-03-11
 
 # 1_content: Content Script Module
 
@@ -26,7 +26,8 @@ This module is the core of the extension that runs on web pages. It is responsib
 │       ├── selectionClassifier.ts  # Classifies selection as word or fragment
 │       ├── selectionValidator.ts   # Validates if a selection should trigger translation
 │       ├── tapWordDetector.ts      # Resolves word range from a pointer coordinate
-│       └── translationOverlapDetector.ts # Handles overlapping translations
+│       ├── translationOverlapDetectorV2.ts # Detects overlapping translations (Range-based)
+│       └── wordBoundary.ts         # Word boundary detection utilities
 ├── resources/                      # Static resources (HTML templates, CSS)
 ├── services/
 │   └── translationRequest.ts       # Communicates with the background script
@@ -34,19 +35,23 @@ This module is the core of the extension that runs on web pages. It is responsib
 │   ├── iconManager.ts              # Manages the translation icon's lifecycle
 │   ├── modalTemplates.ts           # Loads HTML templates for the modal
 │   ├── toastNotification.ts        # Displays temporary toast notifications
-│   ├── translationDisplay.ts       # Manages translation tooltips and inline styling
+│   ├── translationDisplayV2.ts     # Manages translation display via Range-based rendering
+│   ├── translationDisplayV2/       # Sub-components for translation display
 │   └── translationModal.ts         # Manages the detailed translation modal
 └── utils/                          # General utilities
-    ├── styleCalculator/            # UI positioning and style calculations
     ├── concurrencyLimiter.ts       # Limits parallel translation requests
     ├── contextExtractorV2.ts       # Extracts sentence-level context around text
     ├── domSanitizer.ts             # Cleans DOM selections from extension UI
     ├── languageDetector.ts         # Detects the source language of the text
     ├── languageValidator.ts        # "Native Speaker Suppression" logic
     ├── lineHeightAdjuster.ts       # Adjusts line-height for tooltip display
-    ├── modalPositioner.ts          # Calculates optimal modal position
+    ├── modalPositionerV2.ts        # Calculates optimal modal position (Range-based)
+    ├── styleCalculator.ts          # UI positioning and style calculations
+    ├── styleCalculator/            # Style calculator sub-components
     └── versionStatus.ts            # Caches version check results
 ```
+
+> **Note:** Legacy V1 files (`translationDisplay.ts`, `translationOverlapDetector.ts`, `modalPositioner.ts`, etc.) have been moved to the `archive/` directory for reference.
 
 ## Core Components
 
@@ -67,7 +72,7 @@ This directory captures user intent and orchestrates the translation sequence.
 Manages all DOM modifications and visual feedback injected into the host page.
 
 - **`iconManager.ts`**: Displays the translation trigger icon next to manual selections.
-- **`translationDisplay.ts`**: Renders inline translation results (underlines and floating tooltips) and manages their various states (loading, success, error).
+- **`translationDisplayV2.ts`**: Renders inline translation results using Range-based highlighting (CSS Custom Highlights API / underline overlays) and manages their various states (loading, success, error).
 - **`translationModal.ts`**: Controls the detailed popup modal containing comprehensive dictionary definitions, original sentences, and text-to-speech functionality.
 - **`toastNotification.ts`**: Displays temporary, auto-dismissing notifications (e.g., error alerts or status updates) at the top of the viewport.
 

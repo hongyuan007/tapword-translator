@@ -13,7 +13,6 @@ import * as contentIndex from "@/1_content/index"
 import * as modalTemplates from "@/1_content/ui/modalTemplates"
 import * as toastNotification from "@/1_content/ui/toastNotification"
 import * as languageDetector from "@/1_content/utils/languageDetector"
-import { ModalPositioner } from "@/1_content/utils/modalPositioner"
 import { ModalPositionerV2 } from "@/1_content/utils/modalPositionerV2"
 import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
 import * as versionStatus from "@/1_content/utils/versionStatus"
@@ -133,7 +132,7 @@ let offsetY = 0
  * }, anchorElement, 'translation-anchor-0');
  * ```
  */
-export async function showTranslationModal(data: TranslationDetailData, anchorSource: HTMLElement | Range | null, anchorId?: string): Promise<void> {
+export async function showTranslationModal(data: TranslationDetailData, anchorSource: Range | null, anchorId?: string): Promise<void> {
     try {
         // Close existing modal if any
         closeTranslationModal()
@@ -582,24 +581,19 @@ function onDragEnd(): void {
 // Modal Positioning
 // ============================================================================
 
-// Position type now provided by ModalPositioner helper
-
 /**
  * Calculate and apply optimal position for the modal relative to anchor element
  * Priority: bottom-right > bottom-left > top-right > top-left
  *
  * @param modalContainer - The modal container element
- * @param anchorSource - The anchor element or Range to position relative to
+ * @param anchorSource - The Range to position relative to
  */
-function positionModal(modalContainer: HTMLElement, anchorSource: HTMLElement | Range): void {
+function positionModal(modalContainer: HTMLElement, anchorSource: Range): void {
     const modalRect = modalContainer.getBoundingClientRect()
     const isFragment = modalContainer.classList.contains("translation-type--fragment")
     const translationType = isFragment ? "fragment" : "word" as const
 
-    // V2: use ModalPositionerV2 for Range-based positioning
-    const res = anchorSource instanceof Range
-        ? ModalPositionerV2.compute(anchorSource, modalRect, translationType)
-        : ModalPositioner.compute(anchorSource, modalRect, translationType)
+    const res = ModalPositionerV2.compute(anchorSource, modalRect, translationType)
 
     // Use fixed positioning (viewport space) instead of absolute (document space)
     // This makes the modal stay fixed relative to viewport during scroll
