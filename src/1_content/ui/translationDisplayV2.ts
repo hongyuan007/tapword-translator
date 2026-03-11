@@ -289,8 +289,14 @@ function positionTooltip(id: string): void {
     for (const tooltip of entry.tooltips) tooltip.style.visibility = "visible"
 
     const lineRects = rects
-    const scrollX = window.scrollX || document.documentElement.scrollLeft || 0
-    const scrollY = window.scrollY || document.documentElement.scrollTop || 0
+    // On pages where <body> is the scroll container (e.g. position:relative + overflow-y:auto),
+    // window.scrollY stays 0 while body.scrollTop accumulates.  We add body.scrollTop only
+    // when the window scroll is 0, avoiding double-counting in Quirks Mode pages where both
+    // window.scrollY and document.body.scrollTop reflect the same offset simultaneously.
+    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
+    const winScrollY = window.scrollY || document.documentElement.scrollTop  || 0
+    const scrollX = winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0)
+    const scrollY = winScrollY + (winScrollY === 0 ? (document.body?.scrollTop  || 0) : 0)
     const viewportWidth = document.documentElement.clientWidth
 
     const signature = buildRectsSignature(lineRects)
@@ -559,12 +565,14 @@ export function showTranslationResult(
 
         // Line-height adjustment: use range.startContainer.parentElement as anchor substitute
         const autoAdjustHeight = userSettings?.autoAdjustHeight ?? contentIndex.getCachedUserSettings()?.autoAdjustHeight ?? true
+        let didAdjustLineHeight = false
         if (autoAdjustHeight && styleResult?.spaceCalculation) {
             const parentElement = storedRange.startContainer.parentElement
             const adjustmentResult = lineHeightAdjuster.adjustLineHeightIfNeeded(parentElement, styleResult.spaceCalculation)
             if (adjustmentResult.blockElement) {
                 adjustedBlocks.set(id, adjustmentResult.blockElement)
             }
+            didAdjustLineHeight = adjustmentResult.didAdjustLineHeight
         }
 
         document.body.appendChild(tooltip)
@@ -604,6 +612,11 @@ export function showTranslationResult(
 
         ensureOrphanObserver()
         positionTooltip(id)
+        if (didAdjustLineHeight) {
+            // A real line-height change can push lower content down immediately.
+            // Keep the new tooltip on the fast path, then resync all others on the next frame.
+            scheduleReposition()
+        }
         ensureGlobalRepositionListeners()
         ensureHitTestListeners()
 
