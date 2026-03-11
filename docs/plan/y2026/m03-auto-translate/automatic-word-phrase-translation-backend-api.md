@@ -3,8 +3,8 @@
 *Created: 2026-03-10*
 *Status: Draft for implementation alignment*
 *Related docs:*
-- `docs/plan/y2026/automatic-word-phrase-translation-final.md`
-- `docs/plan/y2026/automatic-word-phrase-translation-technical-framework.md`
+- `docs/plan/y2026/m03-auto-translate/automatic-word-phrase-translation-final.md`
+- `docs/plan/y2026/m03-auto-translate/automatic-word-phrase-translation-technical-framework.md`
 
 ## 1. Background and Responsibility Boundary
 

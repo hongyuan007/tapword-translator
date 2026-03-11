@@ -15,7 +15,7 @@
 https://www.reddit.com/r/dating_advice/comments/1rdet1l/first_time_having_sex_with_new_boyfriend_didnt_go/
 
 ## Screenshots 截图
-![Image](./image_1.png)
+![Image](./images/image-1.png)
 
 ## Environment 环境信息
 - Chrome

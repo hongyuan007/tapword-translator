@@ -2,7 +2,7 @@
 
 *Created: 2026-03-10*
 *Status: Draft for implementation alignment*
-*Related requirement doc: `docs/plan/y2026/automatic-word-phrase-translation-final.md`*
+*Related requirement doc: `docs/plan/y2026/m03-auto-translate/automatic-word-phrase-translation-final.md`*
 *Target branch: `feat/260306/auto-translate`*
 
 ## 1. Purpose

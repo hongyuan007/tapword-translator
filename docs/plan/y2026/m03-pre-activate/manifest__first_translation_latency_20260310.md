@@ -4,8 +4,8 @@
 
 - **Related Documents**:
   - `docs/plan/y2026/m03-pre-activate/README.md`
-  - `docs/plan/y2026/m03-pre-activate/日志/content脚本日志.txt`
-  - `docs/plan/y2026/m03-pre-activate/日志/后台脚本日志.txt`
+  - `docs/plan/y2026/m03-pre-activate/logs/content脚本日志.txt`
+  - `docs/plan/y2026/m03-pre-activate/logs/后台脚本日志.txt`
   - `docs/plan/y2026/m03-pre-activate/first-translation-latency-plan.md`
   - `docs/prompt_files/review/generate-review-manifest.prompt.md`
 - **Task Objectives**:
