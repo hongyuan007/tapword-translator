@@ -51,6 +51,7 @@
         "node_modules",
         "dist",
         "tests",
+        "src/1_content/archive",
         "src/5_backend/config/credentials.ts" // Generated & obfuscated file excluded from type-check
     ]
 }
