@@ -6,6 +6,7 @@
 
 import type { MessageType } from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
+import * as AutoCandidatesRequestHandler from "../handlers/AutoCandidatesRequestHandler"
 import * as FragmentTranslationRequestHandler from "../handlers/FragmentTranslationRequestHandler"
 import { buildPopupBootstrapResponse } from "../handlers/PopupBootstrapHandler"
 import * as SpeechSynthesisRequestHandler from "../handlers/SpeechSynthesisRequestHandler"
@@ -60,6 +61,10 @@ export function setupMessageListener(): void {
 
             case "PAGE_ACTIVATED":
                 TokenWarmUpHandler.handlePageActivated(sendResponse)
+                return true
+
+            case "AUTO_CANDIDATES_REQUEST":
+                AutoCandidatesRequestHandler.handleAutoCandidatesRequest(message, sendResponse)
                 return true
 
             default:

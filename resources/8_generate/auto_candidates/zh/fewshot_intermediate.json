@@ -1,0 +1,10 @@
+[
+    {
+        "role": "user",
+        "content": "# Source Language\nen\n\n# Target Language\nzh\n\n# Reader Proficiency Level\nIntermediate\n\n# Maximum Translation Results\n5\n\n# Block Text\nThe architect's meticulous attention to detail was evident in every facet of the building's design, from the ornate cornice work to the subtle interplay of natural light and shadow that permeated the grand foyer.\n"
+    },
+    {
+        "role": "assistant",
+        "content": "{\"candidates\":[{\"reason\":\"Architectural term for decorative molding along the roofline — domain-specific\",\"text\":\"cornice\",\"type\":\"word\",\"translation\":\"檐口\"},{\"reason\":\"'permeated' means spread throughout — less common verb at intermediate level\",\"text\":\"permeated\",\"type\":\"word\",\"translation\":\"弥漫\"},{\"reason\":\"A large entrance hall — architectural term not common in everyday English\",\"text\":\"foyer\",\"type\":\"word\",\"translation\":\"门厅\"}]}"
+    }
+]

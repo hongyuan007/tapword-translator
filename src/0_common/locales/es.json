@@ -148,5 +148,13 @@
     "error.short.bingTranslateError": "Error de Bing Translate",
     "error.mtranserverConfigMissing": "Introduce primero la URL de MTranServer en la configuración",
     "error.mtranserverError": "Fallo de conexión con MTranServer, verifica la URL y la configuración",
-    "error.bingTranslateError": "Bing Translate falló, verifica tu conexión a Internet"
+    "error.bingTranslateError": "Bing Translate falló, verifica tu conexión a Internet",
+    "popup.section.autoTranslate": "Traducción automática",
+    "popup.autoTranslate.label": "Traducción automática",
+    "popup.autoTranslate.description": "Complementa automáticamente traducciones de palabras clave tras la traducción manual",
+    "popup.languageProficiency.label": "Nivel de lectura",
+    "popup.languageProficiency.description": "Afecta cuántas y cuáles palabras se traducen automáticamente",
+    "popup.proficiency.beginner": "Principiante",
+    "popup.proficiency.intermediate": "Intermedio",
+    "popup.proficiency.advanced": "Avanzado"
 }

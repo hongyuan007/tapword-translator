@@ -1,0 +1,14 @@
+# Source Language
+${sourceLang}
+
+# Target Language
+${targetLang}
+
+# Reader Proficiency Level
+${userLevel}
+
+# Maximum Translation Results
+${limit}
+
+# Block Text
+${blockText}

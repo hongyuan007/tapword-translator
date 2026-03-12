@@ -31,6 +31,7 @@ const STORAGE_KEYS = {
 } as const
 
 const ALLOWED_TRIGGER_KEYS: types.TriggerKey[] = ["meta", "option", "alt", "ctrl"]
+const VALID_PROFICIENCY_LEVELS: types.LanguageProficiency[] = ["Beginner", "Intermediate", "Advanced"]
 
 type PlatformDefaultContext = {
     os: PlatformOS
@@ -169,6 +170,11 @@ function normalizeUserSettings(
         doubleClickSentenceTriggerKey: validatedTriggerKey,
         // Ensure V2 key is always populated for internal usage
         doubleClickTranslateV2: mergedSettings.doubleClickTranslateV2 ?? DEFAULT_USER_SETTINGS.doubleClickTranslateV2,
+        // Auto-translation settings with validation
+        enableAutoTranslate: mergedSettings.enableAutoTranslate ?? DEFAULT_USER_SETTINGS.enableAutoTranslate,
+        userLanguageProficiency: VALID_PROFICIENCY_LEVELS.includes(mergedSettings.userLanguageProficiency)
+            ? mergedSettings.userLanguageProficiency
+            : DEFAULT_USER_SETTINGS.userLanguageProficiency,
     }
 }
 

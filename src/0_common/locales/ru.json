@@ -148,5 +148,13 @@
     "error.short.bingTranslateError": "Ошибка Bing Translate",
     "error.mtranserverConfigMissing": "Пожалуйста, сначала введите URL MTranServer в настройках",
     "error.mtranserverError": "Не удалось подключиться к MTranServer, проверьте URL и настройки",
-    "error.bingTranslateError": "Bing Переводчик недоступен, проверьте сетевое подключение"
+    "error.bingTranslateError": "Bing Переводчик недоступен, проверьте сетевое подключение",
+    "popup.section.autoTranslate": "Авто-перевод",
+    "popup.autoTranslate.label": "Авто-перевод",
+    "popup.autoTranslate.description": "Автоматически дополняет перевод ключевых слов после ручного перевода",
+    "popup.languageProficiency.label": "Уровень чтения",
+    "popup.languageProficiency.description": "Влияет на количество и выбор слов для автоматического перевода",
+    "popup.proficiency.beginner": "Начальный",
+    "popup.proficiency.intermediate": "Средний",
+    "popup.proficiency.advanced": "Продвинутый"
 }

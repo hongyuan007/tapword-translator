@@ -70,7 +70,7 @@ export interface SpeechSynthesisRequestData {
 /**
  * Message types for content-background communication
  */
-export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED"
+export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED" | "AUTO_CANDIDATES_REQUEST"
 
 /**
  * Page activated message (sent by content script on injection for token pre-warming)
@@ -179,6 +179,68 @@ export interface FragmentTranslateResponseErrorMessage {
  */
 export type FragmentTranslateResponseMessage = FragmentTranslateResponseSuccessMessage | FragmentTranslateResponseErrorMessage
 
+// --- Auto-Candidates Message Types ---
+
+export interface AutoCandidatesRequestData {
+    sourceLang: string
+    targetLang: string
+    blockText: string
+    /** Used by backend pipeline for filtering. Not passed to LLM prompt. */
+    manualTrigger: {
+        text: string
+        type?: "word" | "phrase"
+        translation?: string
+    }
+    userLevel: LanguageProficiency
+    /** Used by backend pipeline for filtering. Not passed to LLM prompt. */
+    excludedTexts: string[]
+}
+
+export interface AutoCandidatesRequestMessage {
+    type: "AUTO_CANDIDATES_REQUEST"
+    data: AutoCandidatesRequestData
+}
+
+export interface AutoCandidate {
+    text: string
+    type: "word" | "phrase"
+    /** Computed by backend, not LLM. 0-based inclusive. */
+    start: number
+    /** Computed by backend, not LLM. 0-based exclusive. */
+    end: number
+    translation: string
+    source: "llm" | "rule" | "hybrid"
+}
+
+export interface AutoCandidatesResponseData {
+    traceId: string
+    candidates: AutoCandidate[]
+    meta: {
+        sourceLang: string
+        targetLang: string
+        limitApplied: number
+        degraded: boolean
+        model?: string
+    }
+    warnings?: string[]
+}
+
+export interface AutoCandidatesResponseSuccessMessage {
+    type: "AUTO_CANDIDATES_RESPONSE"
+    success: true
+    data: AutoCandidatesResponseData
+}
+
+export interface AutoCandidatesResponseErrorMessage {
+    type: "AUTO_CANDIDATES_RESPONSE"
+    success: false
+    error: string
+}
+
+export type AutoCandidatesResponseMessage =
+    | AutoCandidatesResponseSuccessMessage
+    | AutoCandidatesResponseErrorMessage
+
 /**
  * Speech synthesis request message
  */
@@ -232,6 +294,8 @@ export type IconColor = "pink" | "blue" | "purple" | "green" | "orange" | "red" 
 export type TriggerKey = "meta" | "option" | "alt" | "ctrl"
 
 export type NetworkRegion = "auto" | "china" | "global"
+
+export type LanguageProficiency = "Beginner" | "Intermediate" | "Advanced"
 
 /**
  * Translation provider type
@@ -333,6 +397,10 @@ export interface UserSettings {
     suppressNativeLanguage: boolean
     /** Network region preference for API calls (auto, china, global) */
     networkRegion: NetworkRegion
+    /** Enable automatic supplementary translation after manual translation */
+    enableAutoTranslate: boolean
+    /** User language proficiency level for auto-translation candidate selection */
+    userLanguageProficiency: LanguageProficiency
 }
 
 /**
@@ -383,6 +451,8 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     },
     suppressNativeLanguage: false,
     networkRegion: "auto",
+    enableAutoTranslate: false,
+    userLanguageProficiency: "Intermediate",
 }
 
 export const DEFAULT_SUPPRESS_NATIVE_LANGUAGE = DEFAULT_USER_SETTINGS.suppressNativeLanguage

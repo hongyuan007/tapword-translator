@@ -148,5 +148,13 @@
     "error.short.bingTranslateError": "Bing 번역 오류",
     "error.mtranserverConfigMissing": "먼저 설정에서 MTranServer URL을 입력해 주세요",
     "error.mtranserverError": "MTranServer 연결에 실패했습니다. URL과 설정을 확인해 주세요",
-    "error.bingTranslateError": "Bing 번역에 실패했습니다. 네트워크 연결을 확인해 주세요"
+    "error.bingTranslateError": "Bing 번역에 실패했습니다. 네트워크 연결을 확인해 주세요",
+    "popup.section.autoTranslate": "자동 번역",
+    "popup.autoTranslate.label": "자동 번역",
+    "popup.autoTranslate.description": "수동 번역 후 주요 단어 번역을 자동으로 보완합니다",
+    "popup.languageProficiency.label": "독해 수준",
+    "popup.languageProficiency.description": "자동 번역되는 단어의 수와 종류에 영향을 줍니다",
+    "popup.proficiency.beginner": "초급",
+    "popup.proficiency.intermediate": "중급",
+    "popup.proficiency.advanced": "고급"
 }

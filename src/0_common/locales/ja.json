@@ -148,5 +148,13 @@
     "error.short.bingTranslateError": "Bing 翻訳エラー",
     "error.mtranserverConfigMissing": "まず設定画面で MTranServer の URL を入力してください",
     "error.mtranserverError": "MTranServer への接続に失敗しました。URL と設定を確認してください",
-    "error.bingTranslateError": "Bing 翻訳に失敗しました。ネットワーク接続を確認してください"
+    "error.bingTranslateError": "Bing 翻訳に失敗しました。ネットワーク接続を確認してください",
+    "popup.section.autoTranslate": "自動翻訳",
+    "popup.autoTranslate.label": "自動翻訳",
+    "popup.autoTranslate.description": "手動翻訳後にキーワードの翻訳を自動的に補完します",
+    "popup.languageProficiency.label": "読解レベル",
+    "popup.languageProficiency.description": "自動翻訳される単語の数と種類に影響します",
+    "popup.proficiency.beginner": "初級",
+    "popup.proficiency.intermediate": "中級",
+    "popup.proficiency.advanced": "上級"
 }

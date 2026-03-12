@@ -7,6 +7,7 @@
 // Services
 export { WordTranslationService, createWordTranslationService, translateWord } from "./services/WordTranslationService"
 export { FragmentTranslationService, createFragmentTranslationService, translateFragment } from "./services/FragmentTranslationService"
+export { AutoCandidatesGenerationService, generateAutoCandidates } from "./services/AutoCandidatesGenerationService"
 export { OpenAICompatibleClient, createOpenAICompatibleClient } from "./services/llm/OpenAICompatibleClient"
 
 // Types

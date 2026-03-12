@@ -8,6 +8,7 @@
 export const TRANSLATION_API_ENDPOINTS = {
     TRANSLATE: "/api/v1/translate",
     TRANSLATE_FRAGMENT: "/api/v1/translate/fragment",
+    AUTO_CANDIDATES: "/api/v1/translate/auto-candidates",
 } as const
 
 /**

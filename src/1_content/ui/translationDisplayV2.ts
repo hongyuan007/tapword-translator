@@ -473,6 +473,18 @@ export function getActiveRanges(): Map<string, Range> {
 }
 
 /**
+ * Add a CSS class to all tooltip elements of an existing translation.
+ * Used by auto-translation service to apply the `--auto` visual style post-render.
+ */
+export function addTooltipClass(translationId: string, className: string): void {
+    const entry = activeTranslations.get(translationId)
+    if (!entry) return
+    for (const tooltip of entry.tooltips) {
+        tooltip.classList.add(className)
+    }
+}
+
+/**
  * Check whether a screen point falls inside any active translation Range.
  * Used by `selectionValidator` to suppress re-translation of already-translated text.
  *

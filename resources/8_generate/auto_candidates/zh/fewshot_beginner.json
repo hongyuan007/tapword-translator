@@ -1,0 +1,10 @@
+[
+    {
+        "role": "user",
+        "content": "# Source Language\nen\n\n# Target Language\nzh\n\n# Reader Proficiency Level\nBeginner\n\n# Maximum Translation Results\n5\n\n# Block Text\nThe architect's meticulous attention to detail was evident in every facet of the building's design, from the ornate cornice work to the subtle interplay of natural light and shadow that permeated the grand foyer.\n"
+    },
+    {
+        "role": "assistant",
+        "content": "{\"candidates\":[{\"reason\":\"Beginner readers may not know this adjective meaning extremely careful and precise\",\"text\":\"meticulous\",\"type\":\"word\",\"translation\":\"一丝不苟的\"},{\"reason\":\"'attention to detail' is a common collocation that beginners may not parse as a unit\",\"text\":\"attention to detail\",\"type\":\"phrase\",\"translation\":\"对细节的关注\"},{\"reason\":\"Less common word meaning a particular aspect or side of something\",\"text\":\"facet\",\"type\":\"word\",\"translation\":\"方面\"},{\"reason\":\"Decorative adjective unlikely to be known at beginner level\",\"text\":\"ornate\",\"type\":\"word\",\"translation\":\"华丽的\"},{\"reason\":\"Abstract noun meaning the reciprocal action between elements\",\"text\":\"interplay\",\"type\":\"word\",\"translation\":\"相互作用\"}]}"
+    }
+]

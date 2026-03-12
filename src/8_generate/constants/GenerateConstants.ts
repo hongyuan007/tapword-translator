@@ -15,6 +15,7 @@ export const DEFAULT_TIMEOUT = 10000 // 10 seconds
 export const TASK_WORD_TRANSLATION = "word_translation"
 export const TASK_FRAGMENT_TRANSLATION = "fragment_translation"
 export const TASK_FRAGMENT_ONLY_TRANSLATION = "fragment_translation_only"
+export const TASK_AUTO_CANDIDATES = "auto_candidates"
 
 /**
  * Prompt file names
