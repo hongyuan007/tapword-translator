@@ -36,6 +36,34 @@ async function isNativeLanguageAsync(text: string, targetLanguage: string, conte
 }
 
 /**
+ * Returns true only when `candidateRange` is fully contained by a single active translation range.
+ * Partial overlap across one or more translations is intentionally allowed so the overlap cleanup
+ * path can replace the old translations with the new selection.
+ */
+function isFullyContainedBySingleActiveTranslation(candidateRange: Range): boolean {
+    const activeRanges = translationDisplay.getActiveRanges()
+
+    for (const [, activeRange] of activeRanges) {
+        if (rangeFullyContainsRange(activeRange, candidateRange)) {
+            return true
+        }
+    }
+
+    return false
+}
+
+function rangeFullyContainsRange(outerRange: Range, innerRange: Range): boolean {
+    try {
+        const startsBeforeOrAtInnerStart = outerRange.compareBoundaryPoints(Range.START_TO_START, innerRange) <= 0
+        const endsAfterOrAtInnerEnd = outerRange.compareBoundaryPoints(Range.END_TO_END, innerRange) >= 0
+
+        return startsBeforeOrAtInnerStart && endsAfterOrAtInnerEnd
+    } catch {
+        return false
+    }
+}
+
+/**
  * Validates whether the current selection should trigger a translation action (icon or direct).
  *
  * @param selection - The current selection object
@@ -140,28 +168,10 @@ export async function validateSelectionAsync(
         return { isValid: false, text: selectedText, reason: "Selection inside extension UI", shouldCleanup: false }
     }
 
-    // V2: Check if the ENTIRE selection falls inside an active translation Range.
-    // If fully contained → block (prevents duplicate translation / ghost icon on double-click).
-    // If only partially overlapping → allow (overlap detector cleans up old translation later).
-    // Uses start-edge and end-edge of the selection rects rather than center points,
-    // so a selection like "after a long period" (partially overlapping "long period") is not falsely blocked.
-    {
-        const selectionRects = range.getClientRects()
-        const firstRect = selectionRects[0]
-        const lastRect = selectionRects[selectionRects.length - 1]
-        if (firstRect && lastRect) {
-            const startInside = translationDisplay.isPointInsideActiveTranslation(
-                firstRect.left,
-                firstRect.top + firstRect.height / 2
-            )
-            const endInside = translationDisplay.isPointInsideActiveTranslation(
-                lastRect.right,
-                lastRect.top + lastRect.height / 2
-            )
-            if (startInside && endInside) {
-                return { isValid: false, text: selectedText, reason: "Selection inside active translation", shouldCleanup: false }
-            }
-        }
+    // V2: Block only when the new selection is fully contained by one existing translation range.
+    // Partial overlap remains valid and will be handled by overlap cleanup during translation.
+    if (isFullyContainedBySingleActiveTranslation(range)) {
+        return { isValid: false, text: selectedText, reason: "Selection inside active translation", shouldCleanup: false }
     }
 
     return { isValid: true, text: selectedText, range, reason: "Valid selection", shouldCleanup: false }
