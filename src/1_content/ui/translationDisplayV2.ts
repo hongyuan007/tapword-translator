@@ -34,6 +34,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import type { TranslationEntry, TranslationState, DisplayUserSettings } from "./translationDisplayV2/types"
 import { VIEWPORT_PAD_PX } from "./translationDisplayV2/types"
 import { getNormalizedLineRects, buildRectsSignature, splitTextAcrossRects } from "./translationDisplayV2/tooltipLayout"
+import { findClippingAncestors, isRectVisibleInClipChain } from "./translationDisplayV2/clipVisibility"
 import {
     createTooltipElement,
     syncTooltipStyles,
@@ -279,14 +280,16 @@ function positionTooltip(id: string): void {
     }
 
     const rects = getNormalizedLineRects(entry.range)
-    if (rects.length === 0) {
-        // Range not visible (scrolled out of sub-container) — hide tooltips
+    const sourceElement = entry.range.startContainer.parentElement
+    const clippingAncestors = findClippingAncestors(sourceElement)
+    const visibleRectFlags = rects.map((rect) => isRectVisibleInClipChain(rect, clippingAncestors))
+    const hasVisibleRect = visibleRectFlags.some(Boolean)
+
+    if (!hasVisibleRect) {
+        // Range is fully clipped by its container chain — hide tooltips like V1 did.
         for (const tooltip of entry.tooltips) tooltip.style.visibility = "hidden"
         return
     }
-
-    // Ensure tooltips are visible (they might have been hidden when out of sub-container)
-    for (const tooltip of entry.tooltips) tooltip.style.visibility = "visible"
 
     const lineRects = rects
     // On pages where <body> is the scroll container (e.g. position:relative + overflow-y:auto),
@@ -339,6 +342,10 @@ function positionTooltip(id: string): void {
         const tooltip = segs[i]
         const rect = lineRects[Math.min(i, lineRects.length - 1)]
         if (!tooltip || !rect) continue
+
+        const isVisible = visibleRectFlags[Math.min(i, visibleRectFlags.length - 1)] ?? false
+        tooltip.style.visibility = isVisible ? "visible" : "hidden"
+        if (!isVisible) continue
 
         const isLastLine = i === segs.length - 1
 

@@ -14,6 +14,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
 import { CLICK_DEBOUNCE_DELAY_MS, INTERACTION_GRACE_PERIOD_MS, RANGE_HIT_TEST_HORIZONTAL_PAD_PX } from "./types"
 import { getNormalizedLineRects } from "./tooltipLayout"
+import { findClippingAncestors, isRectVisibleInClipChain } from "./clipVisibility"
 
 const logger = loggerModule.createLogger("translationDisplayV2/hitTesting")
 
@@ -196,9 +197,12 @@ export function isPointInsideTranslationZone(
     x: number, y: number, range: Range, tooltips: HTMLElement[]
 ): boolean {
     const rangeRects = getNormalizedLineRects(range)
+    const sourceElement = range.startContainer.parentElement
+    const clippingAncestors = findClippingAncestors(sourceElement)
 
     // 1. Range text rects (with horizontal padding)
     for (const rect of rangeRects) {
+        if (!isRectVisibleInClipChain(rect, clippingAncestors)) continue
         if (
             x >= rect.left - RANGE_HIT_TEST_HORIZONTAL_PAD_PX &&
             x <= rect.right + RANGE_HIT_TEST_HORIZONTAL_PAD_PX &&
@@ -211,6 +215,7 @@ export function isPointInsideTranslationZone(
 
     // 2. Tooltip element rects
     for (const tooltip of tooltips) {
+        if (tooltip.style.visibility === "hidden") continue
         const rect = tooltip.getBoundingClientRect()
         if (rect.width === 0 || rect.height === 0) continue
         if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
@@ -225,8 +230,10 @@ export function isPointInsideTranslationZone(
         const rangeRect = rangeRects[i]
         if (!rangeRect) continue
         if (rangeRect.width === 0 || rangeRect.height === 0) continue
+        if (!isRectVisibleInClipChain(rangeRect, clippingAncestors)) continue
         const tooltip = tooltips[i]
         if (!tooltip) continue
+        if (tooltip.style.visibility === "hidden") continue
 
         const tooltipRect = tooltip.getBoundingClientRect()
         if (tooltipRect.width === 0 || tooltipRect.height === 0) continue
