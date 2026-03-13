@@ -19,6 +19,14 @@ const STRONG_INTERACTIVE_SELECTOR = `${STRONG_INTERACTIVE_TAG_SELECTOR}, ${STRON
 import * as loggerModule from "@/0_common/utils/logger"
 const logger = loggerModule.createLogger("editableElementDetector")
 
+export interface InteractiveElementClassification {
+    isInteractive: boolean
+    level?: "strong" | "weak"
+    reason?: string
+    element?: Element
+    ignoredAsTextException?: boolean
+}
+
 function isDirectlyEditable(element: Element): boolean {
     if (EDITABLE_TAGS.has(element.tagName)) {
         return true
@@ -48,12 +56,12 @@ export function isEditableElement(element: Element | null): boolean {
     return isDirectlyEditable(closestEditable)
 }
 
-function getElementFromTarget(target: EventTarget | null): HTMLElement | null {
+function getElementFromTarget(target: EventTarget | null): Element | null {
     if (!target) {
         return null
     }
 
-    if (target instanceof HTMLElement) {
+    if (target instanceof Element) {
         return target
     }
 
@@ -65,31 +73,37 @@ function getElementFromTarget(target: EventTarget | null): HTMLElement | null {
 }
 
 export function isInteractiveElement(target: EventTarget | null, event?: Event): boolean {
-    const element = getElementFromTarget(target)
-    if (!element) {
-        return false
-    }
+    return classifyInteractiveElement(target, event).isInteractive
+}
 
-    if (isEditableElement(element)) {
+export function classifyInteractiveElement(target: EventTarget | null, event?: Event): InteractiveElementClassification {
+    const element = getElementFromTarget(target)
+    if (element && isEditableElement(element)) {
         logger.debug("Editable element detected", {
             tag: element.tagName,
         })
-        return true
+        return { isInteractive: true, level: "strong", reason: `editable: ${element.tagName}`, element }
     }
 
     if (event?.composedPath) {
         const path = event.composedPath()
         for (const node of path) {
-            if (node instanceof HTMLElement) {
+            if (node instanceof Element) {
                 const result = isInteractiveElementSelf(node, node === element)
                 if (result.isInteractive) {
-                    if (result.level === "weak" && isTextContentException(element)) {
+                    if (result.level === "weak" && element && isTextContentException(element)) {
                         logger.debug("Weak interactive element ignored (Text Exception)", {
                             elementTag: node.tagName,
                             elementReason: result.reason,
                             targetIsNode: node === element,
                         })
-                        return false
+                        return {
+                            isInteractive: false,
+                            level: "weak",
+                            reason: result.reason,
+                            element: node,
+                            ignoredAsTextException: true,
+                        }
                     }
 
                     logger.debug("Interactive element detected (path)", {
@@ -99,11 +113,28 @@ export function isInteractiveElement(target: EventTarget | null, event?: Event):
                         targetIsNode: node === element,
                         nodeClasses: node.className,
                     })
-                    return true
+                    return {
+                        isInteractive: true,
+                        level: result.level,
+                        reason: result.reason,
+                        element: node,
+                    }
                 }
             }
         }
-        return false
+        if (!element) {
+            logger.debug("Interactive classification skipped: unsupported event target", {
+                targetType: target?.constructor?.name,
+            })
+        }
+        return { isInteractive: false }
+    }
+
+    if (!element) {
+        logger.debug("Interactive classification skipped: no element target", {
+            targetType: target?.constructor?.name,
+        })
+        return { isInteractive: false }
     }
 
     const result = isInteractiveElementByClosest(element)
@@ -113,7 +144,13 @@ export function isInteractiveElement(target: EventTarget | null, event?: Event):
                 elementTag: result.element?.tagName,
                 elementReason: result.reason,
             })
-            return false
+            return {
+                isInteractive: false,
+                level: "weak",
+                reason: result.reason,
+                element: result.element,
+                ignoredAsTextException: true,
+            }
         }
 
         logger.debug("Interactive element detected (closest)", {
@@ -121,16 +158,21 @@ export function isInteractiveElement(target: EventTarget | null, event?: Event):
             reason: result.reason,
             level: result.level,
         })
-        return true
+        return {
+            isInteractive: true,
+            level: result.level,
+            reason: result.reason,
+            element: result.element,
+        }
     }
-    return false
+    return { isInteractive: false }
 }
 
 /**
  * Check if the element looks like plain text content that should be translatable,
  * even if it's inside an interactive container.
  */
-function isTextContentException(element: HTMLElement): boolean {
+function isTextContentException(element: Element): boolean {
     // 1. Must check cursor style. 'text' or 'auto' or 'default' usually implies non-clickable text.
     // 'pointer' implies it's meant to be clicked.
     const style = window.getComputedStyle(element)
@@ -154,7 +196,7 @@ interface InteractiveResult {
     level?: "strong" | "weak"
 }
 
-function isInteractiveElementSelf(node: HTMLElement, checkCursor: boolean): InteractiveResult {
+function isInteractiveElementSelf(node: Element, checkCursor: boolean): InteractiveResult {
     const strongResult = getStrongInteractiveResult(node, checkCursor)
     if (strongResult.isInteractive) {
         return strongResult
@@ -163,7 +205,7 @@ function isInteractiveElementSelf(node: HTMLElement, checkCursor: boolean): Inte
     return getWeakInteractiveResult(node)
 }
 
-function isInteractiveElementByClosest(node: HTMLElement): InteractiveResult & { element?: Element } {
+function isInteractiveElementByClosest(node: Element): InteractiveResult & { element?: Element } {
     const strongMatch = node.closest(STRONG_INTERACTIVE_SELECTOR)
     if (strongMatch) {
         return { isInteractive: true, reason: "closest strong match", level: "strong", element: strongMatch }
@@ -178,7 +220,7 @@ function isInteractiveElementByClosest(node: HTMLElement): InteractiveResult & {
         }
     }
 
-    let current: HTMLElement | null = node
+    let current: Element | null = node
     while (current && current !== document.body) {
         if (current.hasAttribute(TABINDEX_ATTRIBUTE)) {
             const tabIndex = parseInt(current.getAttribute(TABINDEX_ATTRIBUTE) || "-1", 10)
@@ -197,7 +239,7 @@ function isInteractiveElementByClosest(node: HTMLElement): InteractiveResult & {
     return { isInteractive: false }
 }
 
-function getStrongInteractiveResult(node: HTMLElement, checkCursor: boolean): InteractiveResult {
+function getStrongInteractiveResult(node: Element, checkCursor: boolean): InteractiveResult {
     if (node.matches(STRONG_INTERACTIVE_TAG_SELECTOR)) {
         return { isInteractive: true, reason: `tag: ${node.tagName}`, level: "strong" }
     }
@@ -216,7 +258,7 @@ function getStrongInteractiveResult(node: HTMLElement, checkCursor: boolean): In
     return { isInteractive: false }
 }
 
-function getWeakInteractiveResult(node: HTMLElement): InteractiveResult {
+function getWeakInteractiveResult(node: Element): InteractiveResult {
     if (node.hasAttribute(CLICK_ATTRIBUTE)) {
         return { isInteractive: true, reason: "onclick attribute", level: "weak" }
     }

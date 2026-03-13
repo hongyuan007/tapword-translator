@@ -11,6 +11,7 @@
  */
 
 import * as loggerModule from "@/0_common/utils/logger"
+import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
 import { CLICK_DEBOUNCE_DELAY_MS, INTERACTION_GRACE_PERIOD_MS, RANGE_HIT_TEST_HORIZONTAL_PAD_PX } from "./types"
 import { getNormalizedLineRects } from "./tooltipLayout"
 
@@ -88,6 +89,15 @@ function handleClick(e: MouseEvent): void {
     const target = e.target as Element
     if (target.closest(OWN_UI_SELECTOR)) return
 
+    const interaction = editableElementDetector.classifyInteractiveElement(target, e)
+    if (interaction.isInteractive && interaction.level === "strong") {
+        logger.debug("Skipping translation click on strong interactive element", {
+            tag: interaction.element?.tagName,
+            reason: interaction.reason,
+        })
+        return
+    }
+
     // Skip if user just finished a drag-selection — not an intentional click on a translation
     const selection = window.getSelection()
     if (selection && !selection.isCollapsed) return
@@ -101,7 +111,9 @@ function handleClick(e: MouseEvent): void {
         return
     }
 
-    e.stopPropagation()
+    if (!(interaction.level === "weak" || interaction.ignoredAsTextException)) {
+        e.stopPropagation()
+    }
 
     if (clickTimer) window.clearTimeout(clickTimer)
     clickTimer = window.setTimeout(() => {
@@ -117,6 +129,15 @@ function handleDblClick(e: MouseEvent): void {
     const target = e.target as Element
     if (target.closest(OWN_UI_SELECTOR)) return
 
+    const interaction = editableElementDetector.classifyInteractiveElement(target, e)
+    if (interaction.isInteractive && interaction.level === "strong") {
+        logger.debug("Skipping translation double-click on strong interactive element", {
+            tag: interaction.element?.tagName,
+            reason: interaction.reason,
+        })
+        return
+    }
+
     // Note: no selection.isCollapsed guard here — double-clicking inherently selects the word,
     // so getSelection() is always non-collapsed. The drag-select guard is only in handleClick.
 
@@ -129,7 +150,9 @@ function handleDblClick(e: MouseEvent): void {
         return
     }
 
-    e.stopPropagation()
+    if (!(interaction.level === "weak" || interaction.ignoredAsTextException)) {
+        e.stopPropagation()
+    }
     e.preventDefault()
 
     // Cancel any pending single-click action
