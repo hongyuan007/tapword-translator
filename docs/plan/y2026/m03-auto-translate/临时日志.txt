@@ -1,198 +1,124 @@
-index.js:163 [15:40:45.663][+3ms][content-script] AI Click Translator - Content script loaded
-MediaWikiMetricsClientLogger.js:19 The stream mediawiki.web_ui_actions is out of sample. No event will be sent
-MediaWikiMetricsClientLogger.logWarning @ MediaWikiMetricsClientLogger.js:19
-MetricsClient.processSubmitCall @ MetricsClient.js:345
-MetricsClient.submit @ MetricsClient.js:297
-MetricsClient.submitInteraction @ MetricsClient.js:436
-logEvent @ webUIClick.js:99
-eval @ webUIClick.js:166
-mightThrow @ jquery.js:3489
-(anonymous) @ jquery.js:3557
-index.js:163 [15:40:45.712][+52ms][content-script] User settings loaded: {
-  "enableTapWord": true,
-  "showIcon": true,
-  "singleClickTranslate": true,
-  "doubleClickTranslate": false,
-  "doubleClickTranslateV2": false,
-  "doubleClickSentenceTranslate": true,
-  "doubleClickSentenceTriggerKey": "meta",
-  "autoAdjustHeight": true,
-  "restoreLineHeightOnClear": false,
-  "autoPlayAudio": true,
-  "targetLanguage": "zh",
-  "translationFontSizePreset": "medium",
-  "translationFontSize": 12,
-  "tooltipNextLineGapPx": 4,
-  "tooltipNextLineGapPxV2": 6,
-  "tooltipVerticalOffsetPx": 2,
-  "tooltipVerticalOffsetPxV2": 3,
-  "textUnderlineOffsetPx": 3,
-  "textUnderlineOffsetPxV2": 4,
-  "tooltipUnderlineOffsetPxV3": 1,
-  "tooltipTextOffsetPxV3": 1,
-  "tooltipBottomSpacingPxV3": 6,
-  "wordUnderlineColor": "#2A9D8F",
-  "wordUnderlineColorV2": "#1F7FDB",
-  "sentenceUnderlineColor": "#E9C46A",
-  "iconColor": "pink",
-  "translationProvider": "official",
-  "customApi": {
-    "baseUrl": "",
-    "apiKey": "",
-    "model": ""
-  },
-  "mtranserver": {
-    "url": "http://127.0.0.1:8989",
-    "key": "",
-    "enabled": false
-  },
-  "bingTranslate": {
-    "enabled": true
-  },
-  "suppressNativeLanguage": false,
-  "networkRegion": "auto",
-  "enableAutoTranslate": true,
-  "userLanguageProficiency": "Intermediate"
+[requestLogger] --- New Request ---
+[requestLogger] [REQ] 2026-03-12T09:13:27.012Z POST /api/v1/translate/auto-candidates
+[requestLogger] [REQ] Headers: {
+  "host": "local.tapword.cc",
+  "x-real-ip": "127.0.0.1",
+  "x-forwarded-for": "127.0.0.1",
+  "x-forwarded-proto": "https",
+  "connection": "close",
+  "content-length": "421",
+  "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJleHRlbnNpb24tY2M3MGYyZTNkNzlkNjE5MSIsImNsaWVudFR5cGUiOiJleHRlbnNpb24iLCJqdGkiOiI3NDAzMjRmYy0zYWNlLTRiNjgtYWFmYS03MTdlNDBlYzc4YjEiLCJpYXQiOjE3NzMzMDY0MzcsImV4cCI6MTc3MzMwNzYzN30.Lo6WTVwpQmjK5OdG0IEHuJJk56fwNTO4PNNZNp5d7DQ",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+  "x-client-version": "0.1.0",
+  "dnt": "1",
+  "content-type": "application/json",
+  "accept": "*/*",
+  "origin": "chrome-extension://mblnafgdagbhnnmfeakekalbckpoimce",
+  "sec-fetch-site": "none",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "sec-fetch-storage-access": "active",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "zh,ru;q=0.9,ja;q=0.8,en-AU;q=0.7,en;q=0.6,fr-CA;q=0.5,fr;q=0.4,es-AR;q=0.3,es;q=0.2,sq;q=0.1,fr-FR;q=0.1"
 }
-index.js:163 [15:40:45.712][+52ms][content-script] AI Click Translator - Event listeners registered
-index.js:163 [15:40:48.523][+2863ms][selectionHandler] Selection validation failed: Empty selection
-index.js:163 [15:40:48.527][+2867ms][selectionHandler] [Single Click] Translation requested for: narrated
-index.js:163 [15:40:48.527][+2867ms][languageDetector] Starting async language detection: A Game of Thrones is narrated in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts. In the Seven Kingdoms of Westeros, House Stark and House Lannister influence the political fate of the continent. In Westeros' far north, an illegitimate son of House Stark joins a group maintaining a giant wall of ice to protect Westeros from raiders and a group of mythical enemies. Across the sea in Essos, the last surviving members of Westeros' deposed royal house, House Targaryen, live in exile.
-index.js:163 [15:40:48.527][+2867ms][languageDetector] Using chrome.i18n.detectLanguage
-index.js:163 [15:40:48.528][+2868ms][languageDetector] Chrome detected language: en
-index.js:163 [15:40:48.529][+2868ms][languageDetector] Language detection result: lang=en, rawLang=en, blockContextLang=en
-index.js:163 [15:40:48.529][+2868ms][selectionHandler] [Single Click] Detected language: lang=en, blockContextLang=en
-index.js:163 [15:40:48.529][+2869ms][selectionHandler] [Single Click] [Space-delimited Language] Using classification and boundary expansion
-index.js:163 [15:40:48.530][+2870ms][selectionHandler] [Word Path] Translating word: narrated | Language: en
-index.js:163 [15:40:48.532][+2872ms][selectionHandler] [Word Path] Active ranges before overlap check: 0
-index.js:163 [15:40:48.532][+2872ms][translationOverlapDetectorV2] Overlap check: newRange vs 0 active range(s)
-index.js:163 [15:40:48.532][+2872ms][selectionHandler] [Word Path] Pre-overlapping IDs: []
-index.js:163 [15:40:48.532][+2872ms][i18n] Initialized with locale: zh
-index.js:163 [15:40:48.533][+2873ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:48.534][+2873ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=26.00px, lineSpacing=10.00px, availableSpace=11.00px, effectiveAvailable=3.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:48.534][+2874ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:48.534][+2874ms][lineHeightAdjuster] Line-height increase needed: 9.00px (targetAvailable=20.00px, available=11.00px)
-index.js:163 [15:40:48.534][+2874ms][lineHeightAdjuster] Stored original line-height: 26px
-index.js:163 [15:40:48.534][+2874ms][lineHeightAdjuster] Line-height adjusted: 26.00px → 35.00px (increase: 9.00px) on <p>, ref count: 1
-index.js:163 [15:40:48.537][+2877ms][translationDisplayV2/hitTesting] Global hit-test listeners attached
-index.js:163 [15:40:48.538][+2877ms][1_content/ui/translationDisplayV2] Translation displayed: translation-0 {
-  "status": "loading",
-  "text": "翻译中..",
-  "loadingVariant": "text"
-}
-index.js:163 [15:40:48.538][+2878ms][selectionHandler] [Word Path] Target language: zh (user setting: zh )
-index.js:163 [15:40:48.538][+2878ms][translationRequest] [RETRY_DEBUG] Sending message attempt 1 {
-  "type": "TRANSLATE_REQUEST",
-  "data": {
-    "word": "narrated",
-    "leadingText": "A Game of Thrones is ",
-    "trailingText": " in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts.",
-    "originalSentence": "A Game of Thrones is narrated in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts.",
-    "nextSentences": [
-      "In the Seven Kingdoms of Westeros, House Stark and House Lannister influence the political fate of the continent."
-    ],
-    "bookName": "网页<<A Game of Thrones - Wikipedia>>",
-    "sourceLanguage": "en",
-    "targetLanguage": "zh"
-  }
-}
-index.js:163 [15:40:49.614][+3954ms][translationRequest] [RETRY_DEBUG] Message successful on attempt 1 duration(ms)= 1076
-index.js:163 [15:40:49.615][+3954ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:49.615][+3954ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:49.615][+3955ms][1_content/ui/translationDisplayV2] Translation updated: translation-0 {
-  "status": "success",
-  "translation": "叙述",
-  "sentenceTranslation": "《冰与火之歌》以第三人称叙述，每一章在八位叙述者之间交替，有时提供不可靠的描述。",
-  "chineseDefinition": "v. 说故事, 说明, 叙述",
-  "englishDefinition": "verb: provide commentary for a film, for example; narrate or give a detailed account of",
-  "targetDefinition": "v. 叙述; 报告",
-  "targetLanguage": "zh",
-  "lemma": "narrate",
-  "phonetic": "ˈnærˌeɪtid",
-  "lemmaPhonetic": "nә'reit"
-}
-index.js:163 [15:40:49.616][+3955ms][translationRequest] [RETRY_DEBUG] Sending message attempt 1 {
-  "type": "AUTO_CANDIDATES_REQUEST",
-  "data": {
-    "sourceLang": "en",
-    "targetLang": "zh",
-    "blockText": "A Game of Thrones is narrated in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts. In the Seven Kingdoms of Westeros, House Stark and House Lannister influence the political fate of the continent. In Westeros' far north, an illegitimate son of House Stark joins a group maintaining a giant wall of ice to protect Westeros from raiders and a group of mythical enemies. Across the sea in Essos, the last surviving members of Westeros' deposed royal house, House Targaryen, live in exile.\n",
-    "manualTrigger": {
-      "text": "narrated",
-      "type": "word",
-      "translation": "叙述"
+[requestLogger] [REQ] Body: {"sourceLang":"en","targetLang":"zh","blockText":"Global scope: In your Codex home directory (defaults to ~/.codex, unless you set CODEX_HOME), Codex reads AGENTS.override.md if it exists. Otherwise, Codex reads AGENTS.md. Codex uses only the first non-empty file at this level.","manualTrigger":{"text":"Global scope","type":"phrase","translation":"全局范围"},"userLevel":"Beginner","excludedTexts":["global scope"]}
+[jwt.middleware] [DEV MODE] Bypassing JWT verification, using default user: dev-user-123 dev
+[generate.llm] [qwen3.5-122b-a10b] User Prompt:
+# Source Language
+en
+
+# Target Language
+zh
+
+# Reader Proficiency Level
+Beginner
+
+# Maximum Translation Results
+13
+
+# Block Text
+Global scope: In your Codex home directory (defaults to ~/.codex, unless you set CODEX_HOME), Codex reads AGENTS.override.md if it exists. Otherwise, Codex reads AGENTS.md. Codex uses only the first non-empty file at this level.
+
+[generate.llm] [qwen3.5-122b-a10b] LLM Response:
+{
+  "candidates": [
+    {
+      "reason": "Technical term for the main folder where a program stores its files",
+      "text": "home directory",
+      "type": "phrase",
+      "translation": "主目录"
     },
-    "userLevel": "Intermediate",
-    "excludedTexts": [
-      "narrated"
-    ],
-    "limit": 5
-  }
+    {
+      "reason": "Common programming symbol representing the user's home folder path",
+      "text": "~/.codex",
+      "type": "phrase",
+      "translation": "~/.codex"
+    },
+    {
+      "reason": "Environment variable name used to customize the application's location",
+      "text": "CODEX_HOME",
+      "type": "phrase",
+      "translation": "CODEX_HOME"
+    },
+    {
+      "reason": "Verb meaning to assign a value or setting in a technical context",
+      "text": "set",
+      "type": "word",
+      "translation": "设置"
+    },
+    {
+      "reason": "File extension indicating a Markdown formatted text file",
+      "text": ".md",
+      "type": "phrase",
+      "translation": ".md"
+    },
+    {
+      "reason": "Adjective describing a file that contains no content or lines",
+      "text": "non-empty",
+      "type": "phrase",
+      "translation": "非空的"
+    },
+    {
+      "reason": "Prepositional phrase indicating a specific hierarchy level in a system",
+      "text": "at this level",
+      "type": "phrase",
+      "translation": "在此级别"
+    },
+    {
+      "reason": "Technical verb meaning to access and process data from a file",
+      "text": "reads",
+      "type": "word",
+      "translation": "读取"
+    },
+    {
+      "reason": "Conjunction introducing an alternative condition if the first fails",
+      "text": "Otherwise",
+      "type": "word",
+      "translation": "否则"
+    },
+    {
+      "reason": "Phrase indicating the default state before any changes are made",
+      "text": "defaults to",
+      "type": "phrase",
+      "translation": "默认为"
+    },
+    {
+      "reason": "Conditional phrase meaning 'if it is present'",
+      "text": "if it exists",
+      "type": "phrase",
+      "translation": "如果存在"
+    },
+    {
+      "reason": "Adverb emphasizing exclusivity of the action performed",
+      "text": "only",
+      "type": "word",
+      "translation": "仅"
+    },
+    {
+      "reason": "Noun referring to the specific software tool being discussed",
+      "text": "Codex",
+      "type": "word",
+      "translation": "Codex"
+    }
+  ]
 }
-index.js:163 [15:40:54.030][+8370ms][translationRequest] [RETRY_DEBUG] Message successful on attempt 1 duration(ms)= 4414
-index.js:163 [15:40:54.030][+8370ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8370ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8370ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8371ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8371ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8371ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8371ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8371ms][translationOverlapDetectorV2] Overlap check: newRange vs 1 active range(s)
-index.js:163 [15:40:54.031][+8371ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:54.031][+8371ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:54.031][+8371ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:54.031][+8371ms][lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 2 on <p>
-index.js:163 [15:40:54.034][+8374ms][1_content/ui/translationDisplayV2] Translation displayed: translation-1 {
-  "status": "success",
-  "translation": "不可靠的叙述"
-}
-index.js:163 [15:40:54.085][+8425ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:54.086][+8425ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:54.086][+8425ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:54.086][+8426ms][lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 3 on <p>
-index.js:163 [15:40:54.086][+8426ms][1_content/ui/translationDisplayV2] Translation displayed: translation-2 {
-  "status": "success",
-  "translation": "私生子"
-}
-index.js:163 [15:40:54.136][+8476ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:54.137][+8476ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:54.137][+8477ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:54.137][+8477ms][lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 4 on <p>
-index.js:163 [15:40:54.139][+8479ms][1_content/ui/translationDisplayV2] Translation displayed: translation-3 {
-  "status": "success",
-  "translation": "被废黜的皇室"
-}
-index.js:163 [15:40:54.191][+8531ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:54.191][+8531ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:54.191][+8531ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:54.191][+8531ms][lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 5 on <p>
-index.js:163 [15:40:54.191][+8531ms][1_content/ui/translationDisplayV2] Translation displayed: translation-4 {
-  "status": "success",
-  "translation": "流亡"
-}
-index.js:163 [15:40:54.242][+8582ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:54.242][+8582ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:54.242][+8582ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:54.242][+8582ms][lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 6 on <p>
-index.js:163 [15:40:54.243][+8583ms][1_content/ui/translationDisplayV2] Translation displayed: translation-5 {
-  "status": "success",
-  "translation": "维斯特洛"
-}
-index.js:163 [15:40:54.294][+8634ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:54.294][+8634ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:54.294][+8634ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:54.295][+8634ms][lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 7 on <p>
-index.js:163 [15:40:54.295][+8635ms][1_content/ui/translationDisplayV2] Translation displayed: translation-6 {
-  "status": "success",
-  "translation": "维斯特洛"
-}
-index.js:163 [15:40:54.346][+8686ms][styleCalculator/layout] Calculating font size. Original: 16px {}
-index.js:163 [15:40:54.346][+8686ms][styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=35.00px, lineSpacing=19.00px, availableSpace=20.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
-index.js:163 [15:40:54.347][+8686ms][lineHeightAdjuster] Found block ancestor: <p> with display: block
-index.js:163 [15:40:54.347][+8687ms][lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 8 on <p>
-index.js:163 [15:40:54.347][+8687ms][1_content/ui/translationDisplayV2] Translation displayed: translation-7 {
-  "status": "success",
-  "translation": "维斯特洛"
-}
-MediaWikiMetricsClientLogger.js:19 The stream mediawiki.client.session_tick is out of sample. No event will be sent
-MediaWikiMetricsClientLogger.logWarning @ MediaWikiMetricsClientLogger.js:19

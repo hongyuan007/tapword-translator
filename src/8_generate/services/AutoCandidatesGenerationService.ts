@@ -248,13 +248,17 @@ function processLLMOutput(
     expanded = removeNoise(expanded)
     logger.debug(`Stage 5 — after noise removal: ${expanded.length}`)
 
+    // Stage 5b: Filter candidates where translation ≈ source text
+    expanded = filterSameAsSource(expanded)
+    logger.debug(`Stage 5b — after same-as-source filter: ${expanded.length}`)
+
     // Stage 6: Deduplicate by normalized text
     expanded = deduplicateByText(expanded)
     logger.debug(`Stage 6 — after dedup: ${expanded.length}`)
 
-    // Stage 7: Phrase-over-word precedence
-    expanded = applyPhraseOverWord(expanded)
-    logger.debug(`Stage 7 — after phrase-over-word: ${expanded.length}`)
+    // Stage 7: Longer-span precedence
+    expanded = applyLongerSpanPrecedence(expanded)
+    logger.debug(`Stage 7 — after longer-span precedence: ${expanded.length}`)
 
     // Stage 8: Strip reason & set source (reason preserved in raw only for CoT quality)
     const stripped: AutoCandidate[] = expanded.map((c) => ({
@@ -352,6 +356,19 @@ function removeNoise(candidates: ExpandedCandidate[]): ExpandedCandidate[] {
     })
 }
 
+/** Stage 5b: Filter candidates where translation is identical to source text */
+function filterSameAsSource(candidates: ExpandedCandidate[]): ExpandedCandidate[] {
+    return candidates.filter((c) => {
+        const normalizedText = c.text.toLowerCase().trim()
+        const normalizedTranslation = c.translation.toLowerCase().trim()
+        if (normalizedText === normalizedTranslation) {
+            logger.debug(`Dropping same-as-source candidate: "${c.text}" → "${c.translation}"`)
+            return false
+        }
+        return true
+    })
+}
+
 /** Stage 6: Deduplicate by normalized text (case-insensitive, trimmed) — keep first occurrence */
 function deduplicateByText(candidates: ExpandedCandidate[]): ExpandedCandidate[] {
     const seen = new Set<string>()
@@ -363,13 +380,16 @@ function deduplicateByText(candidates: ExpandedCandidate[]): ExpandedCandidate[]
     })
 }
 
-/** Stage 7: If a phrase fully contains a word at the same position, drop the word */
-function applyPhraseOverWord(candidates: ExpandedCandidate[]): ExpandedCandidate[] {
-    const phrases = candidates.filter((c) => c.type === "phrase")
+/** Stage 7: Longer-span precedence — drop ANY candidate fully contained within a longer candidate */
+function applyLongerSpanPrecedence(candidates: ExpandedCandidate[]): ExpandedCandidate[] {
     return candidates.filter((c) => {
-        if (c.type !== "word") return true
-        // Drop if any phrase fully contains this word span
-        const overlapping = phrases.some((p) => p.start <= c.start && p.end >= c.end)
-        return !overlapping
+        const cLen = c.end - c.start
+        // Drop this candidate if any OTHER candidate fully contains it AND is strictly longer
+        const containedByLonger = candidates.some((other) => {
+            if (other === c) return false
+            const otherLen = other.end - other.start
+            return otherLen > cLen && other.start <= c.start && other.end >= c.end
+        })
+        return !containedByLonger
     })
 }

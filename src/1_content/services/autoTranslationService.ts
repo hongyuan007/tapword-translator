@@ -270,21 +270,27 @@ async function processAndRenderCandidates(
         renderedOffsets.add(offsetKey)
     }
 
+    // Intra-batch overlap removal: if two candidates overlap, keep the longer one
+    const nonOverlapping = removeIntraBatchOverlaps(filteredCandidates)
+    const droppedByIntraBatchOverlap = filteredCandidates.length - nonOverlapping.length
+
     logger.info("Auto-candidates filtering summary:", {
         received: candidates.length,
         afterFiltering: filteredCandidates.length,
+        afterIntraBatchOverlap: nonOverlapping.length,
         droppedByExclusion,
         droppedByDedup,
         droppedByDomMapping,
         droppedByOverlap,
+        droppedByIntraBatchOverlap,
         droppedByBudget,
     })
 
     // Render surviving candidates with stagger delay
-    for (let i = 0; i < filteredCandidates.length; i++) {
+    for (let i = 0; i < nonOverlapping.length; i++) {
         if (i > 0) await delay(RENDER_STAGGER_MS)
 
-        const entry = filteredCandidates[i]
+        const entry = nonOverlapping[i]
         if (!entry) continue
         const { candidate, range } = entry
 
@@ -369,6 +375,33 @@ function buildDisplaySettings(): DisplayUserSettings {
 // ============================================================================
 // Internal: Utility
 // ============================================================================
+
+/**
+ * Remove intra-batch overlapping candidates.
+ * When two candidates' [start, end) ranges overlap, keep the one with the longer text.
+ */
+function removeIntraBatchOverlaps(
+    entries: Array<{ candidate: AutoCandidate; range: Range }>
+): Array<{ candidate: AutoCandidate; range: Range }> {
+    // Sort by start position, then by length descending (longer first)
+    const sorted = [...entries].sort((a, b) => {
+        const startDiff = a.candidate.start - b.candidate.start
+        if (startDiff !== 0) return startDiff
+        return (b.candidate.end - b.candidate.start) - (a.candidate.end - a.candidate.start)
+    })
+
+    const result: Array<{ candidate: AutoCandidate; range: Range }> = []
+    for (const entry of sorted) {
+        const overlaps = result.some((kept) => {
+            // Two ranges [s1,e1) and [s2,e2) overlap if s1 < e2 && s2 < e1
+            return kept.candidate.start < entry.candidate.end && entry.candidate.start < kept.candidate.end
+        })
+        if (!overlaps) {
+            result.push(entry)
+        }
+    }
+    return result
+}
 
 function delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
