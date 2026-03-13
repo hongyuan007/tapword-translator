@@ -111,7 +111,8 @@ function handleClick(e: MouseEvent): void {
         return
     }
 
-    if (!(interaction.level === "weak" || interaction.ignoredAsTextException)) {
+    const shouldStopPropagation = interaction.level !== "weak" && !interaction.ignoredAsTextException
+    if (shouldStopPropagation) {
         e.stopPropagation()
     }
 
@@ -150,7 +151,8 @@ function handleDblClick(e: MouseEvent): void {
         return
     }
 
-    if (!(interaction.level === "weak" || interaction.ignoredAsTextException)) {
+    const shouldStopPropagation = interaction.level !== "weak" && !interaction.ignoredAsTextException
+    if (shouldStopPropagation) {
         e.stopPropagation()
     }
     e.preventDefault()
