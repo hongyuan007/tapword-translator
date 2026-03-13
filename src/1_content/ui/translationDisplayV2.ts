@@ -34,7 +34,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import type { TranslationEntry, TranslationState, DisplayUserSettings } from "./translationDisplayV2/types"
 import { VIEWPORT_PAD_PX } from "./translationDisplayV2/types"
 import { getNormalizedLineRects, buildRectsSignature, splitTextAcrossRects } from "./translationDisplayV2/tooltipLayout"
-import { findClippingAncestors, isRectVisibleInClipChain } from "./translationDisplayV2/clipVisibility"
+import { isRectVisibleForSource } from "./translationDisplayV2/clipVisibility"
 import {
     createTooltipElement,
     syncTooltipStyles,
@@ -77,10 +77,16 @@ const adjustedBlocks = new Map<string, HTMLElement>()
 
 let globalRepositionAttached = false
 let repositionScheduled = false
+let interactionRepositionScheduled = false
+let interactionObserver: MutationObserver | null = null
+let interactionObserverStopTimer: number | undefined
 let orphanObserver: MutationObserver | null = null
 let orphanScanScheduled = false
 
 const SCROLL_LISTENER_OPTIONS: AddEventListenerOptions = { passive: true, capture: true }
+const INTERACTION_LISTENER_OPTIONS: AddEventListenerOptions = { capture: true, passive: true }
+const INTERACTION_OBSERVER_WINDOW_MS = 4000
+const INTERACTION_ATTRIBUTE_FILTER = ["class", "style", "hidden", "open", "aria-hidden", "aria-expanded"]
 
 const scheduleReposition = () => {
     if (repositionScheduled) return
@@ -92,6 +98,62 @@ const scheduleReposition = () => {
             positionTooltip(id)
         }
     })
+}
+
+const scheduleInteractionReposition = () => {
+    if (interactionRepositionScheduled) return
+    interactionRepositionScheduled = true
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            interactionRepositionScheduled = false
+            scheduleReposition()
+        })
+    })
+}
+
+function stopInteractionObserver(): void {
+    if (interactionObserver) {
+        interactionObserver.disconnect()
+        interactionObserver = null
+    }
+
+    if (interactionObserverStopTimer !== undefined) {
+        window.clearTimeout(interactionObserverStopTimer)
+        interactionObserverStopTimer = undefined
+    }
+}
+
+function startInteractionObserverWindow(): void {
+    if (activeTranslations.size === 0 || !document.body) return
+
+    if (!interactionObserver) {
+        interactionObserver = new MutationObserver(() => {
+            scheduleReposition()
+        })
+    } else {
+        interactionObserver.disconnect()
+    }
+
+    interactionObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: INTERACTION_ATTRIBUTE_FILTER,
+    })
+
+    if (interactionObserverStopTimer !== undefined) {
+        window.clearTimeout(interactionObserverStopTimer)
+    }
+
+    interactionObserverStopTimer = window.setTimeout(() => {
+        stopInteractionObserver()
+    }, INTERACTION_OBSERVER_WINDOW_MS)
+}
+
+function handleInteractionVisibilityRefresh(): void {
+    scheduleInteractionReposition()
+    startInteractionObserverWindow()
 }
 
 const scheduleOrphanScan = () => {
@@ -116,6 +178,7 @@ function ensureGlobalRepositionListeners(): void {
 
     window.addEventListener("scroll", scheduleReposition, SCROLL_LISTENER_OPTIONS)
     window.addEventListener("resize", scheduleReposition)
+    document.addEventListener("click", handleInteractionVisibilityRefresh, INTERACTION_LISTENER_OPTIONS)
     globalRepositionAttached = true
 }
 
@@ -123,7 +186,10 @@ function maybeDetachGlobalRepositionListeners(): void {
     if (globalRepositionAttached && activeTranslations.size === 0) {
         window.removeEventListener("scroll", scheduleReposition, SCROLL_LISTENER_OPTIONS)
         window.removeEventListener("resize", scheduleReposition)
+        document.removeEventListener("click", handleInteractionVisibilityRefresh, INTERACTION_LISTENER_OPTIONS)
         globalRepositionAttached = false
+        interactionRepositionScheduled = false
+        stopInteractionObserver()
     }
 }
 
@@ -281,8 +347,7 @@ function positionTooltip(id: string): void {
 
     const rects = getNormalizedLineRects(entry.range)
     const sourceElement = entry.range.startContainer.parentElement
-    const clippingAncestors = findClippingAncestors(sourceElement)
-    const visibleRectFlags = rects.map((rect) => isRectVisibleInClipChain(rect, clippingAncestors))
+    const visibleRectFlags = rects.map((rect) => isRectVisibleForSource(rect, sourceElement, entry.range))
     const hasVisibleRect = visibleRectFlags.some(Boolean)
 
     if (!hasVisibleRect) {
