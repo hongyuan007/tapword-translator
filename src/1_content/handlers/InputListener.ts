@@ -8,6 +8,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import * as constants from "@/1_content/constants"
 import * as contentIndex from "@/1_content/index"
 import * as iconManager from "@/1_content/ui/iconManager"
+import * as translationHitTesting from "@/1_content/ui/translationDisplayV2/hitTesting"
 import { expandRangeToSentence } from "@/1_content/utils/contextExtractorV2"
 import * as translationPipeline from "@/1_content/handlers/TranslationPipeline"
 import { validateSelectionAsync, validateSingleClickAsync } from "@/1_content/handlers/utils/selectionValidator"
@@ -65,6 +66,7 @@ export async function handleSingleClick(event: MouseEvent): Promise<void> {
     }
 
     iconManager.removeTranslationIcon()
+    translationHitTesting.cancelPendingTranslationClick()
 
     await translationPipeline.triggerTranslationForRange(validation.range!, SINGLE_CLICK_TRIGGER_LABEL, "text")
 }
@@ -131,7 +133,7 @@ export function handleDocumentClick(event: Event): void {
     const target = event.target as Element
 
     // Don't hide if clicking on our icon or tooltip
-    if (target.closest(`.${constants.CSS_CLASSES.ICON}`) || target.closest(`.${constants.CSS_CLASSES.ANCHOR}`)) {
+    if (target.closest(`.${constants.CSS_CLASSES.ICON}`) || target.closest(`.${constants.CSS_CLASSES.TOOLTIP}`)) {
         return
     }
 

@@ -81,3 +81,12 @@ tests/e2e/screenshots/
 # Agent related files
 .agents/
 .github/instructions
+
+# Docs images
+docs/**/*.png
+docs/**/*.jpg
+docs/**/*.jpeg
+docs/**/*.gif
+docs/**/*.svg
+docs/**/*.webp
+docs/**/*.bmp

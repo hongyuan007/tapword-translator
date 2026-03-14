@@ -13,7 +13,8 @@ import * as contentIndex from "@/1_content/index"
 import * as modalTemplates from "@/1_content/ui/modalTemplates"
 import * as toastNotification from "@/1_content/ui/toastNotification"
 import * as languageDetector from "@/1_content/utils/languageDetector"
-import { ModalPositioner } from "@/1_content/utils/modalPositioner"
+import { ModalPositionerV2 } from "@/1_content/utils/modalPositionerV2"
+import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
 import * as versionStatus from "@/1_content/utils/versionStatus"
 
 // Inject modal stylesheet into Shadow DOM to avoid host CSS leakage
@@ -131,7 +132,7 @@ let offsetY = 0
  * }, anchorElement, 'translation-anchor-0');
  * ```
  */
-export async function showTranslationModal(data: TranslationDetailData, anchorElement: HTMLElement | null, anchorId?: string): Promise<void> {
+export async function showTranslationModal(data: TranslationDetailData, anchorSource: Range | null, anchorId?: string): Promise<void> {
     try {
         // Close existing modal if any
         closeTranslationModal()
@@ -157,9 +158,9 @@ export async function showTranslationModal(data: TranslationDetailData, anchorEl
         activeModalAnchorId = anchorId || null
         activeModalHost = host
 
-        // Position the modal relative to the anchor element
-        if (anchorElement) {
-            positionModal(modal, anchorElement)
+        // Position the modal relative to the anchor source (HTMLElement or Range)
+        if (anchorSource) {
+            positionModal(modal, anchorSource)
         }
 
         // Add dragging functionality
@@ -580,20 +581,19 @@ function onDragEnd(): void {
 // Modal Positioning
 // ============================================================================
 
-// Position type now provided by ModalPositioner helper
-
 /**
  * Calculate and apply optimal position for the modal relative to anchor element
  * Priority: bottom-right > bottom-left > top-right > top-left
  *
  * @param modalContainer - The modal container element
- * @param anchorElement - The anchor element to position relative to
+ * @param anchorSource - The Range to position relative to
  */
-function positionModal(modalContainer: HTMLElement, anchorElement: HTMLElement): void {
+function positionModal(modalContainer: HTMLElement, anchorSource: Range): void {
     const modalRect = modalContainer.getBoundingClientRect()
     const isFragment = modalContainer.classList.contains("translation-type--fragment")
+    const translationType = isFragment ? "fragment" : "word" as const
 
-    const res = ModalPositioner.compute(anchorElement, modalRect, isFragment ? "fragment" : "word")
+    const res = ModalPositionerV2.compute(anchorSource, modalRect, translationType)
 
     // Use fixed positioning (viewport space) instead of absolute (document space)
     // This makes the modal stay fixed relative to viewport during scroll
@@ -643,9 +643,8 @@ function handleOutsideClick(event: MouseEvent): void {
 
     const target = event.target as Node
 
-    // Also check if the click is on a translation anchor
-    const anchor = (target as HTMLElement).closest(`.${constants.CSS_CLASSES.ANCHOR}`)
-    if (anchor) {
+    // V2: Check if click landed inside an active translation Range (replaces V1 anchor check)
+    if (translationDisplay.isPointInsideActiveTranslation(event.clientX, event.clientY)) {
         return
     }
 

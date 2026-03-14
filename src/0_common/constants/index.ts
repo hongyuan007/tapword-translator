@@ -22,6 +22,9 @@ export const UPDATE_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours
  */
 export const UNDERLINE_OPACITY = 1
 
+// Internal shift applied to the user-facing underline offset to derive the effective CSS offset
+export const UNDERLINE_OFFSET_INTERNAL_SHIFT_PX = 2
+
 /**
  * Upgrade model enabled flag
  * When true, all translation requests will use upgraded model by default

@@ -52,13 +52,19 @@ export interface LineHeightAdjustmentResult {
  * Find the nearest block-level ancestor element.
  * Block-level elements are those that typically create new layout blocks.
  *
- * @param element - The starting element (usually the anchor span)
- * @returns The nearest block ancestor, or null if not found
+ * Checks the element itself first: if it is already block-level, returns it.
+ * Otherwise walks up to parentElement, then grandparent, etc.
+ *
+ * This self-check is safe for V1 callers (anchor span is inline → skipped, walks to parent block)
+ * and necessary for V2 callers (startContainer.parentElement may already be `<p>`/`<div>`).
+ *
+ * @param element - The starting element (anchor span in V1, or text node parent in V2)
+ * @returns The nearest block-level element (may be `element` itself), or `document.body` as fallback
  */
 export function findNearestBlockAncestor(element: HTMLElement | null): HTMLElement | null {
     if (!element) return null
 
-    let current = element.parentElement
+    let current: HTMLElement | null = element
 
     while (current) {
         const display = window.getComputedStyle(current).display
@@ -92,11 +98,12 @@ export function findNearestBlockAncestor(element: HTMLElement | null): HTMLEleme
 export function calculateRequiredLineHeightIncrease(spaceCalc: SpaceCalculation): number {
     const { availableSpace, minFontSize } = spaceCalc
     const cachedSettings = contentIndex.getCachedUserSettings()
-    const desiredGap = cachedSettings?.tooltipNextLineGapPxV2 ?? types.DEFAULT_USER_SETTINGS.tooltipNextLineGapPxV2
+    const textOffset = cachedSettings?.tooltipTextOffsetPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipTextOffsetPxV3
+    const bottomSpacing = cachedSettings?.tooltipBottomSpacingPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipBottomSpacingPxV3
 
     // Target: make available space just above the minimum font size by a small safety delta
     const safetyDelta = contentConstants.MIN_TOOLTIP_SAFETY_DELTA_PX
-    const targetAvailableSpace = Math.max(minFontSize + safetyDelta + desiredGap, 0)
+    const targetAvailableSpace = Math.max(minFontSize + safetyDelta + textOffset + bottomSpacing, 0)
 
     if (availableSpace >= targetAvailableSpace) {
         logger.info(`Available space (${availableSpace.toFixed(2)}px) already >= target (${targetAvailableSpace.toFixed(2)}px), no adjustment needed`)
@@ -217,7 +224,7 @@ export function restoreLineHeight(blockElement: HTMLElement, skipDomRestoration:
 /**
  * Main entry point: Adjust line-height if needed based on space calculation.
  *
- * @param anchor - The anchor element (the wrapped translated text)
+ * @param anchor - The element near the translated text (V1: anchor span; V2: text node's parentElement)
  * @param spaceCalc - Space calculation details from styleCalculator
  * @returns The block element that was adjusted, or null if no adjustment was made
  */
