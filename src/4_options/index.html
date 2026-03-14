@@ -191,34 +191,46 @@
 
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="tooltipNextLineGapPxV2" data-i18n-key="popup.tooltipNextLineGapPx.label">Tooltip Next-line Gap (px)</label>
-                <p class="setting-helper" data-i18n-key="popup.tooltipNextLineGapPx.helper">Extra spacing reserved between the tooltip and the next line of text.</p>
+                <label class="setting-label" for="tooltipBottomSpacingPxV3" data-i18n-key="popup.tooltipBottomSpacingPxV3.label">Tooltip Bottom Spacing (px)</label>
+                <p class="setting-helper" data-i18n-key="popup.tooltipBottomSpacingPxV3.helper">Extra spacing reserved below the translation text.</p>
               </div>
               <div class="setting-control">
-                <input type="number" id="tooltipNextLineGapPxV2" data-setting="tooltipNextLineGapPxV2" class="select-input" step="1" min="0" max="20" />
-                <p class="input-warning" id="tooltipNextLineGapPxV2Warning" data-i18n-key="popup.tooltipNextLineGapPx.warning">Value must be between 0 and 20</p>
+                <div class="range-setting">
+                  <div class="range-setting-header">
+                    <span class="range-setting-value" id="tooltipBottomSpacingPxV3Value">0</span>
+                  </div>
+                  <input type="range" id="tooltipBottomSpacingPxV3" data-setting="tooltipBottomSpacingPxV3" class="range-input" step="1" min="0" max="20" value="6" />
+                </div>
               </div>
             </div>
 
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="tooltipVerticalOffsetPxV2" data-i18n-key="popup.tooltipVerticalOffsetPx.label">Tooltip Vertical Offset (px)</label>
-                <p class="setting-helper" data-i18n-key="popup.tooltipVerticalOffsetPx.helper">Moves the tooltip up/down relative to the selected text (negative pulls upward).</p>
+                <label class="setting-label" for="tooltipTextOffsetPxV3" data-i18n-key="popup.tooltipTextOffsetPxV3.label">Translation Vertical Position (px)</label>
+                <p class="setting-helper" data-i18n-key="popup.tooltipTextOffsetPxV3.helper">Adjust the distance between the translation text and the underline.</p>
               </div>
               <div class="setting-control">
-                <input type="number" id="tooltipVerticalOffsetPxV2" data-setting="tooltipVerticalOffsetPxV2" class="select-input" step="1" min="0" max="20" />
-                <p class="input-warning" id="tooltipVerticalOffsetPxV2Warning" data-i18n-key="popup.tooltipVerticalOffsetPx.warning">Value must be between 0 and 20</p>
+                <div class="range-setting">
+                  <div class="range-setting-header">
+                    <span class="range-setting-value" id="tooltipTextOffsetPxV3Value">0</span>
+                  </div>
+                  <input type="range" id="tooltipTextOffsetPxV3" data-setting="tooltipTextOffsetPxV3" class="range-input" step="1" min="0" max="20" value="1" />
+                </div>
               </div>
             </div>
 
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="textUnderlineOffsetPxV2" data-i18n-key="popup.textUnderlineOffsetPx.label">Underline Offset (px)</label>
-                <p class="setting-helper" data-i18n-key="popup.textUnderlineOffsetPx.helper">Adjust the distance between the text and the underline.</p>
+                <label class="setting-label" for="tooltipUnderlineOffsetPxV3" data-i18n-key="popup.tooltipUnderlineOffsetPxV3.label">Underline Offset (px)</label>
+                <p class="setting-helper" data-i18n-key="popup.tooltipUnderlineOffsetPxV3.helper">Adjust the distance between the original text and the underline.</p>
               </div>
               <div class="setting-control">
-                <input type="number" id="textUnderlineOffsetPxV2" data-setting="textUnderlineOffsetPxV2" class="select-input" step="1" min="0" max="20" />
-                <p class="input-warning" id="textUnderlineOffsetPxV2Warning" data-i18n-key="popup.textUnderlineOffsetPx.warning">Value must be between 0 and 20</p>
+                <div class="range-setting">
+                  <div class="range-setting-header">
+                    <span class="range-setting-value" id="tooltipUnderlineOffsetPxV3Value">0</span>
+                  </div>
+                  <input type="range" id="tooltipUnderlineOffsetPxV3" data-setting="tooltipUnderlineOffsetPxV3" class="range-input" step="1" min="0" max="20" value="1" />
+                </div>
               </div>
             </div>
 
@@ -229,8 +241,12 @@
                   <br />
                   <span data-i18n-key="popup.preview.nextLine">Users have reported significant improvements in accuracy.</span>
                 </p>
-                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip1" data-i18n-key="popup.preview.wordTranslation">理解</div>
-                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip" data-i18n-key="popup.preview.phraseTranslation">复杂的指令</div>
+                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip1">
+                  <div class="tooltip-preview-tooltip-content" data-i18n-key="popup.preview.wordTranslation">理解</div>
+                </div>
+                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip">
+                  <div class="tooltip-preview-tooltip-content" data-i18n-key="popup.preview.phraseTranslation">复杂的指令</div>
+                </div>
               </div>
             </div>
           </div>
