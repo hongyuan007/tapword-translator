@@ -7,14 +7,13 @@
  */
 import * as types from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
+import { UNDERLINE_OFFSET_INTERNAL_SHIFT_PX } from "@/0_common/constants"
 import * as contentConstants from "@/1_content/constants"
 import * as contentIndex from "@/1_content/index"
 import type { SpaceCalculation } from "./types"
 
 const logger = loggerModule.createLogger("styleCalculator/layout")
 
-// Minimum visual gap between anchor text bottom and tooltip top (px)
-const UI_SPACING_PX = 3
 // Tooltip font must not exceed this fraction of the original font size
 const MAX_FONT_RATIO = 0.8
 // Rects within this many pixels of the container bottom are treated as "last line"
@@ -67,14 +66,17 @@ export function calculateOptimalTranslationFontSize(
 
     const cachedSettings = contentIndex.getCachedUserSettings()
     const minFontSize = minFontSizeOverride ?? contentConstants.MIN_TOOLTIP_FONT_PX
-    const desiredGap = cachedSettings?.tooltipNextLineGapPxV2 ?? types.DEFAULT_USER_SETTINGS.tooltipNextLineGapPxV2
+    const underlineOffsetSetting = cachedSettings?.tooltipUnderlineOffsetPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipUnderlineOffsetPxV3
+    const underlineOffset = underlineOffsetSetting - UNDERLINE_OFFSET_INTERNAL_SHIFT_PX
+    const textOffset = cachedSettings?.tooltipTextOffsetPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipTextOffsetPxV3
+    const bottomSpacing = cachedSettings?.tooltipBottomSpacingPxV3 ?? types.DEFAULT_USER_SETTINGS.tooltipBottomSpacingPxV3
 
     if (!originalElement) {
         // No element available — use a simple 70% heuristic as fallback
         const fallbackSize = originalFontSize * 0.7
         const maxFontSize = originalFontSize * MAX_FONT_RATIO
         const safetyDelta = contentConstants.MIN_TOOLTIP_SAFETY_DELTA_PX
-        const adjustedFallback = Math.max(fallbackSize - safetyDelta - desiredGap, 0)
+        const adjustedFallback = Math.max(fallbackSize - safetyDelta - underlineOffset - textOffset - bottomSpacing, 0)
         const computedFontSize = Math.max(Math.min(adjustedFallback, maxFontSize), minFontSize)
 
         logger.info(
@@ -104,8 +106,9 @@ export function calculateOptimalTranslationFontSize(
     }
 
     const lineSpacing = lineHeight - originalFontSize
-    // Base available space is the gap below the text within a single line
-    let availableSpace = lineSpacing - UI_SPACING_PX
+    // Base available space is the gap below the text within a single line after
+    // reserving room for the underline itself.
+    let availableSpace = Math.max(lineSpacing - underlineOffset, 0)
 
     // For headings on their last line, prefer margin-bottom over line-gap —
     // it usually provides more vertical room for the tooltip
@@ -113,7 +116,7 @@ export function calculateOptimalTranslationFontSize(
     const onLastLine = isSelectionOnLastLine(anchor || null, originalElement)
     if (heading && onLastLine) {
         const mb = parseFloat(computedStyle.marginBottom)
-        const marginAvailable = (isNaN(mb) ? 0 : mb) - UI_SPACING_PX
+        const marginAvailable = Math.max((isNaN(mb) ? 0 : mb) - underlineOffset, 0)
         if (marginAvailable > 0) {
             logger.info(`Heading on last line detected. Using margin-bottom for available space: ${marginAvailable}px`)
             availableSpace = marginAvailable
@@ -122,7 +125,7 @@ export function calculateOptimalTranslationFontSize(
 
     const maxFontSize = originalFontSize * MAX_FONT_RATIO
     const safetyDelta = contentConstants.MIN_TOOLTIP_SAFETY_DELTA_PX
-    const effectiveAvailable = Math.max(availableSpace - safetyDelta - desiredGap, 0)
+    const effectiveAvailable = Math.max(availableSpace - safetyDelta - textOffset - bottomSpacing, 0)
 
     const translationFontSize = Math.max(Math.min(effectiveAvailable, maxFontSize), minFontSize)
 

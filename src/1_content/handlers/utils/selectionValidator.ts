@@ -8,7 +8,8 @@ import * as loggerModule from "@/0_common/utils/logger"
 import * as constants from "@/1_content/constants"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
-import * as tapWordDetector from "@/1_content/handlers/utils/tapWordDetector"
+import * as singleClickWordCandidate from "@/1_content/handlers/utils/singleClickWordCandidate"
+import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
 
 import { shouldTriggerTranslationAsync } from "@/1_content/utils/languageValidator"
 const ELEMENT_NODE = 1
@@ -135,8 +136,14 @@ export async function validateSelectionAsync(
         return { isValid: false, text: selectedText, reason: "Selection inside editable element", shouldCleanup: true }
     }
 
-    if (element?.closest(`.${constants.CSS_CLASSES.ICON}, .${constants.CSS_CLASSES.TOOLTIP}, .${constants.CSS_CLASSES.ANCHOR}`)) {
+    if (element?.closest(`.${constants.CSS_CLASSES.ICON}, .${constants.CSS_CLASSES.TOOLTIP}`)) {
         return { isValid: false, text: selectedText, reason: "Selection inside extension UI", shouldCleanup: false }
+    }
+
+    // V2: Block only when the new selection is fully contained by one existing translation range.
+    // Partial overlap remains valid and will be handled by overlap cleanup during translation.
+    if (singleClickWordCandidate.isFullyContainedBySingleActiveTranslation(range, translationDisplay.getActiveRanges)) {
+        return { isValid: false, text: selectedText, reason: "Selection inside active translation", shouldCleanup: false }
     }
 
     return { isValid: true, text: selectedText, range, reason: "Valid selection", shouldCleanup: false }
@@ -194,7 +201,6 @@ export async function validateSingleClickAsync(
     if (
         target &&
         (target.closest(`.${constants.CSS_CLASSES.ICON}`) ||
-            target.closest(`.${constants.CSS_CLASSES.ANCHOR}`) ||
             target.closest(`.${constants.CSS_CLASSES.TOOLTIP}`) ||
             target.closest(`.${constants.CSS_CLASSES.MODAL}`) ||
             target.closest(`.${constants.CSS_CLASSES.MODAL_BACKDROP}`))
@@ -209,8 +215,15 @@ export async function validateSingleClickAsync(
     }
 
     // 5. Range Extraction
-    const range = tapWordDetector.getWordRangeFromPoint(event.clientX, event.clientY)
+    const range = singleClickWordCandidate.findSingleClickWordCandidateRangeFromPoint(
+        event.clientX,
+        event.clientY,
+        translationDisplay.getActiveRanges
+    )
     if (!range) {
+        if (translationDisplay.isPointInsideActiveTranslation(event.clientX, event.clientY)) {
+            return { isValid: false, text: "", reason: "Click inside active translation", shouldCleanup: false }
+        }
         return { isValid: false, text: "", reason: "No word range at point", shouldCleanup: false }
     }
 

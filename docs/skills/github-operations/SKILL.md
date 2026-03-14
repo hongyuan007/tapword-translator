@@ -29,7 +29,6 @@ Project defaults:
 - **Release target branch**: `release/0.4.2`
 - **Branch naming**: `fix/YYMMDD/topic` or `feat/YYMMDD/topic`
 
----
 
 ## 1. Push a Branch (first time)
 
@@ -46,7 +45,6 @@ To configure git to auto-track all new branches globally:
 git config --global push.autoSetupRemote true
 ```
 
----
 
 ## 2. Create a Pull Request
 
@@ -73,7 +71,6 @@ GH_PAGER=cat gh pr create \
 
 Returns the PR URL on success.
 
----
 
 ## 3. Fetch Issue Details
 
@@ -95,7 +92,6 @@ Download images from the issue body:
 wget -O screenshot-1.png "<image-url-from-issue-body>"
 ```
 
----
 
 ## 4. Fetch PR Details (Full)
 
@@ -136,7 +132,6 @@ GH_PAGER=cat gh pr view <pr-number> \
 GH_PAGER=cat gh pr checks <pr-number> --repo hongyuan007/tapword-translator
 ```
 
----
 
 ## 5. List Issues / PRs
 
@@ -154,7 +149,6 @@ GH_PAGER=cat gh issue list --repo hongyuan007/tapword-translator --label "bug"
 GH_PAGER=cat gh pr list --repo hongyuan007/tapword-translator --base release/0.4.2
 ```
 
----
 
 ## 6. Check PR / Issue Status
 
@@ -165,8 +159,6 @@ GH_PAGER=cat gh pr view <pr-number> --repo hongyuan007/tapword-translator
 # View issue status
 GH_PAGER=cat gh issue view <issue-number> --repo hongyuan007/tapword-translator
 ```
-
----
 
 ## 7. Close / Merge / Comment
 
@@ -182,7 +174,6 @@ GH_PAGER=cat gh issue comment <issue-number> --repo hongyuan007/tapword-translat
 GH_PAGER=cat gh pr comment <pr-number> --repo hongyuan007/tapword-translator --body "Comment text"
 ```
 
----
 
 ## 8. Saving PR/Issue to Local Directory
 
@@ -219,8 +210,6 @@ docs/plan/y<YEAR>/m<MM>-issue-<number>-<slug>/
 |------|------|------|
 ```
 
----
-
 ## Best Practices
 
 - **Always use `GH_PAGER=cat`** — prevents output from opening an interactive pager
@@ -229,7 +218,6 @@ docs/plan/y<YEAR>/m<MM>-issue-<number>-<slug>/
 - **Use `--jq` for large JSON** — filter fields immediately rather than parsing full output
 - **Inline comments need REST API** — `gh pr view` only returns top-level review summaries
 
----
 
 ## Troubleshooting
 
