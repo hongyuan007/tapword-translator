@@ -92,8 +92,24 @@ function bindRangeValue(input: HTMLInputElement | null, valueElementId: string):
     const valueElement = document.getElementById(valueElementId)
     if (!valueElement) return
 
+    const formatRangeValue = (): string => {
+        const value = Number(input.value)
+        const step = input.step === "any" ? NaN : Number(input.step)
+
+        if (!Number.isFinite(value)) {
+            return input.value
+        }
+
+        if (!Number.isFinite(step) || Number.isInteger(step)) {
+            return String(value)
+        }
+
+        const decimalPart = input.step.split(".")[1] ?? ""
+        return value.toFixed(decimalPart.length)
+    }
+
     const update = () => {
-        valueElement.textContent = input.value
+        valueElement.textContent = formatRangeValue()
         const min = Number(input.min || 0)
         const max = Number(input.max || 100)
         const value = Number(input.value)

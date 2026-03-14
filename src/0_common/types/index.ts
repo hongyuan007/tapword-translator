@@ -360,7 +360,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     tooltipVerticalOffsetPxV2: 3,
     textUnderlineOffsetPx: 3,
     textUnderlineOffsetPxV2: 4,
-    tooltipUnderlineOffsetPxV3: 1,
+    tooltipUnderlineOffsetPxV3: 1.5,
     tooltipTextOffsetPxV3: 1,
     tooltipBottomSpacingPxV3: 6,
     wordUnderlineColor: "#2A9D8F",
