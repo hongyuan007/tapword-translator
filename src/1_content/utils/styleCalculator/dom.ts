@@ -14,6 +14,12 @@ const DARK_COLOR_SCHEME = "dark"
 /** Fallback background when no visible background layer can be resolved from the DOM. */
 const DEFAULT_PAGE_BACKGROUND: RgbaColor = { r: 255, g: 255, b: 255, a: 1 }
 
+export interface BackgroundResolutionResult {
+    backgroundColor: RgbaColor
+    hasVisibleLayers: boolean
+    resolutionSource: "ancestor" | "document" | "theme"
+}
+
 /**
  * Detects whether the page is using a dark color scheme by checking the `<html>`
  * element's `dark` class (common in Tailwind/Bootstrap projects) and the CSS
@@ -32,7 +38,7 @@ function isDarkThemeContext(): boolean {
  * layer. Falls back to `<body>` and `<html>` background colors when no layers are
  * found on the element's ancestors (e.g., when all ancestors are transparent).
  */
-function collectBackgroundLayers(startElement: HTMLElement | null): RgbaColor[] {
+function collectAncestorBackgroundLayers(startElement: HTMLElement | null): RgbaColor[] {
     const layers: RgbaColor[] = []
     let currentElement: HTMLElement | null = startElement
 
@@ -44,11 +50,11 @@ function collectBackgroundLayers(startElement: HTMLElement | null): RgbaColor[] 
         currentElement = currentElement.parentElement
     }
 
-    if (layers.length > 0) {
-        return layers
-    }
+    return layers
+}
 
-    // No opaque ancestor found — use document-level backgrounds as last resort
+function collectDocumentBackgroundLayers(): RgbaColor[] {
+    const layers: RgbaColor[] = []
     const bodyBackground = document.body ? parseColor(window.getComputedStyle(document.body).backgroundColor) : null
     if (isVisibleBackground(bodyBackground)) {
         layers.push(bodyBackground)
@@ -69,21 +75,44 @@ function collectBackgroundLayers(startElement: HTMLElement | null): RgbaColor[] 
  * @param startElement - The element whose background context is being resolved.
  * @returns The final composited opaque background color.
  */
-export function getEffectiveBackgroundColor(startElement: HTMLElement | null): RgbaColor {
-    const backgroundLayers = collectBackgroundLayers(startElement)
+export function getEffectiveBackgroundColor(startElement: HTMLElement | null): BackgroundResolutionResult {
+    const ancestorBackgroundLayers = collectAncestorBackgroundLayers(startElement)
 
-    if (backgroundLayers.length === 0) {
-        // When all layers are transparent, infer a sensible default from the theme
-        return isDarkThemeContext() ? BLACK_COLOR : DEFAULT_PAGE_BACKGROUND
+    if (ancestorBackgroundLayers.length > 0) {
+        // Composite layers from the outermost (bottom) to the innermost (top)
+        let composedBackground = DEFAULT_PAGE_BACKGROUND
+        for (let index = ancestorBackgroundLayers.length - 1; index >= 0; index--) {
+            const layer = ancestorBackgroundLayers[index]
+            if (!layer) continue
+            composedBackground = compositeForegroundOverBackground(layer, composedBackground)
+        }
+
+        return {
+            backgroundColor: composedBackground,
+            hasVisibleLayers: true,
+            resolutionSource: "ancestor",
+        }
     }
 
-    // Composite layers from the outermost (bottom) to the innermost (top)
-    let composedBackground = DEFAULT_PAGE_BACKGROUND
-    for (let index = backgroundLayers.length - 1; index >= 0; index--) {
-        const layer = backgroundLayers[index]
-        if (!layer) continue
-        composedBackground = compositeForegroundOverBackground(layer, composedBackground)
+    const documentBackgroundLayers = collectDocumentBackgroundLayers()
+    if (documentBackgroundLayers.length > 0) {
+        let composedBackground = DEFAULT_PAGE_BACKGROUND
+        for (let index = documentBackgroundLayers.length - 1; index >= 0; index--) {
+            const layer = documentBackgroundLayers[index]
+            if (!layer) continue
+            composedBackground = compositeForegroundOverBackground(layer, composedBackground)
+        }
+
+        return {
+            backgroundColor: composedBackground,
+            hasVisibleLayers: false,
+            resolutionSource: "document",
+        }
     }
 
-    return composedBackground
+    return {
+        backgroundColor: isDarkThemeContext() ? BLACK_COLOR : DEFAULT_PAGE_BACKGROUND,
+        hasVisibleLayers: false,
+        resolutionSource: "theme",
+    }
 }
