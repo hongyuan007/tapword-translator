@@ -79,6 +79,13 @@ export function detachGlobalHitListeners(): void {
     logger.info("Global hit-test listeners detached")
 }
 
+export function cancelPendingTranslationClick(): void {
+    if (!clickTimer) return
+
+    window.clearTimeout(clickTimer)
+    clickTimer = undefined
+}
+
 // ============================================================================
 // Event Handlers
 // ============================================================================

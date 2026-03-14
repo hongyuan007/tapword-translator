@@ -8,7 +8,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import * as constants from "@/1_content/constants"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
-import * as tapWordDetector from "@/1_content/handlers/utils/tapWordDetector"
+import * as singleClickWordCandidate from "@/1_content/handlers/utils/singleClickWordCandidate"
 import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
 
 import { shouldTriggerTranslationAsync } from "@/1_content/utils/languageValidator"
@@ -33,34 +33,6 @@ export interface ValidationResult {
 async function isNativeLanguageAsync(text: string, targetLanguage: string, context?: string): Promise<boolean> {
     const shouldTrigger = await shouldTriggerTranslationAsync(text, targetLanguage, context)
     return !shouldTrigger
-}
-
-/**
- * Returns true only when `candidateRange` is fully contained by a single active translation range.
- * Partial overlap across one or more translations is intentionally allowed so the overlap cleanup
- * path can replace the old translations with the new selection.
- */
-function isFullyContainedBySingleActiveTranslation(candidateRange: Range): boolean {
-    const activeRanges = translationDisplay.getActiveRanges()
-
-    for (const [, activeRange] of activeRanges) {
-        if (rangeFullyContainsRange(activeRange, candidateRange)) {
-            return true
-        }
-    }
-
-    return false
-}
-
-function rangeFullyContainsRange(outerRange: Range, innerRange: Range): boolean {
-    try {
-        const startsBeforeOrAtInnerStart = outerRange.compareBoundaryPoints(Range.START_TO_START, innerRange) <= 0
-        const endsAfterOrAtInnerEnd = outerRange.compareBoundaryPoints(Range.END_TO_END, innerRange) >= 0
-
-        return startsBeforeOrAtInnerStart && endsAfterOrAtInnerEnd
-    } catch {
-        return false
-    }
 }
 
 /**
@@ -170,7 +142,7 @@ export async function validateSelectionAsync(
 
     // V2: Block only when the new selection is fully contained by one existing translation range.
     // Partial overlap remains valid and will be handled by overlap cleanup during translation.
-    if (isFullyContainedBySingleActiveTranslation(range)) {
+    if (singleClickWordCandidate.isFullyContainedBySingleActiveTranslation(range, translationDisplay.getActiveRanges)) {
         return { isValid: false, text: selectedText, reason: "Selection inside active translation", shouldCleanup: false }
     }
 
@@ -236,11 +208,6 @@ export async function validateSingleClickAsync(
         return { isValid: false, text: "", reason: "Extension UI element", shouldCleanup: false }
     }
 
-    // V2: Check if click point falls inside an active translation Range (replaces V1 anchor check)
-    if (translationDisplay.isPointInsideActiveTranslation(event.clientX, event.clientY)) {
-        return { isValid: false, text: "", reason: "Click inside active translation", shouldCleanup: false }
-    }
-
     // 4. Selection Check
     const selection = window.getSelection()
     if (selection && !selection.isCollapsed) {
@@ -248,8 +215,15 @@ export async function validateSingleClickAsync(
     }
 
     // 5. Range Extraction
-    const range = tapWordDetector.getWordRangeFromPoint(event.clientX, event.clientY)
+    const range = singleClickWordCandidate.findSingleClickWordCandidateRangeFromPoint(
+        event.clientX,
+        event.clientY,
+        translationDisplay.getActiveRanges
+    )
     if (!range) {
+        if (translationDisplay.isPointInsideActiveTranslation(event.clientX, event.clientY)) {
+            return { isValid: false, text: "", reason: "Click inside active translation", shouldCleanup: false }
+        }
         return { isValid: false, text: "", reason: "No word range at point", shouldCleanup: false }
     }
 
