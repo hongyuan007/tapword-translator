@@ -1,5 +1,5 @@
 # File Save Path
-`/Users/hongyuan/project/v3/tapword-translator/docs/plan/y2026/m02-issue-twitter-show-more-bug/reviews/manifest_TOOLTIP_V2_MULTILINE_AND_HIT_TEST_20260309.md`
+`docs/plan/y2026/m02-issue-twitter-show-more-bug/reviews/manifest_TOOLTIP_V2_MULTILINE_AND_HIT_TEST_20260309.md`
 
 ### 1. Change Context
 - **Related Documents**:

@@ -86,6 +86,18 @@ export function cancelPendingTranslationClick(): void {
     clickTimer = undefined
 }
 
+export function isPointInsideAnyActiveTranslation(x: number, y: number): boolean {
+    if (!callbacks) return false
+
+    for (const entry of callbacks.getActiveTranslations().values()) {
+        if (isPointInsideTranslationZone(x, y, entry.range, entry.tooltips)) {
+            return true
+        }
+    }
+
+    return false
+}
+
 // ============================================================================
 // Event Handlers
 // ============================================================================
@@ -94,7 +106,8 @@ function handleClick(e: MouseEvent): void {
     if (!callbacks) return
 
     // Skip clicks on our own UI elements
-    const target = e.target as Element
+    const target = e.target
+    if (!(target instanceof Element)) return
     if (target.closest(OWN_UI_SELECTOR)) return
 
     const interaction = editableElementDetector.classifyInteractiveElement(target, e)
@@ -135,7 +148,8 @@ function handleDblClick(e: MouseEvent): void {
     if (!callbacks) return
 
     // Skip clicks on our own UI elements
-    const target = e.target as Element
+    const target = e.target
+    if (!(target instanceof Element)) return
     if (target.closest(OWN_UI_SELECTOR)) return
 
     const interaction = editableElementDetector.classifyInteractiveElement(target, e)

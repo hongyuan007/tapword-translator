@@ -553,13 +553,7 @@ export function getActiveRanges(): Map<string, Range> {
  * @returns `true` if the point is inside an active translation.
  */
 export function isPointInsideActiveTranslation(x: number, y: number): boolean {
-    if (activeTranslations.size === 0) return false
-    for (const [, entry] of activeTranslations) {
-        if (hitTesting.isPointInsideTranslationZone(x, y, entry.range, entry.tooltips)) {
-            return true
-        }
-    }
-    return false
+    return hitTesting.isPointInsideAnyActiveTranslation(x, y)
 }
 
 /**

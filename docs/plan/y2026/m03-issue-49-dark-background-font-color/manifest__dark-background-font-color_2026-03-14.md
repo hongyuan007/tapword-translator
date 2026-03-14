@@ -1,10 +1,10 @@
 ### 1. Change Context
 - **Related Documents**:
-  - [docs/plan/y2026/m03-issue-49-dark-background-font-color/README.md](/Users/hongyuan/project/v3/tapword-translator/docs/plan/y2026/m03-issue-49-dark-background-font-color/README.md)
-  - [docs/plan/y2026/m03-issue-49-dark-background-font-color/issue.json](/Users/hongyuan/project/v3/tapword-translator/docs/plan/y2026/m03-issue-49-dark-background-font-color/issue.json)
-  - [src/1_content/README.md](/Users/hongyuan/project/v3/tapword-translator/src/1_content/README.md)
-  - [src/0_common/README.md](/Users/hongyuan/project/v3/tapword-translator/src/0_common/README.md)
-  - [src/0_common/utils/LOGGER_README.md](/Users/hongyuan/project/v3/tapword-translator/src/0_common/utils/LOGGER_README.md)
+  - `docs/plan/y2026/m03-issue-49-dark-background-font-color/README.md`
+  - `docs/plan/y2026/m03-issue-49-dark-background-font-color/issue.json`
+  - `src/1_content/README.md`
+  - `src/0_common/README.md`
+  - `src/0_common/utils/LOGGER_README.md`
 - **Task Objectives**: This task attempted to adjust tooltip translation text color behavior for dark and mixed-background pages. The changes modified color decision logic, added a dedicated tooltip text color module, adjusted tooltip opacity, and updated diagnostics intending to keep tooltip text readable while visually aligned with host page text across sites such as Discord and Artificial Analysis.
 
 ### 2. File Change Audit

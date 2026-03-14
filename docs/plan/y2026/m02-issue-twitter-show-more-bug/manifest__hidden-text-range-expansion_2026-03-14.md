@@ -3,8 +3,8 @@
 ## 1. Change Context
 
 - **Related Documents**:
-  - [`docs/prompt_files/review/generate-review-manifest.prompt.md`](/Users/hongyuan/project/v3/tapword-translator/docs/prompt_files/review/generate-review-manifest.prompt.md)
-  - [`docs/manual/selection-range-expansion-fixture.html`](/Users/hongyuan/project/v3/tapword-translator/docs/manual/selection-range-expansion-fixture.html)
+  - `docs/prompt_files/review/generate-review-manifest.prompt.md`
+  - `docs/manual/selection-range-expansion-fixture.html`
 - **Task Objectives**:
   - Attempted to reduce incorrect phrase expansion when the content script translates partial selections near hidden or unrelated neighboring text.
   - Adjusted DOM text extraction intending to exclude non-readable text such as hidden or accessibility-only helper content.

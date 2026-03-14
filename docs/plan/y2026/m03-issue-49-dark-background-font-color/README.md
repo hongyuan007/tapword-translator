@@ -26,9 +26,9 @@ https://discord.com/channels/@me
 
 ## Screenshot
 
-- [screenshot-1.png](/Users/hongyuan/project/v3/tapword-translator/docs/plan/y2026/m03-issue-49-dark-background-font-color/screenshot-1.png)
+- [screenshot-1.png](./screenshot-1.png)
 
-![Issue 49 Screenshot](/Users/hongyuan/project/v3/tapword-translator/docs/plan/y2026/m03-issue-49-dark-background-font-color/screenshot-1.png)
+![Issue 49 Screenshot](./screenshot-1.png)
 
 ## Comments
 

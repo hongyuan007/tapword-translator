@@ -14,7 +14,7 @@ import * as modalTemplates from "@/1_content/ui/modalTemplates"
 import * as toastNotification from "@/1_content/ui/toastNotification"
 import * as languageDetector from "@/1_content/utils/languageDetector"
 import { ModalPositionerV2 } from "@/1_content/utils/modalPositionerV2"
-import * as translationDisplay from "@/1_content/ui/translationDisplayV2"
+import * as hitTesting from "@/1_content/ui/translationDisplayV2/hitTesting"
 import * as versionStatus from "@/1_content/utils/versionStatus"
 
 // Inject modal stylesheet into Shadow DOM to avoid host CSS leakage
@@ -116,20 +116,22 @@ let offsetY = 0
  * Show translation detail modal
  *
  * @param data - Translation detail data to display
- * @param anchorElement - The anchor element that triggered the modal (for positioning)
+ * @param anchorSource - The source range that triggered the modal (for positioning)
  * @param anchorId - Optional anchor ID to enable automatic modal updates when translation completes
  *
  * @example
  * ```typescript
- * const anchorElement = document.getElementById('translation-anchor-0');
+ * const anchorRange = document.createRange();
+ * anchorRange.selectNodeContents(document.querySelector('[data-example="source"]')!);
  * showTranslationModal({
  *     status: 'success',
- *     word: 'light',
- *     wordTranslation: '光线',
+ *     translationType: 'word',
+ *     text: 'light',
+ *     translation: '光线',
  *     originalSentence: 'The room was filled with natural light.',
  *     sentenceTranslation: '房间里充满了自然光线。',
- *     dictionaryContent: 'noun: visible electromagnetic radiation...'
- * }, anchorElement, 'translation-anchor-0');
+ *     englishDefinition: 'noun: visible electromagnetic radiation...'
+ * }, anchorRange, 'translation-anchor-0');
  * ```
  */
 export async function showTranslationModal(data: TranslationDetailData, anchorSource: Range | null, anchorId?: string): Promise<void> {
@@ -158,7 +160,7 @@ export async function showTranslationModal(data: TranslationDetailData, anchorSo
         activeModalAnchorId = anchorId || null
         activeModalHost = host
 
-        // Position the modal relative to the anchor source (HTMLElement or Range)
+        // Position the modal relative to the anchor source range
         if (anchorSource) {
             positionModal(modal, anchorSource)
         }
@@ -644,7 +646,7 @@ function handleOutsideClick(event: MouseEvent): void {
     const target = event.target as Node
 
     // V2: Check if click landed inside an active translation Range (replaces V1 anchor check)
-    if (translationDisplay.isPointInsideActiveTranslation(event.clientX, event.clientY)) {
+    if (hitTesting.isPointInsideAnyActiveTranslation(event.clientX, event.clientY)) {
         return
     }
 
