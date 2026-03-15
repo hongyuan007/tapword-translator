@@ -34,6 +34,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import type { TranslationEntry, TranslationState, DisplayUserSettings } from "./translationDisplayV2/types"
 import { VIEWPORT_PAD_PX } from "./translationDisplayV2/types"
 import { getNormalizedLineRects, buildRectsSignature, splitTextAcrossRects } from "./translationDisplayV2/tooltipLayout"
+import { isRectVisibleForSource } from "./translationDisplayV2/clipVisibility"
 import {
     createTooltipElement,
     syncTooltipStyles,
@@ -76,10 +77,16 @@ const adjustedBlocks = new Map<string, HTMLElement>()
 
 let globalRepositionAttached = false
 let repositionScheduled = false
+let interactionRepositionScheduled = false
+let interactionObserver: MutationObserver | null = null
+let interactionObserverStopTimer: number | undefined
 let orphanObserver: MutationObserver | null = null
 let orphanScanScheduled = false
 
 const SCROLL_LISTENER_OPTIONS: AddEventListenerOptions = { passive: true, capture: true }
+const INTERACTION_LISTENER_OPTIONS: AddEventListenerOptions = { capture: true, passive: true }
+const INTERACTION_OBSERVER_WINDOW_MS = 4000
+const INTERACTION_ATTRIBUTE_FILTER = ["class", "style", "hidden", "open", "aria-hidden", "aria-expanded"]
 
 const scheduleReposition = () => {
     if (repositionScheduled) return
@@ -91,6 +98,62 @@ const scheduleReposition = () => {
             positionTooltip(id)
         }
     })
+}
+
+const scheduleInteractionReposition = () => {
+    if (interactionRepositionScheduled) return
+    interactionRepositionScheduled = true
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            interactionRepositionScheduled = false
+            scheduleReposition()
+        })
+    })
+}
+
+function stopInteractionObserver(): void {
+    if (interactionObserver) {
+        interactionObserver.disconnect()
+        interactionObserver = null
+    }
+
+    if (interactionObserverStopTimer !== undefined) {
+        window.clearTimeout(interactionObserverStopTimer)
+        interactionObserverStopTimer = undefined
+    }
+}
+
+function startInteractionObserverWindow(): void {
+    if (activeTranslations.size === 0 || !document.body) return
+
+    if (!interactionObserver) {
+        interactionObserver = new MutationObserver(() => {
+            scheduleReposition()
+        })
+    } else {
+        interactionObserver.disconnect()
+    }
+
+    interactionObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: INTERACTION_ATTRIBUTE_FILTER,
+    })
+
+    if (interactionObserverStopTimer !== undefined) {
+        window.clearTimeout(interactionObserverStopTimer)
+    }
+
+    interactionObserverStopTimer = window.setTimeout(() => {
+        stopInteractionObserver()
+    }, INTERACTION_OBSERVER_WINDOW_MS)
+}
+
+function handleInteractionVisibilityRefresh(): void {
+    scheduleInteractionReposition()
+    startInteractionObserverWindow()
 }
 
 const scheduleOrphanScan = () => {
@@ -115,6 +178,7 @@ function ensureGlobalRepositionListeners(): void {
 
     window.addEventListener("scroll", scheduleReposition, SCROLL_LISTENER_OPTIONS)
     window.addEventListener("resize", scheduleReposition)
+    document.addEventListener("click", handleInteractionVisibilityRefresh, INTERACTION_LISTENER_OPTIONS)
     globalRepositionAttached = true
 }
 
@@ -122,7 +186,10 @@ function maybeDetachGlobalRepositionListeners(): void {
     if (globalRepositionAttached && activeTranslations.size === 0) {
         window.removeEventListener("scroll", scheduleReposition, SCROLL_LISTENER_OPTIONS)
         window.removeEventListener("resize", scheduleReposition)
+        document.removeEventListener("click", handleInteractionVisibilityRefresh, INTERACTION_LISTENER_OPTIONS)
         globalRepositionAttached = false
+        interactionRepositionScheduled = false
+        stopInteractionObserver()
     }
 }
 
@@ -279,14 +346,15 @@ function positionTooltip(id: string): void {
     }
 
     const rects = getNormalizedLineRects(entry.range)
-    if (rects.length === 0) {
-        // Range not visible (scrolled out of sub-container) — hide tooltips
+    const sourceElement = entry.range.startContainer.parentElement
+    const visibleRectFlags = rects.map((rect) => isRectVisibleForSource(rect, sourceElement, entry.range))
+    const hasVisibleRect = visibleRectFlags.some(Boolean)
+
+    if (!hasVisibleRect) {
+        // Range is fully clipped by its container chain — hide tooltips like V1 did.
         for (const tooltip of entry.tooltips) tooltip.style.visibility = "hidden"
         return
     }
-
-    // Ensure tooltips are visible (they might have been hidden when out of sub-container)
-    for (const tooltip of entry.tooltips) tooltip.style.visibility = "visible"
 
     const lineRects = rects
     // On pages where <body> is the scroll container (e.g. position:relative + overflow-y:auto),
@@ -339,6 +407,10 @@ function positionTooltip(id: string): void {
         const tooltip = segs[i]
         const rect = lineRects[Math.min(i, lineRects.length - 1)]
         if (!tooltip || !rect) continue
+
+        const isVisible = visibleRectFlags[Math.min(i, visibleRectFlags.length - 1)] ?? false
+        tooltip.style.visibility = isVisible ? "visible" : "hidden"
+        if (!isVisible) continue
 
         const isLastLine = i === segs.length - 1
 
@@ -493,13 +565,7 @@ export function addTooltipClass(translationId: string, className: string): void 
  * @returns `true` if the point is inside an active translation.
  */
 export function isPointInsideActiveTranslation(x: number, y: number): boolean {
-    if (activeTranslations.size === 0) return false
-    for (const [, entry] of activeTranslations) {
-        if (hitTesting.isPointInsideTranslationZone(x, y, entry.range, entry.tooltips)) {
-            return true
-        }
-    }
-    return false
+    return hitTesting.isPointInsideAnyActiveTranslation(x, y)
 }
 
 /**

@@ -13,7 +13,28 @@ import * as contentIndex from "@/1_content/index"
 import * as constants from "@/1_content/constants"
 import * as translationFontSizeModule from "@/0_common/constants/translationFontSize"
 import * as styleCalculator from "@/1_content/utils/styleCalculator"
+import * as loggerModule from "@/0_common/utils/logger"
 import type { DisplayUserSettings, TranslationState } from "./types"
+
+const logger = loggerModule.createLogger("1_content/ui/translationDisplayV2/tooltipRenderer")
+
+function describeElement(element: HTMLElement | null | undefined): string {
+    if (!element) {
+        return "null"
+    }
+
+    const idPart = element.id ? `#${element.id}` : ""
+    const classList = Array.from(element.classList).slice(0, 3)
+    const classPart = classList.length > 0 ? `.${classList.join(".")}` : ""
+    const textSnippet = (element.textContent || "").replace(/\s+/g, " ").trim().slice(0, 40)
+    const textPart = textSnippet ? ` text="${textSnippet}"` : ""
+
+    return `${element.tagName.toLowerCase()}${idPart}${classPart}${textPart}`
+}
+
+function formatStyleValue(value: string | null | undefined): string {
+    return value && value.trim().length > 0 ? value : "(empty)"
+}
 
 // ============================================================================
 // Font & Style Helpers
@@ -76,6 +97,12 @@ export function syncTooltipStyles(source: HTMLElement, target: HTMLElement): voi
     target.style.color = source.style.color
     target.style.fontFamily = source.style.fontFamily
     target.style.fontWeight = source.style.fontWeight
+
+    const sourceContent = getTooltipContentElement(source)
+    const targetContent = getTooltipContentElement(target)
+    targetContent.style.color = sourceContent.style.color
+    targetContent.style.fontFamily = sourceContent.style.fontFamily
+    targetContent.style.fontWeight = sourceContent.style.fontWeight
 }
 
 // ============================================================================
@@ -200,13 +227,19 @@ export function renderTooltipContent(
     // V2: pass null for anchor — no anchor element exists in the Range-based architecture
     const style = styleCalculator.calculateTooltipStyle(originalElement, null, 16, minFontSize)
     tooltip.style.fontSize = `${style.fontSize}px`
+    content.style.fontSize = `${style.fontSize}px`
 
     // Error state uses a dedicated CSS class color; clear inline color to avoid conflict.
     if (state.status !== "error") {
         tooltip.style.color = style.color
+        content.style.color = style.color
     } else {
         tooltip.style.color = ""
+        content.style.color = "#FF6B35"
     }
+
+    content.style.fontFamily = tooltip.style.fontFamily
+    content.style.fontWeight = tooltip.style.fontWeight
 
     if (state.status === "loading") {
         tooltip.classList.add("loading")
@@ -257,6 +290,21 @@ export function renderTooltipContent(
         content.textContent = state.translation
         tooltip.classList.remove("loading", "error")
     }
+
+    const tooltipComputedStyle = window.getComputedStyle(tooltip)
+    const contentComputedStyle = window.getComputedStyle(content)
+    logger.debug("[TooltipRender] Applied tooltip styles", {
+        status: state.status,
+        originalElement: describeElement(originalElement),
+        tooltipInlineColor: formatStyleValue(tooltip.style.color),
+        tooltipComputedColor: formatStyleValue(tooltipComputedStyle.color),
+        contentInlineColor: formatStyleValue(content.style.color),
+        contentComputedColor: formatStyleValue(contentComputedStyle.color),
+        tooltipInlineFontSize: formatStyleValue(tooltip.style.fontSize),
+        contentInlineFontSize: formatStyleValue(content.style.fontSize),
+        contentComputedFontSize: formatStyleValue(contentComputedStyle.fontSize),
+        previewText: formatStyleValue(content.textContent?.slice(0, 80)),
+    })
 
     return style
 }

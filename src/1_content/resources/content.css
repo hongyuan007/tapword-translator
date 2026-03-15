@@ -106,7 +106,7 @@
 }
 
 .ai-translator-tooltip.visible {
-    opacity: 0.8;
+    opacity: 1;
 }
 
 /* Fragment translations use accent color for border-top */

@@ -1,0 +1,25 @@
+{
+  "assignees": [],
+  "author": {
+    "id": "U_kgDOCMbHgQ",
+    "is_bot": false,
+    "login": "hongyuan007",
+    "name": "Eric Zhang"
+  },
+  "body": "**Description 问题描述**\n如题\n\n**URL 发生问题的网址**\nhttps://discord.com/channels/@me\n\n**Screenshots 截图**\n\n<img width=\"772\" height=\"153\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/0cf0900e-1472-461f-a74e-af688278ad7c\" />\n\n**Environment 环境信息**\n- Browser: Chrome\n- Extension Version: 0.4.3\n",
+  "comments": [],
+  "createdAt": "2026-03-14T08:34:17Z",
+  "labels": [
+    {
+      "id": "LA_kwDOQ1Nttc8AAAACUQS_ww",
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    }
+  ],
+  "number": 49,
+  "state": "OPEN",
+  "title": "[BUG] 翻译的字体颜色不对，黑色背景网页，字体也是黑色的",
+  "updatedAt": "2026-03-14T08:34:17Z",
+  "url": "https://github.com/hongyuan007/tapword-translator/issues/49"
+}

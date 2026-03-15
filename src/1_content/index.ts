@@ -95,6 +95,9 @@ async function init(): Promise<void> {
     // Listen for double-click to trigger direct translation
     document.addEventListener("dblclick", inputListener.handleDoubleClick)
 
+    // Registration-order invariant: this capture listener must be registered before the
+    // V2 hit-testing capture listener. The same-event suppression path in hitTesting.ts
+    // relies on InputListener seeing the click first.
     // Listen for single-click to trigger word translation (capture to avoid page stopPropagation)
     document.addEventListener("click", inputListener.handleSingleClick, { capture: true })
 

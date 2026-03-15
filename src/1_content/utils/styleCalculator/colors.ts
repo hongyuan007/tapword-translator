@@ -16,6 +16,7 @@ export const MIN_VISIBLE_ALPHA = 0.01
 
 export const BLACK_COLOR: RgbaColor = { r: 0, g: 0, b: 0, a: 1 }
 export const WHITE_COLOR: RgbaColor = { r: 255, g: 255, b: 255, a: 1 }
+const OPAQUE_ALPHA = 1
 
 /**
  * Parses a CSS color string (rgb, rgba, 6-digit hex, or 3-digit hex) into an RGBA object.
@@ -61,6 +62,69 @@ export function parseColor(colorString: string): RgbaColor | null {
 }
 
 /**
+ * Resolves a CSS color string to pure black or white based on its perceived lightness.
+ * Supports rgb/rgba/hex via `parseColor()` and modern `oklab()` / `oklch()` syntax
+ * by using their first lightness component directly.
+ */
+export function getMonochromeColorFromCssColor(colorString: string): string | null {
+    const parsedColor = parseColor(colorString)
+    if (parsedColor) {
+        return getMonochromeColorByLuminance(parsedColor)
+    }
+
+    const oklabMatch = colorString.match(/^oklab\(\s*([\d.]+%?)\s+/i)
+    if (oklabMatch) {
+        const rawLightness = oklabMatch[1] ?? ""
+        const normalizedLightness = rawLightness.endsWith("%")
+            ? parseFloat(rawLightness) / 100
+            : parseFloat(rawLightness)
+        if (!Number.isNaN(normalizedLightness)) {
+            return normalizedLightness >= 0.5 ? WHITE_TEXT_COLOR : BLACK_TEXT_COLOR
+        }
+    }
+
+    const oklchMatch = colorString.match(/^oklch\(\s*([\d.]+%?)\s+/i)
+    if (oklchMatch) {
+        const rawLightness = oklchMatch[1] ?? ""
+        const normalizedLightness = rawLightness.endsWith("%")
+            ? parseFloat(rawLightness) / 100
+            : parseFloat(rawLightness)
+        if (!Number.isNaN(normalizedLightness)) {
+            return normalizedLightness >= 0.5 ? WHITE_TEXT_COLOR : BLACK_TEXT_COLOR
+        }
+    }
+
+    return null
+}
+
+function clampChannel(channel: number): number {
+    return Math.max(0, Math.min(255, Math.round(channel)))
+}
+
+export function formatRgbColor(color: RgbaColor): string {
+    return `rgb(${clampChannel(color.r)}, ${clampChannel(color.g)}, ${clampChannel(color.b)})`
+}
+
+export function withOpaqueAlpha(color: RgbaColor): RgbaColor {
+    return {
+        r: clampChannel(color.r),
+        g: clampChannel(color.g),
+        b: clampChannel(color.b),
+        a: OPAQUE_ALPHA,
+    }
+}
+
+export function mixColors(baseColor: RgbaColor, targetColor: RgbaColor, amount: number): RgbaColor {
+    const normalizedAmount = Math.max(0, Math.min(1, amount))
+    return {
+        r: clampChannel(baseColor.r + (targetColor.r - baseColor.r) * normalizedAmount),
+        g: clampChannel(baseColor.g + (targetColor.g - baseColor.g) * normalizedAmount),
+        b: clampChannel(baseColor.b + (targetColor.b - baseColor.b) * normalizedAmount),
+        a: OPAQUE_ALPHA,
+    }
+}
+
+/**
  * Alpha-composites a semi-transparent foreground color over an opaque background
  * using the standard Porter-Duff "over" operation.
  */
@@ -102,6 +166,22 @@ function getRelativeLuminance(color: RgbaColor): number {
         0.7152 * toLinearColorSpace(color.g) +
         0.0722 * toLinearColorSpace(color.b)
     )
+}
+
+export function getRelativeLuminanceValue(color: RgbaColor): number {
+    return getRelativeLuminance(color)
+}
+
+/** Returns whichever monochrome text color best matches the brightness of the input color. */
+export function getMonochromeColorByLuminance(color: RgbaColor): string {
+    const luminance = getRelativeLuminance(color)
+    return luminance >= 0.5 ? WHITE_TEXT_COLOR : BLACK_TEXT_COLOR
+}
+
+export function getBoostedContrastColor(color: RgbaColor, amount: number): RgbaColor {
+    const luminance = getRelativeLuminance(color)
+    const targetColor = luminance >= 0.5 ? WHITE_COLOR : BLACK_COLOR
+    return mixColors(withOpaqueAlpha(color), targetColor, amount)
 }
 
 /** Returns the WCAG contrast ratio between two colors (range: 1–21). */

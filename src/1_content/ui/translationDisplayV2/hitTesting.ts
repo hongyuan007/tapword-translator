@@ -11,8 +11,10 @@
  */
 
 import * as loggerModule from "@/0_common/utils/logger"
+import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
 import { CLICK_DEBOUNCE_DELAY_MS, INTERACTION_GRACE_PERIOD_MS, RANGE_HIT_TEST_HORIZONTAL_PAD_PX } from "./types"
 import { getNormalizedLineRects } from "./tooltipLayout"
+import { isRectVisibleForSource } from "./clipVisibility"
 
 const logger = loggerModule.createLogger("translationDisplayV2/hitTesting")
 
@@ -77,6 +79,25 @@ export function detachGlobalHitListeners(): void {
     logger.info("Global hit-test listeners detached")
 }
 
+export function cancelPendingTranslationClick(): void {
+    if (!clickTimer) return
+
+    window.clearTimeout(clickTimer)
+    clickTimer = undefined
+}
+
+export function isPointInsideAnyActiveTranslation(x: number, y: number): boolean {
+    if (!callbacks) return false
+
+    for (const entry of callbacks.getActiveTranslations().values()) {
+        if (isPointInsideTranslationZone(x, y, entry.range, entry.tooltips)) {
+            return true
+        }
+    }
+
+    return false
+}
+
 // ============================================================================
 // Event Handlers
 // ============================================================================
@@ -85,8 +106,18 @@ function handleClick(e: MouseEvent): void {
     if (!callbacks) return
 
     // Skip clicks on our own UI elements
-    const target = e.target as Element
+    const target = e.target
+    if (!(target instanceof Element)) return
     if (target.closest(OWN_UI_SELECTOR)) return
+
+    const interaction = editableElementDetector.classifyInteractiveElement(target, e)
+    if (interaction.isInteractive && interaction.level === "strong") {
+        logger.debug("Skipping translation click on strong interactive element", {
+            tag: interaction.element?.tagName,
+            reason: interaction.reason,
+        })
+        return
+    }
 
     // Skip if user just finished a drag-selection — not an intentional click on a translation
     const selection = window.getSelection()
@@ -101,7 +132,10 @@ function handleClick(e: MouseEvent): void {
         return
     }
 
-    e.stopPropagation()
+    const shouldStopPropagation = interaction.level !== "weak" && !interaction.ignoredAsTextException
+    if (shouldStopPropagation) {
+        e.stopPropagation()
+    }
 
     if (clickTimer) window.clearTimeout(clickTimer)
     clickTimer = window.setTimeout(() => {
@@ -114,8 +148,18 @@ function handleDblClick(e: MouseEvent): void {
     if (!callbacks) return
 
     // Skip clicks on our own UI elements
-    const target = e.target as Element
+    const target = e.target
+    if (!(target instanceof Element)) return
     if (target.closest(OWN_UI_SELECTOR)) return
+
+    const interaction = editableElementDetector.classifyInteractiveElement(target, e)
+    if (interaction.isInteractive && interaction.level === "strong") {
+        logger.debug("Skipping translation double-click on strong interactive element", {
+            tag: interaction.element?.tagName,
+            reason: interaction.reason,
+        })
+        return
+    }
 
     // Note: no selection.isCollapsed guard here — double-clicking inherently selects the word,
     // so getSelection() is always non-collapsed. The drag-select guard is only in handleClick.
@@ -129,7 +173,10 @@ function handleDblClick(e: MouseEvent): void {
         return
     }
 
-    e.stopPropagation()
+    const shouldStopPropagation = interaction.level !== "weak" && !interaction.ignoredAsTextException
+    if (shouldStopPropagation) {
+        e.stopPropagation()
+    }
     e.preventDefault()
 
     // Cancel any pending single-click action
@@ -171,9 +218,11 @@ export function isPointInsideTranslationZone(
     x: number, y: number, range: Range, tooltips: HTMLElement[]
 ): boolean {
     const rangeRects = getNormalizedLineRects(range)
+    const sourceElement = range.startContainer.parentElement
 
     // 1. Range text rects (with horizontal padding)
     for (const rect of rangeRects) {
+        if (!isRectVisibleForSource(rect, sourceElement, range)) continue
         if (
             x >= rect.left - RANGE_HIT_TEST_HORIZONTAL_PAD_PX &&
             x <= rect.right + RANGE_HIT_TEST_HORIZONTAL_PAD_PX &&
@@ -186,6 +235,7 @@ export function isPointInsideTranslationZone(
 
     // 2. Tooltip element rects
     for (const tooltip of tooltips) {
+        if (tooltip.style.visibility === "hidden") continue
         const rect = tooltip.getBoundingClientRect()
         if (rect.width === 0 || rect.height === 0) continue
         if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
@@ -200,8 +250,10 @@ export function isPointInsideTranslationZone(
         const rangeRect = rangeRects[i]
         if (!rangeRect) continue
         if (rangeRect.width === 0 || rangeRect.height === 0) continue
+        if (!isRectVisibleForSource(rangeRect, sourceElement, range)) continue
         const tooltip = tooltips[i]
         if (!tooltip) continue
+        if (tooltip.style.visibility === "hidden") continue
 
         const tooltipRect = tooltip.getBoundingClientRect()
         if (tooltipRect.width === 0 || tooltipRect.height === 0) continue
