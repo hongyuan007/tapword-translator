@@ -160,6 +160,7 @@ export function expandToWordBoundaries(originalRange: Range): ExpandResult {
             // At the beginning of this text node → peek previous text node's last char.
             const prevNode = domSanitizer.getPreviousTextNodeWithin(startNode, leftRoot)
             if (!prevNode) break
+            if (!domSanitizer.canExpandAcrossTextNodes(startNode, prevNode)) break
             const prevText = (prevNode as Text).textContent || ""
             if (prevText.length === 0) break
             const lastChar = prevText.charAt(prevText.length - 1)
@@ -203,6 +204,7 @@ export function expandToWordBoundaries(originalRange: Range): ExpandResult {
             // At the end of this text node → peek next text node's first char.
             const nextNode = domSanitizer.getNextTextNodeWithin(endNode, rightRoot)
             if (!nextNode) break
+            if (!domSanitizer.canExpandAcrossTextNodes(endNode, nextNode)) break
             const nextText = (nextNode as Text).textContent || ""
             if (nextText.length === 0) break
             const firstChar = nextText.charAt(0)

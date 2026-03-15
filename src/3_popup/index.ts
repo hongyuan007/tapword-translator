@@ -67,7 +67,7 @@ async function initialize(): Promise<void> {
         })
     }
 
-    // Display version number (prefer version_name for descriptive labels)
+    // Display version number (prefer version_name for descriptive labels like "0.4.2-tooltipv2")
     const manifest = chrome.runtime.getManifest()
     const versionText = manifest.version_name || manifest.version
     const versionDisplay = document.getElementById("versionDisplay")

@@ -13,7 +13,8 @@ import * as contentIndex from "@/1_content/index"
 import * as modalTemplates from "@/1_content/ui/modalTemplates"
 import * as toastNotification from "@/1_content/ui/toastNotification"
 import * as languageDetector from "@/1_content/utils/languageDetector"
-import { ModalPositioner } from "@/1_content/utils/modalPositioner"
+import { ModalPositionerV2 } from "@/1_content/utils/modalPositionerV2"
+import * as hitTesting from "@/1_content/ui/translationDisplayV2/hitTesting"
 import * as versionStatus from "@/1_content/utils/versionStatus"
 
 // Inject modal stylesheet into Shadow DOM to avoid host CSS leakage
@@ -115,23 +116,25 @@ let offsetY = 0
  * Show translation detail modal
  *
  * @param data - Translation detail data to display
- * @param anchorElement - The anchor element that triggered the modal (for positioning)
+ * @param anchorSource - The source range that triggered the modal (for positioning)
  * @param anchorId - Optional anchor ID to enable automatic modal updates when translation completes
  *
  * @example
  * ```typescript
- * const anchorElement = document.getElementById('translation-anchor-0');
+ * const anchorRange = document.createRange();
+ * anchorRange.selectNodeContents(document.querySelector('[data-example="source"]')!);
  * showTranslationModal({
  *     status: 'success',
- *     word: 'light',
- *     wordTranslation: '光线',
+ *     translationType: 'word',
+ *     text: 'light',
+ *     translation: '光线',
  *     originalSentence: 'The room was filled with natural light.',
  *     sentenceTranslation: '房间里充满了自然光线。',
- *     dictionaryContent: 'noun: visible electromagnetic radiation...'
- * }, anchorElement, 'translation-anchor-0');
+ *     englishDefinition: 'noun: visible electromagnetic radiation...'
+ * }, anchorRange, 'translation-anchor-0');
  * ```
  */
-export async function showTranslationModal(data: TranslationDetailData, anchorElement: HTMLElement | null, anchorId?: string): Promise<void> {
+export async function showTranslationModal(data: TranslationDetailData, anchorSource: Range | null, anchorId?: string): Promise<void> {
     try {
         // Close existing modal if any
         closeTranslationModal()
@@ -157,9 +160,9 @@ export async function showTranslationModal(data: TranslationDetailData, anchorEl
         activeModalAnchorId = anchorId || null
         activeModalHost = host
 
-        // Position the modal relative to the anchor element
-        if (anchorElement) {
-            positionModal(modal, anchorElement)
+        // Position the modal relative to the anchor source range
+        if (anchorSource) {
+            positionModal(modal, anchorSource)
         }
 
         // Add dragging functionality
@@ -580,20 +583,19 @@ function onDragEnd(): void {
 // Modal Positioning
 // ============================================================================
 
-// Position type now provided by ModalPositioner helper
-
 /**
  * Calculate and apply optimal position for the modal relative to anchor element
  * Priority: bottom-right > bottom-left > top-right > top-left
  *
  * @param modalContainer - The modal container element
- * @param anchorElement - The anchor element to position relative to
+ * @param anchorSource - The Range to position relative to
  */
-function positionModal(modalContainer: HTMLElement, anchorElement: HTMLElement): void {
+function positionModal(modalContainer: HTMLElement, anchorSource: Range): void {
     const modalRect = modalContainer.getBoundingClientRect()
     const isFragment = modalContainer.classList.contains("translation-type--fragment")
+    const translationType = isFragment ? "fragment" : "word" as const
 
-    const res = ModalPositioner.compute(anchorElement, modalRect, isFragment ? "fragment" : "word")
+    const res = ModalPositionerV2.compute(anchorSource, modalRect, translationType)
 
     // Use fixed positioning (viewport space) instead of absolute (document space)
     // This makes the modal stay fixed relative to viewport during scroll
@@ -643,9 +645,8 @@ function handleOutsideClick(event: MouseEvent): void {
 
     const target = event.target as Node
 
-    // Also check if the click is on a translation anchor
-    const anchor = (target as HTMLElement).closest(`.${constants.CSS_CLASSES.ANCHOR}`)
-    if (anchor) {
+    // V2: Check if click landed inside an active translation Range (replaces V1 anchor check)
+    if (hitTesting.isPointInsideAnyActiveTranslation(event.clientX, event.clientY)) {
         return
     }
 

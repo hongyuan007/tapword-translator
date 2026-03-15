@@ -1,4 +1,4 @@
-Last updated on: 2026-01-07
+Last updated on: 2026-03-11
 
 # 0_common: Shared Utilities and Types
 
@@ -13,10 +13,10 @@ The `0_common` module serves as the foundational layer of the TapWord Translator
 ├── README.md
 ├── index.ts
 ├── constants/
-│   ├── customApi.ts
-│   ├── errorMessages.ts
-│   ├── index.ts
-│   └── translationFontSize.ts
+│   ├── customApi.ts                # Fixed parameters for custom OpenAI-compatible APIs
+│   ├── errorMessages.ts            # User-facing error message map
+│   ├── index.ts                    # Re-exports and app-level constants (feature flags, visual styling)
+│   └── translationFontSize.ts      # Font size preset map and helpers
 ├── locales/
 │   ├── en.json
 │   ├── zh.json
@@ -25,12 +25,18 @@ The `0_common` module serves as the foundational layer of the TapWord Translator
 │   ├── index.ts
 │   └── QuotaExceededError.ts
 └── utils/
-    ├── i18n.ts
-    ├── logger.ts
-    ├── storageManager.ts
-    ├── textTruncator.ts
-    ├── translationManager.ts
-    └── version.ts
+    ├── audioUtils.ts               # Audio MIME type detection from Base64 data
+    ├── colorUtils.ts               # Hex color manipulation (opacity, shorthand expansion)
+    ├── i18n.ts                     # Internationalization: locale loading and DOM translation
+    ├── languageDisplay.ts          # Human-readable language names via Intl.DisplayNames
+    ├── logger.ts                   # Prefixed, level-controlled logger (disabled in production)
+    ├── platformDetector.ts         # OS detection via Chrome API / navigator fallback
+    ├── regionDetector.ts           # Heuristic region detection (e.g., Mainland China)
+    ├── storageManager.ts           # chrome.storage abstraction for UserSettings CRUD
+    ├── textTruncator.ts            # Pixel-width string truncation via canvas measurement
+    ├── textUtils.ts                # Text helpers (single-word detection, etc.)
+    ├── translationManager.ts       # Translation history and caching logic
+    └── version.ts                  # Semantic version comparison helpers
 ```
 
 ## Core Components
@@ -39,7 +45,7 @@ The `0_common` module serves as the foundational layer of the TapWord Translator
 
 This directory centralizes all static, unchanging values used across the application.
 
--   **`constants/index.ts`**: Exports application-level constants, such as cache expiry times and environment-driven feature flags.
+-   **`constants/index.ts`**: Exports application-level constants including cache expiry times, environment-driven feature flags (`APP_EDITION`, `PRIVATE_CLOUD_ENABLED`, `ADVANCED_FEATURES_ENABLED`, `UPGRADE_MODEL_ENABLED`), and visual styling constants (`UNDERLINE_OPACITY`, `UNDERLINE_OFFSET_INTERNAL_SHIFT_PX`).
 -   **`constants/errorMessages.ts`**: Contains a map of user-facing error messages for a consistent user experience.
 -   **`constants/customApi.ts`**: Defines fixed parameters (e.g., `temperature`, `maxTokens`) for requests made to custom OpenAI-compatible APIs.
 -   **`constants/translationFontSize.ts`**: Provides a map and helper functions for managing translation font size presets (e.g., "small", "medium").
@@ -56,16 +62,22 @@ This directory contains the core TypeScript interfaces and types that define the
     -   `TranslationContextData` & `FragmentTranslationContextData`: The shape of data sent for a translation request.
     -   `SpeechSynthesisRequestData`: The shape of data for a text-to-speech request.
     -   Message Types (`TranslateRequestMessage`, `SpeechSynthesisResponseMessage`, etc.): Defines the communication protocol between content scripts and the background service worker.
-    -   `UserSettings`: The comprehensive structure for all user-configurable settings, including defaults in `DEFAULT_USER_SETTINGS`.
+    -   `UserSettings`: The comprehensive structure for all user-configurable settings, including defaults in `DEFAULT_USER_SETTINGS`. Includes V3 tooltip spacing fields (`tooltipUnderlineOffsetPxV3`, `tooltipTextOffsetPxV3`, `tooltipBottomSpacingPxV3`).
 -   **`types/QuotaExceededError.ts`**: A custom error class thrown specifically when a translation or speech synthesis quota has been met.
 
 ### 4. Shared Utilities (`utils/`)
 
 This directory provides a collection of reusable services and helper functions that encapsulate common functionalities.
 
+-   **`utils/audioUtils.ts`**: Detects the MIME type of audio data from its Base64 representation (supports WAV and MP3 signatures).
+-   **`utils/colorUtils.ts`**: Hex color manipulation — adds alpha/opacity to hex strings, expands shorthand notation.
 -   **`utils/i18n.ts`**: A powerful internationalization utility that handles all UI translations. It automatically detects the browser's language, loads the appropriate locale from the `locales/` directory, and provides functions to translate strings. It can apply translations declaratively to the DOM by finding elements with a `data-i18n-key` attribute.
+-   **`utils/languageDisplay.ts`**: Resolves human-readable language names using `Intl.DisplayNames` with a static fallback map.
 -   **`utils/logger.ts`**: A singleton logger that provides prefixed, level-controlled logging (`debug`, `info`, `warn`, `error`) and can be disabled in production environments via Vite environment variables. Use `createLogger('module-name')` for module-specific logging.
+-   **`utils/platformDetector.ts`**: Reliably detects the user's OS via `chrome.runtime.getPlatformInfo()` with `navigator.userAgent` fallback.
+-   **`utils/regionDetector.ts`**: Heuristic detection of user region (e.g., Mainland China) based on browser language and timezone.
 -   **`utils/storageManager.ts`**: An abstraction layer over the `chrome.storage` API. It handles CRUD operations for `UserSettings`, provides default settings for new users (detecting their browser language), and normalizes the settings object to ensure data integrity.
--   **`utils/version.ts`**: Provides helper functions (`compareSemver`, `isLowerVersion`) for comparing semantic version strings.
 -   **`utils/textTruncator.ts`**: A utility for truncating strings to fit a specific pixel width, useful for dynamically rendering text in constrained UI elements.
+-   **`utils/textUtils.ts`**: Text classification helpers such as `isSingleWord()` for distinguishing single words from phrases.
 -   **`utils/translationManager.ts`**: A placeholder for managing translation history and caching logic.
+-   **`utils/version.ts`**: Provides helper functions (`compareSemver`, `isLowerVersion`) for comparing semantic version strings.

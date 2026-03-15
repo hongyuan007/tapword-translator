@@ -1,0 +1,55 @@
+index.js:106 [selectionHandler] Selection validation failed: Empty selection
+index.js:106 [languageDetector] Starting async language detection: A Game of Thrones is an epic fantasy novel by American author George R. R. Martin. It was published in August 1996 as the first entry in his series A Song of Ice and Fire. It was Martin's fourth novel and his return to writing prose fiction after a long period working in television. He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy.
+index.js:114 [languageDetector] Using chrome.i18n.detectLanguage
+index.js:114 [languageDetector] Chrome detected language: en
+index.js:114 [selectionHandler] [Single Click] Translation requested for: American
+index.js:106 [languageDetector] Starting async language detection: A Game of Thrones is an epic fantasy novel by American author George R. R. Martin. It was published in August 1996 as the first entry in his series A Song of Ice and Fire. It was Martin's fourth novel and his return to writing prose fiction after a long period working in television. He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy.
+index.js:114 [languageDetector] Using chrome.i18n.detectLanguage
+index.js:114 [languageDetector] Chrome detected language: en
+index.js:114 [selectionHandler] [Single Click] Routing language (block context): en
+index.js:106 [languageDetector] Starting async language detection: American
+index.js:114 [languageDetector] Using chrome.i18n.detectLanguage
+index.js:114 [languageDetector] Chrome detected language: ko
+index.js:114 [languageDetector] Correcting false positive CJK detection (ko) -> 'en'
+index.js:114 [selectionHandler] [Single Click] Selection language (selected text): en
+index.js:114 [selectionHandler] [Single Click] [Space-delimited Language] Using classification and boundary expansion
+index.js:114 [selectionHandler] [Word Path] Translating word: American | Language: en
+index.js:114 [styleCalculator/layout] Calculating font size. Original: 16px {}
+index.js:114 [styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=38.00px, lineSpacing=22.00px, availableSpace=19.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
+index.js:114 [lineHeightAdjuster] Found block ancestor: <div> with display: block
+index.js:114 [lineHeightAdjuster] Existing adjusted block detected. Incrementing ref count to 2 on <div>
+index.js:114 [1_content/ui/translationDisplayV2] Translation displayed: translation-1 {
+  "status": "loading",
+  "text": "翻译中..",
+  "loadingVariant": "text"
+}
+index.js:114 [selectionHandler] [Word Path] Target language: zh (user setting: zh )
+index.js:114 [translationRequest] [RETRY_DEBUG] Sending message attempt 1 {
+  "type": "TRANSLATE_REQUEST",
+  "data": {
+    "word": "American",
+    "leadingText": "A Game of Thrones is an epic fantasy novel by ",
+    "trailingText": " author George R.",
+    "originalSentence": "A Game of Thrones is an epic fantasy novel by American author George R.",
+    "nextSentences": [
+      "R."
+    ],
+    "bookName": "网页<<A Game of Thrones - Wikipedia>>",
+    "sourceLanguage": "en",
+    "targetLanguage": "zh"
+  }
+}
+index.js:114 [translationRequest] [RETRY_DEBUG] Message successful on attempt 1 duration(ms)= 1076
+index.js:114 [styleCalculator/layout] Calculating font size. Original: 16px {}
+index.js:114 [styleCalculator/layout] Font size calculation complete. Result: 12.00px. Details: original=16.00px, lineHeight=38.00px, lineSpacing=22.00px, availableSpace=19.00px, effectiveAvailable=12.00px, safetyDelta=1, constraints(min=12, max=12.80)
+index.js:114 [1_content/ui/translationDisplayV2] Translation updated: translation-1 {
+  "status": "success",
+  "translation": "美国的",
+  "sentenceTranslation": "《权力的游戏》是一部由美国作家乔治·R.著的史诗奇幻小说。",
+  "chineseDefinition": "n. 美国人\na. 美国的, 美洲的",
+  "englishDefinition": "noun: a native or inhabitant of the United States; the English language as used in the United States; a native or inhabitant of a North American or Central American or South American country\nadjective: of or relating to the United States of America or its people or language or culture; of or relating to or characteristic of the continents and islands of the Americas",
+  "targetDefinition": "n. 美国人\na. 美国的, 美洲的",
+  "targetLanguage": "zh",
+  "phonetic": "ә'merikәn",
+  "lemmaPhonetic": "ә'merikәn"
+}

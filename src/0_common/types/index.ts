@@ -307,6 +307,12 @@ export interface UserSettings {
     textUnderlineOffsetPx: number
     /** Distance between the text baseline and the underline (px) - V2 forced defaults */
     textUnderlineOffsetPxV2: number
+    /** V3: distance between the original text and the tooltip underline (px) */
+    tooltipUnderlineOffsetPxV3: number
+    /** V3: distance between the tooltip underline and the translation text (px) */
+    tooltipTextOffsetPxV3: number
+    /** V3: extra blank space below the translation text (px) */
+    tooltipBottomSpacingPxV3: number
     /** Color for single word translation underline (hex code) */
     wordUnderlineColor: string
     /** Color for single word translation underline (hex code) - V2 forced defaults */
@@ -354,6 +360,9 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     tooltipVerticalOffsetPxV2: 3,
     textUnderlineOffsetPx: 3,
     textUnderlineOffsetPxV2: 4,
+    tooltipUnderlineOffsetPxV3: 1.5,
+    tooltipTextOffsetPxV3: 1,
+    tooltipBottomSpacingPxV3: 6,
     wordUnderlineColor: "#2A9D8F",
     wordUnderlineColorV2: "#1F7FDB",
     sentenceUnderlineColor: "#E9C46A",
