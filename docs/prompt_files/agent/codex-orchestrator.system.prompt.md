@@ -126,6 +126,8 @@ Tell the sub-agent to:
 - update `docs/plan/y2026/[TaskID]/progress.md`
 - not run tests or build commands
 - return the exact progress document path
+- if asked to generate a review manifest, first read `docs/prompt_files/review/generate-review-manifest.prompt.md`
+- if it creates a review manifest, write it under `docs/plan/y2026/[TaskID]/review/` and return the exact manifest path
 - if it creates any additional task document, return the exact path
 
 ### Verification
@@ -143,6 +145,7 @@ Tell the sub-agent to:
 
 Tell the sub-agent to:
 
+- first read `docs/prompt_files/review/project-review-rule.prompt.md`
 - inspect modified files against the intended change
 - identify regressions, maintainability issues, and missing tests
 - separate findings into Must Fix and Nice to Have
