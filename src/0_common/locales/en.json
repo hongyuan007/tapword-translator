@@ -185,5 +185,8 @@
     "popup.languageProficiency.description": "Affects how many and which words are auto-translated",
     "popup.proficiency.beginner": "Beginner",
     "popup.proficiency.intermediate": "Intermediate",
-    "popup.proficiency.advanced": "Advanced"
+    "popup.proficiency.advanced": "Advanced",
+    "popup.translatePage.label": "Translate Page",
+    "popup.translatePage.loading": "Translating...",
+    "popup.translatePage.stop": "Stop Translation"
 }

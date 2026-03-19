@@ -70,7 +70,7 @@ export interface SpeechSynthesisRequestData {
 /**
  * Message types for content-background communication
  */
-export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED" | "AUTO_CANDIDATES_REQUEST"
+export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED" | "AUTO_CANDIDATES_REQUEST" | "FULL_TRANSLATE_BATCH_REQUEST" | "FULL_TRANSLATE_TOGGLE" | "FULL_TRANSLATE_STATUS_REQUEST"
 
 /**
  * Page activated message (sent by content script on injection for token pre-warming)
@@ -456,3 +456,49 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
 }
 
 export const DEFAULT_SUPPRESS_NATIVE_LANGUAGE = DEFAULT_USER_SETTINGS.suppressNativeLanguage
+
+// --- Full-Page Translation Types ---
+
+export interface FullTranslateToggleMessage {
+    type: "FULL_TRANSLATE_TOGGLE"
+    data: {
+        enabled: boolean
+    }
+}
+
+export interface FullTranslateToggleResponseMessage {
+    success: boolean
+    isRunning: boolean
+    error?: string
+}
+
+export interface FullTranslateStatusRequestMessage {
+    type: "FULL_TRANSLATE_STATUS_REQUEST"
+}
+
+export interface FullTranslateStatusResponseMessage {
+    success: boolean
+    isRunning: boolean
+    error?: string
+}
+
+export interface FullTranslateBatchRequestData {
+    /** Array of text segments to translate */
+    texts: string[]
+    /** Source language code */
+    sourceLang: string
+    /** Target language code */
+    targetLang: string
+}
+
+export interface FullTranslateBatchRequestMessage {
+    type: "FULL_TRANSLATE_BATCH_REQUEST"
+    data: FullTranslateBatchRequestData
+}
+
+export interface FullTranslateBatchResponseMessage {
+    success: boolean
+    /** Array of translated texts, same order as input */
+    translations?: string[]
+    error?: string
+}

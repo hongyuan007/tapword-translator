@@ -156,5 +156,8 @@
     "popup.languageProficiency.description": "자동 번역되는 단어의 수와 종류에 영향을 줍니다",
     "popup.proficiency.beginner": "초급",
     "popup.proficiency.intermediate": "중급",
-    "popup.proficiency.advanced": "고급"
+    "popup.proficiency.advanced": "고급",
+    "popup.translatePage.label": "페이지 번역",
+    "popup.translatePage.loading": "번역 중...",
+    "popup.translatePage.stop": "번역 중지"
 }

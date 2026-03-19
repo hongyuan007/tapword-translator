@@ -11,6 +11,12 @@
 
 import * as i18nModule from "@/0_common/utils/i18n"
 import { APP_EDITION } from "@/0_common/constants"
+import type {
+    FullTranslateStatusRequestMessage,
+    FullTranslateStatusResponseMessage,
+    FullTranslateToggleMessage,
+    FullTranslateToggleResponseMessage,
+} from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as settingsManagerModule from "./modules/settingsManager"
 import * as tooltipManagerModule from "./modules/tooltipManager"
@@ -83,9 +89,97 @@ async function initialize(): Promise<void> {
         }
     }
 
+    // Setup full-page translate button
+    await setupFullTranslateButton()
+
     // Remove loading state to reveal content
     document.documentElement.classList.remove("loading")
     logger.info("Popup initialized")
+}
+
+/**
+ * Setup full-page translate button with toggle behavior
+ */
+async function setupFullTranslateButton(): Promise<void> {
+    const button = document.getElementById("fullTranslateButton") as HTMLButtonElement | null
+    const label = document.getElementById("fullTranslateLabel")
+    if (!button || !label) {
+        logger.warn("Full translate button not found")
+        return
+    }
+
+    let isRunning = await getFullTranslateStatus()
+    updateButtonState(button, label, isRunning)
+
+    button.addEventListener("click", () => {
+        const enabling = !isRunning
+
+        // Set loading state
+        button.classList.add("is-loading")
+        button.classList.remove("is-active")
+        label.textContent = i18nModule.translate("popup.translatePage.loading")
+
+        const message: FullTranslateToggleMessage = {
+            type: "FULL_TRANSLATE_TOGGLE",
+            data: { enabled: enabling },
+        }
+
+        chrome.runtime.sendMessage(message, (response: FullTranslateToggleResponseMessage) => {
+            button.classList.remove("is-loading")
+
+            if (chrome.runtime.lastError) {
+                logger.error("Full translate toggle failed:", chrome.runtime.lastError.message)
+                updateButtonState(button, label, isRunning)
+                return
+            }
+
+            // Guard against undefined/error responses (e.g., no content script on restricted pages)
+            if (!response || response.error) {
+                logger.warn("Full translate unavailable on this page:", response?.error ?? "no response")
+                updateButtonState(button, label, isRunning)
+                return
+            }
+
+            isRunning = response.isRunning
+            updateButtonState(button, label, isRunning)
+            logger.info(`Full translate toggled: isRunning=${isRunning}`)
+        })
+    })
+}
+
+function getFullTranslateStatus(): Promise<boolean> {
+    const message: FullTranslateStatusRequestMessage = {
+        type: "FULL_TRANSLATE_STATUS_REQUEST",
+    }
+
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage(message, (response: FullTranslateStatusResponseMessage) => {
+            if (chrome.runtime.lastError) {
+                logger.warn("Failed to load full translate status:", chrome.runtime.lastError.message)
+                resolve(false)
+                return
+            }
+
+            if (!response || response.error) {
+                logger.info("Full translate status unavailable:", response?.error ?? "no response")
+                resolve(false)
+                return
+            }
+
+            resolve(response.isRunning)
+        })
+    })
+}
+
+/** Update button visual state based on running status */
+function updateButtonState(button: HTMLButtonElement, label: HTMLElement, isRunning: boolean): void {
+    if (isRunning) {
+        button.classList.add("is-active")
+        label.textContent = i18nModule.translate("popup.translatePage.stop")
+    } else {
+        button.classList.remove("is-active")
+        label.textContent = i18nModule.translate("popup.translatePage.label")
+    }
 }
 
 // Initialize when DOM is ready

@@ -8,6 +8,7 @@ import type { MessageType } from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as AutoCandidatesRequestHandler from "../handlers/AutoCandidatesRequestHandler"
 import * as FragmentTranslationRequestHandler from "../handlers/FragmentTranslationRequestHandler"
+import * as FullTranslateBatchHandler from "../handlers/FullTranslateBatchHandler"
 import { buildPopupBootstrapResponse } from "../handlers/PopupBootstrapHandler"
 import * as SpeechSynthesisRequestHandler from "../handlers/SpeechSynthesisRequestHandler"
 import * as TokenWarmUpHandler from "../handlers/TokenWarmUpHandler"
@@ -66,6 +67,55 @@ export function setupMessageListener(): void {
             case "AUTO_CANDIDATES_REQUEST":
                 AutoCandidatesRequestHandler.handleAutoCandidatesRequest(message, sendResponse)
                 return true
+
+            case "FULL_TRANSLATE_BATCH_REQUEST":
+                FullTranslateBatchHandler.handleFullTranslateBatchRequest(message.data, sendResponse)
+                return true
+
+            case "FULL_TRANSLATE_TOGGLE": {
+                // Forward to the active tab's content script
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs[0]?.id) {
+                        chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
+                            if (chrome.runtime.lastError) {
+                                logger.warn("No content script on this page:", chrome.runtime.lastError.message)
+                                sendResponse({ success: false, isRunning: false, error: "No content script available on this page" })
+                            } else {
+                                sendResponse(response ?? {
+                                    success: false,
+                                    isRunning: false,
+                                    error: "No response from content script",
+                                })
+                            }
+                        })
+                    } else {
+                        sendResponse({ success: false, isRunning: false, error: "No active tab found" })
+                    }
+                })
+                return true
+            }
+
+            case "FULL_TRANSLATE_STATUS_REQUEST": {
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs[0]?.id) {
+                        chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
+                            if (chrome.runtime.lastError) {
+                                logger.warn("Unable to query full-translate status:", chrome.runtime.lastError.message)
+                                sendResponse({ success: false, isRunning: false, error: "No content script available on this page" })
+                            } else {
+                                sendResponse(response ?? {
+                                    success: false,
+                                    isRunning: false,
+                                    error: "No response from content script",
+                                })
+                            }
+                        })
+                    } else {
+                        sendResponse({ success: false, isRunning: false, error: "No active tab found" })
+                    }
+                })
+                return true
+            }
 
             default:
                 logger.warn("Unknown message type:", messageType)

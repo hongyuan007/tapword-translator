@@ -185,5 +185,8 @@
     "popup.languageProficiency.description": "影响自动翻译的数量和选词",
     "popup.proficiency.beginner": "初级",
     "popup.proficiency.intermediate": "中级",
-    "popup.proficiency.advanced": "高级"
+    "popup.proficiency.advanced": "高级",
+    "popup.translatePage.label": "翻译整页",
+    "popup.translatePage.loading": "翻译中...",
+    "popup.translatePage.stop": "停止翻译"
 }

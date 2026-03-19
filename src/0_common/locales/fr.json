@@ -156,5 +156,8 @@
     "popup.languageProficiency.description": "Affecte le nombre et le type de mots traduits automatiquement",
     "popup.proficiency.beginner": "Débutant",
     "popup.proficiency.intermediate": "Intermédiaire",
-    "popup.proficiency.advanced": "Avancé"
+    "popup.proficiency.advanced": "Avancé",
+    "popup.translatePage.label": "Traduire la page",
+    "popup.translatePage.loading": "Traduction en cours...",
+    "popup.translatePage.stop": "Arrêter la traduction"
 }

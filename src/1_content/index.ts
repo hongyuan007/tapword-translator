@@ -19,6 +19,7 @@ import "@/1_content/resources/content.css"
 import "@/1_content/resources/modal.css"
 import * as iconManager from "@/1_content/ui/iconManager"
 import * as spaNavigationHandler from "@/1_content/handlers/SpaNavigationHandler"
+import * as fullTranslateHandler from "@/1_content/handlers/FullTranslateHandler"
 
 const logger = loggerModule.createLogger("content-script")
 
@@ -112,6 +113,19 @@ async function init(): Promise<void> {
 
     // Cleanup translation UI when SPA navigation changes core URL (ignores hash-only jumps)
     spaNavigationHandler.setup()
+
+    // Listen for messages from popup/background
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+        if (message.type === "FULL_TRANSLATE_TOGGLE") {
+            fullTranslateHandler.handleToggle(message.data.enabled, sendResponse)
+            return true // keep channel open for async response
+        }
+        if (message.type === "FULL_TRANSLATE_STATUS_REQUEST") {
+            fullTranslateHandler.handleStatusRequest(sendResponse)
+            return false
+        }
+        return false
+    })
 
     logger.info("AI Click Translator - Event listeners registered")
 }

@@ -1,0 +1,179 @@
+index.js:1 [15:07:06.397][+6989ms][FullTranslate/ViewportObserver] Started with margin: 600 threshold: 0.1
+index.js:1 [15:07:06.415][+7007ms][FullTranslate/DynamicContentObserver] Started observing document.body
+index.js:1 [15:07:06.415][+7007ms][FullTranslate/PageTranslationManager] Started full-page translation {
+  "walkId": "b4d871c3-b5f1-4eda-a6a8-de4211cda7f0",
+  "paragraphCount": 40
+}
+index.js:1 [15:07:06.417][+7008ms][Content/FullTranslateHandler] Full-page translation started
+index.js:1 [15:07:06.418][+7009ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "DIV",
+  "text": "What’s happening?"
+}
+index.js:1 [15:07:06.418][+7009ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "DIV",
+  "text": "What’s happening?"
+}
+index.js:1 [15:07:06.418][+7010ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "SPAN",
+  "text": "Elon Musk"
+}
+index.js:1 [15:07:06.418][+7010ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "SPAN",
+  "text": "Elon Musk"
+}
+index.js:1 [15:07:06.419][+7010ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "DIV",
+  "text": "@elonmusk"
+}
+index.js:1 [15:07:06.419][+7010ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "DIV",
+  "text": "@elonmusk"
+}
+index.js:1 [15:07:06.419][+7011ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "A",
+  "text": "1h"
+}
+index.js:1 [15:07:06.419][+7011ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "A",
+  "text": "1h"
+}
+index.js:1 [15:07:06.419][+7011ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "DIV",
+  "text": "Generated with @Grok Imagine "
+}
+index.js:1 [15:07:06.419][+7011ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "DIV",
+  "text": "Generated with @Grok Imagine "
+}
+index.js:1 [15:07:06.420][+7011ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "DIV",
+  "text": "0:00"
+}
+index.js:1 [15:07:06.420][+7011ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "DIV",
+  "text": "0:00"
+}
+index.js:1 [15:07:06.420][+7012ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "DIV",
+  "text": "Create your own with Grok"
+}
+index.js:1 [15:07:06.420][+7012ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "DIV",
+  "text": "Create your own with Grok"
+}
+index.js:1 [15:07:06.420][+7012ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "SPAN",
+  "text": "2.1K"
+}
+index.js:1 [15:07:06.420][+7012ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "SPAN",
+  "text": "2.1K"
+}
+index.js:1 [15:07:06.420][+7012ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "SPAN",
+  "text": "918"
+}
+index.js:1 [15:07:06.420][+7012ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "SPAN",
+  "text": "918"
+}
+index.js:1 [15:07:06.421][+7012ms][FullTranslate/PageTranslationManager] [translateSimpleParagraph] skipped — did not pass shouldTranslateParagraph
+index.js:1 [15:07:06.421][+7012ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "SPAN",
+  "text": "7.7K"
+}
+index.js:1 [15:07:06.421][+7012ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "SPAN",
+  "text": "7.7K"
+}
+index.js:1 [15:07:06.421][+7012ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "SPAN",
+  "text": "1.2M"
+}
+index.js:1 [15:07:06.421][+7012ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "SPAN",
+  "text": "1.2M"
+}
+index.js:1 [15:07:06.421][+7013ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "SPAN",
+  "text": "Lord Bebo"
+}
+index.js:1 [15:07:06.421][+7013ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "SPAN",
+  "text": "Lord Bebo"
+}
+index.js:1 [15:07:06.421][+7013ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "DIV",
+  "text": "@MyLordBebo"
+}
+index.js:1 [15:07:06.421][+7013ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "DIV",
+  "text": "@MyLordBebo"
+}
+index.js:1 [15:07:06.421][+7013ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "A",
+  "text": "11h"
+}
+index.js:1 [15:07:06.421][+7013ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "A",
+  "text": "11h"
+}
+index.js:1 [15:07:06.422][+7013ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "DIV",
+  "text": "Why turn off autopilot?"
+}
+index.js:1 [15:07:06.422][+7013ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "DIV",
+  "text": "Why turn off autopilot?"
+}
+index.js:1 [15:07:06.422][+7013ms][FullTranslate/PageTranslationManager] [onParagraphVisible] {
+  "tag": "BODY",
+  "text": "The function is being upgraded"
+}
+index.js:1 [15:07:06.422][+7013ms][FullTranslate/PageTranslationManager] [translateElement] simple paragraph branch {
+  "tag": "BODY",
+  "text": "The function is being upgraded"
+}
+index.js:1 [15:07:06.428][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "What’s happening?"
+}
+index.js:1 [15:07:06.428][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "Elon Musk"
+}
+index.js:1 [15:07:06.428][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "@elonmusk"
+}
+index.js:1 [15:07:06.429][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "0:00"
+}
+index.js:1 [15:07:06.429][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "Create your own with Grok"
+}
+index.js:1 [15:07:06.429][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "2.1K"
+}
+index.js:1 [15:07:06.429][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "1.2M"
+}
+index.js:1 [15:07:06.429][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "Lord Bebo"
+}
+index.js:1 [15:07:06.429][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "@MyLordBebo"
+}
+index.js:1 [15:07:06.429][+7020ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "11h"
+}
+index.js:1 [15:07:06.429][+7021ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "Why turn off autopilot?"
+}
+index.js:1 [15:07:06.429][+7021ms][FullTranslate/PageTranslationManager] [translateText] cache hit {
+  "text": "The function is being upgraded"
+}
+index.js:1 [15:07:06.530][+7121ms][FullTranslate/BatchQueue] [flush] flushing {
+  "batchCount": 1,
+  "totalItems": 3
+}
+index.js:1 [15:07:07.650][+8242ms][FullTranslate/BatchQueue] [executeBatch] success {
+  "batchSize": 3
+}

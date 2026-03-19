@@ -156,5 +156,8 @@
     "popup.languageProficiency.description": "自動翻訳される単語の数と種類に影響します",
     "popup.proficiency.beginner": "初級",
     "popup.proficiency.intermediate": "中級",
-    "popup.proficiency.advanced": "上級"
+    "popup.proficiency.advanced": "上級",
+    "popup.translatePage.label": "ページを翻訳",
+    "popup.translatePage.loading": "翻訳中...",
+    "popup.translatePage.stop": "翻訳を停止"
 }

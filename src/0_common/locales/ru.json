@@ -156,5 +156,8 @@
     "popup.languageProficiency.description": "Влияет на количество и выбор слов для автоматического перевода",
     "popup.proficiency.beginner": "Начальный",
     "popup.proficiency.intermediate": "Средний",
-    "popup.proficiency.advanced": "Продвинутый"
+    "popup.proficiency.advanced": "Продвинутый",
+    "popup.translatePage.label": "Перевести страницу",
+    "popup.translatePage.loading": "Перевод...",
+    "popup.translatePage.stop": "Остановить перевод"
 }

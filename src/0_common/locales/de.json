@@ -156,5 +156,8 @@
     "popup.languageProficiency.description": "Beeinflusst, wie viele und welche Wörter automatisch übersetzt werden",
     "popup.proficiency.beginner": "Anfänger",
     "popup.proficiency.intermediate": "Mittelstufe",
-    "popup.proficiency.advanced": "Fortgeschritten"
+    "popup.proficiency.advanced": "Fortgeschritten",
+    "popup.translatePage.label": "Seite übersetzen",
+    "popup.translatePage.loading": "Übersetze...",
+    "popup.translatePage.stop": "Übersetzung stoppen"
 }
