@@ -136,12 +136,14 @@ export const CUSTOM_FORCE_BLOCK_SELECTORS: Record<string, string[]> = {
     'www.youtube.com': [
         'yt-attributed-string > span',
     ],
-    'x.com': [
-        '[data-testid="tweetText"] span',
-    ],
-    'twitter.com': [
-        '[data-testid="tweetText"] span',
-    ],
+    // Temporarily disabled while validating the generic unwrap/content-container fix.
+    // Re-enable only if the generic rule proves insufficient for tweet body rendering.
+    // 'x.com': [
+    //     '[data-testid="tweetText"] span',
+    // ],
+    // 'twitter.com': [
+    //     '[data-testid="tweetText"] span',
+    // ],
 };
 
 // --- RTL Languages ---

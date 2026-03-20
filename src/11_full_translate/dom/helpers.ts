@@ -4,6 +4,7 @@
  */
 
 import type { PageTranslateRange } from '../types';
+import { BLOCK_ATTRIBUTE, INLINE_ATTRIBUTE } from '../constants';
 import { isHTMLElement, isDontWalkIntoAndDontTranslateAsChildElement } from './filter';
 
 // ============================================================
@@ -27,14 +28,7 @@ export function unwrapDeepestOnlyHTMLChild(
     while (currentElement) {
         smashTruncationStyle(currentElement);
 
-        const shouldKeepNode = (child: ChildNode): boolean => {
-            if (!child.textContent?.trim()) return false;
-            if (child.nodeType === Node.TEXT_NODE) return true;
-            return isHTMLElement(child)
-                && !isDontWalkIntoAndDontTranslateAsChildElement(child, range);
-        };
-
-        const effectiveChildNodes = Array.from(currentElement.childNodes).filter(shouldKeepNode);
+        const effectiveChildNodes = getMeaningfulChildNodes(currentElement, range);
         const effectiveChildren = effectiveChildNodes.filter(
             child => child.nodeType === Node.ELEMENT_NODE,
         );
@@ -44,6 +38,14 @@ export function unwrapDeepestOnlyHTMLChild(
 
         const onlyChildElement = effectiveChildren[0];
         if (!onlyChildElement || !isHTMLElement(onlyChildElement)) break;
+
+        // Stop at the first block-like node that directly owns text content,
+        // or that immediately wraps a single inline text leaf.
+        // This preserves content containers such as tweetText divs while still
+        // allowing pure wrapper chains like div > div > div > text to unwrap.
+        if (shouldKeepCurrentElementAsInsertionTarget(currentElement, onlyChildElement)) {
+            break;
+        }
 
         currentElement = onlyChildElement;
     }
@@ -84,4 +86,65 @@ export function smashTruncationStyle(element: HTMLElement): void {
             element.style.textOverflow = 'unset';
         }
     });
+}
+
+function getMeaningfulChildNodes(
+    element: HTMLElement,
+    range: PageTranslateRange,
+): ChildNode[] {
+    return Array.from(element.childNodes).filter((child: ChildNode): boolean => {
+        if (!child.textContent?.trim()) return false;
+        if (child.nodeType === Node.TEXT_NODE) return true;
+        return isHTMLElement(child)
+            && !isDontWalkIntoAndDontTranslateAsChildElement(child, range);
+    });
+}
+
+function shouldKeepCurrentElementAsInsertionTarget(
+    currentElement: HTMLElement,
+    onlyChildElement: HTMLElement,
+): boolean {
+    if (hasMeaningfulDirectText(currentElement)) {
+        return true;
+    }
+
+    const currentIsBlockLike = isBlockLikeNode(currentElement);
+    const childIsInlineLike = isInlineLikeNode(onlyChildElement);
+    if (currentIsBlockLike && childIsInlineLike) {
+        return true;
+    }
+
+    return false;
+}
+
+function hasMeaningfulDirectText(element: HTMLElement): boolean {
+    return Array.from(element.childNodes).some((child: ChildNode): boolean => (
+        child.nodeType === Node.TEXT_NODE && !!child.textContent?.trim()
+    ));
+}
+
+function isBlockLikeNode(element: HTMLElement): boolean {
+    if (element.hasAttribute(BLOCK_ATTRIBUTE)) {
+        return true;
+    }
+
+    if (element.hasAttribute(INLINE_ATTRIBUTE)) {
+        return false;
+    }
+
+    const display = window.getComputedStyle(element).display;
+    return !display.startsWith('inline') && display !== 'contents';
+}
+
+function isInlineLikeNode(element: HTMLElement): boolean {
+    if (element.hasAttribute(INLINE_ATTRIBUTE)) {
+        return true;
+    }
+
+    if (element.hasAttribute(BLOCK_ATTRIBUTE)) {
+        return false;
+    }
+
+    const display = window.getComputedStyle(element).display;
+    return display.startsWith('inline') || display === 'contents';
 }
