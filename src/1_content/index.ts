@@ -20,6 +20,7 @@ import "@/1_content/resources/modal.css"
 import * as iconManager from "@/1_content/ui/iconManager"
 import * as spaNavigationHandler from "@/1_content/handlers/SpaNavigationHandler"
 import * as fullTranslateHandler from "@/1_content/handlers/FullTranslateHandler"
+import * as floatingButtonIntegration from "@/1_content/handlers/FloatingButtonIntegration"
 
 const logger = loggerModule.createLogger("content-script")
 
@@ -80,6 +81,15 @@ async function initializeUserSettings(): Promise<void> {
     })
 }
 
+// Detect extension context invalidation and clean up injected DOM
+const invalidationCheckInterval = setInterval(() => {
+    if (!chrome.runtime?.id) {
+        clearInterval(invalidationCheckInterval)
+        logger.info("Extension context invalidated — cleaning up")
+        floatingButtonIntegration.destroy()
+    }
+}, 1000)
+
 /**
  * Initialize the content script
  */
@@ -113,6 +123,11 @@ async function init(): Promise<void> {
 
     // Cleanup translation UI when SPA navigation changes core URL (ignores hash-only jumps)
     spaNavigationHandler.setup()
+
+    // Initialize floating translation button
+    floatingButtonIntegration.setup().catch((error) => {
+        logger.error("Failed to initialize floating button:", error)
+    })
 
     // Listen for messages from popup/background
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

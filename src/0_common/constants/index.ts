@@ -18,6 +18,11 @@ export const CACHE_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 export const UPDATE_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
 /**
+ * Extension UI ownership marker — used to exclude extension-injected DOM from full-text translation
+ */
+export const EXTENSION_OWNED_ATTRIBUTE = "data-tapword-ext"
+
+/**
  * Visual styling constants
  */
 export const UNDERLINE_OPACITY = 1

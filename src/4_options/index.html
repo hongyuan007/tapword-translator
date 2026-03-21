@@ -33,10 +33,10 @@
       <aside class="sidebar">
         <nav class="nav-menu">
           <a href="#general-settings" class="nav-item active" data-section="general-settings" data-i18n-key="popup.section.general">General</a>
+          <a href="#appearance-settings" class="nav-item" data-section="appearance-settings" data-i18n-key="popup.section.appearance">Appearance</a>
           <a href="#translation-settings" class="nav-item" data-section="translation-settings" data-i18n-key="popup.section.translate">Translation</a>
           <a href="#display-settings" class="nav-item" data-section="display-settings" data-i18n-key="popup.section.text">Text</a>
           <a href="#audio-settings" class="nav-item" data-section="audio-settings" data-i18n-key="popup.section.audio">Audio</a>
-          <a href="#appearance-settings" class="nav-item" data-section="appearance-settings" data-i18n-key="popup.section.appearance">Appearance</a>
           <a href="#advanced-settings" class="nav-item" data-section="advanced-settings" data-i18n-key="popup.section.advanced">Advanced</a>
         </nav>
       </aside>
@@ -121,6 +121,285 @@
                 <input type="checkbox" id="doubleClickSentenceTranslate" data-setting="doubleClickSentenceTranslate">
                 <span class="toggle-slider"></span>
               </label>
+            </div>
+          </div>
+        </div>
+
+        <div id="appearance-settings" class="settings-section">
+          <div class="section-header">
+            <h2 data-i18n-key="popup.section.appearance">Appearance Settings</h2>
+          </div>
+          <div class="card settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="popup.iconColor.label">Icon Color</label>
+              </div>
+            </div>
+            <div class="icon-picker-container">
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="pink" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#F472B6" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="blue" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#60A5FA" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="purple" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#A78BFA" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="green" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#4ADE80" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="orange" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#FB923C" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="red" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#F87171" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="teal" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#2DD4BF" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+              <label class="icon-option">
+                <input type="radio" name="iconColor" value="indigo" data-setting="iconColor">
+                <span class="icon-preview">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#818CF8" opacity="0.85"/>
+                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </label>
+            </div>
+
+            <!-- Floating Button Icon Style -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="popup.floatingButtonIcon.label">Floating Button Style</label>
+              </div>
+            </div>
+            <div class="icon-picker-container" id="icon-variant-picker">
+              <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- Floating Button Color -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="popup.floatingButtonColor.label">Floating Button Color</label>
+              </div>
+              <div class="setting-control">
+                <div class="custom-select-wrapper" id="floatingButtonColorSelect">
+                  <div class="custom-select-trigger">
+                    <span class="color-dot" id="floatingButtonColorPreview"></span>
+                    <span class="color-name" id="floatingButtonColorLabel">Select Color</span>
+                    <span class="custom-select-arrow"></span>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="#F472B6">
+                      <span class="color-dot" style="background-color: #F472B6;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.pink">Pink</span>
+                    </div>
+                    <div class="custom-option" data-value="#60A5FA">
+                      <span class="color-dot" style="background-color: #60A5FA;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.blue">Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#A78BFA">
+                      <span class="color-dot" style="background-color: #A78BFA;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.purple">Purple</span>
+                    </div>
+                    <div class="custom-option" data-value="#4ADE80">
+                      <span class="color-dot" style="background-color: #4ADE80;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.green">Green</span>
+                    </div>
+                    <div class="custom-option" data-value="#FB923C">
+                      <span class="color-dot" style="background-color: #FB923C;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.orange">Orange</span>
+                    </div>
+                    <div class="custom-option" data-value="#F87171">
+                      <span class="color-dot" style="background-color: #F87171;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.red">Red</span>
+                    </div>
+                    <div class="custom-option" data-value="#2DD4BF">
+                      <span class="color-dot" style="background-color: #2DD4BF;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.teal">Teal</span>
+                    </div>
+                    <div class="custom-option" data-value="#818CF8">
+                      <span class="color-dot" style="background-color: #818CF8;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.indigo">Indigo</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="wordUnderlineColor" data-i18n-key="popup.wordUnderlineColor.label">Word Underline Color</label>
+              </div>
+              <div class="setting-control">
+                <!-- Custom Select for Word Color -->
+                <div class="custom-select-wrapper" id="wordUnderlineColorSelect" data-setting="wordUnderlineColorV2">
+                  <div class="custom-select-trigger">
+                    <span class="color-dot" id="wordUnderlineColorPreview"></span>
+                    <span class="color-name" id="wordUnderlineColorLabel">Select Color</span>
+                    <span class="custom-select-arrow"></span>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="#2A9D8F">
+                      <span class="color-dot" style="background-color: #2A9D8F;"></span>
+                      <span data-i18n-key="popup.color.teal">Teal</span>
+                    </div>
+                    <div class="custom-option" data-value="#6366F1">
+                      <span class="color-dot" style="background-color: #6366F1;"></span>
+                      <span data-i18n-key="popup.color.indigo">Indigo</span>
+                    </div>
+                    <div class="custom-option" data-value="#0EA5E9">
+                      <span class="color-dot" style="background-color: #0EA5E9;"></span>
+                      <span data-i18n-key="popup.color.skyBlue">Sky Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#1F7FDB">
+                      <span class="color-dot" style="background-color: #1F7FDB;"></span>
+                      <span data-i18n-key="popup.color.standardBlue">Standard Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#E9C46A">
+                      <span class="color-dot" style="background-color: #E9C46A;"></span>
+                      <span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span>
+                    </div>
+                    <div class="custom-option" data-value="#F59E0B">
+                      <span class="color-dot" style="background-color: #F59E0B;"></span>
+                      <span data-i18n-key="popup.color.amber">Amber</span>
+                    </div>
+                    <div class="custom-option" data-value="#8B5CF6">
+                      <span class="color-dot" style="background-color: #8B5CF6;"></span>
+                      <span data-i18n-key="popup.color.softViolet">Soft Violet</span>
+                    </div>
+                    <div class="custom-option" data-value="#F4A261">
+                      <span class="color-dot" style="background-color: #F4A261;"></span>
+                      <span data-i18n-key="popup.color.goldenSand">Golden Sand</span>
+                    </div>
+                    <div class="custom-option" data-value="#D4A373">
+                      <span class="color-dot" style="background-color: #D4A373;"></span>
+                      <span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span>
+                    </div>
+                    <div class="custom-option" data-value="#FFB703">
+                      <span class="color-dot" style="background-color: #FFB703;"></span>
+                      <span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span>
+                    </div>
+                    <div class="custom-option" data-value="#C1A162">
+                      <span class="color-dot" style="background-color: #C1A162;"></span>
+                      <span data-i18n-key="popup.color.mutedGold">Muted Gold</span>
+                    </div>
+                    <div class="custom-option" data-value="#E59E47">
+                      <span class="color-dot" style="background-color: #E59E47;"></span>
+                      <span data-i18n-key="popup.color.standardOrange">Standard Orange</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="sentenceUnderlineColor" data-i18n-key="popup.sentenceUnderlineColor.label">Sentence Underline Color</label>
+              </div>
+              <div class="setting-control">
+                <!-- Custom Select for Sentence Color -->
+                <div class="custom-select-wrapper" id="sentenceUnderlineColorSelect" data-setting="sentenceUnderlineColor">
+                  <div class="custom-select-trigger">
+                    <span class="color-dot" id="sentenceUnderlineColorPreview"></span>
+                    <span class="color-name" id="sentenceUnderlineColorLabel">Select Color</span>
+                    <span class="custom-select-arrow"></span>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="#2A9D8F">
+                      <span class="color-dot" style="background-color: #2A9D8F;"></span>
+                      <span data-i18n-key="popup.color.teal">Teal</span>
+                    </div>
+                    <div class="custom-option" data-value="#6366F1">
+                      <span class="color-dot" style="background-color: #6366F1;"></span>
+                      <span data-i18n-key="popup.color.indigo">Indigo</span>
+                    </div>
+                    <div class="custom-option" data-value="#0EA5E9">
+                      <span class="color-dot" style="background-color: #0EA5E9;"></span>
+                      <span data-i18n-key="popup.color.skyBlue">Sky Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#1F7FDB">
+                      <span class="color-dot" style="background-color: #1F7FDB;"></span>
+                      <span data-i18n-key="popup.color.standardBlue">Standard Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#E9C46A">
+                      <span class="color-dot" style="background-color: #E9C46A;"></span>
+                      <span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span>
+                    </div>
+                    <div class="custom-option" data-value="#F59E0B">
+                      <span class="color-dot" style="background-color: #F59E0B;"></span>
+                      <span data-i18n-key="popup.color.amber">Amber</span>
+                    </div>
+                    <div class="custom-option" data-value="#8B5CF6">
+                      <span class="color-dot" style="background-color: #8B5CF6;"></span>
+                      <span data-i18n-key="popup.color.softViolet">Soft Violet</span>
+                    </div>
+                    <div class="custom-option" data-value="#F4A261">
+                      <span class="color-dot" style="background-color: #F4A261;"></span>
+                      <span data-i18n-key="popup.color.goldenSand">Golden Sand</span>
+                    </div>
+                    <div class="custom-option" data-value="#D4A373">
+                      <span class="color-dot" style="background-color: #D4A373;"></span>
+                      <span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span>
+                    </div>
+                    <div class="custom-option" data-value="#FFB703">
+                      <span class="color-dot" style="background-color: #FFB703;"></span>
+                      <span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span>
+                    </div>
+                    <div class="custom-option" data-value="#C1A162">
+                      <span class="color-dot" style="background-color: #C1A162;"></span>
+                      <span data-i18n-key="popup.color.mutedGold">Muted Gold</span>
+                    </div>
+                    <div class="custom-option" data-value="#E59E47">
+                      <span class="color-dot" style="background-color: #E59E47;"></span>
+                      <span data-i18n-key="popup.color.standardOrange">Standard Orange</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -266,225 +545,6 @@
                 <input type="checkbox" id="autoPlayAudio" data-setting="autoPlayAudio">
                 <span class="toggle-slider"></span>
               </label>
-            </div>
-          </div>
-        </div>
-
-        <div id="appearance-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.appearance">Appearance Settings</h2>
-          </div>
-          <div class="card settings-card">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" data-i18n-key="popup.iconColor.label">Icon Color</label>
-              </div>
-            </div>
-            <div class="icon-picker-container">
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="pink" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#F472B6" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="blue" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#60A5FA" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="purple" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#A78BFA" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="green" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#4ADE80" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="orange" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#FB923C" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="red" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#F87171" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="teal" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#2DD4BF" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-              <label class="icon-option">
-                <input type="radio" name="iconColor" value="indigo" data-setting="iconColor">
-                <span class="icon-preview">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#818CF8" opacity="0.85"/>
-                    <path d="M8 9L11 12L8 15M14 9L17 12L14 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-              </label>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="wordUnderlineColor" data-i18n-key="popup.wordUnderlineColor.label">Word Underline Color</label>
-              </div>
-              <div class="setting-control">
-                <!-- Custom Select for Word Color -->
-                <div class="custom-select-wrapper" id="wordUnderlineColorSelect" data-setting="wordUnderlineColorV2">
-                  <div class="custom-select-trigger">
-                    <span class="color-dot" id="wordUnderlineColorPreview"></span>
-                    <span class="color-name" id="wordUnderlineColorLabel">Select Color</span>
-                    <span class="custom-select-arrow"></span>
-                  </div>
-                  <div class="custom-select-options">
-                    <div class="custom-option" data-value="#2A9D8F">
-                      <span class="color-dot" style="background-color: #2A9D8F;"></span>
-                      <span data-i18n-key="popup.color.teal">Teal</span>
-                    </div>
-                    <div class="custom-option" data-value="#6366F1">
-                      <span class="color-dot" style="background-color: #6366F1;"></span>
-                      <span data-i18n-key="popup.color.indigo">Indigo</span>
-                    </div>
-                    <div class="custom-option" data-value="#0EA5E9">
-                      <span class="color-dot" style="background-color: #0EA5E9;"></span>
-                      <span data-i18n-key="popup.color.skyBlue">Sky Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#1F7FDB">
-                      <span class="color-dot" style="background-color: #1F7FDB;"></span>
-                      <span data-i18n-key="popup.color.standardBlue">Standard Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#E9C46A">
-                      <span class="color-dot" style="background-color: #E9C46A;"></span>
-                      <span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span>
-                    </div>
-                    <div class="custom-option" data-value="#F59E0B">
-                      <span class="color-dot" style="background-color: #F59E0B;"></span>
-                      <span data-i18n-key="popup.color.amber">Amber</span>
-                    </div>
-                    <div class="custom-option" data-value="#8B5CF6">
-                      <span class="color-dot" style="background-color: #8B5CF6;"></span>
-                      <span data-i18n-key="popup.color.softViolet">Soft Violet</span>
-                    </div>
-                    <div class="custom-option" data-value="#F4A261">
-                      <span class="color-dot" style="background-color: #F4A261;"></span>
-                      <span data-i18n-key="popup.color.goldenSand">Golden Sand</span>
-                    </div>
-                    <div class="custom-option" data-value="#D4A373">
-                      <span class="color-dot" style="background-color: #D4A373;"></span>
-                      <span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span>
-                    </div>
-                    <div class="custom-option" data-value="#FFB703">
-                      <span class="color-dot" style="background-color: #FFB703;"></span>
-                      <span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span>
-                    </div>
-                    <div class="custom-option" data-value="#C1A162">
-                      <span class="color-dot" style="background-color: #C1A162;"></span>
-                      <span data-i18n-key="popup.color.mutedGold">Muted Gold</span>
-                    </div>
-                    <div class="custom-option" data-value="#E59E47">
-                      <span class="color-dot" style="background-color: #E59E47;"></span>
-                      <span data-i18n-key="popup.color.standardOrange">Standard Orange</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="sentenceUnderlineColor" data-i18n-key="popup.sentenceUnderlineColor.label">Sentence Underline Color</label>
-              </div>
-              <div class="setting-control">
-                <!-- Custom Select for Sentence Color -->
-                <div class="custom-select-wrapper" id="sentenceUnderlineColorSelect" data-setting="sentenceUnderlineColor">
-                  <div class="custom-select-trigger">
-                    <span class="color-dot" id="sentenceUnderlineColorPreview"></span>
-                    <span class="color-name" id="sentenceUnderlineColorLabel">Select Color</span>
-                    <span class="custom-select-arrow"></span>
-                  </div>
-                  <div class="custom-select-options">
-                    <div class="custom-option" data-value="#2A9D8F">
-                      <span class="color-dot" style="background-color: #2A9D8F;"></span>
-                      <span data-i18n-key="popup.color.teal">Teal</span>
-                    </div>
-                    <div class="custom-option" data-value="#6366F1">
-                      <span class="color-dot" style="background-color: #6366F1;"></span>
-                      <span data-i18n-key="popup.color.indigo">Indigo</span>
-                    </div>
-                    <div class="custom-option" data-value="#0EA5E9">
-                      <span class="color-dot" style="background-color: #0EA5E9;"></span>
-                      <span data-i18n-key="popup.color.skyBlue">Sky Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#1F7FDB">
-                      <span class="color-dot" style="background-color: #1F7FDB;"></span>
-                      <span data-i18n-key="popup.color.standardBlue">Standard Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#E9C46A">
-                      <span class="color-dot" style="background-color: #E9C46A;"></span>
-                      <span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span>
-                    </div>
-                    <div class="custom-option" data-value="#F59E0B">
-                      <span class="color-dot" style="background-color: #F59E0B;"></span>
-                      <span data-i18n-key="popup.color.amber">Amber</span>
-                    </div>
-                    <div class="custom-option" data-value="#8B5CF6">
-                      <span class="color-dot" style="background-color: #8B5CF6;"></span>
-                      <span data-i18n-key="popup.color.softViolet">Soft Violet</span>
-                    </div>
-                    <div class="custom-option" data-value="#F4A261">
-                      <span class="color-dot" style="background-color: #F4A261;"></span>
-                      <span data-i18n-key="popup.color.goldenSand">Golden Sand</span>
-                    </div>
-                    <div class="custom-option" data-value="#D4A373">
-                      <span class="color-dot" style="background-color: #D4A373;"></span>
-                      <span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span>
-                    </div>
-                    <div class="custom-option" data-value="#FFB703">
-                      <span class="color-dot" style="background-color: #FFB703;"></span>
-                      <span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span>
-                    </div>
-                    <div class="custom-option" data-value="#C1A162">
-                      <span class="color-dot" style="background-color: #C1A162;"></span>
-                      <span data-i18n-key="popup.color.mutedGold">Muted Gold</span>
-                    </div>
-                    <div class="custom-option" data-value="#E59E47">
-                      <span class="color-dot" style="background-color: #E59E47;"></span>
-                      <span data-i18n-key="popup.color.standardOrange">Standard Orange</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

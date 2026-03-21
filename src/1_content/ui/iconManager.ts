@@ -5,6 +5,7 @@
  */
 
 import * as constants from "@/1_content/constants"
+import * as commonConstants from "@/0_common/constants"
 import type * as types from "@/0_common/types"
 
 // Global state
@@ -19,6 +20,7 @@ function createTranslationIcon(onClick: (event: Event) => void, iconColor: types
     const colorHex = constants.ICON_COLORS[iconColor] || constants.ICON_COLORS.pink
     const icon = document.createElement("div")
     icon.className = constants.CSS_CLASSES.ICON
+    icon.setAttribute(commonConstants.EXTENSION_OWNED_ATTRIBUTE, "")
     icon.innerHTML = `
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="12" r="10" fill="${colorHex}" opacity="0.85"/>

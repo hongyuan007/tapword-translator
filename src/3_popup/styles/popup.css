@@ -235,6 +235,21 @@ body {
     flex-shrink: 0;
 }
 
+/* Floating Button Toggle */
+.floating-button-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 0 2px;
+}
+
+.floating-button-toggle .setting-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(30, 30, 30, 0.7);
+}
+
 /* Settings List */
 .settings-list {
     padding: 4px 18px 8px;

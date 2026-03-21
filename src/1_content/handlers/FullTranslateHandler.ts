@@ -20,6 +20,34 @@ import {
 
 const logger = loggerModule.createLogger('Content/FullTranslateHandler');
 
+// --- Event system for external observers (e.g., floating button) ---
+
+/** Lifecycle events emitted during translation state transitions */
+export type FullTranslateEvent = 'starting' | 'started' | 'stopped' | 'error';
+export type FullTranslateEventListener = (event: FullTranslateEvent) => void;
+
+const eventListeners = new Set<FullTranslateEventListener>();
+
+/** Register a listener for translation lifecycle events */
+export function addEventListener(listener: FullTranslateEventListener): void {
+    eventListeners.add(listener);
+}
+
+/** Unregister a lifecycle event listener */
+export function removeEventListener(listener: FullTranslateEventListener): void {
+    eventListeners.delete(listener);
+}
+
+function emitEvent(event: FullTranslateEvent): void {
+    for (const listener of eventListeners) {
+        try {
+            listener(event);
+        } catch (e) {
+            logger.error('Event listener error:', e);
+        }
+    }
+}
+
 const DEFAULT_SOURCE_LANG = 'auto';
 const DEFAULT_TARGET_LANG = 'zh';
 const DEFAULT_MODE = 'bilingual' as const;
@@ -30,8 +58,56 @@ const DEFAULT_RANGE = 'all' as const;
 
 let manager: PageTranslationManager | null = null;
 
+/** Check if full-text translation is currently running */
+export function getIsRunning(): boolean {
+    return manager?.getIsRunning() ?? false;
+}
+
+// --- Core start/stop logic (shared by message handler and direct toggle) ---
+
+async function startTranslation(): Promise<void> {
+    emitEvent('starting');
+    const config = await buildConfig();
+    if (!manager) {
+        manager = new PageTranslationManager(config);
+    } else {
+        await manager.updateConfig(config);
+    }
+    await manager.start();
+    logger.info('Full-page translation started');
+    emitEvent('started');
+}
+
+function stopTranslation(): void {
+    if (manager) {
+        manager.stop();
+        logger.info('Full-page translation stopped');
+    }
+    emitEvent('stopped');
+}
+
 /**
- * Handle the full-translate toggle message.
+ * Toggle translation directly (for in-page callers like the floating button).
+ * @returns the new isRunning state
+ */
+export async function toggle(): Promise<boolean> {
+    try {
+        if (getIsRunning()) {
+            stopTranslation();
+            return false;
+        } else {
+            await startTranslation();
+            return true;
+        }
+    } catch (error) {
+        logger.error('Failed to toggle full-page translation:', error);
+        emitEvent('error');
+        return getIsRunning();
+    }
+}
+
+/**
+ * Handle the full-translate toggle message from popup/background.
  * Lazily creates the PageTranslationManager on first use.
  */
 export async function handleToggle(
@@ -44,27 +120,15 @@ export async function handleToggle(
                 sendResponse({ success: true, isRunning: true });
                 return;
             }
-
-            const config = await buildConfig();
-
-            if (!manager) {
-                manager = new PageTranslationManager(config);
-            } else {
-                await manager.updateConfig(config);
-            }
-
-            await manager.start();
-            logger.info('Full-page translation started');
+            await startTranslation();
             sendResponse({ success: true, isRunning: true });
         } else {
-            if (manager) {
-                manager.stop();
-                logger.info('Full-page translation stopped');
-            }
+            stopTranslation();
             sendResponse({ success: true, isRunning: false });
         }
     } catch (error) {
         logger.error('Failed to toggle full-page translation:', error);
+        emitEvent('error');
         sendResponse({
             success: false,
             isRunning: manager?.getIsRunning() ?? false,

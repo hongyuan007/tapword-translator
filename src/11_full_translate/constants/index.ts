@@ -21,6 +21,9 @@ export const MARK_ATTRIBUTES = new Set([
     ATTR_WALK_ID,
 ]);
 
+// --- Extension Ownership (re-exported from common) ---
+export { EXTENSION_OWNED_ATTRIBUTE } from '@/0_common/constants';
+
 // --- CSS Class Names ---
 export const CONTENT_WRAPPER_CLASS = "tapword-translated-content-wrapper";
 export const INLINE_CONTENT_CLASS = "tapword-translated-inline-content";

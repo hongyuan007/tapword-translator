@@ -14,6 +14,7 @@ import {
     MAIN_CONTENT_IGNORE_TAGS,
     CUSTOM_FORCE_BLOCK_SELECTORS,
     CUSTOM_DONT_WALK_SELECTORS,
+    EXTENSION_OWNED_ATTRIBUTE,
 } from '../constants';
 import type { TransNode, PageTranslateRange } from '../types';
 
@@ -230,6 +231,11 @@ function getSkipDecision(
     element: HTMLElement,
     range: PageTranslateRange,
 ): SkipDecision {
+    // Extension-owned UI element — skip entirely
+    if (element.hasAttribute(EXTENSION_OWNED_ATTRIBUTE)) {
+        return { shouldSkip: true, reasons: ['extension-owned'] };
+    }
+
     const reasons: string[] = [];
 
     // The "main" range remains as a reserved capability.

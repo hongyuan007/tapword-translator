@@ -18,6 +18,8 @@ import type {
     FullTranslateToggleResponseMessage,
 } from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
+import { FLOATING_BUTTON_STORAGE_KEY, DEFAULT_CONFIG } from "@/12_floating_button/constants"
+import type { FloatingButtonConfig } from "@/12_floating_button/types"
 import * as settingsManagerModule from "./modules/settingsManager"
 import * as tooltipManagerModule from "./modules/tooltipManager"
 import "./styles/popup.css"
@@ -92,9 +94,47 @@ async function initialize(): Promise<void> {
     // Setup full-page translate button
     await setupFullTranslateButton()
 
+    // Setup floating button toggle
+    await setupFloatingButtonToggle()
+
     // Remove loading state to reveal content
     document.documentElement.classList.remove("loading")
     logger.info("Popup initialized")
+}
+
+/**
+ * Setup floating button toggle — reads/writes directly to chrome.storage.local
+ */
+async function setupFloatingButtonToggle(): Promise<void> {
+    const checkbox = document.getElementById("floatingButtonEnabled") as HTMLInputElement | null
+    if (!checkbox) {
+        logger.warn("Floating button toggle not found")
+        return
+    }
+
+    // Load current state
+    try {
+        const result = await chrome.storage.local.get(FLOATING_BUTTON_STORAGE_KEY)
+        const stored = result[FLOATING_BUTTON_STORAGE_KEY] as Partial<FloatingButtonConfig> | undefined
+        const config = { ...DEFAULT_CONFIG, ...stored }
+        checkbox.checked = config.enabled
+    } catch (error) {
+        logger.error("Failed to load floating button config:", error)
+        checkbox.checked = DEFAULT_CONFIG.enabled
+    }
+
+    // Save on toggle
+    checkbox.addEventListener("change", async () => {
+        try {
+            const result = await chrome.storage.local.get(FLOATING_BUTTON_STORAGE_KEY)
+            const stored = result[FLOATING_BUTTON_STORAGE_KEY] as Partial<FloatingButtonConfig> | undefined
+            const config = { ...DEFAULT_CONFIG, ...stored, enabled: checkbox.checked }
+            await chrome.storage.local.set({ [FLOATING_BUTTON_STORAGE_KEY]: config })
+            logger.info(`Floating button enabled set to ${checkbox.checked}`)
+        } catch (error) {
+            logger.error("Failed to save floating button config:", error)
+        }
+    })
 }
 
 /**

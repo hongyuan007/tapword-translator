@@ -6,7 +6,7 @@
  */
 
 import type { SpeechSynthesisResponseMessage } from "@/0_common/types"
-import { APP_EDITION } from "@/0_common/constants"
+import * as commonConstants from "@/0_common/constants"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as constants from "@/1_content/constants"
 import * as contentIndex from "@/1_content/index"
@@ -481,7 +481,7 @@ function createModalElement(data: TranslationDetailData, showUpdateLabel: boolea
     // Create modal container
     const modalContainer = document.createElement("div")
     modalContainer.className = constants.CSS_CLASSES.MODAL
-    modalContainer.setAttribute("data-app-edition", APP_EDITION)
+    modalContainer.setAttribute("data-app-edition", commonConstants.APP_EDITION)
 
     // Add a class based on the translation type for specific styling
     if (data.translationType === "word") {
@@ -616,6 +616,7 @@ function positionModal(modalContainer: HTMLElement, anchorSource: Range): void {
 
 function createShadowHost(): { host: HTMLElement; shadowRoot: ShadowRoot } {
     const host = document.createElement("div")
+    host.setAttribute(commonConstants.EXTENSION_OWNED_ATTRIBUTE, "")
     // Keep host inert and style-neutral; child modal uses fixed positioning and its own z-index
     host.style.all = "initial"
     const shadowRoot = host.attachShadow({ mode: "open" })

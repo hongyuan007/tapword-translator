@@ -7,6 +7,7 @@
  */
 
 import * as loggerModule from "@/0_common/utils/logger"
+import * as commonConstants from "@/0_common/constants"
 
 const logger = loggerModule.createLogger("toastNotification")
 
@@ -48,6 +49,7 @@ export function showToast(message: string, type: "error" | "info" | "success" = 
         // Create toast element
         const toast = document.createElement("div")
         toast.className = `${TOAST_CLASS} ${TOAST_CLASS}--${type}`
+        toast.setAttribute(commonConstants.EXTENSION_OWNED_ATTRIBUTE, "")
         toast.textContent = message
 
         // Add to specified container, shadow root, or document body

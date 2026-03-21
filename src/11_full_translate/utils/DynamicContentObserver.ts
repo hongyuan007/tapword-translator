@@ -4,7 +4,7 @@
  */
 
 import * as loggerModule from '@/0_common/utils/logger';
-import { WALKED_ATTRIBUTE, CONTENT_WRAPPER_CLASS } from '../constants';
+import { WALKED_ATTRIBUTE, CONTENT_WRAPPER_CLASS, EXTENSION_OWNED_ATTRIBUTE } from '../constants';
 import { hasNoWalkAncestor, isDontWalkIntoAndDontTranslateAsChildElement } from '@/11_full_translate/dom/filter';
 import type { PageTranslateRange } from '@/11_full_translate/types';
 
@@ -123,6 +123,8 @@ export class DynamicContentObserver {
 
     /** Skip elements that are our wrappers, already walked, or match don't-walk rules */
     private shouldSkip(element: HTMLElement): boolean {
+        // Skip extension-owned UI elements
+        if (element.hasAttribute(EXTENSION_OWNED_ATTRIBUTE)) return true;
         // Skip TapWord's own injected elements
         if (element.classList.contains(CONTENT_WRAPPER_CLASS)) return true;
         if (element.closest(`.${CONTENT_WRAPPER_CLASS}`)) return true;

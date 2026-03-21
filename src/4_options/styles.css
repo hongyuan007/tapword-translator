@@ -676,6 +676,37 @@ body {
   height: 100%;
 }
 
+/* Icon Variant Preview (pill shape matching floating button) */
+.icon-option:has(.icon-preview--variant) {
+  padding-left: 8px;
+  padding-right: 0;
+}
+
+.icon-preview--variant {
+  width: 100%;
+  height: 40px;
+  background: #ffffff;
+  border-radius: 9999px 0 0 9999px;
+  border: 1px solid #e5e7eb;
+  border-right: none;
+  justify-content: flex-start;
+  padding-left: 8px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  filter: none;
+}
+
+.icon-preview--variant svg {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.icon-option input[type="radio"]:checked ~ .icon-preview--variant {
+  transform: none;
+}
+
 .highlight-language {
   display: inline-block;
   padding: 2px 6px;
