@@ -368,6 +368,11 @@ body {
   gap: 4px;
 }
 
+.color-setting-control {
+  width: auto;
+  max-width: 100%;
+}
+
 .validation-control {
   align-items: flex-end;
 }
@@ -795,7 +800,8 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  gap: 10px;
+  padding: 8px 40px 8px 12px;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-color);
@@ -805,6 +811,19 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 180px;
+}
+
+.custom-select-wrapper-wide {
+  width: fit-content;
+  max-width: min(100%, 320px);
+}
+
+.color-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .custom-select-trigger:hover {
