@@ -19,7 +19,7 @@ export const DEFAULT_BASE_URL = PRIVATE_CLOUD_ENABLED ? PRIVATE_API_URL : ""
  * Client version
  * Should match the extension version
  */
-export const CLIENT_VERSION = "0.1.0"
+export const CLIENT_VERSION = "0.4.5"
 
 /**
  * Token refresh buffer time (in seconds)
