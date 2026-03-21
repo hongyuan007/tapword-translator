@@ -369,7 +369,7 @@ body {
 }
 
 .color-setting-control {
-  width: auto;
+  width: 252px;
   max-width: 100%;
 }
 
@@ -814,8 +814,12 @@ body {
 }
 
 .custom-select-wrapper-wide {
-  width: fit-content;
-  max-width: min(100%, 320px);
+  width: 100%;
+  min-width: 0;
+}
+
+.custom-select-trigger .color-dot {
+  margin-right: 0;
 }
 
 .color-name {
