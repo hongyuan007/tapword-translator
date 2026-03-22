@@ -46,9 +46,11 @@ export async function handleTextSelection(): Promise<void> {
 
     // Get icon color from settings
     const iconColor = settings?.iconColor ?? "pink"
+    // Get icon position from settings
+    const iconPosition = settings?.iconPosition ?? "bottom-right"
 
     // Show the icon
-    iconManager.showTranslationIcon(range, onIconClick, iconColor)
+    iconManager.showTranslationIcon(range, onIconClick, iconColor, iconPosition)
 }
 
 /**
