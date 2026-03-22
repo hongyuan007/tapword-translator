@@ -357,8 +357,36 @@
 
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="wordUnderlineColor" data-i18n-key="popup.wordUnderlineColor.label">Word Underline Color</label>
+                <label class="setting-label" data-i18n-key="popup.iconPosition.label">Icon position</label>
+                <p class="setting-helper" data-i18n-key="popup.iconPosition.tooltip">
+                  Choose where the translation icon appears relative to selected text.
+                </p>
               </div>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="iconPosition" value="bottom-right" data-setting="iconPosition">
+                  <span data-i18n-key="popup.iconPosition.bottomRight">Bottom-right</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="iconPosition" value="bottom-left" data-setting="iconPosition">
+                  <span data-i18n-key="popup.iconPosition.bottomLeft">Bottom-left</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="iconPosition" value="top-right" data-setting="iconPosition">
+                  <span data-i18n-key="popup.iconPosition.topRight">Top-right</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="iconPosition" value="top-left" data-setting="iconPosition">
+                  <span data-i18n-key="popup.iconPosition.topLeft">Top-left</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="iconPosition" value="auto" data-setting="iconPosition">
+                  <span data-i18n-key="popup.iconPosition.auto">Auto (smart)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="setting-item">
               <div class="setting-control">
                 <!-- Custom Select for Word Color -->
                 <div class="custom-select-wrapper" id="wordUnderlineColorSelect" data-setting="wordUnderlineColorV2">

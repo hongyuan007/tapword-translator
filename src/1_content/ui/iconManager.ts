@@ -12,6 +12,13 @@ let currentIcon: HTMLElement | null = null
 let showIconTimeoutId: number | null = null // For delayed show
 const DOUBLE_CLICK_THRESHOLD = 20 // ms
 
+/** Icon element dimensions (matches SVG viewBox) */
+const ICON_SIZE = 24
+/** Gap between selection boundary and icon */
+const POSITION_GAP = 4
+/** Minimum padding from viewport edges */
+const VIEWPORT_PAD = 2
+
 /**
  * Create the translation icon element
  */
@@ -33,9 +40,85 @@ function createTranslationIcon(onClick: (event: Event) => void, iconColor: types
 }
 
 /**
- * Calculate optimal position for the icon based on selection bounds
+ * Get scroll offsets, handling body-scroll pages (Quirks Mode)
  */
-function calculateIconPosition(range: Range): { top: number; left: number } {
+function getScrollOffset(): { scrollX: number; scrollY: number } {
+    const winScrollY = window.scrollY || document.documentElement.scrollTop || 0
+    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
+    return {
+        scrollY: winScrollY + (winScrollY === 0 ? (document.body?.scrollTop || 0) : 0),
+        scrollX: winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0),
+    }
+}
+
+/**
+ * Calculate position for a specific corner relative to a selection rect
+ */
+function calculateCornerPosition(
+    rect: DOMRect,
+    scroll: { scrollX: number; scrollY: number },
+    corner: types.IconPosition,
+): { top: number; left: number } {
+    const gap = POSITION_GAP
+    switch (corner) {
+        case "bottom-left":
+            return {
+                top: rect.bottom + scroll.scrollY + gap,
+                left: rect.left + scroll.scrollX - ICON_SIZE - gap,
+            }
+        case "top-right":
+            return {
+                top: rect.top + scroll.scrollY - ICON_SIZE - gap,
+                left: rect.right + scroll.scrollX + gap,
+            }
+        case "top-left":
+            return {
+                top: rect.top + scroll.scrollY - ICON_SIZE - gap,
+                left: rect.left + scroll.scrollX - ICON_SIZE - gap,
+            }
+        case "bottom-right":
+        default:
+            return {
+                top: rect.bottom + scroll.scrollY + gap,
+                left: rect.right + scroll.scrollX + gap,
+            }
+    }
+}
+
+/**
+ * Clamp icon position so it stays within the viewport
+ */
+function clampToViewport(top: number, left: number): { top: number; left: number } {
+    const clampedTop = Math.max(0, Math.min(top, window.innerHeight + window.scrollY - ICON_SIZE - VIEWPORT_PAD))
+    const clampedLeft = Math.max(0, Math.min(left, window.innerWidth + window.scrollX - ICON_SIZE - VIEWPORT_PAD))
+    return { top: clampedTop, left: clampedLeft }
+}
+
+/**
+ * Calculate the best corner for auto mode based on available viewport space
+ */
+function computeAutoCorner(rect: DOMRect): types.IconPosition {
+    const spaceBelow = window.innerHeight - rect.bottom
+    const spaceAbove = rect.top
+    const spaceRight = window.innerWidth - rect.right
+    const spaceLeft = rect.left
+
+    // Prefer bottom-right, then choose corner with most space
+    const corners: Array<{ corner: types.IconPosition; space: number }> = [
+        { corner: "bottom-right", space: Math.min(spaceBelow, spaceRight) },
+        { corner: "bottom-left", space: Math.min(spaceBelow, spaceLeft) },
+        { corner: "top-right", space: Math.min(spaceAbove, spaceRight) },
+        { corner: "top-left", space: Math.min(spaceAbove, spaceLeft) },
+    ]
+
+    corners.sort((a, b) => b.space - a.space)
+    return corners[0]?.corner ?? "bottom-right"
+}
+
+/**
+ * Calculate optimal position for the icon based on selection bounds and position setting
+ */
+function calculateIconPosition(range: Range, iconPosition: types.IconPosition): { top: number; left: number } {
     const rects = range.getClientRects()
     if (rects.length === 0) {
         return { top: 0, left: 0 }
@@ -46,29 +129,29 @@ function calculateIconPosition(range: Range): { top: number; left: number } {
         return { top: 0, left: 0 }
     }
 
-    // Position icon at bottom-right of selection.
-    // On body-scroll pages (window.scrollY stays 0, body.scrollTop accumulates) add
-    // body.scrollTop only when window scroll is 0 to avoid double-counting in Quirks Mode.
-    const winScrollY = window.scrollY || document.documentElement.scrollTop || 0
-    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
-    const top = rect.bottom + winScrollY + (winScrollY === 0 ? (document.body?.scrollTop  || 0) : 0) + 4
-    const left = rect.right  + winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0) + 4
-
-    return { top, left }
+    const scroll = getScrollOffset()
+    const effectiveCorner = iconPosition === "auto" ? computeAutoCorner(rect) : iconPosition
+    const pos = calculateCornerPosition(rect, scroll, effectiveCorner)
+    return clampToViewport(pos.top, pos.left)
 }
 
 /**
  * Show the translation icon near the selected text after a short delay.
  * This delay prevents the icon from appearing during a double-click.
  */
-export function showTranslationIcon(range: Range, onClick: (event: Event) => void, iconColor: types.IconColor): void {
+export function showTranslationIcon(
+    range: Range,
+    onClick: (event: Event) => void,
+    iconColor: types.IconColor,
+    iconPosition: types.IconPosition,
+): void {
     // Remove any existing icon or cancel any pending icon display.
     removeTranslationIcon()
 
     showIconTimeoutId = window.setTimeout(() => {
         // Create and position new icon
         const icon = createTranslationIcon(onClick, iconColor)
-        const position = calculateIconPosition(range)
+        const position = calculateIconPosition(range, iconPosition)
 
         icon.style.top = `${position.top}px`
         icon.style.left = `${position.left}px`

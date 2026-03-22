@@ -233,6 +233,9 @@ export type TriggerKey = "meta" | "option" | "alt" | "ctrl"
 
 export type NetworkRegion = "auto" | "china" | "global"
 
+/** Position of the translation icon relative to selected text */
+export type IconPosition = "bottom-right" | "bottom-left" | "top-right" | "top-left" | "auto"
+
 /**
  * Translation provider type
  * - official: Official cloud API (default)
@@ -321,6 +324,8 @@ export interface UserSettings {
     sentenceUnderlineColor: string
     /** Icon background color */
     iconColor: IconColor
+    /** Position of the translation icon relative to selected text */
+    iconPosition: IconPosition
     /** Translation provider selection */
     translationProvider: TranslationProvider
     /** Custom API settings */
@@ -367,6 +372,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     wordUnderlineColorV2: "#1F7FDB",
     sentenceUnderlineColor: "#E9C46A",
     iconColor: "pink",
+    iconPosition: "bottom-right",
     translationProvider: "official",
     customApi: {
         baseUrl: "",
