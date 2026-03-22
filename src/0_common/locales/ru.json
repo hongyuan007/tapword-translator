@@ -148,5 +148,9 @@
     "error.short.bingTranslateError": "Ошибка Bing Translate",
     "error.mtranserverConfigMissing": "Пожалуйста, сначала введите URL MTranServer в настройках",
     "error.mtranserverError": "Не удалось подключиться к MTranServer, проверьте URL и настройки",
-    "error.bingTranslateError": "Bing Переводчик недоступен, проверьте сетевое подключение"
+    "error.bingTranslateError": "Bing Переводчик недоступен, проверьте сетевое подключение",
+    "error.networkError": "Не удалось подключиться к серверу перевода. Проверьте сеть или попробуйте другое подключение.",
+    "error.networkTimeout": "Превышено время ожидания запроса перевода. Проверьте сетевое подключение.",
+    "error.short.networkError": "Ошибка сети",
+    "error.short.networkTimeout": "Превышено время ожидания"
 }

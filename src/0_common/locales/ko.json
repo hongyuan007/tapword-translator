@@ -148,5 +148,9 @@
     "error.short.bingTranslateError": "Bing 번역 오류",
     "error.mtranserverConfigMissing": "먼저 설정에서 MTranServer URL을 입력해 주세요",
     "error.mtranserverError": "MTranServer 연결에 실패했습니다. URL과 설정을 확인해 주세요",
-    "error.bingTranslateError": "Bing 번역에 실패했습니다. 네트워크 연결을 확인해 주세요"
+    "error.bingTranslateError": "Bing 번역에 실패했습니다. 네트워크 연결을 확인해 주세요",
+    "error.networkError": "번역 서버에 연결할 수 없습니다. 네트워크를 확인하거나 다른 네트워크를 사용해 보세요.",
+    "error.networkTimeout": "번역 요청 시간이 초과되었습니다. 네트워크 연결을 확인해 주세요.",
+    "error.short.networkError": "네트워크 오류",
+    "error.short.networkTimeout": "요청 시간 초과"
 }

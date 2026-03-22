@@ -148,5 +148,9 @@
     "error.short.bingTranslateError": "Bing Translate-Fehler",
     "error.mtranserverConfigMissing": "Bitte geben Sie zuerst die MTranServer-URL in den Einstellungen ein",
     "error.mtranserverError": "MTranServer-Verbindung fehlgeschlagen, bitte URL und Konfiguration überprüfen",
-    "error.bingTranslateError": "Bing Übersetzer fehlgeschlagen, bitte Netzwerkverbindung überprüfen"
+    "error.bingTranslateError": "Bing Übersetzer fehlgeschlagen, bitte Netzwerkverbindung überprüfen",
+    "error.networkError": "Verbindung zum Übersetzungsserver fehlgeschlagen. Bitte Netzwerk prüfen oder anderes Netzwerk versuchen.",
+    "error.networkTimeout": "Übersetzungsanfrage zeitüberschritten. Bitte Netzwerkverbindung prüfen.",
+    "error.short.networkError": "Netzwerkfehler",
+    "error.short.networkTimeout": "Zeitüberschreitung"
 }

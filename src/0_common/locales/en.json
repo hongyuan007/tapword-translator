@@ -177,5 +177,9 @@
     "error.short.bingTranslateError": "Bing Translate error",
     "error.mtranserverConfigMissing": "Please enter the MTranServer URL in settings first",
     "error.mtranserverError": "MTranServer connection failed, please check your URL and configuration",
-    "error.bingTranslateError": "Bing Translate failed, please check your network connection"
+    "error.bingTranslateError": "Bing Translate failed, please check your network connection",
+    "error.networkError": "Unable to connect to the translation server. Please check your network or try a different network.",
+    "error.networkTimeout": "Translation request timed out. Please check your network connection.",
+    "error.short.networkError": "Network error",
+    "error.short.networkTimeout": "Request timed out"
 }

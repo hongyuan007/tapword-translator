@@ -177,5 +177,9 @@
     "error.short.bingTranslateError": "Bing 翻译错误",
     "error.mtranserverConfigMissing": "请先在设置中填写 MTranServer 服务地址",
     "error.mtranserverError": "MTranServer 连接失败，请检查服务地址和配置",
-    "error.bingTranslateError": "Bing 翻译失败，请检查网络连接"
+    "error.bingTranslateError": "Bing 翻译失败，请检查网络连接",
+    "error.networkError": "无法连接到翻译服务器，请检查网络或尝试切换网络。",
+    "error.networkTimeout": "翻译请求超时，请检查网络连接。",
+    "error.short.networkError": "网络错误",
+    "error.short.networkTimeout": "请求超时"
 }
