@@ -248,7 +248,10 @@ export function resolveTargetLanguage(sourceLanguage: string, targetLanguage: st
         logger.info(`Block context (${blockLang}) overrides script-based source "${srcLang}" → "${effectiveSrc}"`)
     }
 
-    // If source and target are the same, apply fallback rules
+    // If source and target are the same, apply fallback rules.
+    // zh and zh-tw are treated as distinct — a zh source with zh-tw target
+    // (or vice versa) does NOT trigger fallback. This works naturally since
+    // source detection always returns "zh" (never "zh-tw"), so "zh" !== "zh-tw".
     if (effectiveSrc === tgtLang) {
         logger.info(`Source language (${effectiveSrc}) matches target language (${tgtLang}), applying fallback`)
 

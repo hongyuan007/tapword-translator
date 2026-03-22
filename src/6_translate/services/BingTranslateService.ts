@@ -22,6 +22,7 @@ let currentSubdomain: string | null = null
  */
 const LANGUAGE_CODE_MAP: Record<string, string> = {
     zh: "zh-Hans",
+    "zh-tw": "zh-Hant",
     "zh-Hant": "zh-Hant",
     en: "en",
     ja: "ja",
