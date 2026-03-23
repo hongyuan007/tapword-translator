@@ -357,14 +357,9 @@ function positionTooltip(id: string): void {
     }
 
     const lineRects = rects
-    // On pages where <body> is the scroll container (e.g. position:relative + overflow-y:auto),
-    // window.scrollY stays 0 while body.scrollTop accumulates.  We add body.scrollTop only
-    // when the window scroll is 0, avoiding double-counting in Quirks Mode pages where both
-    // window.scrollY and document.body.scrollTop reflect the same offset simultaneously.
-    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
-    const winScrollY = window.scrollY || document.documentElement.scrollTop  || 0
-    const scrollX = winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0)
-    const scrollY = winScrollY + (winScrollY === 0 ? (document.body?.scrollTop  || 0) : 0)
+    // position: fixed — top/left are relative to the viewport, so clientRect
+    // values can be used directly without scroll offset. This also fixes Firefox
+    // misalignment on pages with CSS transform/filter/will-change ancestors.
     const viewportWidth = document.documentElement.clientWidth
 
     const signature = buildRectsSignature(lineRects)
@@ -418,7 +413,7 @@ function positionTooltip(id: string): void {
             document.body.appendChild(tooltip)
         }
 
-        tooltip.style.position = "absolute"
+        tooltip.style.position = "fixed"
         tooltip.style.transform = "none"
         tooltip.style.marginTop = "0px"
 
@@ -435,17 +430,17 @@ function positionTooltip(id: string): void {
             setTooltipText(tooltip, cached[i] ?? "", rectWidth, isLastLine)
         }
 
-        const top = rect.bottom + scrollY + underlineOffset
+        const top = rect.bottom + underlineOffset
         const tooltipWidth = tooltip.offsetWidth || 0
 
         let left: number
         if (isSingleLine) {
-            const idealLeft = rect.left + scrollX + (rect.width - tooltipWidth) / 2
-            left = Math.max(scrollX + VIEWPORT_PAD_PX, Math.min(idealLeft, scrollX + viewportWidth - tooltipWidth - VIEWPORT_PAD_PX))
+            const idealLeft = rect.left + (rect.width - tooltipWidth) / 2
+            left = Math.max(VIEWPORT_PAD_PX, Math.min(idealLeft, viewportWidth - tooltipWidth - VIEWPORT_PAD_PX))
         } else {
             // Multi-line: left-align each segment to its own rect.
-            left = rect.left + scrollX
-            left = Math.max(scrollX + VIEWPORT_PAD_PX, Math.min(left, scrollX + viewportWidth - tooltipWidth - VIEWPORT_PAD_PX))
+            left = rect.left
+            left = Math.max(VIEWPORT_PAD_PX, Math.min(left, viewportWidth - tooltipWidth - VIEWPORT_PAD_PX))
         }
 
         tooltip.style.top = `${top}px`

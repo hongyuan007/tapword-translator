@@ -46,13 +46,11 @@ function calculateIconPosition(range: Range): { top: number; left: number } {
         return { top: 0, left: 0 }
     }
 
-    // Position icon at bottom-right of selection.
-    // On body-scroll pages (window.scrollY stays 0, body.scrollTop accumulates) add
-    // body.scrollTop only when window scroll is 0 to avoid double-counting in Quirks Mode.
-    const winScrollY = window.scrollY || document.documentElement.scrollTop || 0
-    const winScrollX = window.scrollX || document.documentElement.scrollLeft || 0
-    const top = rect.bottom + winScrollY + (winScrollY === 0 ? (document.body?.scrollTop  || 0) : 0) + 4
-    const left = rect.right  + winScrollX + (winScrollX === 0 ? (document.body?.scrollLeft || 0) : 0) + 4
+    // Position icon at bottom-right of selection using viewport coords.
+    // position: fixed means top/left are relative to the viewport, so clientRect
+    // values can be used directly without scroll offset.
+    const top = rect.bottom + 4
+    const left = rect.right + 4
 
     return { top, left }
 }
