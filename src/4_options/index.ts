@@ -534,6 +534,30 @@ function setVersion(): void {
     versionDisplay.textContent = version
 }
 
+// --- Auto-Hide on Quota Exhaustion Toggle ---
+
+async function loadAutoHideOnQuotaSetting(): Promise<void> {
+    const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || floatingButtonConstants.DEFAULT_CONFIG
+    const checkbox = document.getElementById("autoHideOnQuotaExhausted") as HTMLInputElement | null
+    if (checkbox) {
+        checkbox.checked = config.autoHideOnQuotaExhausted ?? floatingButtonConstants.DEFAULT_CONFIG.autoHideOnQuotaExhausted
+    }
+}
+
+function setupAutoHideOnQuotaListener(): void {
+    const checkbox = document.getElementById("autoHideOnQuotaExhausted") as HTMLInputElement | null
+    if (!checkbox) return
+
+    checkbox.addEventListener("change", async () => {
+        const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+        const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || { ...floatingButtonConstants.DEFAULT_CONFIG }
+        config.autoHideOnQuotaExhausted = checkbox.checked
+        await chrome.storage.local.set({ [floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY]: config })
+        logger.info(`Auto-hide on quota exhaustion: ${checkbox.checked}`)
+    })
+}
+
 async function initializeOptions(): Promise<void> {
     logger.info("Options initializing")
 
@@ -550,6 +574,8 @@ async function initializeOptions(): Promise<void> {
         const fabColor = await loadFloatingButtonColor()
         initIconVariantPicker(fabColor)
         initFloatingButtonColorPicker(fabColor)
+        await loadAutoHideOnQuotaSetting()
+        setupAutoHideOnQuotaListener()
         await setupTooltipSpacingPreview()
 
         const websiteUrl = await fetchWebsiteUrl()

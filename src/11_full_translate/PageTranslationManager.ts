@@ -58,6 +58,9 @@ export class PageTranslationManager {
     // --- Duplicate prevention ---
     private translatingNodes: WeakSet<Element> = new WeakSet();
 
+    /** Callback invoked when a batch response indicates quota exhaustion */
+    onQuotaExhausted?: () => void;
+
     constructor(config: FullTranslateConfig) {
         this.config = config;
         this.cache = new TranslationCache();
@@ -82,6 +85,7 @@ export class PageTranslationManager {
             sourceLang: this.config.sourceLang,
             targetLang: this.config.targetLang,
         });
+        this.batchQueue.onQuotaExhausted = () => this.onQuotaExhausted?.();
 
         this.viewportObserver = new ViewportObserver(
             (element) => this.onParagraphVisible(element),
@@ -139,6 +143,28 @@ export class PageTranslationManager {
         this.translatingNodes = new WeakSet();
 
         logger.info('Stopped full-page translation');
+    }
+
+    /**
+     * Pause translation without removing existing translations from the DOM.
+     * Used when quota is exhausted to preserve already-translated content.
+     */
+    pause(): void {
+        this.isRunning = false;
+        this.walkId = null;
+
+        this.viewportObserver?.stop();
+        this.viewportObserver = null;
+
+        this.dynamicContentObserver?.stop();
+        this.dynamicContentObserver = null;
+
+        this.batchQueue?.clear();
+        this.batchQueue = null;
+
+        this.translatingNodes = new WeakSet();
+
+        logger.info('Paused full-page translation (existing translations preserved)');
     }
 
     /** Check if the manager is currently running. */

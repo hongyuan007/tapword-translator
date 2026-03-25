@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapWord Global Toast (Branded) Preview</title>
+    <style>
+        :root {
+            --tw-toast-bg: #ffffff;
+            --tw-toast-text-primary: #1f2937;
+            --tw-toast-text-secondary: #6b7280;
+            --tw-toast-border: rgba(0, 0, 0, 0.06);
+            --tw-toast-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 8px 32px rgba(0, 0, 0, 0.08);
+            
+            /* Status Colors */
+            --tw-toast-info: #2484E0;
+            --tw-toast-success: #34C759;
+            --tw-toast-warning: #FF9500;
+            --tw-toast-error: #FF3B30;
+            --tw-toast-quota: #ED6D8F; /* Brand Pink for Quota */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* Test Backgrounds */
+        .bg-selector {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+        .bg-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        button.trigger-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+        }
+        button.trigger-btn:hover { opacity: 0.9; }
+        
+        .btn-info { background: var(--tw-toast-info); }
+        .btn-success { background: var(--tw-toast-success); }
+        .btn-warning { background: var(--tw-toast-warning); }
+        .btn-error { background: var(--tw-toast-error); }
+        .btn-quota { background: var(--tw-toast-quota); }
+        .btn-clear { background: #e5e7eb; color: #374151 !important; margin-left: 12px; }
+
+        /* ==========================================================================
+           TOAST CSS (This is what goes into the extension)
+           ========================================================================== */
+        
+        .tw-toast-container {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2147483647;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none; /* Let clicks pass through the container */
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .tw-toast {
+            /* Layout & Spacing */
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 16px;
+            margin-bottom: 8px; /* Spacing between stacked toasts */
+            min-width: 280px;
+            max-width: 100%;
+            box-sizing: border-box;
+            
+            /* Appearance */
+            background: var(--tw-toast-bg);
+            border-radius: 12px;
+            border: 1px solid var(--tw-toast-border);
+            box-shadow: var(--tw-toast-shadow);
+            
+            /* Typography */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            
+            /* Interactivity */
+            pointer-events: auto; /* Enable clicks on the toast itself */
+            
+            /* Animation Initial State */
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy entry */
+        }
+
+        /* Animation Classes */
+        .tw-toast.tw-toast-enter {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .tw-toast.tw-toast-exit {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.2s ease-out; /* Smooth fade out */
+            pointer-events: none;
+        }
+
+        /* Dual Icon System Container */
+        .tw-toast-icon-group {
+            position: relative;
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
+        }
+
+        /* The App Brand Icon (Base) */
+        .tw-toast-brand-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--tw-toast-quota);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            font-style: italic;
+            line-height: 1;
+            user-select: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* The Status Badge (Overlaid on bottom right) */
+        .tw-toast-status-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 2px solid var(--tw-toast-bg); /* Thicker border for better separation */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .tw-toast-status-badge svg {
+            width: 9px;
+            height: 9px;
+        }
+
+        /* Special case for Quota: Just the big brand icon, centered */
+        .tw-toast-type-quota .tw-toast-brand-icon {
+            width: 28px;
+            height: 28px;
+            font-size: 18px;
+            top: 2px;
+            left: 2px;
+        }
+        .tw-toast-type-quota .tw-toast-status-badge {
+            display: none;
+        }
+
+        /* Content Area */
+        .tw-toast-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 28px; /* Align with icon group height */
+        }
+
+        .tw-toast-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--tw-toast-text-primary);
+            line-height: 1.4;
+            margin: 0;
+            word-break: break-word;
+        }
+
+        .tw-toast-desc {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--tw-toast-text-secondary);
+            margin: 4px 0 0 0;
+            line-height: 1.4;
+        }
+
+        .tw-toast-link {
+            color: var(--tw-toast-quota);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .tw-toast-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Close Button */
+        .tw-toast-close {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            margin-left: 12px;
+            margin-right: -4px; /* Pull towards edge slightly */
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .tw-toast-close:hover {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .tw-toast-close svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* --- Status Variations (Badge Colors) --- */
+        .tw-toast-type-info .tw-toast-status-badge { background: var(--tw-toast-info); color: white; }
+        .tw-toast-type-success .tw-toast-status-badge { background: var(--tw-toast-success); color: white; }
+        .tw-toast-type-warning .tw-toast-status-badge { background: var(--tw-toast-warning); color: white; }
+        .tw-toast-type-error .tw-toast-status-badge { background: var(--tw-toast-error); color: white; }
+
+        /* Optional Background Tint for Error/Warning to make them stand out more */
+        /* .tw-toast-type-error { background: #fef2f2; border-color: #fca5a5; } */
+
+    </style>
+</head>
+<body>
+
+    <!-- Target Container for Toasts -->
+    <div id="tw-toast-root" class="tw-toast-container"></div>
+
+    <!-- UI Controls for Testing -->
+    <div class="control-panel">
+        <button class="trigger-btn btn-info" onclick="showToast('info')">Info</button>
+        <button class="trigger-btn btn-success" onclick="showToast('success')">Success</button>
+        <button class="trigger-btn btn-warning" onclick="showToast('warning')">Warning</button>
+        <button class="trigger-btn btn-error" onclick="showToast('error')">Error</button>
+        <button class="trigger-btn btn-quota" onclick="showToast('quota')">Quota</button>
+        <button class="trigger-btn btn-clear" onclick="clearToasts()">Clear All</button>
+    </div>
+
+    <!-- Background Selectors -->
+    <div class="bg-selector">
+        <button class="bg-btn" style="background: #f3f4f6;" onclick="document.body.style.background='#f3f4f6'" title="Light Gray"></button>
+        <button class="bg-btn" style="background: #ffffff;" onclick="document.body.style.background='#ffffff'" title="White"></button>
+        <button class="bg-btn" style="background: #111827;" onclick="document.body.style.background='#111827'" title="Dark Mode"></button>
+        <button class="bg-btn" style="background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);" onclick="document.body.style.background='linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)'" title="Colorful"></button>
+    </div>
+
+    <script>
+        const root = document.getElementById('tw-toast-root');
+
+        // SVG Definitions for Status Icons (used in the mini badges)
+        const icons = {
+            info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
+            success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+            error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+            close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'
+        };
+
+        const config = {
+            info: { title: 'Translation process started', duration: 3000 },
+            success: { title: 'Text successfully copied to clipboard', duration: 3000 },
+            warning: { title: 'Free translation quota running low (10%)', duration: 5000 },
+            error: { title: 'Translation failed', desc: 'Please check your network connection and try again.', duration: 5000 },
+            quota: { title: '今日免费额度已用完', desc: '继续使用无限制的 AI 翻译服务，<br><a class="tw-toast-link" href="#" onclick="alert(\'Open options page\')">查看升级套餐 &rarr;</a>', duration: 0 } // 0 means persistent
+        };
+
+        function showToast(type) {
+            const data = config[type];
+            
+            // Create DOM elements
+            const toastEl = document.createElement('div');
+            toastEl.className = `tw-toast tw-toast-type-${type}`;
+            
+            // --- The Dual Icon System ---
+            const iconGroupEl = document.createElement('div');
+            iconGroupEl.className = 'tw-toast-icon-group';
+            
+            // 1. Brand Icon (Background)
+            const brandIconEl = document.createElement('div');
+            brandIconEl.className = 'tw-toast-brand-icon';
+            brandIconEl.innerHTML = 'T';
+            iconGroupEl.appendChild(brandIconEl);
+            
+            // 2. Status Badge (Foreground Overhang), except for Quota which is just brand
+            if (type !== 'quota') {
+                const statusBadgeEl = document.createElement('div');
+                statusBadgeEl.className = 'tw-toast-status-badge';
+                statusBadgeEl.innerHTML = icons[type];
+                iconGroupEl.appendChild(statusBadgeEl);
+            }
+            // ----------------------------
+            
+            const contentEl = document.createElement('div');
+            contentEl.className = 'tw-toast-content';
+            
+            const titleEl = document.createElement('p');
+            titleEl.className = 'tw-toast-title';
+            titleEl.innerHTML = data.title;
+            contentEl.appendChild(titleEl);
+            
+            if (data.desc) {
+                const descEl = document.createElement('p');
+                descEl.className = 'tw-toast-desc';
+                descEl.innerHTML = data.desc;
+                contentEl.appendChild(descEl);
+            }
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'tw-toast-close';
+            closeBtn.innerHTML = icons.close;
+            
+            // Assembly
+            toastEl.appendChild(iconGroupEl);
+            toastEl.appendChild(contentEl);
+            toastEl.appendChild(closeBtn);
+            
+            // Add to DOM at the TOP of the container (newest first)
+            root.insertBefore(toastEl, root.firstChild);
+
+            // Trigger Entry Animation
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    toastEl.classList.add('tw-toast-enter');
+                });
+            });
+
+            // Handle Dismissal
+            const dismiss = () => {
+                toastEl.classList.remove('tw-toast-enter');
+                toastEl.classList.add('tw-toast-exit');
+                
+                setTimeout(() => {
+                    if (toastEl.parentNode) {
+                        toastEl.parentNode.removeChild(toastEl);
+                    }
+                }, 200); 
+            };
+
+            closeBtn.addEventListener('click', dismiss);
+
+            // Auto-dismiss if duration > 0
+            if (data.duration > 0) {
+                setTimeout(dismiss, data.duration);
+            }
+
+            // Stacking limit: Remove oldest if there are more than 3
+            const allToasts = root.querySelectorAll('.tw-toast');
+            if (allToasts.length > 3) {
+                const oldest = allToasts[allToasts.length - 1];
+                if (!oldest.classList.contains('tw-toast-exit')) {
+                    oldest.classList.remove('tw-toast-enter');
+                    oldest.classList.add('tw-toast-exit');
+                    setTimeout(() => {
+                        if (oldest.parentNode) oldest.parentNode.removeChild(oldest);
+                    }, 200);
+                }
+            }
+        }
+
+        function clearToasts() {
+            const allToasts = root.querySelectorAll('.tw-toast');
+            allToasts.forEach(toast => {
+                toast.classList.remove('tw-toast-enter');
+                toast.classList.add('tw-toast-exit');
+            });
+            setTimeout(() => {
+                root.innerHTML = '';
+            }, 200);
+        }
+    </script>
+</body>
+</html>

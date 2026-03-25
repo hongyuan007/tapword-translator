@@ -134,4 +134,10 @@ export interface FullTextBatchApiResponse {
         completionTokens: number
         totalTokens: number
     }
+    /** Quota info returned by server after successful translation */
+    quota?: {
+        used: number
+        limit: number
+        remaining: number
+    }
 }

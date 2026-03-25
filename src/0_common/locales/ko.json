@@ -178,5 +178,13 @@
     "popup.translatePage.stop": "번역 중지",
     "popup.floatingButton.label": "플로팅 버튼 표시",
     "popup.floatingButton.disableSite": "이 사이트에서 비활성화",
-    "popup.floatingButton.disableGlobally": "전체 비활성화"
+    "popup.floatingButton.disableGlobally": "전체 비활성화",
+    "options.autoHideQuota.label": "할당량 소진 시 플로팅 버튼 자동 숨김",
+    "popup.quota.title": "오늘의 무료 할당량",
+    "popup.quota.pageTranslation": "페이지 번역",
+    "popup.quota.exhausted": "오늘의 무료 할당량을 모두 사용했습니다. 내일 다시 오세요!",
+    "popup.quota.warning": "할당량이 거의 소진되었습니다",
+    "popup.quota.loading": "로딩 중...",
+    "popup.quota.error": "할당량을 불러오지 못했습니다",
+    "fullTranslate.quotaExhausted.toast": "오늘의 무료 번역 할당량을 모두 사용했습니다. 이미 번역된 콘텐츠는 계속 표시됩니다."
 }

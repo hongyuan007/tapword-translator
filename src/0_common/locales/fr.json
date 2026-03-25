@@ -178,5 +178,13 @@
     "popup.translatePage.stop": "Arrêter la traduction",
     "popup.floatingButton.label": "Afficher le bouton flottant",
     "popup.floatingButton.disableSite": "Désactiver sur ce site",
-    "popup.floatingButton.disableGlobally": "Désactiver globalement"
+    "popup.floatingButton.disableGlobally": "Désactiver globalement",
+    "options.autoHideQuota.label": "Masquer le bouton flottant automatiquement quand le quota est épuisé",
+    "popup.quota.title": "Quota gratuit du jour",
+    "popup.quota.pageTranslation": "Traduction de page",
+    "popup.quota.exhausted": "Le quota gratuit du jour est épuisé. Revenez demain !",
+    "popup.quota.warning": "Quota bientôt épuisé",
+    "popup.quota.loading": "Chargement...",
+    "popup.quota.error": "Échec du chargement du quota",
+    "fullTranslate.quotaExhausted.toast": "Le quota de traduction gratuit du jour est épuisé. Le contenu déjà traduit restera visible."
 }

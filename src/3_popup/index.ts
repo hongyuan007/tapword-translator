@@ -22,6 +22,7 @@ import { FLOATING_BUTTON_STORAGE_KEY, DEFAULT_CONFIG } from "@/12_floating_butto
 import type { FloatingButtonConfig } from "@/12_floating_button/types"
 import * as settingsManagerModule from "./modules/settingsManager"
 import * as tooltipManagerModule from "./modules/tooltipManager"
+import * as quotaDisplayModule from "./modules/quotaDisplay"
 import "./styles/popup.css"
 
 const logger = loggerModule.createLogger("Popup")
@@ -96,6 +97,9 @@ async function initialize(): Promise<void> {
 
     // Setup floating button toggle
     await setupFloatingButtonToggle()
+
+    // Initialize quota display
+    await quotaDisplayModule.initQuotaDisplay()
 
     // Remove loading state to reveal content
     document.documentElement.classList.remove("loading")

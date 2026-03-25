@@ -17,10 +17,12 @@ export interface FloatingButtonConfig {
     iconVariant: IconVariant;
     /** Brand color hex for the icon (default: '#ED6D8F') */
     iconColor: string;
+    /** Auto-hide the floating button when quota is exhausted (default: false) */
+    autoHideOnQuotaExhausted: boolean;
 }
 
 /** Visual states of the floating button */
-export type FloatingButtonState = 'idle' | 'translating' | 'active';
+export type FloatingButtonState = 'idle' | 'translating' | 'active' | 'quota_exhausted';
 
 /** Callback signature for config change events */
 export type ConfigChangeCallback = (config: FloatingButtonConfig) => void;

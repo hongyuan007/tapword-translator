@@ -26,6 +26,14 @@ class BatchCountMismatchError extends Error {
     }
 }
 
+/** Error thrown when server reports quota exceeded */
+export class QuotaExhaustedError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'QuotaExhaustedError';
+    }
+}
+
 type BatchResolverEntry = {
     text: string;
     resolve: (translatedText: string) => void;
@@ -40,6 +48,10 @@ export class BatchQueue {
     private batchDelayMs: number;
     private sourceLang: string;
     private targetLang: string;
+    private isQuotaExhausted = false;
+
+    /** Callback invoked when a batch response indicates quota exhaustion */
+    onQuotaExhausted?: () => void;
 
     constructor(config: {
         sourceLang: string;
@@ -57,6 +69,9 @@ export class BatchQueue {
 
     /** Enqueue text for translation. Returns a promise that resolves with translated text. */
     enqueue(text: string): Promise<string> {
+        if (this.isQuotaExhausted) {
+            return Promise.reject(new QuotaExhaustedError('Daily free quota exhausted'));
+        }
         return new Promise<string>((resolve, reject) => {
             this.queue.push({ text, resolve, reject });
             if (this.isBatchFull()) {
@@ -160,6 +175,17 @@ export class BatchQueue {
                 };
 
                 const response = await chrome.runtime.sendMessage(message) as FullTranslateBatchResponseMessage;
+
+                // Detect quota exhaustion from response
+                if (!response?.success && response?.errorType === 'QuotaExceeded') {
+                    this.isQuotaExhausted = true;
+                    const errorMsg = response.error ?? 'Daily free quota exhausted';
+                    for (const entry of batch) {
+                        entry.reject(new QuotaExhaustedError(errorMsg));
+                    }
+                    this.onQuotaExhausted?.();
+                    return;
+                }
 
                 if (!response || !response.success || !response.translations) {
                     const errorMsg = response?.error ?? 'Batch translation failed';

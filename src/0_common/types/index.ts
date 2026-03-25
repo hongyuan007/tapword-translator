@@ -70,7 +70,7 @@ export interface SpeechSynthesisRequestData {
 /**
  * Message types for content-background communication
  */
-export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED" | "AUTO_CANDIDATES_REQUEST" | "FULL_TRANSLATE_BATCH_REQUEST" | "FULL_TRANSLATE_TOGGLE" | "FULL_TRANSLATE_STATUS_REQUEST"
+export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED" | "AUTO_CANDIDATES_REQUEST" | "FULL_TRANSLATE_BATCH_REQUEST" | "FULL_TRANSLATE_TOGGLE" | "FULL_TRANSLATE_STATUS_REQUEST" | "QUOTA_USAGE_REQUEST"
 
 /**
  * Page activated message (sent by content script on injection for token pre-warming)
@@ -500,5 +500,36 @@ export interface FullTranslateBatchResponseMessage {
     success: boolean
     /** Array of translated texts, same order as input */
     translations?: string[]
+    error?: string
+    /** Error type to distinguish quota exceeded from generic errors */
+    errorType?: "QuotaExceeded" | "GenericError"
+    /** Quota info returned from server on quota errors or successful responses */
+    quotaInfo?: FullTextTranslationQuotaInfo
+}
+
+/**
+ * Full-text translation quota info (from server response)
+ */
+export interface FullTextTranslationQuotaInfo {
+    used: number
+    limit: number
+    remaining: number
+}
+
+/**
+ * Quota usage request message (sent by popup to background)
+ */
+export interface QuotaUsageRequestMessage {
+    type: "QUOTA_USAGE_REQUEST"
+}
+
+/**
+ * Quota usage response message
+ */
+export interface QuotaUsageResponseMessage {
+    success: boolean
+    data?: {
+        fullTextTranslation: FullTextTranslationQuotaInfo
+    }
     error?: string
 }

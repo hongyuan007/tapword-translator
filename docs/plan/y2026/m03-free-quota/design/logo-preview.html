@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapWord Pure HTML/CSS Logo Variations</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        h1 { margin-top: 0; margin-bottom: 8px; font-size: 24px; }
+        p.desc { color: #6b7280; margin-bottom: 40px; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card-title {
+            font-weight: 500;
+            margin-bottom: 24px;
+            color: #4b5563;
+        }
+
+        /* Container sizes for previewing */
+        .preview-sizes {
+            display: flex;
+            align-items: flex-end;
+            gap: 24px;
+            height: 64px;
+        }
+
+        .size-label {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+
+        /* Base utility for sizes */
+        .s-48 { width: 48px; height: 48px; font-size: 32px; border-radius: 10px; }
+        .s-24 { width: 24px; height: 24px; font-size: 16px; border-radius: 6px; }
+        .s-16 { width: 16px; height: 16px; font-size: 11px; border-radius: 4px; }
+
+        /* ==========================================
+           STYLE VARIATIONS (The actual CSS you copy)
+           ========================================== */
+
+        /* Base structural properties needed for all variations */
+        .logo-base {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-style: italic;
+            user-select: none;
+            line-height: 1;
+        }
+
+        /* V1: Flat Brand (Modern, simple, fast) */
+        .logo-v1 {
+            background: #ED6D8F;
+            color: #ffffff;
+        }
+
+        /* V2: 3D Gradient (Inspired by OG image, rich texture) */
+        .logo-v2 {
+            background: linear-gradient(135deg, #FF66B2 0%, #FF3388 100%);
+            color: white;
+            box-shadow: 
+                inset 2px 2px 4px rgba(255, 255, 255, 0.5),
+                inset -2px -2px 6px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Fix shadow scaling for smaller sizes in V2 */
+        .s-24.logo-v2 { box-shadow: inset 1px 1px 2px rgba(255,255,255,0.5), inset -1px -1px 3px rgba(0,0,0,0.2); text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .s-16.logo-v2 { box-shadow: inset 1px 1px 1px rgba(255,255,255,0.5), inset -1px -1px 2px rgba(0,0,0,0.2); text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
+
+        /* V3: Soft Neumorphism */
+        .logo-v3 {
+            background: #fdf2f5;
+            color: #ED6D8F;
+            border: 1px solid rgba(237, 109, 143, 0.2);
+            box-shadow: 0 2px 8px rgba(237, 109, 143, 0.15);
+        }
+
+        /* V4: Gradient Text on White */
+        .logo-v4 {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            /* Gradient text effect */
+            background-image: linear-gradient(135deg, #FF66B2 0%, #FF3388 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Force background color for container while keeping text gradient */
+            position: relative;
+        }
+        .logo-v4::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: white;
+            z-index: -1;
+            border-radius: inherit;
+        }
+
+        /* V5: High Contrast Dark */
+        .logo-v5 {
+            background: #1f2937;
+            color: #ED6D8F;
+            border: 1px solid #374151;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-shadow: 0 0 10px rgba(237, 109, 143, 0.4);
+        }
+
+        /* V6: Outline / Ghost */
+        .logo-v6 {
+            background: transparent;
+            color: #ED6D8F;
+            border: 2px solid #ED6D8F;
+        }
+        .s-24.logo-v6 { border-width: 1.5px; }
+        .s-16.logo-v6 { border-width: 1px; }
+
+    </style>
+</head>
+<body>
+
+    <h1>Pure HTML/CSS Logo Variations</h1>
+    <p class="desc">
+        Zero dependencies. No image files. No SVGs. Just HTML <code>&lt;div&gt;</code> and pure CSS.<br>
+        Showing sizes: 48px (App Icon), 24px (UI Element), 16px (Favicon/Inline).
+    </p>
+
+    <div class="grid">
+        <!-- V1 -->
+        <div class="card">
+            <div class="card-title">V1. Flat Brand</div>
+            <div class="preview-sizes">
+                <div>
+                    <div class="logo-base logo-v1 s-48">T</div>
+                    <div class="size-label">48x48</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v1 s-24">T</div>
+                    <div class="size-label">24x24</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v1 s-16">T</div>
+                    <div class="size-label">16x16</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- V2 -->
+        <div class="card">
+            <div class="card-title">V2. 3D Gradient (OG Style)</div>
+            <div class="preview-sizes">
+                <div>
+                    <div class="logo-base logo-v2 s-48">T</div>
+                    <div class="size-label">48x48</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v2 s-24">T</div>
+                    <div class="size-label">24x24</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v2 s-16">T</div>
+                    <div class="size-label">16x16</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- V3 -->
+        <div class="card">
+            <div class="card-title">V3. Soft Neumorphism</div>
+            <div class="preview-sizes">
+                <div>
+                    <div class="logo-base logo-v3 s-48">T</div>
+                    <div class="size-label">48x48</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v3 s-24">T</div>
+                    <div class="size-label">24x24</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v3 s-16">T</div>
+                    <div class="size-label">16x16</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- V4 -->
+        <div class="card">
+            <div class="card-title">V4. Gradient Text on White</div>
+            <div class="preview-sizes">
+                <div>
+                    <div class="logo-base logo-v4 s-48">T</div>
+                    <div class="size-label">48x48</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v4 s-24">T</div>
+                    <div class="size-label">24x24</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v4 s-16">T</div>
+                    <div class="size-label">16x16</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- V5 -->
+        <div class="card">
+            <div class="card-title">V5. High Contrast Dark</div>
+            <div class="preview-sizes">
+                <div>
+                    <div class="logo-base logo-v5 s-48">T</div>
+                    <div class="size-label">48x48</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v5 s-24">T</div>
+                    <div class="size-label">24x24</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v5 s-16">T</div>
+                    <div class="size-label">16x16</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- V6 -->
+        <div class="card">
+            <div class="card-title">V6. Outline / Ghost</div>
+            <div class="preview-sizes">
+                <div>
+                    <div class="logo-base logo-v6 s-48">T</div>
+                    <div class="size-label">48x48</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v6 s-24">T</div>
+                    <div class="size-label">24x24</div>
+                </div>
+                <div>
+                    <div class="logo-base logo-v6 s-16">T</div>
+                    <div class="size-label">16x16</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

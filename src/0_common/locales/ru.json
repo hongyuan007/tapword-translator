@@ -178,5 +178,13 @@
     "popup.translatePage.stop": "Остановить перевод",
     "popup.floatingButton.label": "Показать плавающую кнопку",
     "popup.floatingButton.disableSite": "Отключить на этом сайте",
-    "popup.floatingButton.disableGlobally": "Отключить везде"
+    "popup.floatingButton.disableGlobally": "Отключить везде",
+    "options.autoHideQuota.label": "Автоматически скрывать плавающую кнопку при исчерпании квоты",
+    "popup.quota.title": "Бесплатная квота на сегодня",
+    "popup.quota.pageTranslation": "Перевод страницы",
+    "popup.quota.exhausted": "Бесплатная квота на сегодня исчерпана. Возвращайтесь завтра!",
+    "popup.quota.warning": "Квота почти исчерпана",
+    "popup.quota.loading": "Загрузка...",
+    "popup.quota.error": "Не удалось загрузить квоту",
+    "fullTranslate.quotaExhausted.toast": "Бесплатная квота перевода на сегодня исчерпана. Уже переведённый контент останется видимым."
 }

@@ -19,6 +19,12 @@ const CHECK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 
     <path d="M5 12l5 5L20 7"/>
 </svg>`;
 
+/** Warning "!" icon for exhausted badge */
+const EXHAUSTED_ICON_SVG = `<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="6" cy="6" r="6" fill="${constants.BADGE_COLOR_EXHAUSTED}"/>
+    <text x="6" y="9" text-anchor="middle" font-size="8" font-weight="bold" fill="white">!</text>
+</svg>`;
+
 /** X icon for close button */
 const CLOSE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M18 6L6 18"/>
@@ -30,6 +36,7 @@ export class FloatingButtonRenderer {
     private mainButton: HTMLDivElement | null = null;
     private closeButton: HTMLButtonElement | null = null;
     private activeBadge: HTMLDivElement | null = null;
+    private exhaustedBadge: HTMLDivElement | null = null;
     private spinner: HTMLDivElement | null = null;
     private dropdown: HTMLDivElement | null = null;
     private styleElement: HTMLStyleElement | null = null;
@@ -68,6 +75,12 @@ export class FloatingButtonRenderer {
         activeBadge.innerHTML = CHECK_ICON_SVG;
         mainButton.appendChild(activeBadge);
 
+        // Exhausted badge (gray warning "!")
+        const exhaustedBadge = document.createElement('div');
+        exhaustedBadge.className = constants.CLASS_EXHAUSTED_BADGE;
+        exhaustedBadge.innerHTML = EXHAUSTED_ICON_SVG;
+        mainButton.appendChild(exhaustedBadge);
+
         // Spinner (for translating state)
         const spinner = document.createElement('div');
         spinner.className = constants.CLASS_SPINNER;
@@ -84,6 +97,7 @@ export class FloatingButtonRenderer {
         this.mainButton = mainButton;
         this.closeButton = closeButton;
         this.activeBadge = activeBadge;
+        this.exhaustedBadge = exhaustedBadge;
         this.spinner = spinner;
         this.dropdown = dropdown;
 
@@ -100,6 +114,7 @@ export class FloatingButtonRenderer {
         this.mainButton = null;
         this.closeButton = null;
         this.activeBadge = null;
+        this.exhaustedBadge = null;
         this.spinner = null;
         this.dropdown = null;
         this.styleElement = null;
@@ -107,7 +122,7 @@ export class FloatingButtonRenderer {
         logger.info('Floating button DOM destroyed');
     }
 
-    /** Update visual state: idle, translating, or active */
+    /** Update visual state: idle, translating, active, or quota_exhausted */
     setTranslationState(state: FloatingButtonState): void {
         if (state === this.currentState) return;
         this.currentState = state;
@@ -117,15 +132,23 @@ export class FloatingButtonRenderer {
         switch (state) {
             case 'idle':
                 this.activeBadge?.classList.remove(badgeVisible);
+                this.exhaustedBadge?.classList.remove(badgeVisible);
                 this.spinner?.classList.remove(badgeVisible);
                 break;
             case 'translating':
                 this.activeBadge?.classList.remove(badgeVisible);
+                this.exhaustedBadge?.classList.remove(badgeVisible);
                 this.spinner?.classList.add(badgeVisible);
                 break;
             case 'active':
                 this.spinner?.classList.remove(badgeVisible);
+                this.exhaustedBadge?.classList.remove(badgeVisible);
                 this.activeBadge?.classList.add(badgeVisible);
+                break;
+            case 'quota_exhausted':
+                this.spinner?.classList.remove(badgeVisible);
+                this.activeBadge?.classList.remove(badgeVisible);
+                this.exhaustedBadge?.classList.add(badgeVisible);
                 break;
         }
 
@@ -171,6 +194,16 @@ export class FloatingButtonRenderer {
     /** Get the container element */
     getContainer(): HTMLDivElement | null {
         return this.container;
+    }
+
+    /** Slide the button to the right out of viewport, then hide */
+    slideOutAndHide(): void {
+        if (!this.container) return;
+        this.container.classList.add(constants.CLASS_SLIDING_OUT);
+        setTimeout(() => {
+            this.hide();
+            this.container?.classList.remove(constants.CLASS_SLIDING_OUT);
+        }, constants.SLIDE_OUT_DURATION_MS);
     }
 
     /** Set dragging visual state */

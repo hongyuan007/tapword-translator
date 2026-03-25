@@ -258,6 +258,104 @@ body {
     gap: 12px;
 }
 
+/* ─── Quota Display Section ─── */
+.quota-section {
+    padding: 10px 20px 10px;
+}
+
+.quota-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.quota-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(30, 30, 30, 0.7);
+    letter-spacing: 0.3px;
+}
+
+.quota-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quota-bar-track {
+    flex: 1;
+    height: 8px;
+    background: #ECECEC;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.quota-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    transition: width 0.5s ease, background 0.4s ease;
+    background: #34C759;
+}
+
+.quota-percentage {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(30, 30, 30, 0.55);
+    white-space: nowrap;
+    min-width: 44px;
+    text-align: right;
+}
+
+.quota-sublabel {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(30, 30, 30, 0.45);
+}
+
+/* Quota color states */
+.quota-section.quota-normal .quota-bar-fill {
+    background: #34C759;
+}
+
+.quota-section.quota-warning .quota-bar-fill {
+    background: #FF9500;
+}
+
+.quota-section.quota-warning .quota-percentage {
+    color: #E08600;
+}
+
+.quota-section.quota-exhausted .quota-bar-fill {
+    background: #FF3B30;
+}
+
+.quota-section.quota-exhausted .quota-percentage {
+    color: #D42F27;
+}
+
+/* Quota loading skeleton */
+.quota-section.is-loading .quota-bar-track {
+    background: linear-gradient(90deg, #ECECEC 25%, #E0E0E0 50%, #ECECEC 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Full-translate button quota-exhausted state */
+.full-translate-button.is-quota-exhausted {
+    background: linear-gradient(135deg, #9CA3AF 0%, #8B929E 100%);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 /* Section Card */
 .section-card {
     background: transparent;

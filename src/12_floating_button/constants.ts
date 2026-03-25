@@ -19,6 +19,7 @@ export const DEFAULT_CONFIG: FloatingButtonConfig = {
     disabledSites: [],
     iconVariant: 'v5',
     iconColor: DEFAULT_ICON_COLOR,
+    autoHideOnQuotaExhausted: true,
 };
 
 // --- CSS ---
@@ -81,3 +82,20 @@ export const TRANSITION_DURATION_MS = 300;
 
 /** Active badge color */
 export const BADGE_COLOR = '#22c55e';
+
+/** Exhausted badge color (gray-400) */
+export const BADGE_COLOR_EXHAUSTED = '#9ca3af';
+
+/** CSS class for quota-exhausted state */
+export const CLASS_EXHAUSTED_BADGE = `${CSS_PREFIX}-exhausted-badge`;
+
+// --- Auto-Hide ---
+
+/** Delay before auto-hiding the button when quota is exhausted (ms) */
+export const AUTO_HIDE_DELAY_MS = 3000;
+
+/** Duration of the slide-out animation before hiding (ms) */
+export const SLIDE_OUT_DURATION_MS = 400;
+
+/** CSS class applied during slide-out animation */
+export const CLASS_SLIDING_OUT = `${CSS_PREFIX}-sliding-out`;

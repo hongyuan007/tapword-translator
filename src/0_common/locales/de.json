@@ -178,5 +178,13 @@
     "popup.translatePage.stop": "Übersetzung stoppen",
     "popup.floatingButton.label": "Floating-Taste anzeigen",
     "popup.floatingButton.disableSite": "Auf dieser Seite deaktivieren",
-    "popup.floatingButton.disableGlobally": "Global deaktivieren"
+    "popup.floatingButton.disableGlobally": "Global deaktivieren",
+    "options.autoHideQuota.label": "Floating-Taste automatisch ausblenden bei Kontingenterschöpfung",
+    "popup.quota.title": "Heutiges Freikontingent",
+    "popup.quota.pageTranslation": "Seitenübersetzung",
+    "popup.quota.exhausted": "Das heutige Freikontingent ist aufgebraucht. Kommen Sie morgen wieder!",
+    "popup.quota.warning": "Kontingent fast aufgebraucht",
+    "popup.quota.loading": "Laden...",
+    "popup.quota.error": "Kontingent konnte nicht geladen werden",
+    "fullTranslate.quotaExhausted.toast": "Das heutige kostenlose Übersetzungskontingent ist aufgebraucht. Bereits übersetzte Inhalte bleiben sichtbar."
 }

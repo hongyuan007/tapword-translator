@@ -207,5 +207,13 @@
     "popup.translatePage.stop": "Stop Translation",
     "popup.floatingButton.label": "Show floating button",
     "popup.floatingButton.disableSite": "Disable on this site",
-    "popup.floatingButton.disableGlobally": "Disable globally"
+    "popup.floatingButton.disableGlobally": "Disable globally",
+    "options.autoHideQuota.label": "Auto-hide floating button when quota runs out",
+    "popup.quota.title": "Today's Free Quota",
+    "popup.quota.pageTranslation": "Page Translation",
+    "popup.quota.exhausted": "Today's free quota is used up. Come back tomorrow!",
+    "popup.quota.warning": "Quota running low",
+    "popup.quota.loading": "Loading...",
+    "popup.quota.error": "Failed to load quota",
+    "fullTranslate.quotaExhausted.toast": "Today's free translation quota has been used up. Already translated content will remain visible."
 }

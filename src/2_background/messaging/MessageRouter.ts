@@ -10,6 +10,7 @@ import * as AutoCandidatesRequestHandler from "../handlers/AutoCandidatesRequest
 import * as FragmentTranslationRequestHandler from "../handlers/FragmentTranslationRequestHandler"
 import * as FullTranslateBatchHandler from "../handlers/FullTranslateBatchHandler"
 import { buildPopupBootstrapResponse } from "../handlers/PopupBootstrapHandler"
+import * as QuotaUsageHandler from "../handlers/QuotaUsageHandler"
 import * as SpeechSynthesisRequestHandler from "../handlers/SpeechSynthesisRequestHandler"
 import * as TokenWarmUpHandler from "../handlers/TokenWarmUpHandler"
 import * as TranslationRequestHandler from "../handlers/TranslationRequestHandler"
@@ -70,6 +71,10 @@ export function setupMessageListener(): void {
 
             case "FULL_TRANSLATE_BATCH_REQUEST":
                 FullTranslateBatchHandler.handleFullTranslateBatchRequest(message.data, sendResponse)
+                return true
+
+            case "QUOTA_USAGE_REQUEST":
+                QuotaUsageHandler.handleQuotaUsageRequest(sendResponse)
                 return true
 
             case "FULL_TRANSLATE_TOGGLE": {

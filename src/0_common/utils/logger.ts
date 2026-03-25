@@ -146,10 +146,10 @@ class Logger {
 
         try {
             const bgColor = level === "error" ? "#dc3545" : "#fd7e14"
-            const topOffset = 16 + this.activeToasts.length * 64
+            const bottomOffset = 16 + this.activeToasts.length * 64
 
             const toast = document.createElement("div")
-            toast.style.cssText = `position:fixed;top:${topOffset}px;right:16px;z-index:2147483647;max-width:500px;padding:12px 16px;border-radius:8px;font:13px/1.4 system-ui,sans-serif;color:#fff;background:${bgColor};opacity:0.95;pointer-events:auto;box-shadow:0 4px 12px rgba(0,0,0,0.3);word-break:break-all;transition:opacity 0.3s ease;`
+            toast.style.cssText = `position:fixed;bottom:${bottomOffset}px;right:16px;z-index:2147483647;max-width:500px;padding:12px 16px;border-radius:8px;font:13px/1.4 system-ui,sans-serif;color:#fff;background:${bgColor};opacity:0.95;pointer-events:auto;box-shadow:0 4px 12px rgba(0,0,0,0.3);word-break:break-all;transition:opacity 0.3s ease;`
 
             const truncMsg = message.length > 200 ? message.substring(0, 200) + "..." : message
             toast.innerHTML = `<strong>[${level.toUpperCase()}]</strong> [${this.escapeHtml(prefix)}] ${this.escapeHtml(truncMsg)}`

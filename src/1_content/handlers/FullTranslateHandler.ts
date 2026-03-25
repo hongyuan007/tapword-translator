@@ -5,10 +5,12 @@
 
 import * as loggerModule from '@/0_common/utils/logger';
 import * as storageManager from '@/0_common/utils/storageManager';
+import * as i18nModule from '@/0_common/utils/i18n';
 import type {
     FullTranslateStatusResponseMessage,
     FullTranslateToggleResponseMessage,
 } from '@/0_common/types';
+import * as toastNotification from '@/1_content/ui/toast/toastNotification';
 import { PageTranslationManager } from '@/11_full_translate/PageTranslationManager';
 import type { FullTranslateConfig } from '@/11_full_translate/types';
 import {
@@ -23,7 +25,7 @@ const logger = loggerModule.createLogger('Content/FullTranslateHandler');
 // --- Event system for external observers (e.g., floating button) ---
 
 /** Lifecycle events emitted during translation state transitions */
-export type FullTranslateEvent = 'starting' | 'started' | 'stopped' | 'error';
+export type FullTranslateEvent = 'starting' | 'started' | 'stopped' | 'error' | 'quota_exhausted';
 export type FullTranslateEventListener = (event: FullTranslateEvent) => void;
 
 const eventListeners = new Set<FullTranslateEventListener>();
@@ -66,6 +68,22 @@ export function getIsRunning(): boolean {
 // --- Core start/stop logic (shared by message handler and direct toggle) ---
 
 async function startTranslation(): Promise<void> {
+    // Proactive quota check before starting translation
+    try {
+        const response = await chrome.runtime.sendMessage({ type: 'QUOTA_USAGE_REQUEST' });
+        if (response?.success && response.data?.fullTextTranslation) {
+            const quota = response.data.fullTextTranslation;
+            if (quota.remaining <= 0) {
+                const message = i18nModule.translate('fullTranslate.quotaExhausted.toast');
+                toastNotification.showViewportToast(message, 'info');
+                emitEvent('quota_exhausted');
+                return;
+            }
+        }
+    } catch (error) {
+        logger.warn('Failed to check quota before translation, proceeding anyway', error);
+    }
+
     emitEvent('starting');
     const config = await buildConfig();
     if (!manager) {
@@ -73,6 +91,12 @@ async function startTranslation(): Promise<void> {
     } else {
         await manager.updateConfig(config);
     }
+    manager.onQuotaExhausted = () => {
+        manager?.pause();
+        const message = i18nModule.translate('fullTranslate.quotaExhausted.toast');
+        toastNotification.showViewportToast(message, 'info');
+        emitEvent('quota_exhausted');
+    };
     await manager.start();
     logger.info('Full-page translation started');
     emitEvent('started');

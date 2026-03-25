@@ -17,6 +17,11 @@ export interface QuotaConfig {
      * Daily free speech synthesis quota
      */
     dailyFreeSpeech: number
+
+    /**
+     * Daily free full-text translation character quota
+     */
+    dailyFreeFullTextTranslationChars: number
 }
 
 /**

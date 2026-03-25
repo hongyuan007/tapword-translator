@@ -129,6 +129,24 @@ export const FLOATING_BUTTON_STYLES = `
     display: flex;
 }
 
+/* Exhausted badge — gray circle with "!" warning, same position as active badge */
+.${constants.CLASS_EXHAUSTED_BADGE} {
+    position: absolute;
+    bottom: 4px;
+    left: 26px;
+    width: ${constants.BADGE_SIZE_PX}px;
+    height: ${constants.BADGE_SIZE_PX}px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
+.${constants.CLASS_EXHAUSTED_BADGE}.${constants.CSS_PREFIX}-visible {
+    display: flex;
+}
+
 /* Spinner for translating state, overhang at inner icon edge */
 .${constants.CLASS_SPINNER} {
     position: absolute;
@@ -192,5 +210,11 @@ export const FLOATING_BUTTON_STYLES = `
 
 .${constants.CLASS_DROPDOWN_ITEM}:hover {
     background: #f3f4f6;
+}
+
+/* Slide-out animation — slides the container off-screen to the right */
+.${constants.CLASS_CONTAINER}.${constants.CLASS_SLIDING_OUT} {
+    transform: translateX(100%) !important;
+    transition: transform ${constants.SLIDE_OUT_DURATION_MS}ms ease-in !important;
 }
 `;
