@@ -22,7 +22,6 @@ import * as selectionClassifier from "@/1_content/handlers/utils/selectionClassi
 import * as translationOverlapDetector from "@/1_content/handlers/utils/translationOverlapDetectorV2"
 import * as editableElementDetector from "@/1_content/handlers/utils/editableElementDetector"
 import { createConcurrencyLimiter, type RequestLimiter } from "@/1_content/utils/concurrencyLimiter"
-import * as autoTranslationService from "@/1_content/services/autoTranslationService"
 
 const logger = loggerModule.createLogger("selectionHandler")
 const MAX_PARALLEL_TRANSLATIONS = 3
@@ -258,15 +257,6 @@ async function translateWordPath(
                     displaySettings
                 )
 
-                // Fire-and-forget auto-translation (never blocks manual flow)
-                void autoTranslationService.tryAutoTranslate({
-                    triggerRange: range,
-                    triggerText: word,
-                    triggerType: "word",
-                    triggerTranslation: response.data.wordTranslation,
-                    detectedLang: detectedLang,
-                    targetLang: targetLang,
-                })
             } else {
                 // Check errorType to determine error handling
                 // QuotaExceeded: use short message for tooltip, keep detailed message for modal
@@ -428,15 +418,6 @@ async function translateFragmentPath(
                     displaySettings
                 )
 
-                // Fire-and-forget auto-translation (never blocks manual flow)
-                void autoTranslationService.tryAutoTranslate({
-                    triggerRange: range,
-                    triggerText: fragment,
-                    triggerType: "phrase",
-                    triggerTranslation: response.data.translation,
-                    detectedLang: detectedLang,
-                    targetLang: targetLang,
-                })
             } else {
                 // Check errorType to determine error handling
                 // QuotaExceeded: use short message for tooltip, keep detailed message for modal

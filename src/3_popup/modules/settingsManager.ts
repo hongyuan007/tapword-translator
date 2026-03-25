@@ -50,18 +50,6 @@ function setTranslationControlsEnabled(enabled: boolean): void {
     })
 }
 
-function setAutoTranslateDependentControlsEnabled(enabled: boolean): void {
-    const proficiencySelect = document.getElementById("userLanguageProficiency") as HTMLSelectElement | null
-    if (!proficiencySelect) return
-
-    proficiencySelect.disabled = !enabled
-
-    const settingItem = proficiencySelect.closest(".setting-item")
-    if (settingItem) {
-        settingItem.classList.toggle("is-disabled", !enabled)
-    }
-}
-
 async function restoreDependentTogglesIfAllOff(): Promise<void> {
     const showIconInput = document.getElementById("showIcon") as HTMLInputElement | null
     const singleClickInput = document.getElementById("singleClickTranslate") as HTMLInputElement | null
@@ -190,8 +178,6 @@ export async function loadSettings(): Promise<void> {
         setTranslationControlsEnabled(settings.enableTapWord)
         syncMasterSectionVisualState(settings.enableTapWord)
 
-        // Apply auto-translate toggle effect to proficiency selector
-        setAutoTranslateDependentControlsEnabled(settings.enableAutoTranslate)
     } catch (error) {
         logger.error("Failed to load settings:", error)
     }
@@ -237,9 +223,6 @@ export function setupSettingChangeListeners(): void {
                     }
                 }
 
-                if (settingKey === "enableAutoTranslate") {
-                    setAutoTranslateDependentControlsEnabled(input.checked)
-                }
             }
         })
     })

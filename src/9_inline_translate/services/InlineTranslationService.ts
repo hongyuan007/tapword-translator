@@ -1,5 +1,5 @@
 /**
- * Auto-Translation Orchestrator Service
+ * Inline Translation Orchestrator Service
  *
  * Core auto-translation logic triggered after a successful manual translation.
  * Extracts block text, requests auto-candidates from backend, filters them,
@@ -23,11 +23,11 @@ import type { DisplayUserSettings } from "@/1_content/ui/translationDisplayV2"
 import type { SuccessState } from "@/1_content/ui/translationDisplayV2/types"
 import * as translationOverlapDetector from "@/1_content/handlers/utils/translationOverlapDetectorV2"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
-import * as blockTextExtractor from "@/1_content/utils/blockTextExtractor"
-import type { TextNodeSegment } from "@/1_content/utils/blockTextExtractor"
-import * as candidateDomMapper from "@/1_content/utils/candidateDomMapper"
+import * as blockTextExtractor from "@/9_inline_translate/utils/blockTextExtractor"
+import type { TextNodeSegment } from "@/9_inline_translate/utils/blockTextExtractor"
+import * as candidateDomMapper from "@/9_inline_translate/utils/candidateDomMapper"
 
-const logger = loggerModule.createLogger("autoTranslationService")
+const logger = loggerModule.createLogger("InlineTranslationService")
 
 // ============================================================================
 // Public Interface
