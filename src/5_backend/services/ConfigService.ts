@@ -28,7 +28,7 @@ const DEFAULT_CONFIG: CloudConfig = {
         dailyFreeSpeech: 300, // Conservative default
     },
     websiteUrl: "www.tapword.cc", // Default official website
-    chromeExtensionVersion: "0.1.0", // Default version
+    chromeExtensionVersion: CLIENT_VERSION, // Default version
 }
 
 /**
