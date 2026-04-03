@@ -688,10 +688,6 @@ body {
     background: #9CA3AF;
 }
 
-[data-app-edition="community"] .section-audio {
-    display: none !important;
-}
-
 /* Feature highlight dot */
 .feature-dot {
     width: 6px;

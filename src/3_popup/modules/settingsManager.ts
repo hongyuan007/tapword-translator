@@ -9,7 +9,6 @@ import * as i18nModule from "@/0_common/utils/i18n"
 import * as languageDisplayModule from "@/0_common/utils/languageDisplay"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as storageManagerModule from "@/0_common/utils/storageManager"
-import { getPlatformOS, PLATFORMS } from "@/0_common/utils/platformDetector"
 import * as toastManagerModule from "./toastManager"
 
 const logger = loggerModule.createLogger("Popup/Settings")
@@ -32,7 +31,7 @@ function updateSuppressNativeLanguageLabel(targetLanguage: string): void {
 }
 
 function setTranslationControlsEnabled(enabled: boolean): void {
-    const dependentIds = ["showIcon", "singleClickTranslate", "doubleClickSentenceTranslate", "doubleClickSentenceTriggerKey"]
+    const dependentIds = ["showIcon", "singleClickTranslate"]
 
     dependentIds.forEach((id) => {
         const input = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null
@@ -53,87 +52,28 @@ function setTranslationControlsEnabled(enabled: boolean): void {
 async function restoreDependentTogglesIfAllOff(): Promise<void> {
     const showIconInput = document.getElementById("showIcon") as HTMLInputElement | null
     const singleClickInput = document.getElementById("singleClickTranslate") as HTMLInputElement | null
-    const sentenceTranslateInput = document.getElementById("doubleClickSentenceTranslate") as HTMLInputElement | null
 
-    if (!showIconInput || !singleClickInput || !sentenceTranslateInput) {
+    if (!showIconInput || !singleClickInput) {
         return
     }
 
     const currentSettings = await storageManagerModule.getUserSettings()
     const isDoubleClickEnabled = currentSettings.doubleClickTranslateV2
 
-    const allDisabled = !showIconInput.checked && !singleClickInput.checked && !sentenceTranslateInput.checked && !isDoubleClickEnabled
+    const allDisabled = !showIconInput.checked && !singleClickInput.checked && !isDoubleClickEnabled
     if (!allDisabled) {
         return
     }
 
     showIconInput.checked = true
     singleClickInput.checked = true
-    // V2 default: Double Click OFF, Single Click ON
-    // doubleClickInput.checked = false // already false if allDisabled
-    sentenceTranslateInput.checked = true
 
     // Atomic update to avoid concurrent overwrite
     await storageManagerModule.updateUserSettings({
         showIcon: true,
         singleClickTranslate: true,
         doubleClickTranslateV2: false,
-        doubleClickSentenceTranslate: true,
     })
-}
-
-/**
- * Detect OS and populate trigger key options
- */
-async function populateTriggerKeyOptions(): Promise<void> {
-    const select = document.getElementById("doubleClickSentenceTriggerKey") as HTMLSelectElement | null
-    if (!select) return
-
-    const os = await getPlatformOS()
-    select.innerHTML = ""
-
-    if (os === PLATFORMS.MAC) {
-        // Mac Options: Command (Default), Option
-        const cmdOption = document.createElement("option")
-        cmdOption.value = "meta"
-        cmdOption.textContent = "Command"
-        select.appendChild(cmdOption)
-
-        const optOption = document.createElement("option")
-        optOption.value = "option"
-        optOption.textContent = "Option"
-        select.appendChild(optOption)
-    } else {
-        // Windows/Linux/Other Options: Alt (Default), Ctrl
-        const altOption = document.createElement("option")
-        altOption.value = "alt"
-        altOption.textContent = "Alt"
-        select.appendChild(altOption)
-
-        const ctrlOption = document.createElement("option")
-        ctrlOption.value = "ctrl"
-        ctrlOption.textContent = "Ctrl"
-        select.appendChild(ctrlOption)
-    }
-}
-
-/**
- * Apply visibility rules based on current locale
- * Some settings may be hidden in certain languages to avoid layout issues or clutter
- */
-function applyLocaleSpecificVisibility(): void {
-    const locale = i18nModule.getCurrentLocale()
-    const settingItem = document.getElementById("settingItem-doubleClickSentence")
-
-    if (settingItem) {
-        // Only show for 'zh' (Chinese), hide for all others because UI space is limited in popup
-        // Users can still configure this via the full options page if needed
-        if (locale !== "zh") {
-            settingItem.style.display = "none"
-        } else {
-            settingItem.style.display = ""
-        }
-    }
 }
 
 /**
@@ -141,12 +81,6 @@ function applyLocaleSpecificVisibility(): void {
  */
 export async function loadSettings(): Promise<void> {
     try {
-        // Initialize dynamic options before loading values
-        await populateTriggerKeyOptions()
-
-        // Apply locale-specific visibility rules
-        applyLocaleSpecificVisibility()
-
         const settings = await storageManagerModule.getUserSettings()
         logger.info("Loaded settings:", settings)
 
