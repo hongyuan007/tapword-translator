@@ -5,9 +5,21 @@ const EMBEDDING_MODEL = import.meta.env.VITE_AGENT_EMBEDDING_MODEL || "text-embe
 const EMBEDDING_API_KEY = import.meta.env.VITE_AGENT_EMBEDDING_API_KEY || ""
 const EMBEDDING_DIMENSIONS = 1024
 
-export async function getEmbedding(apiKey: string, text: string): Promise<Float32Array> {
+/** Runtime API key set by the application layer. */
+let runtimeApiKey = ""
+
+/** Set the API key used for embedding requests. */
+export function setApiKey(key: string): void {
+    runtimeApiKey = key
+}
+
+export async function getEmbedding(text: string): Promise<Float32Array> {
+    const effectiveKey = EMBEDDING_API_KEY || runtimeApiKey
+    if (!effectiveKey) {
+        throw new Error("Embedding API key not configured. Call setApiKey() first.")
+    }
     const client = new OpenAI({
-        apiKey: EMBEDDING_API_KEY || apiKey,
+        apiKey: effectiveKey,
         baseURL: DASHSCOPE_OPENAI_BASE_URL,
         dangerouslyAllowBrowser: true,
     })

@@ -1,6 +1,5 @@
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { Loader2 } from "lucide-react"
-import { KnowledgeStore } from "./store/KnowledgeStore"
 import { useApiKey } from "./hooks/useApiKey"
 import { useAgentChat } from "./hooks/useAgentChat"
 import { ChatHeader } from "./components/ChatHeader"
@@ -18,13 +17,10 @@ export default function App() {
     const [activeTab, setActiveTab] = useState<"chat" | "knowledge">("chat")
     const [showSettings, setShowSettings] = useState(false)
     const [input, setInput] = useState("")
-    const knowledgeStoreRef = useRef(new KnowledgeStore())
 
     const { apiKey, isLoaded: keyLoaded, apiKeyInput, setApiKeyInput, saveKey } = useApiKey()
-    const { messages, isLoading, activeTool, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } = useAgentChat(
-        apiKey,
-        knowledgeStoreRef.current
-    )
+    const { messages, isLoading, activeTool, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } =
+        useAgentChat(apiKey)
 
     async function handleSend() {
         const trimmed = input.trim()
@@ -80,7 +76,7 @@ export default function App() {
             )}
             {todoItems.length > 0 && <TodoPanel items={todoItems} isTaskCompleted={isTaskCompleted} />}
             {activeTab === "knowledge" ? (
-                <KnowledgePanel knowledgeStore={knowledgeStoreRef.current} />
+                <KnowledgePanel />
             ) : (
                 <>
                     <MessageList messages={messages} activeTool={activeTool} />

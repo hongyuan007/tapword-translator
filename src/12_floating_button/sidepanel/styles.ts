@@ -3,7 +3,7 @@
  * Injected inside a Shadow DOM to isolate from host page.
  */
 
-import * as constants from './constants';
+import * as constants from "./constants"
 
 export const SIDEPANEL_BUTTON_STYLES = `
 /* Hide sidepanel button when printing */
@@ -58,4 +58,4 @@ export const SIDEPANEL_BUTTON_STYLES = `
     color: ${constants.ICON_COLOR};
     pointer-events: none;
 }
-`;
+`

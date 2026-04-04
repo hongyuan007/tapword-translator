@@ -17,4 +17,4 @@ const TOOL_REGISTRY = new Map<string, ToolRegistration>([
 ])
 
 export { TOOL_REGISTRY }
-export type { ToolRegistration, ToolContext } from "./types"
+export type { ToolRegistration } from "./types"

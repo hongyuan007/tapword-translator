@@ -14,6 +14,30 @@
 | **FILESYSTEM ONLY** | You may only read high-level docs (`AGENTS.md`, `progress.md`, `README.md`) or list directories to plan next steps. |
 | **NO RAW PROMPTS** | When filling in TASK DESCRIPTION or INSTRUCTIONS placeholders, always rephrase the user's request into a clear technical goal. Do **NOT** paste raw user messages into sub-agent prompts. |
 
+### 📝 PROMPT WRITING PRINCIPLES
+
+**Describe WHAT, not HOW.** Subagents are competent engineers — give them goals, constraints, and acceptance criteria. Do NOT dictate implementation details.
+
+| ✅ Good (Goal-Oriented) | ❌ Bad (Over-Specified) |
+|---|---|
+| "Split the single `manage_todos` tool into 3 separate tools for finer-grained control" | Pasting pseudo-code for each tool's `execute` function |
+| "Add a `description` field to `TodoItem` for LLM internal guidance (not shown in UI)" | Writing the full interface definition and every component change |
+| "Tools should import their own dependencies instead of receiving via ToolContext" | Dictating exact module structure, function signatures, and singleton patterns |
+| "Add a completion banner to TodoPanel when all items are done" | Writing JSX/CSS class names for the subagent |
+
+**Prompt structure for implementation subagents:**
+1. **Goal**: One sentence describing the end state.
+2. **Context files**: List files the subagent MUST read first.
+3. **Requirements**: Bullet list of WHAT must be true when done (acceptance criteria).
+4. **Constraints**: Only if non-obvious — naming conventions, patterns to follow, patterns to avoid.
+5. **DO NOT include**: Code snippets, pseudo-code, specific class/function designs, step-by-step implementation order.
+
+**Trust the subagent to:**
+- Read existing code and infer patterns.
+- Choose appropriate data structures and algorithms.
+- Decide implementation order.
+- Handle edge cases it discovers during implementation.
+
 ---
 
 ## 2. WORKFLOW SELECTION (CRITICAL STARTING STEP)

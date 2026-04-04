@@ -1,11 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk"
 import * as loggerModule from "@/0_common/utils/logger"
 import { createAnthropicClient } from "../api/AnthropicClient"
-import { KnowledgeStore } from "../store/KnowledgeStore"
-import { TodoManager } from "../store/TodoManager"
+import { todoManager } from "../store/TodoManager"
 import { SYSTEM_PROMPT } from "./prompts"
 import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
-import type { ToolContext } from "./tools"
 
 const logger = loggerModule.createLogger("AgentLoop")
 
@@ -56,16 +54,10 @@ function classifyApiError(error: unknown): AgentError {
 export class AgentLoop {
     private client: Anthropic
     private history: Anthropic.MessageParam[] = []
-    private knowledgeStore: KnowledgeStore
-    private todoManager: TodoManager
-    private apiKey: string
     private roundsSinceTodoUpdate: number = 0
 
-    constructor(apiKey: string, knowledgeStore: KnowledgeStore, todoManager: TodoManager) {
-        this.apiKey = apiKey
+    constructor(apiKey: string) {
         this.client = createAnthropicClient(apiKey)
-        this.knowledgeStore = knowledgeStore
-        this.todoManager = todoManager
     }
 
     // Restore LLM conversation history from simplified message pairs
@@ -91,7 +83,7 @@ export class AgentLoop {
             try {
                 // Compute effective system prompt with optional nag reminder
                 let effectiveSystem = SYSTEM_PROMPT
-                if (this.roundsSinceTodoUpdate >= TODO_NAG_THRESHOLD && this.todoManager.getItems().length > 0) {
+                if (this.roundsSinceTodoUpdate >= TODO_NAG_THRESHOLD && todoManager.getItems().length > 0) {
                     effectiveSystem += "\n\n<reminder>You have an active task list. Please update your todos to reflect current progress.</reminder>"
                 }
 
@@ -140,7 +132,11 @@ export class AgentLoop {
                                 ? `${result.substring(0, 250)}...[${result.length} chars]...${result.substring(result.length - 250)}`
                                 : result
                         logger.info(`Tool result (${block.name}): ${preview}`)
-                        toolResults.push({ type: "tool_result", tool_use_id: block.id, content: result })
+                        toolResults.push({
+                            type: "tool_result",
+                            tool_use_id: block.id,
+                            content: result,
+                        })
                     } catch (error) {
                         const errorMsg = error instanceof Error ? error.message : String(error)
                         logger.error(`Tool ${block.name} failed:`, errorMsg)
@@ -173,8 +169,7 @@ export class AgentLoop {
     private async executeTool(name: string, input: Record<string, unknown>): Promise<string> {
         const tool = TOOL_REGISTRY.get(name)
         if (!tool) throw new Error(`Unknown tool: ${name}`)
-        const context: ToolContext = { apiKey: this.apiKey, knowledgeStore: this.knowledgeStore, todoManager: this.todoManager }
-        return tool.execute(input, context)
+        return tool.execute(input)
     }
 
     clearHistory(): void {

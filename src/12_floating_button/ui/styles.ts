@@ -3,7 +3,7 @@
  * All classes are prefixed with `tw-fab-` to avoid host page conflicts.
  */
 
-import * as constants from '@/12_floating_button/constants';
+import * as constants from "@/12_floating_button/constants"
 
 export const FLOATING_BUTTON_STYLES = `
 /* Hide floating button when printing */
@@ -217,4 +217,4 @@ export const FLOATING_BUTTON_STYLES = `
     transform: translateX(100%) !important;
     transition: transform ${constants.SLIDE_OUT_DURATION_MS}ms ease-in !important;
 }
-`;
+`

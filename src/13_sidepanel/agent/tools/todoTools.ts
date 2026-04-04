@@ -1,4 +1,5 @@
 import * as loggerModule from "@/0_common/utils/logger"
+import { todoManager } from "../../store/TodoManager"
 import type { TodoStatus } from "../../types"
 import type { ToolRegistration } from "./types"
 
@@ -48,11 +49,8 @@ export const createTodosTool: ToolRegistration = {
         },
     },
     label: "Planning tasks...",
-    execute: async (input, context) => {
-        if (!context.todoManager) {
-            throw new Error("TodoManager is not available in tool context.")
-        }
-        const rendered = context.todoManager.createTodos(input.items as Array<Record<string, unknown>>)
+    execute: async (input) => {
+        const rendered = todoManager.createTodos(input.items as Array<Record<string, unknown>>)
         logger.info("Todo list created successfully")
         return rendered
     },
@@ -82,11 +80,8 @@ export const updateTodoStatusTool: ToolRegistration = {
         },
     },
     label: "Updating task status...",
-    execute: async (input, context) => {
-        if (!context.todoManager) {
-            throw new Error("TodoManager is not available in tool context.")
-        }
-        const rendered = context.todoManager.updateTodoStatus(input.id as string, input.status as TodoStatus)
+    execute: async (input) => {
+        const rendered = todoManager.updateTodoStatus(input.id as string, input.status as TodoStatus)
         logger.info(`Todo #${input.id} updated to ${input.status}`)
         return rendered
     },
@@ -105,11 +100,8 @@ export const completeTodosTool: ToolRegistration = {
         },
     },
     label: "Completing task...",
-    execute: async (_input, context) => {
-        if (!context.todoManager) {
-            throw new Error("TodoManager is not available in tool context.")
-        }
-        const result = context.todoManager.completeTask()
+    execute: async () => {
+        const result = todoManager.completeTask()
         logger.info("Task completed")
         return result
     },

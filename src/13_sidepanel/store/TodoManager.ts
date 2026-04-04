@@ -24,8 +24,9 @@ export class TodoManager {
     private _isTaskCompleted: boolean = false
     private onChange?: (items: readonly TodoItem[], isTaskCompleted: boolean) => void
 
-    constructor(onChange?: (items: readonly TodoItem[], isTaskCompleted: boolean) => void) {
-        this.onChange = onChange
+    /** Set the callback invoked whenever todo state changes. */
+    setOnChange(cb: (items: readonly TodoItem[], isTaskCompleted: boolean) => void): void {
+        this.onChange = cb
     }
 
     /** Replace-all: creates a new set of todos (starts a new task). */
@@ -161,3 +162,6 @@ export class TodoManager {
         return validated
     }
 }
+
+/** Module-level singleton instance. */
+export const todoManager = new TodoManager()

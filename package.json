@@ -29,7 +29,7 @@
         "test": "vitest --config config/vitest.config.ts",
         "test:e2e": "playwright test -c config/playwright.config.ts",
         "test:e2e:headed": "playwright test -c config/playwright.config.ts --headed",
-        "format": "prettier --config config/.prettierrc.json --write \"src/**/*.{ts,tsx}\"",
+        "format": "prettier --write \"src/**/*.{ts,tsx}\"",
         "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --config config/.eslintrc.json \"src/**/*.{ts,tsx}\""
     },
     "dependencies": {

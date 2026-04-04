@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react"
 import { Trash2, Loader2, Database } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
-import type { KnowledgeStore, KnowledgeItem } from "../store/KnowledgeStore"
+import { knowledgeStore } from "../store/KnowledgeStore"
+import type { KnowledgeItem } from "../store/KnowledgeStore"
 
 // --- Constants ---
 
@@ -37,11 +38,7 @@ function truncate(text: string, maxLength: number): string {
 
 // --- Component ---
 
-interface KnowledgePanelProps {
-    knowledgeStore: KnowledgeStore
-}
-
-export function KnowledgePanel({ knowledgeStore }: KnowledgePanelProps) {
+export function KnowledgePanel() {
     const [items, setItems] = useState<KnowledgeItem[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
@@ -55,7 +52,7 @@ export function KnowledgePanel({ knowledgeStore }: KnowledgePanelProps) {
         } finally {
             setIsLoading(false)
         }
-    }, [knowledgeStore])
+    }, [])
 
     useEffect(() => {
         loadItems()

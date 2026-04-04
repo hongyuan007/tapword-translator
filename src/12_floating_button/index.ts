@@ -5,20 +5,14 @@
  */
 
 // --- Types ---
-export type { FloatingButtonConfig, FloatingButtonState, ConfigChangeCallback, IconVariant } from './types';
+export type { FloatingButtonConfig, FloatingButtonState, ConfigChangeCallback, IconVariant } from "./types"
 
 // --- Constants ---
-export {
-    FLOATING_BUTTON_STORAGE_KEY,
-    DEFAULT_CONFIG,
-    DEFAULT_ICON_COLOR,
-    CSS_PREFIX,
-    Z_INDEX,
-} from './constants';
+export { FLOATING_BUTTON_STORAGE_KEY, DEFAULT_CONFIG, DEFAULT_ICON_COLOR, CSS_PREFIX, Z_INDEX } from "./constants"
 
 // --- Core ---
-export { FloatingButtonManager } from './FloatingButtonManager';
-export { FloatingButtonConfigStore } from './config/FloatingButtonConfigStore';
+export { FloatingButtonManager } from "./FloatingButtonManager"
+export { FloatingButtonConfigStore } from "./config/FloatingButtonConfigStore"
 
 // --- Sidepanel ---
-export { SidepanelButtonManager } from './sidepanel/SidepanelButtonManager';
+export { SidepanelButtonManager } from "./sidepanel/SidepanelButtonManager"

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import * as loggerModule from "@/0_common/utils/logger"
 import { AgentLoop, AgentError } from "../agent/AgentLoop"
-import type { KnowledgeStore } from "../store/KnowledgeStore"
-import { TodoManager } from "../store/TodoManager"
+import * as embeddingClient from "../api/EmbeddingClient"
+import { todoManager } from "../store/TodoManager"
 import type { ChatMessage, TodoItem } from "../types"
 import * as storageService from "../services/StorageService"
 
@@ -20,7 +20,7 @@ interface UseAgentChatResult {
     dismissAuthError: () => void
 }
 
-export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeStore): UseAgentChatResult {
+export function useAgentChat(apiKey: string | null): UseAgentChatResult {
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [activeTool, setActiveTool] = useState<string | null>(null)
@@ -30,16 +30,14 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
 
     const agentRef = useRef<AgentLoop | null>(null)
     const loadedMessagesRef = useRef<ChatMessage[] | null>(null)
-    const todoManagerRef = useRef<TodoManager>(
-        new TodoManager((items, taskCompleted) => {
+
+    // Load session messages and todos on mount; wire up TodoManager callback
+    useEffect(() => {
+        todoManager.setOnChange((items, taskCompleted) => {
             setTodoItems(items)
             setIsTaskCompleted(taskCompleted)
             storageService.saveSessionTodos(items, taskCompleted)
         })
-    )
-
-    // Load session messages and todos on mount
-    useEffect(() => {
         loadPersistedMessages()
         loadPersistedTodos()
     }, [])
@@ -47,7 +45,8 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
     // Recreate AgentLoop when apiKey changes
     useEffect(() => {
         if (apiKey) {
-            const agent = new AgentLoop(apiKey, knowledgeStore, todoManagerRef.current)
+            embeddingClient.setApiKey(apiKey)
+            const agent = new AgentLoop(apiKey)
             agentRef.current = agent
             // Restore LLM history from persisted messages
             if (loadedMessagesRef.current && loadedMessagesRef.current.length > 0) {
@@ -77,7 +76,7 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
     async function loadPersistedTodos() {
         const saved = await storageService.loadSessionTodos()
         if (saved.items.length > 0) {
-            todoManagerRef.current.restore(saved.items, saved.isTaskCompleted)
+            todoManager.restore(saved.items, saved.isTaskCompleted)
             setTodoItems(saved.items)
             setIsTaskCompleted(saved.isTaskCompleted)
         }
@@ -117,7 +116,10 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
                             const msg = updated[assistantIndex]!
                             const calls = msg.toolCalls || []
                             if (!calls.includes(toolLabel)) {
-                                updated[assistantIndex] = { ...msg, toolCalls: [...calls, toolLabel] }
+                                updated[assistantIndex] = {
+                                    ...msg,
+                                    toolCalls: [...calls, toolLabel],
+                                }
                             }
                             return updated
                         })
@@ -130,7 +132,11 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
                 setMessages((prev) => {
                     const updated = [...prev]
                     const current = updated[assistantIndex]!
-                    updated[assistantIndex] = { ...current, content: errorMsg, isError: true }
+                    updated[assistantIndex] = {
+                        ...current,
+                        content: errorMsg,
+                        isError: true,
+                    }
                     return updated
                 })
                 if (isAuthErr) {
@@ -149,7 +155,7 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
         setMessages([])
         setShowAuthError(false)
         storageService.clearSessionMessages()
-        todoManagerRef.current.clear()
+        todoManager.clear()
         setTodoItems([])
         setIsTaskCompleted(false)
         storageService.clearSessionTodos()
@@ -159,5 +165,15 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
         setShowAuthError(false)
     }
 
-    return { messages, isLoading, activeTool, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError }
+    return {
+        messages,
+        isLoading,
+        activeTool,
+        showAuthError,
+        todoItems,
+        isTaskCompleted,
+        sendMessage,
+        clearChat,
+        dismissAuthError,
+    }
 }

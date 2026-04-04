@@ -168,3 +168,6 @@ export class KnowledgeStore {
         })
     }
 }
+
+/** Module-level singleton instance. */
+export const knowledgeStore = new KnowledgeStore()

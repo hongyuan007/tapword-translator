@@ -3,19 +3,19 @@
  * Distinguishes click from drag using a movement threshold.
  */
 
-import * as loggerModule from '@/0_common/utils/logger';
-import { DRAG_THRESHOLD_PX, MIN_TOP_PX, MIN_BOTTOM_PX } from '@/12_floating_button/constants';
+import * as loggerModule from "@/0_common/utils/logger"
+import { DRAG_THRESHOLD_PX, MIN_TOP_PX, MIN_BOTTOM_PX } from "@/12_floating_button/constants"
 
-const logger = loggerModule.createLogger('DragHandler');
+const logger = loggerModule.createLogger("DragHandler")
 
 export class DragHandler {
-    private hasMoved = false;
-    private startClientY = 0;
-    private startTop = 0;
+    private hasMoved = false
+    private startClientY = 0
+    private startTop = 0
 
-    private boundHandleMouseMove: ((e: MouseEvent) => void) | null = null;
-    private boundHandleMouseUp: ((e: MouseEvent) => void) | null = null;
-    private boundHandleMouseDown: ((e: MouseEvent) => void) | null = null;
+    private boundHandleMouseMove: ((e: MouseEvent) => void) | null = null
+    private boundHandleMouseUp: ((e: MouseEvent) => void) | null = null
+    private boundHandleMouseDown: ((e: MouseEvent) => void) | null = null
 
     /**
      * @param element — The element to attach mousedown to (main button)
@@ -29,99 +29,96 @@ export class DragHandler {
         private readonly onDragMove: (positionRatio: number) => void,
         private readonly onDragEnd: (positionRatio: number) => void,
         private readonly onClick: () => void,
-        private readonly onDragStart?: () => void,
+        private readonly onDragStart?: () => void
     ) {}
 
     /** Attach the mousedown listener to the target element */
     attach(): void {
-        this.boundHandleMouseDown = this.handleMouseDown.bind(this);
-        this.element.addEventListener('mousedown', this.boundHandleMouseDown);
+        this.boundHandleMouseDown = this.handleMouseDown.bind(this)
+        this.element.addEventListener("mousedown", this.boundHandleMouseDown)
     }
 
     /** Remove all listeners and clean up */
     detach(): void {
         if (this.boundHandleMouseDown) {
-            this.element.removeEventListener('mousedown', this.boundHandleMouseDown);
-            this.boundHandleMouseDown = null;
+            this.element.removeEventListener("mousedown", this.boundHandleMouseDown)
+            this.boundHandleMouseDown = null
         }
-        this.removeDocumentListeners();
+        this.removeDocumentListeners()
     }
 
     private handleMouseDown(e: MouseEvent): void {
         // Only handle left click
-        if (e.button !== 0) return;
+        if (e.button !== 0) return
 
-        e.preventDefault();
+        e.preventDefault()
 
-        this.startClientY = e.clientY;
-        this.hasMoved = false;
+        this.startClientY = e.clientY
+        this.hasMoved = false
 
         // Get the current top position from the element's parent container
-        const container = this.element.parentElement;
+        const container = this.element.parentElement
         if (container) {
-            this.startTop = container.getBoundingClientRect().top;
+            this.startTop = container.getBoundingClientRect().top
         }
 
         // Attach document-level listeners for move and up
-        this.boundHandleMouseMove = this.handleMouseMove.bind(this);
-        this.boundHandleMouseUp = this.handleMouseUp.bind(this);
-        document.addEventListener('mousemove', this.boundHandleMouseMove);
-        document.addEventListener('mouseup', this.boundHandleMouseUp);
+        this.boundHandleMouseMove = this.handleMouseMove.bind(this)
+        this.boundHandleMouseUp = this.handleMouseUp.bind(this)
+        document.addEventListener("mousemove", this.boundHandleMouseMove)
+        document.addEventListener("mouseup", this.boundHandleMouseUp)
     }
 
     private handleMouseMove(e: MouseEvent): void {
-        const deltaY = e.clientY - this.startClientY;
+        const deltaY = e.clientY - this.startClientY
 
         if (!this.hasMoved && Math.abs(deltaY) > DRAG_THRESHOLD_PX) {
-            this.hasMoved = true;
+            this.hasMoved = true
             // Prevent text selection during drag
-            document.body.style.userSelect = 'none';
-            this.onDragStart?.();
-            logger.info('Drag started');
+            document.body.style.userSelect = "none"
+            this.onDragStart?.()
+            logger.info("Drag started")
         }
 
         if (this.hasMoved) {
-            const newTop = this.startTop + deltaY;
-            const clampedTop = Math.max(
-                MIN_TOP_PX,
-                Math.min(window.innerHeight - MIN_BOTTOM_PX, newTop)
-            );
-            const ratio = clampedTop / window.innerHeight;
-            this.onDragMove(ratio);
+            const newTop = this.startTop + deltaY
+            const clampedTop = Math.max(MIN_TOP_PX, Math.min(window.innerHeight - MIN_BOTTOM_PX, newTop))
+            const ratio = clampedTop / window.innerHeight
+            this.onDragMove(ratio)
         }
     }
 
     private handleMouseUp(_e: MouseEvent): void {
-        this.removeDocumentListeners();
+        this.removeDocumentListeners()
 
         // Restore text selection
-        document.body.style.userSelect = '';
+        document.body.style.userSelect = ""
 
         if (this.hasMoved) {
             // Drag ended — compute final position
-            const container = this.element.parentElement;
+            const container = this.element.parentElement
             if (container) {
-                const currentTop = container.getBoundingClientRect().top;
-                const ratio = currentTop / window.innerHeight;
-                this.onDragEnd(ratio);
+                const currentTop = container.getBoundingClientRect().top
+                const ratio = currentTop / window.innerHeight
+                this.onDragEnd(ratio)
             }
-            logger.info('Drag ended');
+            logger.info("Drag ended")
         } else {
             // Click (no movement)
-            this.onClick();
+            this.onClick()
         }
 
-        this.hasMoved = false;
+        this.hasMoved = false
     }
 
     private removeDocumentListeners(): void {
         if (this.boundHandleMouseMove) {
-            document.removeEventListener('mousemove', this.boundHandleMouseMove);
-            this.boundHandleMouseMove = null;
+            document.removeEventListener("mousemove", this.boundHandleMouseMove)
+            this.boundHandleMouseMove = null
         }
         if (this.boundHandleMouseUp) {
-            document.removeEventListener('mouseup', this.boundHandleMouseUp);
-            this.boundHandleMouseUp = null;
+            document.removeEventListener("mouseup", this.boundHandleMouseUp)
+            this.boundHandleMouseUp = null
         }
     }
 }

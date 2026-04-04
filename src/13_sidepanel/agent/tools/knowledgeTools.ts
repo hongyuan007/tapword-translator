@@ -1,5 +1,6 @@
 import * as loggerModule from "@/0_common/utils/logger"
 import * as embeddingClient from "../../api/EmbeddingClient"
+import { knowledgeStore } from "../../store/KnowledgeStore"
 import type { ScoredItem } from "../../store/KnowledgeStore"
 import type { ToolRegistration } from "./types"
 
@@ -29,14 +30,14 @@ export const searchKnowledgeTool: ToolRegistration = {
         },
     },
     label: "Searching knowledge...",
-    execute: async (input, context) => {
+    execute: async (input) => {
         const query = input.query as string
         const topK = (input.topK as number) || 5
 
         logger.info(`Searching knowledge base for: "${query}" (topK=${topK})`)
 
-        const queryEmbedding = await embeddingClient.getEmbedding(context.apiKey, query)
-        const results: ScoredItem[] = await context.knowledgeStore.search(queryEmbedding, topK)
+        const queryEmbedding = await embeddingClient.getEmbedding(query)
+        const results: ScoredItem[] = await knowledgeStore.search(queryEmbedding, topK)
 
         const relevant = results.filter((r) => r.score >= MIN_RELEVANCE_SCORE)
 
@@ -78,17 +79,17 @@ export const storeKnowledgeTool: ToolRegistration = {
         },
     },
     label: "Saving knowledge...",
-    execute: async (input, context) => {
+    execute: async (input) => {
         const text = input.text as string
         const title = input.title as string
         const source = (input.source as string) || ""
 
         logger.info(`Storing knowledge: "${title}"`)
 
-        const embedding = await embeddingClient.getEmbedding(context.apiKey, text)
+        const embedding = await embeddingClient.getEmbedding(text)
         const id = crypto.randomUUID()
 
-        await context.knowledgeStore.store({
+        await knowledgeStore.store({
             id,
             text,
             embedding,
