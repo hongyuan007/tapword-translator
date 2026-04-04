@@ -11,11 +11,11 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettings, showClearButton }: ChatHeaderProps) {
     return (
-        <header className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+        <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-stone-200">
             <div className="flex items-center gap-1">
                 <button
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                        activeTab === "chat" ? "bg-gray-800 text-gray-100" : "text-gray-400 hover:text-gray-200"
+                        activeTab === "chat" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
                     }`}
                     onClick={() => onTabChange("chat")}
                 >
@@ -24,7 +24,7 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettin
                 </button>
                 <button
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                        activeTab === "knowledge" ? "bg-gray-800 text-gray-100" : "text-gray-400 hover:text-gray-200"
+                        activeTab === "knowledge" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
                     }`}
                     onClick={() => onTabChange("knowledge")}
                 >
@@ -35,7 +35,7 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettin
             <div className="flex items-center gap-1">
                 {showClearButton && (
                     <button
-                        className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-gray-200"
+                        className="p-1.5 rounded-md hover:bg-stone-100 text-stone-400 hover:text-stone-600"
                         onClick={onClearChat}
                         title={i18nModule.translate("sidepanel.clearChat")}
                     >
@@ -43,7 +43,7 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettin
                     </button>
                 )}
                 <button
-                    className="p-1.5 rounded-md hover:bg-gray-800 text-gray-400 hover:text-gray-200"
+                    className="p-1.5 rounded-md hover:bg-stone-100 text-stone-400 hover:text-stone-600"
                     onClick={onToggleSettings}
                     title={i18nModule.translate("sidepanel.settings")}
                 >

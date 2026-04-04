@@ -11,17 +11,17 @@ interface TodoPanelProps {
 function StatusIcon({ status }: { status: TodoItem["status"] }) {
     switch (status) {
         case "pending":
-            return <Circle className="w-3.5 h-3.5 text-gray-500 shrink-0" />
+            return <Circle className="w-3.5 h-3.5 text-stone-400 shrink-0" />
         case "in_progress":
-            return <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin shrink-0" />
+            return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin shrink-0" />
         case "completed":
-            return <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+            return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
     }
 }
 
 function TodoItemRow({ item }: { item: TodoItem }) {
     const textClass =
-        item.status === "completed" ? "line-through text-gray-500" : item.status === "in_progress" ? "font-medium text-blue-400" : "text-gray-400"
+        item.status === "completed" ? "line-through text-stone-400" : item.status === "in_progress" ? "font-medium text-blue-500" : "text-stone-500"
 
     return (
         <div className="flex items-start gap-2 py-1 px-1">
@@ -50,15 +50,15 @@ export function TodoPanel({ items, isTaskCompleted }: TodoPanelProps) {
     const collapseLabel = collapsed ? i18nModule.translate("sidepanel.todo.expand") : i18nModule.translate("sidepanel.todo.collapse")
 
     return (
-        <div className="border-b border-gray-800 bg-gray-900/50">
+        <div className="border-b border-stone-200 bg-stone-50">
             {isTaskCompleted && (
-                <div className="px-4 py-1.5 bg-green-900/30 border-b border-green-800/40 text-xs text-green-400 font-medium flex items-center gap-1.5">
+                <div className="px-4 py-1.5 bg-emerald-50 border-b border-emerald-200 text-xs text-emerald-700 font-medium flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {i18nModule.translate("sidepanel.todo.completed")}
                 </div>
             )}
             <button
-                className="flex items-center justify-between w-full px-4 py-2 text-xs text-gray-300 hover:bg-gray-800/50 transition-colors"
+                className="flex items-center justify-between w-full px-4 py-2 text-xs text-stone-600 hover:bg-stone-100 transition-colors"
                 onClick={() => setCollapsed(!collapsed)}
                 aria-label={collapseLabel}
                 title={collapseLabel}

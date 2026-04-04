@@ -64,8 +64,7 @@ export const updateTodoStatusTool: ToolRegistration = {
     definition: {
         name: "update_todo_status",
         description:
-            "Update the status of a single todo item. " +
-            "Use this to mark an item as in_progress before starting work, or completed when done.",
+            "Update the status of a single todo item. " + "Use this to mark an item as in_progress before starting work, or completed when done.",
         input_schema: {
             type: "object" as const,
             properties: {

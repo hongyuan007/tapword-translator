@@ -73,7 +73,7 @@ export function KnowledgePanel({ knowledgeStore }: KnowledgePanelProps) {
     if (isLoading) {
         return (
             <div className="flex-1 flex items-center justify-center">
-                <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+                <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
             </div>
         )
     }
@@ -81,8 +81,8 @@ export function KnowledgePanel({ knowledgeStore }: KnowledgePanelProps) {
     if (items.length === 0) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
-                <Database className="w-8 h-8 text-gray-600" />
-                <p className="text-xs text-gray-500 max-w-[200px]">{i18nModule.translate("sidepanel.knowledge.emptyState")}</p>
+                <Database className="w-8 h-8 text-stone-300" />
+                <p className="text-xs text-stone-400 max-w-[200px]">{i18nModule.translate("sidepanel.knowledge.emptyState")}</p>
             </div>
         )
     }
@@ -91,20 +91,20 @@ export function KnowledgePanel({ knowledgeStore }: KnowledgePanelProps) {
         <div className="flex-1 overflow-y-auto">
             <div className="p-3 space-y-2">
                 {items.map((item) => (
-                    <div key={item.id} className="bg-gray-900 rounded-lg p-3 border border-gray-800 hover:border-gray-700 transition-colors">
+                    <div key={item.id} className="bg-white rounded-lg p-3 border border-stone-200 hover:border-stone-300 transition-colors">
                         <div className="flex items-start justify-between gap-2">
-                            <h3 className="text-sm font-medium text-gray-100 truncate flex-1">{item.title}</h3>
+                            <h3 className="text-sm font-medium text-stone-800 truncate flex-1">{item.title}</h3>
                             <button
-                                className="p-1 rounded hover:bg-gray-800 text-gray-500 hover:text-red-400 flex-shrink-0"
+                                className="p-1 rounded hover:bg-stone-100 text-stone-400 hover:text-red-500 flex-shrink-0"
                                 onClick={() => handleDelete(item.id)}
                                 title={i18nModule.translate("sidepanel.knowledge.delete")}
                             >
                                 <Trash2 className="w-3.5 h-3.5" />
                             </button>
                         </div>
-                        {item.source && <p className="text-[10px] text-gray-500 mt-1 truncate">{truncate(item.source, URL_DISPLAY_LENGTH)}</p>}
-                        <p className="text-xs text-gray-400 mt-1.5 line-clamp-2">{truncate(item.text, TEXT_SNIPPET_LENGTH)}</p>
-                        <p className="text-[10px] text-gray-600 mt-1.5">{formatRelativeTime(item.createdAt)}</p>
+                        {item.source && <p className="text-[10px] text-stone-400 mt-1 truncate">{truncate(item.source, URL_DISPLAY_LENGTH)}</p>}
+                        <p className="text-xs text-stone-500 mt-1.5 line-clamp-2">{truncate(item.text, TEXT_SNIPPET_LENGTH)}</p>
+                        <p className="text-[10px] text-stone-400 mt-1.5">{formatRelativeTime(item.createdAt)}</p>
                     </div>
                 ))}
             </div>

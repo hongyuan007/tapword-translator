@@ -41,8 +41,8 @@ export default function App() {
     // Wait for key loading before rendering
     if (!keyLoaded) {
         return (
-            <div className="flex items-center justify-center h-screen bg-gray-950">
-                <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+            <div className="flex items-center justify-center h-screen bg-stone-50">
+                <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
             </div>
         )
     }
@@ -53,7 +53,7 @@ export default function App() {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-gray-950 text-gray-100">
+        <div className="flex flex-col h-screen bg-stone-50 text-stone-800">
             <ChatHeader
                 activeTab={activeTab}
                 onTabChange={setActiveTab}

@@ -19,7 +19,7 @@ export function MessageList({ messages, activeTool }: MessageListProps) {
 
     return (
         <main className="flex-1 overflow-y-auto p-4 space-y-3">
-            {messages.length === 0 && <p className="text-xs text-gray-500 text-center mt-8">{i18nModule.translate("sidepanel.emptyState")}</p>}
+            {messages.length === 0 && <p className="text-xs text-stone-400 text-center mt-8">{i18nModule.translate("sidepanel.emptyState")}</p>}
             {messages.map((msg, i) => (
                 <MessageBubble key={i} message={msg} />
             ))}
@@ -27,8 +27,8 @@ export function MessageList({ messages, activeTool }: MessageListProps) {
             {/* Active tool indicator */}
             {activeTool && (
                 <div className="flex items-center gap-2 px-3 py-1.5">
-                    <Loader2 className="w-3 h-3 text-blue-400 animate-spin" />
-                    <span className="text-xs text-blue-400">{activeTool}</span>
+                    <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
+                    <span className="text-xs text-blue-500">{activeTool}</span>
                 </div>
             )}
 
