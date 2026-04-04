@@ -1,0 +1,16 @@
+{
+  "testCase": "folder-import-smoke",
+  "version": 1,
+  "flags": {
+    "expectNestedFiles": true,
+    "expectJsonRead": true,
+    "expectTextRead": true
+  },
+  "paths": [
+    "SKILL.md",
+    "examples/basic/example-request.md",
+    "examples/deep/nested/response-template.txt",
+    "fixtures/notes/import-checklist.txt",
+    "references/glossary/terms.md"
+  ]
+}

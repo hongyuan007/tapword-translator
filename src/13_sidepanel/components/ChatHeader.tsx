@@ -1,9 +1,11 @@
-import { MessageSquare, BookOpen, Trash2, Settings } from "lucide-react"
+import { MessageSquare, BookOpen, Zap, FolderOpen, Trash2, Settings } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 
+export type SidePanelTab = "chat" | "knowledge" | "skills" | "files"
+
 interface ChatHeaderProps {
-    activeTab: "chat" | "knowledge"
-    onTabChange: (tab: "chat" | "knowledge") => void
+    activeTab: SidePanelTab
+    onTabChange: (tab: SidePanelTab) => void
     onClearChat: () => void
     onToggleSettings: () => void
     showClearButton: boolean
@@ -30,6 +32,24 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettin
                 >
                     <BookOpen className="w-3.5 h-3.5" />
                     {i18nModule.translate("sidepanel.tab.knowledge")}
+                </button>
+                <button
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                        activeTab === "skills" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
+                    }`}
+                    onClick={() => onTabChange("skills")}
+                >
+                    <Zap className="w-3.5 h-3.5" />
+                    {i18nModule.translate("sidepanel.tab.skills")}
+                </button>
+                <button
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                        activeTab === "files" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
+                    }`}
+                    onClick={() => onTabChange("files")}
+                >
+                    <FolderOpen className="w-3.5 h-3.5" />
+                    {i18nModule.translate("sidepanel.tab.files")}
                 </button>
             </div>
             <div className="flex items-center gap-1">

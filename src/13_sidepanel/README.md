@@ -39,9 +39,11 @@ This module implements the React-based Side Panel application for the TapWord ex
 │   ├── useAgentChat.ts                     # Hook for managing agent conversation state
 │   └── useApiKey.ts                        # Hook for persistent API key management
 ├── services/
-│   └── StorageService.ts                   # Utility for chrome.storage interaction
-├── store/
-│   └── KnowledgeStore.ts                   # Local knowledge base persistence & retrieval
+│   ├── KnowledgeStore.ts                   # Local knowledge base persistence & retrieval
+│   ├── SkillStorageService.ts              # Skill file storage using TapWordFS
+│   ├── StorageService.ts                   # Utility for chrome.storage interaction
+│   ├── TapWordFS.ts                        # Virtual file system backed by chrome.storage
+│   └── TodoManager.ts                      # Todo item persistence & lifecycle management
 └── styles/
     └── sidepanel.css                       # Global styles for the side panel
 ```
@@ -61,13 +63,12 @@ This module implements the React-based Side Panel application for the TapWord ex
 │  │  • LLM Prompting (Anthropic SDK format)          │     │
 │  └──────────────────────────────────────────────────┘     │
 │                                                          │
-│  ┌── Data & Persistence ───────────────────────────┐     │
-│  │  KnowledgeStore (store/)                         │     │
+│  ┌── Data & Persistence (services/) ───────────────┐     │
+│  │  KnowledgeStore                                  │     │
 │  │  • Persistent local facts/data                   │     │
 │  │  • Embedding-based retrieval logic               │     │
-│  │                                                  │     │
-│  │  StorageService (services/)                      │     │
-│  │  • chrome.storage.local abstraction              │     │
+│  │  TapWordFS / TodoManager / StorageService        │     │
+│  │  • Virtual FS, todo lifecycle, chrome.storage    │     │
 │  └──────────────────────────────────────────────────┘     │
 │                                                          │
 │  ┌── UI Components (components/) ──────────────────┐     │
@@ -89,7 +90,7 @@ This module implements the React-based Side Panel application for the TapWord ex
 ### 1. Agent Loop (`agent/AgentLoop.ts`)
 The core orchestrator for AI interactions. It handles the iterative process of sending messages to the LLM, processing tool calls (like reading the current page or searching knowledge), and updating the UI with text responses.
 
-### 2. Knowledge Store (`store/KnowledgeStore.ts`)
+### 2. Knowledge Store (`services/KnowledgeStore.ts`)
 Manages the user's local "brain." It stores data that the agent can retrieve later to provide context-aware answers that persist across different webpages.
 
 ### 3. API Clients (`api/`)

@@ -37,3 +37,21 @@ All subagents MUST strictly adhere to these rules when writing or modifying code
 - **Component Splitting**: Break down large, monolithic components (God Components) into smaller, single-responsibility UI components (e.g., Header, List, InputBar).
 - **Custom Hooks for Logic**: Extract complex state management, business logic, and side effects (`useEffect`) into custom hooks (e.g., `useAgentChat`) to keep components clean.
 - **Isolate Side Effects**: should not directly access external services, complex SDKs, or local storage inside a UI component. Better Delegate these to dedicated Service classes or custom hooks.
+
+## 7. Public Interface Declarations
+- **Explicit Interface at Top**: Every service, store, or manager file must declare an `interface I{Name}` at the top of the file listing all public methods.
+- **Class-based modules**: The class must `implements I{Name}`.
+- **Function-based modules**: The interface serves as a quick-reference contract; no `implements` clause is needed.
+
+```typescript
+// Example — class-based module
+export interface IMyStore {
+    get(id: string): Promise<Item | null>
+    save(item: Item): Promise<void>
+}
+
+export class MyStore implements IMyStore {
+    async get(id: string): Promise<Item | null> { /* ... */ }
+    async save(item: Item): Promise<void> { /* ... */ }
+}
+```

@@ -1,5 +1,5 @@
 import * as loggerModule from "@/0_common/utils/logger"
-import { todoManager } from "../../store/TodoManager"
+import { todoManager } from "../../services/TodoManager"
 import type { TodoStatus } from "../../types"
 import type { ToolRegistration } from "./types"
 

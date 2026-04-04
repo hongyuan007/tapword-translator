@@ -1,0 +1,9 @@
+Smoke Test Response Template
+============================
+
+Status: nested file read success
+
+Return format:
+- skill_id: folder-import-smoke-skill
+- verification: passed
+- source: examples/deep/nested/response-template.txt

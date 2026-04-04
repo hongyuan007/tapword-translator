@@ -1,0 +1,7 @@
+Folder Import Smoke Checklist
+
+1. Skill appears in the side panel list.
+2. Preview opens without error.
+3. The file listing includes nested paths.
+4. Reading a nested file returns the expected content.
+5. Reading this checklist file works.

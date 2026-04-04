@@ -95,6 +95,7 @@ export default defineConfig(({ mode }) => {
 					...(isFirefox ? [] : ['src/9_offscreen/offscreen.html']),
 					'src/10_welcome/update_v0_4_0.html',
 					'src/13_sidepanel/sidepanel.html',
+					'src/13_sidepanel/import-skill.html',
 				],
 				webExtConfig: {
 					target: browserTarget,

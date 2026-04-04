@@ -12,6 +12,7 @@ interface SettingsDrawerProps {
 export function SettingsDrawer({ apiKeyInput, onApiKeyInputChange, onSave, onClose, currentKeyPreview }: SettingsDrawerProps) {
     return (
         <div className="px-4 py-3 border-b border-stone-200 bg-stone-50">
+            {/* API Key Section */}
             <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-stone-500">{i18nModule.translate("sidepanel.apiKeySettings")}</span>
                 <button className="p-1 rounded hover:bg-stone-100 text-stone-400" onClick={onClose}>

@@ -1,7 +1,7 @@
 import * as loggerModule from "@/0_common/utils/logger"
 import * as embeddingClient from "../../api/EmbeddingClient"
-import { knowledgeStore } from "../../store/KnowledgeStore"
-import type { ScoredItem } from "../../store/KnowledgeStore"
+import { knowledgeStore } from "../../services/KnowledgeStore"
+import type { ScoredItem } from "../../services/KnowledgeStore"
 import type { ToolRegistration } from "./types"
 
 const logger = loggerModule.createLogger("knowledgeTools")

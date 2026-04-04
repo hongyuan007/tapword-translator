@@ -1,25 +1,57 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 import { useApiKey } from "./hooks/useApiKey"
 import { useAgentChat } from "./hooks/useAgentChat"
 import { ChatHeader } from "./components/ChatHeader"
+import type { SidePanelTab } from "./components/ChatHeader"
 import { MessageList } from "./components/MessageList"
 import { ChatInputBar } from "./components/ChatInputBar"
 import { SettingsDrawer } from "./components/SettingsDrawer"
 import { AuthBanner } from "./components/AuthBanner"
 import { ApiKeySetup } from "./components/ApiKeySetup"
 import { KnowledgePanel } from "./components/KnowledgePanel"
+import { SkillsPanel } from "./components/SkillsPanel"
+import { FileBrowserPanel } from "./components/FileBrowserPanel"
 import { TodoPanel } from "./components/TodoPanel"
+import * as skillStorageService from "./services/SkillStorageService"
+import type { SkillMeta } from "./types"
 
 // --- Component ---
 
 export default function App() {
-    const [activeTab, setActiveTab] = useState<"chat" | "knowledge">("chat")
+    const [activeTab, setActiveTab] = useState<SidePanelTab>("chat")
     const [showSettings, setShowSettings] = useState(false)
     const [input, setInput] = useState("")
+    const [skills, setSkills] = useState<SkillMeta[]>([])
 
     const { apiKey, isLoaded: keyLoaded, apiKeyInput, setApiKeyInput, saveKey } = useApiKey()
     const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } = useAgentChat(apiKey)
+
+    // Load skill metadata on mount
+    useEffect(() => {
+        skillStorageService.loadSkillMetas().then(setSkills)
+    }, [])
+
+    // Listen for skill-imported messages from the relay popup window
+    useEffect(() => {
+        const handler = (message: any) => {
+            if (message?.type === "skill-imported" && message.skillMeta) {
+                setSkills((prev) => [...prev.filter((s) => s.id !== message.skillMeta.id), message.skillMeta])
+            }
+        }
+        chrome.runtime.onMessage.addListener(handler)
+        return () => chrome.runtime.onMessage.removeListener(handler)
+    }, [])
+
+    const handleDeleteSkill = async (skillId: string) => {
+        await skillStorageService.deleteSkill(skillId)
+        setSkills((prev) => prev.filter((s) => s.id !== skillId))
+    }
+
+    const handleToggleSkill = async (skillId: string, enabled: boolean) => {
+        await skillStorageService.toggleSkillEnabled(skillId, enabled)
+        setSkills((prev) => prev.map((s) => (s.id === skillId ? { ...s, enabled } : s)))
+    }
 
     async function handleSend() {
         const trimmed = input.trim()
@@ -76,6 +108,14 @@ export default function App() {
             {todoItems.length > 0 && <TodoPanel items={todoItems} isTaskCompleted={isTaskCompleted} />}
             {activeTab === "knowledge" ? (
                 <KnowledgePanel />
+            ) : activeTab === "skills" ? (
+                <SkillsPanel
+                    skills={skills}
+                    onDeleteSkill={handleDeleteSkill}
+                    onToggleSkill={handleToggleSkill}
+                />
+            ) : activeTab === "files" ? (
+                <FileBrowserPanel />
             ) : (
                 <>
                     <MessageList messages={messages} />

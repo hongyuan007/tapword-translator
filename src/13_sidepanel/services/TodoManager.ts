@@ -19,7 +19,20 @@ const STATUS_MARKERS: Record<TodoStatus, string> = {
     completed: "[x]",
 }
 
-export class TodoManager {
+/** Public API for TodoManager. */
+export interface ITodoManager {
+    setOnChange(cb: (items: readonly TodoItem[], isTaskCompleted: boolean) => void): void
+    createTodos(rawItems: Array<Record<string, unknown>>): string
+    updateTodoStatus(id: string, status: TodoStatus): string
+    completeTask(): string
+    getItems(): readonly TodoItem[]
+    readonly isTaskCompleted: boolean
+    render(): string
+    restore(items: TodoItem[], isTaskCompleted: boolean): void
+    clear(): void
+}
+
+export class TodoManager implements ITodoManager {
     private items: TodoItem[] = []
     private _isTaskCompleted: boolean = false
     private onChange?: (items: readonly TodoItem[], isTaskCompleted: boolean) => void

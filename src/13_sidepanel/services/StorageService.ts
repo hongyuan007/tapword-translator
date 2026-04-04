@@ -1,5 +1,19 @@
 import type { ChatMessage, TodoItem } from "../types"
 
+// ─── Public Interface ──────────────────────────────────────────
+
+/** Public API for StorageService. */
+export interface IStorageService {
+    loadApiKeyFromStorage(): Promise<string | null>
+    saveApiKeyToStorage(key: string): Promise<void>
+    loadSessionMessages(): Promise<ChatMessage[]>
+    saveSessionMessages(messages: ChatMessage[]): Promise<void>
+    clearSessionMessages(): Promise<void>
+    loadSessionTodos(): Promise<{ items: TodoItem[]; isTaskCompleted: boolean }>
+    saveSessionTodos(items: readonly TodoItem[], isTaskCompleted: boolean): Promise<void>
+    clearSessionTodos(): Promise<void>
+}
+
 // Storage keys
 const API_KEY_STORAGE_KEY = "dashscopeApiKey"
 const SESSION_MESSAGES_KEY = "agentMessages"

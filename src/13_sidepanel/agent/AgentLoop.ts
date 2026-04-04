@@ -1,9 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk"
 import * as loggerModule from "@/0_common/utils/logger"
 import { createAnthropicClient } from "../api/AnthropicClient"
-import { todoManager } from "../store/TodoManager"
+import { todoManager } from "../services/TodoManager"
 import type { AgentCallbacks } from "../types"
-import { SYSTEM_PROMPT } from "./prompts"
+import * as skillStorageService from "../services/SkillStorageService"
+import { buildSystemPrompt } from "./prompts"
 import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
 
 const logger = loggerModule.createLogger("AgentLoop")
@@ -80,10 +81,14 @@ export class AgentLoop {
     async runAgent(userMessage: string, callbacks: AgentCallbacks): Promise<string> {
         this.history.push({ role: "user", content: userMessage })
 
+        // Load skill metadata for Layer 1 system prompt injection
+        const skillMetas = await skillStorageService.loadSkillMetas()
+        const baseSystemPrompt = buildSystemPrompt(skillMetas)
+
         while (true) {
             try {
                 // Compute effective system prompt with optional nag reminder
-                let effectiveSystem = SYSTEM_PROMPT
+                let effectiveSystem = baseSystemPrompt
                 if (this.roundsSinceTodoUpdate >= TODO_NAG_THRESHOLD && todoManager.getItems().length > 0) {
                     effectiveSystem += "\n\n<reminder>You have an active task list. Please update your todos to reflect current progress.</reminder>"
                 }

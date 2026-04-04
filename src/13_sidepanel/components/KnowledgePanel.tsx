@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react"
 import { Trash2, Loader2, Database } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
-import { knowledgeStore } from "../store/KnowledgeStore"
-import type { KnowledgeItem } from "../store/KnowledgeStore"
+import { knowledgeStore } from "../services/KnowledgeStore"
+import type { KnowledgeItem } from "../services/KnowledgeStore"
 
 // --- Constants ---
 

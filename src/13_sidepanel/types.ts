@@ -77,6 +77,54 @@ export interface AgentCallbacks {
     onToolCallComplete: (toolCallId: string, result: string, isError: boolean) => void
 }
 
+// ─── Skill Types ───────────────────────────────────────────────
+
+/** A single imported skill (folder-based). */
+export interface Skill {
+    /** Unique identifier = sanitized folder name (e.g., "e2e-testing"). */
+    id: string
+    /** Human-readable name from SKILL.md frontmatter or folder name. */
+    name: string
+    /** Short description for Layer 1 injection (~10-20 words). */
+    description: string
+    /**
+     * Full markdown body of SKILL.md (Layer 2 content, excluding frontmatter).
+     * Populated on demand for preview; may be empty in list context.
+     */
+    body: string
+    /** Folder name as imported (e.g., "e2e-testing"). */
+    folderName: string
+    /** Import timestamp (epoch ms). */
+    importedAt: number
+    /** Whether this skill is enabled for agent use. */
+    enabled: boolean
+}
+
+/** Metadata-only projection used for Layer 1 injection, UI listing, and LLM discovery. */
+export interface SkillMeta {
+    /** Unique identifier = sanitized folder name. */
+    id: string
+    /** Human-readable name from SKILL.md frontmatter or folder name. */
+    name: string
+    /** Short description for Layer 1 injection (~10-20 words). */
+    description: string
+    /** Folder name as imported. */
+    folderName: string
+    /** Absolute virtual FS path to the skill folder (e.g., "/tapword/skills/e2e-testing"). */
+    folderPath: string
+    /**
+     * List of all file paths relative to the skill folder.
+     * e.g., ["SKILL.md", "examples/login.spec.ts", "fixtures/auth.json"]
+     */
+    files: string[]
+    /** Import timestamp (epoch ms). */
+    importedAt: number
+    /** Whether this skill is enabled for agent use. */
+    enabled: boolean
+}
+
+// ─── Todo Types ────────────────────────────────────────────────
+
 /** Status of a single todo item. */
 export type TodoStatus = "pending" | "in_progress" | "completed"
 

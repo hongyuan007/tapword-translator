@@ -73,9 +73,19 @@ function cosineSimilarity(a: Float32Array, b: Float32Array): number {
     return dot / denom
 }
 
+// --- Public Interface ---
+
+/** Public API for KnowledgeStore. */
+export interface IKnowledgeStore {
+    store(item: KnowledgeItem): Promise<void>
+    search(queryEmbedding: Float32Array, topK?: number): Promise<ScoredItem[]>
+    delete(id: string): Promise<void>
+    list(): Promise<KnowledgeItem[]>
+}
+
 // --- KnowledgeStore class ---
 
-export class KnowledgeStore {
+export class KnowledgeStore implements IKnowledgeStore {
     private dbPromise: Promise<IDBDatabase>
 
     constructor() {

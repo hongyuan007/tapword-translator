@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import * as loggerModule from "@/0_common/utils/logger"
 import { AgentLoop, AgentError } from "../agent/AgentLoop"
 import * as embeddingClient from "../api/EmbeddingClient"
-import { todoManager } from "../store/TodoManager"
+import { todoManager } from "../services/TodoManager"
 import type { ChatMessage, TodoItem, AgentCallbacks, ContentBlock, TextBlock, ToolCallBlock } from "../types"
 import * as storageService from "../services/StorageService"
 
