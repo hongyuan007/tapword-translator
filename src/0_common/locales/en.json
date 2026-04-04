@@ -229,5 +229,17 @@
     "sidepanel.time.minutesAgo": "m ago",
     "sidepanel.time.hoursAgo": "h ago",
     "sidepanel.time.yesterday": "yesterday",
-    "sidepanel.time.daysAgo": "d ago"
+    "sidepanel.time.daysAgo": "d ago",
+    "sidepanel.todo.header": "Tasks",
+    "sidepanel.todo.progress": "{completed}/{total} completed",
+    "sidepanel.todo.collapse": "Collapse task list",
+    "sidepanel.todo.expand": "Expand task list",
+    "sidepanel.todo.empty": "No active tasks",
+    "sidepanel.todo.status.pending": "Pending",
+    "sidepanel.todo.status.inProgress": "In Progress",
+    "sidepanel.todo.status.completed": "Completed",
+    "sidepanel.todo.completed": "Task completed",
+    "sidepanel.todo.updatingStatus": "Updating task status...",
+    "sidepanel.todo.completing": "Completing task...",
+    "sidepanel.todo.planning": "Planning tasks..."
 }

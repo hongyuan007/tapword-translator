@@ -2,14 +2,17 @@ import Anthropic from "@anthropic-ai/sdk"
 import * as loggerModule from "@/0_common/utils/logger"
 import { createAnthropicClient } from "../api/AnthropicClient"
 import { KnowledgeStore } from "../store/KnowledgeStore"
+import { TodoManager } from "../store/TodoManager"
 import { SYSTEM_PROMPT } from "./prompts"
-import { TOOL_REGISTRY } from "./tools"
+import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
 import type { ToolContext } from "./tools"
 
 const logger = loggerModule.createLogger("AgentLoop")
 
 const DEFAULT_MODEL = import.meta.env.VITE_AGENT_MODEL || "qwen3.5-plus"
 const MAX_TOKENS = 4000
+/** Max rounds without a todo update before injecting a nag reminder. */
+const TODO_NAG_THRESHOLD = 3
 
 const TOOL_DEFINITIONS = Array.from(TOOL_REGISTRY.values()).map((t) => t.definition)
 
@@ -54,12 +57,15 @@ export class AgentLoop {
     private client: Anthropic
     private history: Anthropic.MessageParam[] = []
     private knowledgeStore: KnowledgeStore
+    private todoManager: TodoManager
     private apiKey: string
+    private roundsSinceTodoUpdate: number = 0
 
-    constructor(apiKey: string, knowledgeStore: KnowledgeStore) {
+    constructor(apiKey: string, knowledgeStore: KnowledgeStore, todoManager: TodoManager) {
         this.apiKey = apiKey
         this.client = createAnthropicClient(apiKey)
         this.knowledgeStore = knowledgeStore
+        this.todoManager = todoManager
     }
 
     // Restore LLM conversation history from simplified message pairs
@@ -83,11 +89,17 @@ export class AgentLoop {
 
         while (true) {
             try {
+                // Compute effective system prompt with optional nag reminder
+                let effectiveSystem = SYSTEM_PROMPT
+                if (this.roundsSinceTodoUpdate >= TODO_NAG_THRESHOLD && this.todoManager.getItems().length > 0) {
+                    effectiveSystem += "\n\n<reminder>You have an active task list. Please update your todos to reflect current progress.</reminder>"
+                }
+
                 let response: Anthropic.Message
                 try {
                     response = await this.client.messages.create({
                         model: DEFAULT_MODEL,
-                        system: SYSTEM_PROMPT,
+                        system: effectiveSystem,
                         messages: this.history,
                         tools: TOOL_DEFINITIONS,
                         max_tokens: MAX_TOKENS,
@@ -143,6 +155,14 @@ export class AgentLoop {
 
                 // Append tool results and continue loop
                 this.history.push({ role: "user", content: toolResults })
+
+                // Track todo update counter
+                const calledTodoTool = response.content.some((block) => block.type === "tool_use" && TODO_TOOL_NAMES.has(block.name))
+                if (calledTodoTool) {
+                    this.roundsSinceTodoUpdate = 0
+                } else {
+                    this.roundsSinceTodoUpdate++
+                }
             } catch (error) {
                 logger.error("Unhandled error in agent loop:", error)
                 throw error
@@ -153,12 +173,13 @@ export class AgentLoop {
     private async executeTool(name: string, input: Record<string, unknown>): Promise<string> {
         const tool = TOOL_REGISTRY.get(name)
         if (!tool) throw new Error(`Unknown tool: ${name}`)
-        const context: ToolContext = { apiKey: this.apiKey, knowledgeStore: this.knowledgeStore }
+        const context: ToolContext = { apiKey: this.apiKey, knowledgeStore: this.knowledgeStore, todoManager: this.todoManager }
         return tool.execute(input, context)
     }
 
     clearHistory(): void {
         this.history = []
+        this.roundsSinceTodoUpdate = 0
         logger.info("Conversation history cleared")
     }
 }

@@ -1,8 +1,9 @@
-import type { ChatMessage } from "../types"
+import type { ChatMessage, TodoItem } from "../types"
 
 // Storage keys
 const API_KEY_STORAGE_KEY = "dashscopeApiKey"
 const SESSION_MESSAGES_KEY = "agentMessages"
+const SESSION_TODOS_KEY = "agentTodos"
 
 // --- API Key Storage (chrome.storage.sync) ---
 
@@ -48,6 +49,43 @@ export async function saveSessionMessages(messages: ChatMessage[]): Promise<void
 export async function clearSessionMessages(): Promise<void> {
     try {
         await chrome.storage.session.remove(SESSION_MESSAGES_KEY)
+    } catch {
+        // Session storage may not be available
+    }
+}
+
+// --- Session Todos Storage (chrome.storage.session) ---
+
+interface TodoStorageData {
+    items: TodoItem[]
+    isTaskCompleted: boolean
+}
+
+export async function loadSessionTodos(): Promise<TodoStorageData> {
+    try {
+        const result = await chrome.storage.session.get(SESSION_TODOS_KEY)
+        const saved = result[SESSION_TODOS_KEY] as TodoStorageData | undefined
+        if (saved && saved.items && saved.items.length > 0) {
+            return { items: saved.items, isTaskCompleted: saved.isTaskCompleted ?? false }
+        }
+        return { items: [], isTaskCompleted: false }
+    } catch {
+        return { items: [], isTaskCompleted: false }
+    }
+}
+
+export async function saveSessionTodos(items: readonly TodoItem[], isTaskCompleted: boolean): Promise<void> {
+    try {
+        const data: TodoStorageData = { items: [...items], isTaskCompleted }
+        await chrome.storage.session.set({ [SESSION_TODOS_KEY]: data })
+    } catch {
+        // Session storage may not be available
+    }
+}
+
+export async function clearSessionTodos(): Promise<void> {
+    try {
+        await chrome.storage.session.remove(SESSION_TODOS_KEY)
     } catch {
         // Session storage may not be available
     }

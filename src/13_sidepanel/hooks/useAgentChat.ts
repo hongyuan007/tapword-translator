@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import * as loggerModule from "@/0_common/utils/logger"
 import { AgentLoop, AgentError } from "../agent/AgentLoop"
 import type { KnowledgeStore } from "../store/KnowledgeStore"
-import type { ChatMessage } from "../types"
+import { TodoManager } from "../store/TodoManager"
+import type { ChatMessage, TodoItem } from "../types"
 import * as storageService from "../services/StorageService"
 
 const logger = loggerModule.createLogger("useAgentChat")
@@ -12,6 +13,8 @@ interface UseAgentChatResult {
     isLoading: boolean
     activeTool: string | null
     showAuthError: boolean
+    todoItems: readonly TodoItem[]
+    isTaskCompleted: boolean
     sendMessage: (text: string) => Promise<void>
     clearChat: () => void
     dismissAuthError: () => void
@@ -22,19 +25,29 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
     const [isLoading, setIsLoading] = useState(false)
     const [activeTool, setActiveTool] = useState<string | null>(null)
     const [showAuthError, setShowAuthError] = useState(false)
+    const [todoItems, setTodoItems] = useState<readonly TodoItem[]>([])
+    const [isTaskCompleted, setIsTaskCompleted] = useState(false)
 
     const agentRef = useRef<AgentLoop | null>(null)
     const loadedMessagesRef = useRef<ChatMessage[] | null>(null)
+    const todoManagerRef = useRef<TodoManager>(
+        new TodoManager((items, taskCompleted) => {
+            setTodoItems(items)
+            setIsTaskCompleted(taskCompleted)
+            storageService.saveSessionTodos(items, taskCompleted)
+        })
+    )
 
-    // Load session messages on mount
+    // Load session messages and todos on mount
     useEffect(() => {
         loadPersistedMessages()
+        loadPersistedTodos()
     }, [])
 
     // Recreate AgentLoop when apiKey changes
     useEffect(() => {
         if (apiKey) {
-            const agent = new AgentLoop(apiKey, knowledgeStore)
+            const agent = new AgentLoop(apiKey, knowledgeStore, todoManagerRef.current)
             agentRef.current = agent
             // Restore LLM history from persisted messages
             if (loadedMessagesRef.current && loadedMessagesRef.current.length > 0) {
@@ -58,6 +71,15 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
         if (saved.length > 0) {
             setMessages(saved)
             loadedMessagesRef.current = saved
+        }
+    }
+
+    async function loadPersistedTodos() {
+        const saved = await storageService.loadSessionTodos()
+        if (saved.items.length > 0) {
+            todoManagerRef.current.restore(saved.items, saved.isTaskCompleted)
+            setTodoItems(saved.items)
+            setIsTaskCompleted(saved.isTaskCompleted)
         }
     }
 
@@ -127,11 +149,15 @@ export function useAgentChat(apiKey: string | null, knowledgeStore: KnowledgeSto
         setMessages([])
         setShowAuthError(false)
         storageService.clearSessionMessages()
+        todoManagerRef.current.clear()
+        setTodoItems([])
+        setIsTaskCompleted(false)
+        storageService.clearSessionTodos()
     }
 
     function dismissAuthError() {
         setShowAuthError(false)
     }
 
-    return { messages, isLoading, activeTool, showAuthError, sendMessage, clearChat, dismissAuthError }
+    return { messages, isLoading, activeTool, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError }
 }

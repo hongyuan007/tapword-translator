@@ -213,7 +213,7 @@
     "sidepanel.clearChat": "清空聊天",
     "sidepanel.settings": "设置",
     "sidepanel.thinking": "思考中...",
-    "sidepanel.emptyState": "随便问我关于当前页面的问题，或保存知识以备后用。",
+    "sidepanel.emptyState": "问我关于当前页面的问题",
     "sidepanel.input.placeholder": "问问关于这个页面的问题...",
     "sidepanel.input.placeholderDisabled": "请先配置 API Key...",
     "sidepanel.apiKeySettings": "API Key 设置",
@@ -229,5 +229,17 @@
     "sidepanel.time.minutesAgo": "分钟前",
     "sidepanel.time.hoursAgo": "小时前",
     "sidepanel.time.yesterday": "昨天",
-    "sidepanel.time.daysAgo": "天前"
+    "sidepanel.time.daysAgo": "天前",
+    "sidepanel.todo.header": "任务",
+    "sidepanel.todo.progress": "已完成 {completed}/{total}",
+    "sidepanel.todo.collapse": "收起任务列表",
+    "sidepanel.todo.expand": "展开任务列表",
+    "sidepanel.todo.empty": "暂无任务",
+    "sidepanel.todo.status.pending": "待处理",
+    "sidepanel.todo.status.inProgress": "进行中",
+    "sidepanel.todo.status.completed": "已完成",
+    "sidepanel.todo.completed": "任务完成",
+    "sidepanel.todo.updatingStatus": "更新任务状态...",
+    "sidepanel.todo.completing": "完成任务...",
+    "sidepanel.todo.planning": "规划任务中..."
 }

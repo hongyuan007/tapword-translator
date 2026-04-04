@@ -1,5 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk"
 import type { KnowledgeStore } from "../../store/KnowledgeStore"
+import type { TodoManager } from "../../store/TodoManager"
 
 /**
  * Context passed to every tool executor.
@@ -7,6 +8,7 @@ import type { KnowledgeStore } from "../../store/KnowledgeStore"
 export interface ToolContext {
     apiKey: string
     knowledgeStore: KnowledgeStore
+    todoManager: TodoManager
 }
 
 /**

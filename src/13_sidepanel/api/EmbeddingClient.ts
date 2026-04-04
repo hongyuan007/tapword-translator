@@ -2,11 +2,12 @@ import OpenAI from "openai"
 
 const DASHSCOPE_OPENAI_BASE_URL = import.meta.env.VITE_AGENT_EMBEDDING_BASE_URL || "https://dashscope.aliyuncs.com/compatible-mode/v1"
 const EMBEDDING_MODEL = import.meta.env.VITE_AGENT_EMBEDDING_MODEL || "text-embedding-v4"
+const EMBEDDING_API_KEY = import.meta.env.VITE_AGENT_EMBEDDING_API_KEY || ""
 const EMBEDDING_DIMENSIONS = 1024
 
 export async function getEmbedding(apiKey: string, text: string): Promise<Float32Array> {
     const client = new OpenAI({
-        apiKey,
+        apiKey: EMBEDDING_API_KEY || apiKey,
         baseURL: DASHSCOPE_OPENAI_BASE_URL,
         dangerouslyAllowBrowser: true,
     })

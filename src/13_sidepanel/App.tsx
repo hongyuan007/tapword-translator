@@ -10,6 +10,7 @@ import { SettingsDrawer } from "./components/SettingsDrawer"
 import { AuthBanner } from "./components/AuthBanner"
 import { ApiKeySetup } from "./components/ApiKeySetup"
 import { KnowledgePanel } from "./components/KnowledgePanel"
+import { TodoPanel } from "./components/TodoPanel"
 
 // --- Component ---
 
@@ -20,7 +21,7 @@ export default function App() {
     const knowledgeStoreRef = useRef(new KnowledgeStore())
 
     const { apiKey, isLoaded: keyLoaded, apiKeyInput, setApiKeyInput, saveKey } = useApiKey()
-    const { messages, isLoading, activeTool, showAuthError, sendMessage, clearChat, dismissAuthError } = useAgentChat(
+    const { messages, isLoading, activeTool, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } = useAgentChat(
         apiKey,
         knowledgeStoreRef.current
     )
@@ -77,6 +78,7 @@ export default function App() {
                     }}
                 />
             )}
+            {todoItems.length > 0 && <TodoPanel items={todoItems} isTaskCompleted={isTaskCompleted} />}
             {activeTab === "knowledge" ? (
                 <KnowledgePanel knowledgeStore={knowledgeStoreRef.current} />
             ) : (
