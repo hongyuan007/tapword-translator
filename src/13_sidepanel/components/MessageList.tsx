@@ -1,21 +1,19 @@
 import { useRef, useEffect } from "react"
-import { Loader2 } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 import type { ChatMessage } from "../types"
 import { MessageBubble } from "./MessageBubble"
 
 interface MessageListProps {
     messages: ChatMessage[]
-    activeTool: string | null
 }
 
-export function MessageList({ messages, activeTool }: MessageListProps) {
+export function MessageList({ messages }: MessageListProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
-    // Auto-scroll to bottom on new messages or tool activity
+    // Auto-scroll to bottom on new messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [messages, activeTool])
+    }, [messages])
 
     return (
         <main className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -23,14 +21,6 @@ export function MessageList({ messages, activeTool }: MessageListProps) {
             {messages.map((msg, i) => (
                 <MessageBubble key={i} message={msg} />
             ))}
-
-            {/* Active tool indicator */}
-            {activeTool && (
-                <div className="flex items-center gap-2 px-3 py-1.5">
-                    <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
-                    <span className="text-xs text-blue-500">{activeTool}</span>
-                </div>
-            )}
 
             <div ref={messagesEndRef} />
         </main>

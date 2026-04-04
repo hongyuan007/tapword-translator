@@ -2,13 +2,14 @@ import Anthropic from "@anthropic-ai/sdk"
 import * as loggerModule from "@/0_common/utils/logger"
 import { createAnthropicClient } from "../api/AnthropicClient"
 import { todoManager } from "../store/TodoManager"
+import type { AgentCallbacks } from "../types"
 import { SYSTEM_PROMPT } from "./prompts"
 import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
 
 const logger = loggerModule.createLogger("AgentLoop")
 
 const DEFAULT_MODEL = import.meta.env.VITE_AGENT_MODEL || "qwen3.5-plus"
-const MAX_TOKENS = 4000
+const MAX_TOKENS = 10000
 /** Max rounds without a todo update before injecting a nag reminder. */
 const TODO_NAG_THRESHOLD = 3
 
@@ -76,7 +77,7 @@ export class AgentLoop {
         logger.info(`Restored ${this.history.length} history entries`)
     }
 
-    async runAgent(userMessage: string, onTextUpdate: (text: string) => void, onToolUse?: (toolLabel: string) => void): Promise<string> {
+    async runAgent(userMessage: string, callbacks: AgentCallbacks): Promise<string> {
         this.history.push({ role: "user", content: userMessage })
 
         while (true) {
@@ -88,31 +89,48 @@ export class AgentLoop {
                 }
 
                 let response: Anthropic.Message
+                let accumulatedText = ""
+
                 try {
-                    response = await this.client.messages.create({
+                    const stream = this.client.messages.stream({
                         model: DEFAULT_MODEL,
                         system: effectiveSystem,
                         messages: this.history,
                         tools: TOOL_DEFINITIONS,
                         max_tokens: MAX_TOKENS,
                     })
+
+                    // Thinking deltas — forward to callback
+                    stream.on("thinking", (delta, snapshot) => {
+                        callbacks.onThinkingUpdate(delta, snapshot)
+                    })
+
+                    // Text deltas — forward to callback and track snapshot
+                    stream.on("text", (delta, snapshot) => {
+                        accumulatedText = snapshot
+                        callbacks.onTextUpdate(delta, snapshot)
+                    })
+
+                    // Completed content blocks — detect thinking completion
+                    stream.on("contentBlock", (block) => {
+                        if (block.type === "thinking") {
+                            callbacks.onThinkingComplete()
+                        }
+                        // tool_use handling moved to execution loop
+                    })
+
+                    response = await stream.finalMessage()
                 } catch (error) {
-                    logger.error("API call failed:", error)
+                    logger.error("Streaming API call failed:", error)
                     throw classifyApiError(error)
                 }
 
-                // Append assistant turn
+                // Push response content blocks as assistant turn
                 this.history.push({ role: "assistant", content: response.content })
-
-                // Extract text from this turn and notify UI
-                const textParts = response.content.filter((block): block is Anthropic.TextBlock => block.type === "text").map((block) => block.text)
-                if (textParts.length > 0) {
-                    onTextUpdate(textParts.join(""))
-                }
 
                 // If no tool use, we're done
                 if (response.stop_reason !== "tool_use") {
-                    return textParts.join("")
+                    return accumulatedText
                 }
 
                 // Process tool calls
@@ -123,7 +141,8 @@ export class AgentLoop {
                     const toolReg = TOOL_REGISTRY.get(block.name)
                     const toolLabel = toolReg?.label || `Running ${block.name}...`
                     logger.info(`Tool call: ${block.name}`, JSON.stringify(block.input))
-                    onToolUse?.(toolLabel)
+
+                    callbacks.onToolCallStart(block.id, block.name, toolLabel, block.input as Record<string, unknown>)
 
                     try {
                         const result = await this.executeTool(block.name, block.input as Record<string, unknown>)
@@ -132,6 +151,7 @@ export class AgentLoop {
                                 ? `${result.substring(0, 250)}...[${result.length} chars]...${result.substring(result.length - 250)}`
                                 : result
                         logger.info(`Tool result (${block.name}): ${preview}`)
+                        callbacks.onToolCallComplete(block.id, result, false)
                         toolResults.push({
                             type: "tool_result",
                             tool_use_id: block.id,
@@ -140,6 +160,7 @@ export class AgentLoop {
                     } catch (error) {
                         const errorMsg = error instanceof Error ? error.message : String(error)
                         logger.error(`Tool ${block.name} failed:`, errorMsg)
+                        callbacks.onToolCallComplete(block.id, `Error: ${errorMsg}`, true)
                         toolResults.push({
                             type: "tool_result",
                             tool_use_id: block.id,

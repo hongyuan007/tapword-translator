@@ -19,8 +19,7 @@ export default function App() {
     const [input, setInput] = useState("")
 
     const { apiKey, isLoaded: keyLoaded, apiKeyInput, setApiKeyInput, saveKey } = useApiKey()
-    const { messages, isLoading, activeTool, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } =
-        useAgentChat(apiKey)
+    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } = useAgentChat(apiKey)
 
     async function handleSend() {
         const trimmed = input.trim()
@@ -79,7 +78,7 @@ export default function App() {
                 <KnowledgePanel />
             ) : (
                 <>
-                    <MessageList messages={messages} activeTool={activeTool} />
+                    <MessageList messages={messages} />
                     <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} isLoading={isLoading} disabled={!apiKey} />
                 </>
             )}
