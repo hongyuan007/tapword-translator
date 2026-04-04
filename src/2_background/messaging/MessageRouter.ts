@@ -200,6 +200,37 @@ export function setupMessageListener(): void {
                 return true
             }
 
+            case "FETCH_URL": {
+                const url = message.url as string
+                if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
+                    sendResponse({ success: false, error: "Invalid URL: must start with http:// or https://" })
+                    return true
+                }
+                const FETCH_TIMEOUT_MS = 30_000
+                const controller = new AbortController()
+                const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+                fetch(url, { signal: controller.signal })
+                    .then((response) => {
+                        clearTimeout(timeoutId)
+                        return response.text().then((text) => ({
+                            success: true as const,
+                            content: text,
+                            contentType: response.headers.get("content-type") ?? "",
+                            statusCode: response.status,
+                        }))
+                    })
+                    .then((result) => sendResponse(result))
+                    .catch((err) => {
+                        clearTimeout(timeoutId)
+                        const errorMessage = err instanceof Error && err.name === "AbortError"
+                            ? "Request timed out after 30 seconds."
+                            : err instanceof Error ? err.message : String(err)
+                        logger.warn(`FETCH_URL failed for ${url}:`, errorMessage)
+                        sendResponse({ success: false, error: errorMessage })
+                    })
+                return true
+            }
+
             default:
                 logger.warn("Unknown message type:", messageType)
                 sendResponse({ status: "ok" })

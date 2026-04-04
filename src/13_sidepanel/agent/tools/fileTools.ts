@@ -1,11 +1,8 @@
 import * as loggerModule from "@/0_common/utils/logger"
-import { tapWordFS } from "../../services/TapWordFS"
+import { tapWordFS, VFS_PATH_PREFIX, VFS_ROOT } from "../../services/TapWordFS"
 import type { ToolRegistration } from "./types"
 
 const logger = loggerModule.createLogger("fileTools")
-
-const VFS_PATH_PREFIX = "/tapword/"
-const VFS_ROOT_PATH = "/tapword"
 
 /** Validate that a path is non-empty and starts with /tapword/. Returns error message or null if valid. */
 function validatePath(path: string): string | null {
@@ -211,7 +208,7 @@ export const deleteDirectoryTool: ToolRegistration = {
 
         // Safety guard: block deletion of the root directory
         const normalized = path.replace(/\/+$/, "")
-        if (normalized === VFS_ROOT_PATH) {
+        if (normalized === VFS_ROOT) {
             return `Error: Cannot delete the root directory.`
         }
 

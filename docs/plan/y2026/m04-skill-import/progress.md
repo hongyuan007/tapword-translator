@@ -92,3 +92,37 @@ Add 4 new file management tools to the sidepanel LLM agent (`list_directory`, `w
 |------|--------|
 | 2026-07-14 | Spec created: 4 new tools, 1 new file + 2 modified files. |
 | 2026-04-04 | Implementation complete (tasks 1-4). Type-check passes. Manual verification pending. |
+---
+
+## Phase 4: `fetch_url` and `search_files` Tools — Spec
+
+**Status**: Spec Complete  
+**Started**: 2026-07-14
+
+### Spec
+- [260714_fetch_search_tools_spec.md](analysis/260714_fetch_search_tools_spec.md)
+
+### Summary
+Add 2 new tools to the sidepanel LLM agent: `fetch_url` (fetch web pages and convert to markdown) and `search_files` (grep-like text search across VFS files). `fetch_url` delegates fetching to the background service worker for CORS bypass, then uses `@mozilla/readability` + `turndown` in sidebar for HTML→Markdown conversion. `search_files` recursively scans VFS files with plain text or regex matching.
+
+### Task Checklist
+
+| # | Task | File(s) | Status | Notes |
+|---|------|---------|--------|-------|
+| 1 | Add `<all_urls>` to `host_permissions` | `manifest.json` | ✅ Done | Required for CORS-free fetching |
+| 2 | Add `FETCH_URL` message type | `0_common/types/` | ✅ Done | — |
+| 3 | Add `FETCH_URL` handler in background | `2_background/messaging/MessageRouter.ts` | ✅ Done | fetch() + return body + metadata |
+| 4 | Install `@mozilla/readability` + `turndown` | `package.json` | ✅ Done | + `@types/turndown` |
+| 5 | Implement `fetch_url` tool | `agent/tools/fetchUrlTool.ts` | ✅ Done | HTML detect → readability → turndown → truncate |
+| 6 | Implement `search_files` tool | `agent/tools/searchFilesTool.ts` | ✅ Done | Recursive VFS walk + line matching |
+| 7 | Register both tools | `agent/tools/index.ts` | ✅ Done | — |
+| 8 | Update system prompt | `agent/prompts.ts` | ✅ Done | Document both new tools |
+| 9 | Type check | — | ✅ Done | — |
+| 10 | Verification | — | ⬜ Not Started | 20+ test cases in spec |
+
+### Log
+
+| Date | Update |
+|------|--------|
+| 2026-07-14 | Technical spec created with research summary, tool designs, and verification plan. |
+| 2026-04-04 | Implementation complete (tasks 1-9). Type-check pending. Manual verification pending. |

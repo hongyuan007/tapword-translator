@@ -3,6 +3,8 @@ import { getCurrentPageTool } from "./getCurrentPage"
 import { searchKnowledgeTool, storeKnowledgeTool } from "./knowledgeTools"
 import { loadSkillTool } from "./skillTools"
 import { readFileTool, listDirectoryTool, writeFileTool, deleteFileTool, deleteDirectoryTool } from "./fileTools"
+import { fetchUrlTool } from "./fetchUrlTool"
+import { searchFilesTool } from "./searchFilesTool"
 import { createTodosTool, updateTodoStatusTool, completeTodosTool } from "./todoTools"
 
 /** Tool names related to todo management. */
@@ -22,6 +24,8 @@ const TOOL_REGISTRY = new Map<string, ToolRegistration>([
     [writeFileTool.definition.name, writeFileTool],
     [deleteFileTool.definition.name, deleteFileTool],
     [deleteDirectoryTool.definition.name, deleteDirectoryTool],
+    [fetchUrlTool.definition.name, fetchUrlTool],
+    [searchFilesTool.definition.name, searchFilesTool],
 ])
 
 export { TOOL_REGISTRY }

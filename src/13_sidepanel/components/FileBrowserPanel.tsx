@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback } from "react"
 import { Folder, FolderOpen, FileText, ChevronRight, ChevronDown, Loader2, HardDrive } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 import * as loggerModule from "@/0_common/utils/logger"
-import { tapWordFS } from "../services/TapWordFS"
+import { tapWordFS, VFS_PATH_PREFIX } from "../services/TapWordFS"
 import type { DirEntry, FileStat } from "../services/TapWordFS"
 
 const logger = loggerModule.createLogger("FileBrowserPanel")
 
 // --- Constants ---
 
-const ROOT_PATH = "/tapword/"
+const ROOT_PATH = VFS_PATH_PREFIX
 const MAX_DEPTH = 5
 const BYTES_PER_KB = 1024
 const INDENT_PX_PER_LEVEL = 16

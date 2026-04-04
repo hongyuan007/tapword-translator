@@ -5,6 +5,11 @@ const logger = loggerModule.createLogger("TapWordFS")
 const TAPWORD_ROOT = "tapword"
 const PATH_PREFIX = "/tapword/"
 
+/** Absolute VFS root path without trailing slash (e.g., "/tapword"). */
+export const VFS_ROOT = "/tapword"
+/** Absolute VFS root path with trailing slash (e.g., "/tapword/"). */
+export const VFS_PATH_PREFIX = PATH_PREFIX
+
 // ─── Public Types ──────────────────────────────────────────────
 
 /** Metadata returned by stat(). */

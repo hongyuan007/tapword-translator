@@ -1,5 +1,5 @@
 import * as loggerModule from "@/0_common/utils/logger"
-import { tapWordFS } from "./TapWordFS"
+import { tapWordFS, VFS_ROOT } from "./TapWordFS"
 import type { SkillMeta } from "../types"
 
 // ─── Public Interface ──────────────────────────────────────────
@@ -17,8 +17,8 @@ export interface ISkillStorageService {
 
 const logger = loggerModule.createLogger("SkillStorageService")
 
-const SKILLS_DIR = "/tapword/skills"
-const INDEX_FILE = "/tapword/skills/.index.json"
+const SKILLS_DIR = `${VFS_ROOT}/skills`
+const INDEX_FILE = `${VFS_ROOT}/skills/.index.json`
 const ENTRY_DOCUMENT = "SKILL.md"
 const CURRENT_DIRECTORY = "."
 const PARENT_DIRECTORY = ".."
