@@ -9,44 +9,49 @@
         "check:firefox-logger-disabled": "node scripts/check-production-logger-disabled.mjs firefox",
         "prebuild:dev": "cross-env KEY_ENV=dev node other/scripts/inject-secrets-simple.mjs",
         "prebuild:prod": "cross-env KEY_ENV=prod node other/scripts/inject-secrets-simple.mjs",
-
         "dev": "npm run prebuild:dev && vite -c vite.config.ts --mode development",
+        "dev:watch": "npm run prebuild:dev && vite build -c vite.config.ts --mode development --watch",
         "dev:firefox": "npm run prebuild:dev && vite -c vite.config.ts --mode firefox",
         "dev:prod": "npm run prebuild:prod && vite -c vite.config.ts --mode production",
-
         "build": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode development",
         "build:firefox": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode firefox",
         "build:firefox-dev": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode firefox-development",
         "build:prod": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode production",
-
         "package": "npm run build:prod && npm run check:prod-logger-disabled && node scripts/package-with-version.mjs",
         "package:firefox": "npm run build:firefox && npm run check:firefox-logger-disabled && node scripts/package-with-version.mjs firefox",
         "package:source": "node scripts/package-source-with-version.mjs",
         "package:community": "npm run build:community && node scripts/package-with-version.mjs community",
-
         "prebuild:community": "node scripts/prepare-community-credentials.mjs",
         "dev:community": "npm run prebuild:community && vite -c vite.config.ts --mode community",
         "build:community": "npm run clean && npm run prebuild:community && cross-env NODE_ENV=production vite build -c vite.config.ts --mode community",
-        
         "type-check": "tsc --noEmit",
         "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
         "test": "vitest --config config/vitest.config.ts",
         "test:e2e": "playwright test -c config/playwright.config.ts",
         "test:e2e:headed": "playwright test -c config/playwright.config.ts --headed",
-        "format": "prettier --config config/.prettierrc.json --write \"src/**/*.ts\"",
-        "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --config config/.eslintrc.json \"src/**/*.ts\""
+        "format": "prettier --config config/.prettierrc.json --write \"src/**/*.{ts,tsx}\"",
+        "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --config config/.eslintrc.json \"src/**/*.{ts,tsx}\""
     },
     "dependencies": {
+        "@anthropic-ai/sdk": "0.82.0",
+        "@vitejs/plugin-react": "4.7.0",
         "crypto-js": "4.2.0",
         "franc-min": "6.2.0",
-        "openai": "6.15.0"
+        "lucide-react": "1.7.0",
+        "openai": "6.15.0",
+        "react": "19.2.4",
+        "react-dom": "19.2.4",
+        "voyageai": "0.2.1"
     },
     "devDependencies": {
         "@playwright/test": "1.51.0",
+        "@tailwindcss/vite": "4.2.1",
         "@types/chrome": "^0.0.268",
         "@types/crypto-js": "4.2.2",
         "@types/jsdom": "27.0.0",
         "@types/node": "^20.12.7",
+        "@types/react": "19.2.14",
+        "@types/react-dom": "19.2.3",
         "@typescript-eslint/eslint-plugin": "8.46.2",
         "@typescript-eslint/parser": "8.46.2",
         "@vitest/ui": "4.0.3",
@@ -57,6 +62,7 @@
         "javascript-obfuscator": "4.1.1",
         "jsdom": "27.0.1",
         "prettier": "3.6.2",
+        "tailwindcss": "4.2.1",
         "typescript": "^5.4.5",
         "vite": "^5.2.10",
         "vite-plugin-static-copy": "3.1.4",

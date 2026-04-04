@@ -1,0 +1,96 @@
+---
+
+### 1. 拆分 UI 组件 (Component Splitting)
+
+将庞大的 `return` 语句拆分成多个小的、职责单一的 UI 组件。每个组件只负责渲染自己那一小块，并且只接收它需要的数据（Props）。
+
+**重构方向示例：**
+
+*   **`ChatHeader.tsx`**: 只负责顶部的 Tab 切换、清空聊天按钮和设置按钮。
+*   **`MessageList.tsx`**: 接收 `messages` 数组，负责渲染整个聊天列表和自动滚动逻辑。
+*   **`ChatInputBar.tsx`**: 接收 `input` 状态、`isLoading` 状态和 `onSend` 回调，只负责底部的输入区域。
+*   **`SettingsDrawer.tsx`**: 负责 API Key 的输入、保存和错误提示。
+*   **`AuthBanner.tsx`**: 负责显示 API Key 错误时的红色警告。
+
+**拆分后的 `App.tsx` 的 UI 部分应该非常干净**
+
+
+### 2. 抽离业务逻辑：自定义 Hook (Custom Hooks)
+
+把 `useState` 和 `useEffect` 里面复杂的业务逻辑抽离出来，封装成自定义 Hook。这就像 SwiftUI 里的 `@StateObject` 配合一个独立的 `ViewModel` (ObservableObject)。
+
+自定义 Hook 让你可以在不修改 UI 的前提下，复用和测试状态逻辑。
+
+**重构方向示例：**
+
+*   **`useAgentChat.ts`**: 封装所有和聊天相关的逻辑。它管理 `messages` 状态、初始化 `AgentLoop`、处理 `handleSend` 和流式输出。对外只暴露 UI 需要的干净接口：`{ messages, isLoading, activeTool, sendMessage, clearChat }`。
+*   **`useApiKey.ts`**: 专门负责从 Chrome Storage 或环境变量加载、保存和验证 API Key。对外暴露：`{ apiKey, isLoaded, saveKey, error }`。
+
+**抽离后的 `App.tsx` 逻辑部分会变成这样：**
+
+```tsx
+export default function App() {
+  const [activeTab, setActiveTab] = useState<'chat' | 'knowledge'>('chat')
+  const [showSettings, setShowSettings] = useState(false)
+
+  // 干净的自定义 Hook，把复杂的逻辑藏在里面
+  const { apiKey, isLoaded: keyLoaded, saveKey, error: authError } = useApiKey()
+  const { 
+    messages, 
+    isLoading, 
+    activeTool, 
+    sendMessage, 
+    clearChat 
+  } = useAgentChat(apiKey, knowledgeStoreRef.current)
+
+  // ... 渲染逻辑 ...
+}
+```
+
+### 3. 隔离副作用与外部服务 (Service / API Layer)
+
+确保 UI 组件绝对不直接接触底层的数据存储（如 `chrome.storage`）或复杂的外部库（如 `AgentLoop` 内部的大模型 SDK 调用）。
+
+目前的 `App.tsx` 已经做得不错的一点是，它把 AI 工具调用的核心逻辑交给了 `AgentLoop.ts`，把知识库存储交给了 `KnowledgeStore.ts`。这就是典型的分离策略。
+
+但 `App.tsx` 里面直接调用 `chrome.storage.session.get` 来读写聊天记录，这依然有些耦合。最佳实践是把这些操作封装到专门的 Service 文件中（比如 `SessionStorageService.ts`），然后在自定义 Hook 中调用这些 Service。
+
+### 4. 推荐的文件目录结构
+
+当采用上述最佳实践后，一个组织良好的复杂 React 功能模块应该长这样：
+
+```
+src/13_sidepanel/
+├── index.tsx                 // 挂载点
+├── App.tsx                   // 主容器（现在非常薄，主要负责拼装）
+├── components/               // 纯 UI 组件 (Presentational Components)
+│   ├── ChatHeader.tsx
+│   ├── MessageList.tsx
+│   ├── MessageBubble.tsx
+│   ├── ChatInputBar.tsx
+│   ├── SettingsDrawer.tsx
+│   └── KnowledgePanel.tsx
+├── hooks/                    // 业务逻辑 (State & Effects)
+│   ├── useAgentChat.ts
+│   ├── useApiKey.ts
+│   └── useScrollToBottom.ts  // 甚至自动滚动逻辑也可以抽成 Hook
+├── agent/                    // 核心 AI 逻辑（与 UI 无关）
+│   ├── AgentLoop.ts
+│   └── tools/
+├── store/                    // 数据持久化层（与 UI 无关）
+│   └── KnowledgeStore.ts
+├── services/                 // 外部接口封装
+│   └── StorageService.ts     // 封装 chrome.storage 的细节
+└── styles/
+    └── sidepanel.css
+```
+
+### 总结最佳代码风格
+
+*   **UI 应该“笨”一点**：组件只负责接收数据（Props）并渲染界面。
+*   **逻辑应该“藏”起来**：复杂的业务流程、状态流转和副作用应该封装在自定义 Hook (如 `useAgentChat`) 或独立的 Class (如 `AgentLoop`) 中。
+*   **文件要“小”一点**：理想情况下，一个 React 组件文件不应超过 150-200 行。如果超过了，说明它承担了太多的职责，是时候拆分了。
+
+你觉得这种拆分方式和 SwiftUI 里的 `View` 与 `ViewModel` 的拆分思路像吗？其实现代前端架构的思想都是相通的。
+
+了解了 UI 层的问题和重构方向后，我们接下来可以看看最硬核的部分：**Agent 层（大脑是如何工作的）**，看看那个 `while` 循环是怎么让 AI 自己决定使用工具的。你想继续看这部分吗？

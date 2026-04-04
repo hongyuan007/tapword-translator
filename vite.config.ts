@@ -1,6 +1,8 @@
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import webExtension, { readJsonFile } from 'vite-plugin-web-extension';
 
@@ -23,6 +25,8 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		plugins: [
+			react(),
+			tailwindcss(),
 			webExtension({
 				manifest: () => {
 					const m = readJsonFile(manifestFile);
@@ -74,6 +78,14 @@ export default defineConfig(({ mode }) => {
 						};
 					}
 
+					// Rewrite side_panel path to source entry for vite-plugin-web-extension
+					if (m.side_panel?.default_path) {
+						manifest.side_panel = {
+							...m.side_panel,
+							default_path: 'src/13_sidepanel/sidepanel.html',
+						};
+					}
+
 					return manifest;
 				},
 				watchFilePaths: ['src/manifest.json', 'src/manifest-firefox.json'],
@@ -82,6 +94,7 @@ export default defineConfig(({ mode }) => {
 				additionalInputs: [
 					...(isFirefox ? [] : ['src/9_offscreen/offscreen.html']),
 					'src/10_welcome/update_v0_4_0.html',
+					'src/13_sidepanel/sidepanel.html',
 				],
 				webExtConfig: {
 					target: browserTarget,

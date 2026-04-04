@@ -21,6 +21,7 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
+        "jsx": "react-jsx",
         /* Path Aliases */
         "baseUrl": ".",
         "paths": {

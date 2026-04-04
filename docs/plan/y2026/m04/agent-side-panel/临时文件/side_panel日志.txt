@@ -1,0 +1,76 @@
+logger.js:1 [17:49:09.583][+129397ms][AgentLoop] Conversation history cleared
+logger.js:1 [17:49:09.589][+129403ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:11.545][+131359ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:11.608][+131421ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:12.010][+131823ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:12.123][+131937ms][KnowledgeStore] IndexedDB opened successfully
+index.js:1 [17:49:18.045][+159144ms][AuthService] Using cached token
+index.js:1 [17:49:18.045][+159144ms][TokenWarmUpHandler] Token pre-warm completed
+index.js:1 [17:49:18.589][+159688ms][AuthService] Using cached token
+index.js:1 [17:49:18.589][+159688ms][TokenWarmUpHandler] Token pre-warm completed
+index.js:1 [17:49:18.706][+159805ms][QuotaUsageHandler] Quota usage request handled: {
+  "used": 0,
+  "limit": 2000000,
+  "remaining": 2000000
+}
+index.js:1 [17:49:19.013][+160112ms][QuotaUsageHandler] Quota usage request handled: {
+  "used": 0,
+  "limit": 2000000,
+  "remaining": 2000000
+}
+logger.js:1 [17:49:19.044][+138858ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:19.129][+138943ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:19.272][+139086ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:19.421][+139235ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:19.625][+139439ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:19.814][+139628ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:20.559][+140373ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:20.705][+140519ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:20.754][+140568ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:20.875][+140689ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:21.028][+140842ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:21.152][+140966ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:21.449][+141263ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:21.643][+141457ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:21.991][+141805ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.024][+141838ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.136][+141950ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.228][+142042ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.272][+142085ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.376][+142190ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.438][+142252ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.644][+142458ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.842][+142656ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.907][+142721ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:22.929][+142743ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:23.007][+142821ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:23.126][+142940ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:23.294][+143108ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:24.104][+143918ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:25.250][+145064ms][AgentLoop] Tool call: get_current_page {}
+logger.js:1 [17:49:25.252][+145065ms][KnowledgeStore] IndexedDB opened successfully
+logger.js:1 [17:49:25.253][+145067ms][getCurrentPage] Page content received: 277 chars
+logger.js:1 [17:49:25.253][+145067ms][AgentLoop] Tool result (get_current_page): window.addEventListener(
+    "message",
+    (event) => {
+      try {
+        if (event.data.cmd === 'REQUEST') {
+          sessionStorage.setItem('request', JSON.stringify(event.data));
+        }
+      } catch {}
+    },
+    false
+  );
+
+
+
+
+    
+    
+
+    
+
+    
+    !
+在此网站禁用全局禁用
+logger.js:1 [17:49:29.957][+149770ms][KnowledgeStore] IndexedDB opened successfully

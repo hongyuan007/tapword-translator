@@ -31,3 +31,9 @@ All subagents MUST strictly adhere to these rules when writing or modifying code
 ## 5. Testing (TDD Mindset)
 - **Black-Box Testing**: Focus on inputs and outputs without considering internal logic.
 - **Correctness First**: Define expected outcomes based on requirements, not the current implementation.
+
+## 6. React UI Architecture
+- **Separation of Concerns**: Keep UI components "dumb" and focused only on rendering props and handling user events.
+- **Component Splitting**: Break down large, monolithic components (God Components) into smaller, single-responsibility UI components (e.g., Header, List, InputBar).
+- **Custom Hooks for Logic**: Extract complex state management, business logic, and side effects (`useEffect`) into custom hooks (e.g., `useAgentChat`) to keep components clean.
+- **Isolate Side Effects**: should not directly access external services, complex SDKs, or local storage inside a UI component. Better Delegate these to dedicated Service classes or custom hooks.

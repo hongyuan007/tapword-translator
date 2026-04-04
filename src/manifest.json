@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "__MSG_extName__",
-    "version": "0.5.0",
-    "version_name": "0.5.0-full-translate",
+    "version": "0.5.1",
+    "version_name": "0.5.1-qa-agent",
     "description": "__MSG_extDescription__",
     "default_locale": "en",
     "icons": {
@@ -12,11 +12,16 @@
     },
     "permissions": [
         "storage",
-        "offscreen"
+        "offscreen",
+        "sidePanel"
     ],
     "host_permissions": [
-        "https://*.bing.com/*"
+        "https://*.bing.com/*",
+        "https://dashscope.aliyuncs.com/*"
     ],
+    "side_panel": {
+        "default_path": "sidepanel.html"
+    },
     "background": {
         "service_worker": "background.js",
         "type": "module"

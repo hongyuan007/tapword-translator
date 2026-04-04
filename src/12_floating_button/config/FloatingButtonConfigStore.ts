@@ -90,14 +90,22 @@ export class FloatingButtonConfigStore {
                     listener({ ...this.config });
                 }
             };
-            chrome.storage.onChanged.addListener(this.storageListener);
+            try {
+                chrome.storage.onChanged.addListener(this.storageListener);
+            } catch {
+                // Extension context may be invalidated
+            }
         }
     }
 
     /** Remove all listeners and clean up */
     destroy(): void {
         if (this.storageListener) {
-            chrome.storage.onChanged.removeListener(this.storageListener);
+            try {
+                chrome.storage?.onChanged?.removeListener(this.storageListener);
+            } catch {
+                // Extension context may be invalidated
+            }
             this.storageListener = null;
         }
         this.changeListeners = [];

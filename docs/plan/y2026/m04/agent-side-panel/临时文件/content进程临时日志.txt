@@ -1,0 +1,74 @@
+index.js:165 [17:08:40.425][+19ms][content-script] AI Click Translator - Content script loaded
+index.js:165 [17:08:40.478][+72ms][content-script] User settings loaded: {
+  "enableTapWord": true,
+  "showIcon": true,
+  "singleClickTranslate": true,
+  "doubleClickTranslate": false,
+  "doubleClickTranslateV2": false,
+  "doubleClickSentenceTranslate": true,
+  "doubleClickSentenceTriggerKey": "meta",
+  "autoAdjustHeight": true,
+  "restoreLineHeightOnClear": false,
+  "autoPlayAudio": true,
+  "targetLanguage": "zh",
+  "translationFontSizePreset": "medium",
+  "translationFontSize": 12,
+  "tooltipNextLineGapPx": 4,
+  "tooltipNextLineGapPxV2": 6,
+  "tooltipVerticalOffsetPx": 2,
+  "tooltipVerticalOffsetPxV2": 3,
+  "textUnderlineOffsetPx": 3,
+  "textUnderlineOffsetPxV2": 4,
+  "tooltipUnderlineOffsetPxV3": 1.5,
+  "tooltipTextOffsetPxV3": 1,
+  "tooltipBottomSpacingPxV3": 6,
+  "wordUnderlineColor": "#2A9D8F",
+  "wordUnderlineColorV2": "#1F7FDB",
+  "sentenceUnderlineColor": "#E9C46A",
+  "iconColor": "pink",
+  "translationProvider": "official",
+  "customApi": {
+    "baseUrl": "",
+    "apiKey": "",
+    "model": ""
+  },
+  "mtranserver": {
+    "url": "http://127.0.0.1:8989",
+    "key": "",
+    "enabled": false
+  },
+  "bingTranslate": {
+    "enabled": true
+  },
+  "suppressNativeLanguage": false,
+  "networkRegion": "auto",
+  "enableAutoTranslate": false,
+  "userLanguageProficiency": "Intermediate"
+}
+index.js:165 [17:08:40.479][+73ms][SidepanelButtonManager] Sidepanel button initialized
+index.js:165 [17:08:40.479][+73ms][content-script] AI Click Translator - Event listeners registered
+index.js:165 [17:08:40.480][+74ms][FloatingButtonConfigStore] Config loaded: {
+  "enabled": true,
+  "position": 0.66,
+  "disabledSites": [],
+  "iconVariant": "v5",
+  "iconColor": "#F472B6",
+  "autoHideOnQuotaExhausted": true
+}
+index.js:165 [17:08:40.481][+75ms][FloatingButtonRenderer] Floating button DOM created
+index.js:165 [17:08:40.482][+76ms][i18n] Initialized with locale: zh
+index.js:165 [17:08:40.482][+76ms][FloatingButtonManager] Floating button initialized
+index.js:165 [17:08:40.484][+78ms][Content/FloatingButtonIntegration] Floating button integration initialized
+index.js:165 [17:11:34.446][+174041ms][selectionHandler] Selection validation failed: No valid selection
+index.js:165 [17:11:34.448][+174042ms][tapWordDetector] Failed to expand caret range to word {
+  "x": 1257,
+  "y": 732
+}
+index.js:165 [17:11:34.449][+174043ms][selectionHandler] [Single Click] Skipped: No word range at point
+index.js:165 [17:11:34.524][+174118ms][SidepanelButtonManager] Side panel opened
+index.js:165 [17:11:41.477][+181071ms][content-script] Extension context invalidated — cleaning up
+index.js:10376 Uncaught TypeError: Cannot read properties of undefined (reading 'onChanged')
+    at FloatingButtonConfigStore.destroy (index.js:10376:24)
+    at FloatingButtonManager.destroy (index.js:10667:24)
+    at destroy (index.js:10967:29)
+    at index.js:11016:7

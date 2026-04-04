@@ -19,3 +19,6 @@ export {
 // --- Core ---
 export { FloatingButtonManager } from './FloatingButtonManager';
 export { FloatingButtonConfigStore } from './config/FloatingButtonConfigStore';
+
+// --- Sidepanel ---
+export { SidepanelButtonManager } from './sidepanel/SidepanelButtonManager';

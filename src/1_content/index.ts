@@ -21,6 +21,7 @@ import * as iconManager from "@/1_content/ui/iconManager"
 import * as spaNavigationHandler from "@/1_content/handlers/SpaNavigationHandler"
 import * as fullTranslateHandler from "@/1_content/handlers/FullTranslateHandler"
 import * as floatingButtonIntegration from "@/1_content/handlers/FloatingButtonIntegration"
+import { SidepanelButtonManager } from "@/12_floating_button"
 
 const logger = loggerModule.createLogger("content-script")
 
@@ -28,6 +29,9 @@ logger.info("AI Click Translator - Content script loaded")
 
 // Module-level user settings (loaded during init)
 let userSettings: UserSettings | null = null
+
+// Sidepanel floating button instance
+let sidepanelButton: SidepanelButtonManager | null = null
 
 function resolveEffectiveUnderlineOffsetPx(value: number): number {
     return value - UNDERLINE_OFFSET_INTERNAL_SHIFT_PX
@@ -86,7 +90,13 @@ const invalidationCheckInterval = setInterval(() => {
     if (!chrome.runtime?.id) {
         clearInterval(invalidationCheckInterval)
         logger.info("Extension context invalidated — cleaning up")
-        floatingButtonIntegration.destroy()
+        try {
+            floatingButtonIntegration.destroy()
+            sidepanelButton?.destroy()
+        } catch (error) {
+            // Chrome APIs may already be unavailable
+            logger.warn("Cleanup error during context invalidation:", error)
+        }
     }
 }, 1000)
 
@@ -129,6 +139,10 @@ async function init(): Promise<void> {
         logger.error("Failed to initialize floating button:", error)
     })
 
+    // Initialize sidepanel floating button
+    sidepanelButton = new SidepanelButtonManager()
+    sidepanelButton.initialize()
+
     // Listen for messages from popup/background
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         if (message.type === "FULL_TRANSLATE_TOGGLE") {
@@ -137,6 +151,14 @@ async function init(): Promise<void> {
         }
         if (message.type === "FULL_TRANSLATE_STATUS_REQUEST") {
             fullTranslateHandler.handleStatusRequest(sendResponse)
+            return false
+        }
+        if (message.type === "GET_PAGE_CONTENT") {
+            // Clone body and remove extension-injected elements before extracting text
+            const clone = document.body.cloneNode(true) as HTMLElement
+            clone.querySelectorAll('[data-tapword-ext]').forEach(el => el.remove())
+            const text = clone.innerText?.trim() ?? ''
+            sendResponse({ success: true, content: text.slice(0, 50000) })
             return false
         }
         return false

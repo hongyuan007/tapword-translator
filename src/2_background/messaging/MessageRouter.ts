@@ -18,6 +18,9 @@ import * as serviceInitializer from "../services/ServiceInitializer"
 
 const logger = loggerModule.createLogger("MessageRouter")
 
+/** Tracks whether the sidepanel is open per window (windowId → isOpen) */
+const sidepanelOpenState = new Map<number, boolean>()
+
 /**
  * Setup message listener
  *
@@ -25,9 +28,8 @@ const logger = loggerModule.createLogger("MessageRouter")
  * to appropriate handlers based on message type
  */
 export function setupMessageListener(): void {
-    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-        logger.info("Message received in background:", message)
-
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        try {
         // Route based on message type
         const messageType = message.type as MessageType
 
@@ -122,10 +124,95 @@ export function setupMessageListener(): void {
                 return true
             }
 
+            case "GET_PAGE_CONTENT": {
+                try {
+                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                        if (tabs[0]?.id) {
+                            // Target main frame only (frameId: 0) to avoid iframe content
+                            chrome.tabs.sendMessage(tabs[0].id, message, { frameId: 0 }, (response) => {
+                                if (chrome.runtime.lastError) {
+                                    logger.warn("Failed to get page content:", chrome.runtime.lastError.message)
+                                    sendResponse({ success: false, error: "No content script available on this page" })
+                                } else {
+                                    sendResponse(response ?? { success: false, error: "No response from content script" })
+                                }
+                            })
+                        } else {
+                            sendResponse({ success: false, error: "No active tab found" })
+                        }
+                    })
+                } catch (error) {
+                    logger.error("Failed to get page content:", error)
+                    sendResponse({ success: false, error: String(error) })
+                }
+                return true
+            }
+
+            case "TOGGLE_SIDE_PANEL": {
+                const windowId = sender.tab?.windowId
+                if (windowId === undefined) {
+                    sendResponse({ success: false, error: 'No window context' })
+                    return true
+                }
+                const isCurrentlyOpen = sidepanelOpenState.get(windowId) ?? false
+                if (isCurrentlyOpen) {
+                    // Close: disable then re-enable to force sidepanel closed
+                    chrome.sidePanel.setOptions({ enabled: false })
+                        .then(() => chrome.sidePanel.setOptions({ enabled: true }))
+                        .then(() => {
+                            sidepanelOpenState.set(windowId, false)
+                            sendResponse({ success: true, isOpen: false })
+                        })
+                        .catch((error) => {
+                            logger.warn('Failed to close side panel:', error)
+                            sendResponse({ success: false, error: String(error) })
+                        })
+                } else {
+                    // Open
+                    chrome.sidePanel.open({ windowId })
+                        .then(() => {
+                            sidepanelOpenState.set(windowId, true)
+                            sendResponse({ success: true, isOpen: true })
+                        })
+                        .catch((error) => {
+                            logger.warn('Failed to open side panel:', error)
+                            sendResponse({ success: false, error: String(error) })
+                        })
+                }
+                return true
+            }
+
+            case "SIDE_PANEL_OPENED": {
+                const windowId = sender.tab?.windowId
+                if (windowId !== undefined) {
+                    sidepanelOpenState.set(windowId, true)
+                }
+                sendResponse({ success: true })
+                return true
+            }
+
+            case "SIDE_PANEL_CLOSED": {
+                const windowId = sender.tab?.windowId
+                if (windowId !== undefined) {
+                    sidepanelOpenState.set(windowId, false)
+                }
+                sendResponse({ success: true })
+                return true
+            }
+
             default:
                 logger.warn("Unknown message type:", messageType)
                 sendResponse({ status: "ok" })
                 return true
+        }
+        } catch (error) {
+            logger.error("[MessageRouter] Top-level error in onMessage listener:", error)
+            try {
+                sendResponse({ success: false, error: `Internal error: ${String(error)}` })
+            } catch {
+                // sendResponse may already have been called
+            }
+            return true
         }
     })
 
