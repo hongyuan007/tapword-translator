@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import { Folder, FolderOpen, FileText, ChevronRight, ChevronDown, Loader2, HardDrive } from "lucide-react"
+import { Folder, FolderOpen, FileText, ChevronRight, ChevronDown, Loader2, HardDrive, X } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 import * as loggerModule from "@/0_common/utils/logger"
 import { tapWordFS, VFS_PATH_PREFIX } from "../services/TapWordFS"
@@ -13,6 +13,8 @@ const ROOT_PATH = VFS_PATH_PREFIX
 const MAX_DEPTH = 5
 const BYTES_PER_KB = 1024
 const INDENT_PX_PER_LEVEL = 16
+/** Max file size for preview (200 KB). */
+const MAX_PREVIEW_SIZE = 200 * 1024
 
 // --- Types ---
 
@@ -59,11 +61,20 @@ function sortEntries(entries: DirEntry[]): DirEntry[] {
     })
 }
 
+// --- Preview Types ---
+
+type PreviewState =
+    | { kind: "idle" }
+    | { kind: "loading"; fileName: string }
+    | { kind: "loaded"; fileName: string; filePath: string; content: string; size: number }
+    | { kind: "error"; fileName: string; message: string }
+
 // --- Component ---
 
 export function FileBrowserPanel() {
     const [rootNodes, setRootNodes] = useState<TreeNode[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [preview, setPreview] = useState<PreviewState>({ kind: "idle" })
 
     /** Load entries for a directory path and return TreeNode[] */
     const loadDir = useCallback(async (dirPath: string, depth: number): Promise<TreeNode[]> => {
@@ -120,72 +131,101 @@ export function FileBrowserPanel() {
 
     /** Toggle expand/collapse for a directory node. */
     const toggleDir = useCallback(async (targetPath: string) => {
-        /** Recursively update a node list to toggle the target directory. */
-        async function updateNodes(nodes: TreeNode[]): Promise<TreeNode[]> {
-            const result: TreeNode[] = []
-            for (const node of nodes) {
+        /** Recursively find and update the target node in the tree. */
+        function updateNode(nodes: TreeNode[], updater: (node: TreeNode) => TreeNode): TreeNode[] {
+            return nodes.map((node) => {
                 if (node.path === targetPath && node.kind === "directory") {
-                    if (node.isExpanded) {
-                        // Collapse
-                        result.push({ ...node, isExpanded: false, children: undefined })
-                    } else {
-                        // Guard max depth
-                        if (node.depth >= MAX_DEPTH) {
-                            result.push(node)
-                            continue
-                        }
-                        // Mark loading
-                        result.push({ ...node, isLoading: true })
-                    }
-                } else if (node.children) {
-                    result.push({ ...node, children: await updateNodes(node.children) })
-                } else {
-                    result.push(node)
+                    return updater(node)
                 }
-            }
-            return result
+                if (node.children) {
+                    return { ...node, children: updateNode(node.children, updater) }
+                }
+                return node
+            })
         }
 
-        // First pass: set loading state
+        // Check if the node is currently expanded (read from current state)
+        let isCurrentlyExpanded = false
         setRootNodes((prev) => {
-            // We run this async, so update state optimistically
-            updateNodes(prev).then(setRootNodes)
-            return prev
-        })
-
-        // Actually load children for the target
-        /** Find and expand the target node within the tree. */
-        async function expandTarget(nodes: TreeNode[]): Promise<TreeNode[]> {
-            const result: TreeNode[] = []
-            for (const node of nodes) {
-                if (node.path === targetPath && node.kind === "directory" && !node.isExpanded) {
-                    try {
-                        const children = await loadDir(node.path, node.depth + 1)
-                        result.push({
-                            ...node,
-                            isExpanded: true,
-                            isLoading: false,
-                            children,
-                            childCount: children.length,
-                        })
-                    } catch (err) {
-                        logger.error(`Failed to load directory: ${node.path}`, err)
-                        result.push({ ...node, isLoading: false })
-                    }
-                } else if (node.children) {
-                    result.push({ ...node, children: await expandTarget(node.children) })
-                } else {
-                    result.push(node)
+            // Find the target node to check its state
+            function findExpanded(nodes: TreeNode[]): boolean {
+                for (const n of nodes) {
+                    if (n.path === targetPath) return !!n.isExpanded
+                    if (n.children) { const found = findExpanded(n.children); if (found) return true }
                 }
+                return false
             }
-            return result
-        }
-
-        setRootNodes((prev) => {
-            expandTarget(prev).then(setRootNodes)
-            return prev
+            isCurrentlyExpanded = findExpanded(prev)
+            return prev // No-op update, just reading
         })
+
+        if (isCurrentlyExpanded) {
+            // Collapse: synchronous state update
+            setRootNodes((prev) => updateNode(prev, (node) => ({
+                ...node, isExpanded: false, children: undefined,
+            })))
+        } else {
+            // Expand: mark loading → load children → update
+            setRootNodes((prev) => updateNode(prev, (node) => ({
+                ...node, isLoading: true,
+            })))
+
+            // Find the depth of the target node
+            let targetDepth = 0
+            setRootNodes((prev) => {
+                function findDepth(nodes: TreeNode[]): number {
+                    for (const n of nodes) {
+                        if (n.path === targetPath) return n.depth
+                        if (n.children) { const d = findDepth(n.children); if (d >= 0) return d }
+                    }
+                    return -1
+                }
+                targetDepth = findDepth(prev)
+                return prev
+            })
+
+            if (targetDepth >= MAX_DEPTH) {
+                setRootNodes((prev) => updateNode(prev, (node) => ({
+                    ...node, isLoading: false,
+                })))
+                return
+            }
+
+            try {
+                const children = await loadDir(targetPath, targetDepth + 1)
+                setRootNodes((prev) => updateNode(prev, (node) => ({
+                    ...node,
+                    isExpanded: true,
+                    isLoading: false,
+                    children,
+                    childCount: children.length,
+                })))
+            } catch (err) {
+                logger.error(`Failed to load directory: ${targetPath}`, err)
+                setRootNodes((prev) => updateNode(prev, (node) => ({
+                    ...node, isLoading: false,
+                })))
+            }
+        }
     }, [loadDir])
+
+    /** Open file preview. */
+    const openPreview = useCallback(async (node: TreeNode) => {
+        if (node.stat && node.stat.size > MAX_PREVIEW_SIZE) {
+            setPreview({ kind: "error", fileName: node.name, message: `File too large to preview (${formatSize(node.stat.size)})` })
+            return
+        }
+        setPreview({ kind: "loading", fileName: node.name })
+        try {
+            const content = await tapWordFS.readFile(node.path)
+            setPreview({ kind: "loaded", fileName: node.name, filePath: node.path, content, size: content.length })
+        } catch (err) {
+            logger.error(`Failed to read file: ${node.path}`, err)
+            setPreview({ kind: "error", fileName: node.name, message: "Failed to read file" })
+        }
+    }, [])
+
+    const closePreview = useCallback(() => setPreview({ kind: "idle" }), [])
 
     // --- Render helpers ---
 
@@ -196,11 +236,13 @@ export function FileBrowserPanel() {
         return (
             <div key={node.path}>
                 <button
-                    className={`w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-stone-100 transition-colors rounded-md ${
-                        isDir ? "cursor-pointer" : "cursor-default"
+                    className={`w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-stone-100 transition-colors rounded-md cursor-pointer ${
+                        !isDir && preview.kind !== "idle" && "filePath" in preview && preview.filePath === node.path
+                            ? "bg-stone-100"
+                            : ""
                     }`}
                     style={{ paddingLeft: `${indent + 12}px` }}
-                    onClick={isDir ? () => toggleDir(node.path) : undefined}
+                    onClick={isDir ? () => toggleDir(node.path) : () => openPreview(node)}
                 >
                     {/* Expand/collapse chevron for directories */}
                     {isDir ? (
@@ -247,6 +289,46 @@ export function FileBrowserPanel() {
         )
     }
 
+    // --- Preview panel ---
+    function renderPreview() {
+        if (preview.kind === "idle") return null
+
+        return (
+            <div className="border-t border-stone-200 flex flex-col max-h-[60%] min-h-[120px]">
+                {/* Header */}
+                <div className="flex items-center justify-between px-3 py-2 bg-stone-50 border-b border-stone-200">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
+                        <span className="text-xs font-medium text-stone-700 truncate">{preview.fileName}</span>
+                        {preview.kind === "loaded" && (
+                            <span className="text-[10px] text-stone-400 flex-shrink-0">{formatSize(preview.size)}</span>
+                        )}
+                    </div>
+                    <button
+                        className="p-0.5 rounded hover:bg-stone-200 transition-colors"
+                        onClick={closePreview}
+                    >
+                        <X className="w-3.5 h-3.5 text-stone-400" />
+                    </button>
+                </div>
+                {/* Content */}
+                <div className="flex-1 overflow-auto">
+                    {preview.kind === "loading" && (
+                        <div className="flex items-center justify-center py-8">
+                            <Loader2 className="w-4 h-4 text-stone-400 animate-spin" />
+                        </div>
+                    )}
+                    {preview.kind === "error" && (
+                        <div className="px-3 py-4 text-xs text-stone-400 text-center">{preview.message}</div>
+                    )}
+                    {preview.kind === "loaded" && (
+                        <pre className="px-3 py-2 text-[11px] leading-relaxed text-stone-600 font-mono whitespace-pre-wrap break-words">{preview.content}</pre>
+                    )}
+                </div>
+            </div>
+        )
+    }
+
     // --- Loading state ---
     if (isLoading) {
         return (
@@ -266,10 +348,13 @@ export function FileBrowserPanel() {
         )
     }
 
-    // --- Tree view ---
+    // --- Tree view with optional preview ---
     return (
-        <div className="flex-1 overflow-y-auto">
-            <div className="py-2">{rootNodes.map(renderNode)}</div>
+        <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto">
+                <div className="py-2">{rootNodes.map(renderNode)}</div>
+            </div>
+            {renderPreview()}
         </div>
     )
 }
