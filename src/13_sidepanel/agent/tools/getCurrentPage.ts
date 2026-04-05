@@ -6,7 +6,10 @@ const logger = loggerModule.createLogger("getCurrentPage")
 export const getCurrentPageTool: ToolRegistration = {
     definition: {
         name: "get_current_page",
-        description: "Get the text content of the currently active webpage. Use this when the user asks about the current page.",
+        description:
+            "Get a structured Markdown snapshot of the currently active webpage. " +
+            "The output is cleaned for high signal-to-noise ratio and removes most navigation, footer, form, and extension-injected noise. " +
+            "Use this when the user asks about the current page.",
         input_schema: {
             type: "object" as const,
             properties: {},

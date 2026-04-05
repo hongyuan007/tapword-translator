@@ -21,6 +21,7 @@ import * as iconManager from "@/1_content/ui/iconManager"
 import * as spaNavigationHandler from "@/1_content/handlers/SpaNavigationHandler"
 import * as fullTranslateHandler from "@/1_content/handlers/FullTranslateHandler"
 import * as floatingButtonIntegration from "@/1_content/handlers/FloatingButtonIntegration"
+import * as currentPageMarkdown from "@/1_content/utils/currentPageMarkdown"
 import { SidepanelButtonManager } from "@/12_floating_button"
 
 const logger = loggerModule.createLogger("content-script")
@@ -167,11 +168,8 @@ async function init(): Promise<void> {
             return false
         }
         if (message.type === "GET_PAGE_CONTENT") {
-            // Clone body and remove extension-injected elements before extracting text
-            const clone = document.body.cloneNode(true) as HTMLElement
-            clone.querySelectorAll('[data-tapword-ext]').forEach(el => el.remove())
-            const text = clone.innerText?.trim() ?? ''
-            sendResponse({ success: true, content: text.slice(0, 50000) })
+            const content = currentPageMarkdown.extractCurrentPageMarkdown()
+            sendResponse({ success: true, content })
             return false
         }
         return false
