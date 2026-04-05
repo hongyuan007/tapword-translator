@@ -1,5 +1,5 @@
 import * as loggerModule from "@/0_common/utils/logger"
-import type { TodoItem, TodoStatus } from "../types"
+import type { TodoItem, TodoStatus } from "@/13_sidepanel/types"
 
 const logger = loggerModule.createLogger("TodoManager")
 

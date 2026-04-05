@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import Anthropic from "@anthropic-ai/sdk"
 import { McpClientManager } from "../mcp/McpClientManager"
-import * as mcpStorage from "../mcp/McpServerStorage"
+import { mcpServerStorage } from "@/13_sidepanel/mcp/McpServerStorage"
 import type { McpServerConfig, McpServerState } from "../mcp/types"
 import type { McpToolCallbacks } from "../agent/AgentLoop"
 
@@ -28,8 +28,8 @@ export function useMcpServers(): UseMcpServersResult {
         let cancelled = false
 
         async function init() {
-            const configs = await mcpStorage.loadServerConfigs()
-            const toolStates = await mcpStorage.loadToolEnabledStates()
+            const configs = await mcpServerStorage.loadServerConfigs()
+            const toolStates = await mcpServerStorage.loadToolEnabledStates()
             if (cancelled) return
 
             // Pre-populate states using cached tools for instant UI display
@@ -38,7 +38,7 @@ export function useMcpServers(): UseMcpServersResult {
                     if (!config.enabled) {
                         return { config, status: "disconnected" as const, tools: [] }
                     }
-                    const cached = await mcpStorage.loadSessionCache(config.id)
+                    const cached = await mcpServerStorage.loadSessionCache(config.id)
                     if (cached) {
                         // Show cached tools immediately with "connecting" status
                         const cachedTools = cached.tools.map((t) => ({ ...t }))
@@ -71,7 +71,7 @@ export function useMcpServers(): UseMcpServersResult {
     }, [])
 
     const addServer = useCallback(async (config: McpServerConfig) => {
-        await mcpStorage.addServerConfig(config)
+        await mcpServerStorage.addServerConfig(config)
 
         if (config.enabled) {
             const connectingState: McpServerState = { config, status: "connecting", tools: [] }
@@ -86,7 +86,7 @@ export function useMcpServers(): UseMcpServersResult {
 
     const removeServer = useCallback(async (serverId: string) => {
         await managerRef.current.disconnectAndClearCache(serverId)
-        await mcpStorage.removeServerConfig(serverId)
+        await mcpServerStorage.removeServerConfig(serverId)
         setServerStates((prev) => prev.filter((s) => s.config.id !== serverId))
     }, [])
 
@@ -96,13 +96,13 @@ export function useMcpServers(): UseMcpServersResult {
         if (!current) return
 
         const updatedConfig: McpServerConfig = { ...current.config, enabled }
-        await mcpStorage.updateServerConfig(updatedConfig)
+        await mcpServerStorage.updateServerConfig(updatedConfig)
 
         if (enabled) {
             setServerStates((prev) =>
                 prev.map((s) => (s.config.id === serverId ? { ...s, config: updatedConfig, status: "connecting" } : s))
             )
-            const toolStates = await mcpStorage.loadToolEnabledStates()
+            const toolStates = await mcpServerStorage.loadToolEnabledStates()
             const state = await managerRef.current.connectServer(updatedConfig)
             applyToolEnabledOverrides(state, toolStates)
             setServerStates((prev) => prev.map((s) => (s.config.id === serverId ? state : s)))
@@ -117,7 +117,7 @@ export function useMcpServers(): UseMcpServersResult {
     }, [serverStates])
 
     const toggleTool = useCallback((serverId: string, toolName: string, enabled: boolean) => {
-        mcpStorage.saveToolEnabledState(serverId, toolName, enabled)
+        mcpServerStorage.saveToolEnabledState(serverId, toolName, enabled)
         setServerStates((prev) =>
             prev.map((s) => {
                 if (s.config.id !== serverId) return s
@@ -138,7 +138,7 @@ export function useMcpServers(): UseMcpServersResult {
             prev.map((s) => (s.config.id === serverId ? { ...s, status: "connecting", tools: [], errorMessage: undefined } : s))
         )
 
-        const toolStates = await mcpStorage.loadToolEnabledStates()
+        const toolStates = await mcpServerStorage.loadToolEnabledStates()
         const state = await managerRef.current.connectServer(current.config)
         applyToolEnabledOverrides(state, toolStates)
         setServerStates((prev) => prev.map((s) => (s.config.id === serverId ? state : s)))

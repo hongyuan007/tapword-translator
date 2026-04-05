@@ -1,6 +1,6 @@
 import * as loggerModule from "@/0_common/utils/logger"
-import { todoManager } from "../../services/TodoManager"
-import type { TodoStatus } from "../../types"
+import { todoManager } from "@/13_sidepanel/services/TodoManager"
+import type { TodoStatus } from "@/13_sidepanel/types"
 import type { ToolRegistration } from "./types"
 
 const logger = loggerModule.createLogger("todoTools")

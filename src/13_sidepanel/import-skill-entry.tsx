@@ -4,7 +4,7 @@ import { Upload, X, CheckCircle, AlertCircle, Loader2, FolderOpen } from "lucide
 import "./styles/sidepanel.css"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as i18nModule from "@/0_common/utils/i18n"
-import * as skillStorageService from "./services/SkillStorageService"
+import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 
 // --- Constants ---
 

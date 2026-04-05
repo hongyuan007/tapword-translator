@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import * as storageService from "../services/StorageService"
+import { storageService } from "@/13_sidepanel/services/StorageService"
 
 interface UseApiKeyResult {
     apiKey: string | null

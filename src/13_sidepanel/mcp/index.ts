@@ -13,16 +13,5 @@ export type { IMcpClientManager } from "./McpClientManager"
 export { McpClientManager } from "./McpClientManager"
 
 // ─── Storage ───────────────────────────────────────────────────
-export {
-    loadServerConfigs,
-    saveServerConfigs,
-    addServerConfig,
-    removeServerConfig,
-    updateServerConfig,
-    loadToolEnabledStates,
-    saveToolEnabledState,
-    saveSessionCache,
-    loadSessionCache,
-    clearSessionCache,
-    clearAllSessionCaches,
-} from "./McpServerStorage"
+export type { IMcpServerStorage } from "./McpServerStorage"
+export { McpServerStorage, mcpServerStorage } from "./McpServerStorage"

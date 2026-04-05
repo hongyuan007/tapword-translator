@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Download, Trash2, ChevronDown, ChevronUp, Zap, Loader2 } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
-import * as skillStorageService from "../services/SkillStorageService"
+import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import type { SkillMeta } from "../types"
 
 // --- Constants ---

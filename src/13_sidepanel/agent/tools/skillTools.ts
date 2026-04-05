@@ -1,5 +1,5 @@
 import * as loggerModule from "@/0_common/utils/logger"
-import * as SkillStorageService from "../../services/SkillStorageService"
+import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import type { ToolRegistration } from "./types"
 
 const logger = loggerModule.createLogger("skillTools")
@@ -30,7 +30,7 @@ export const loadSkillTool: ToolRegistration = {
         }
 
         // Check enabled status before loading body
-        const metas = await SkillStorageService.loadSkillMetas()
+        const metas = await skillStorageService.loadSkillMetas()
         const meta = metas.find((m) => m.id === skillId)
 
         if (meta && !meta.enabled) {
@@ -38,7 +38,7 @@ export const loadSkillTool: ToolRegistration = {
             return `Error: Skill '${skillId}' is currently disabled.`
         }
 
-        const body = await SkillStorageService.getSkillBody(skillId)
+        const body = await skillStorageService.getSkillBody(skillId)
         if (!body) {
             const available = metas.filter((m) => m.enabled).map((m) => m.id).join(", ")
             logger.warn(`Skill not found: ${skillId}. Available: ${available}`)

@@ -1,9 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk"
 import * as loggerModule from "@/0_common/utils/logger"
 import { createAnthropicClient } from "../api/AnthropicClient"
-import { todoManager } from "../services/TodoManager"
+import { todoManager } from "@/13_sidepanel/services/TodoManager"
 import type { AgentCallbacks } from "../types"
-import * as skillStorageService from "../services/SkillStorageService"
+import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import { buildSystemPrompt } from "./prompts"
 import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
 

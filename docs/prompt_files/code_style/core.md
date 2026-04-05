@@ -40,11 +40,12 @@ All subagents MUST strictly adhere to these rules when writing or modifying code
 
 ## 7. Public Interface Declarations
 - **Explicit Interface at Top**: Every service, store, or manager file must declare an `interface I{Name}` at the top of the file listing all public methods.
-- **Class-based modules**: The class must `implements I{Name}`.
-- **Function-based modules**: The interface serves as a quick-reference contract; no `implements` clause is needed.
+- **Class + Interface Pattern**: Service, Store, and Manager files MUST use a class-based pattern. The class must `implements I{Name}`.
+- **Singleton Export**: For stateless or module-scoped service classes, export a singleton instance: `export const myService = new MyService()`.
+- **API Contract**: The interface serves as the public API contract that consumers depend on.
 
 ```typescript
-// Example — class-based module
+// Example — class-based service with interface and singleton
 export interface IMyStore {
     get(id: string): Promise<Item | null>
     save(item: Item): Promise<void>
@@ -54,4 +55,7 @@ export class MyStore implements IMyStore {
     async get(id: string): Promise<Item | null> { /* ... */ }
     async save(item: Item): Promise<void> { /* ... */ }
 }
+
+/** Module-level singleton instance. */
+export const myStore = new MyStore()
 ```

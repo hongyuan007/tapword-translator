@@ -106,8 +106,11 @@ logger.info('Message');
 console.log('[ModuleName] Message');
 ```
 
-### Code Organization
-- Export functions/variables at file top, internal functions below
+## Public Interface Declarations
+- **Explicit Interface at Top**: Every service, store, or manager file must declare an `interface I{Name}` at the top of the file listing all public methods.
+- **Class + Interface Pattern**: Service, Store, and Manager files MUST use a class-based pattern. The class must `implements I{Name}`.
+- **Singleton Export**: For stateless or module-scoped service classes, better export a singleton instance: `export const myService = new MyService()`.
+- **API Contract**: The interface serves as the public API contract that consumers depend on.
 
 ### In-App UI Localization
 The project uses a custom utility at `src/0_common/utils/i18n.ts` for in-app UI translations.

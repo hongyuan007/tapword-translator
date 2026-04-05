@@ -14,7 +14,7 @@ import { SkillsPanel } from "./components/SkillsPanel"
 import { FileBrowserPanel } from "./components/FileBrowserPanel"
 import { McpPanel } from "./components/McpPanel"
 import { TodoPanel } from "./components/TodoPanel"
-import * as skillStorageService from "./services/SkillStorageService"
+import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import { useMcpServers } from "./hooks/useMcpServers"
 import type { SkillMeta } from "./types"
 

@@ -1,7 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js"
 import * as loggerModule from "@/0_common/utils/logger"
-import * as mcpStorage from "./McpServerStorage"
+import { mcpServerStorage } from "@/13_sidepanel/mcp/McpServerStorage"
 import type { McpServerConfig, McpServerState, McpToolEntry } from "./types"
 
 const logger = loggerModule.createLogger("McpClientManager")
@@ -74,7 +74,7 @@ export class McpClientManager implements IMcpClientManager {
         }
 
         // Attempt session resumption first
-        const cached = await mcpStorage.loadSessionCache(config.id)
+        const cached = await mcpServerStorage.loadSessionCache(config.id)
         if (cached) {
             try {
                 const result = await this.attemptSessionResumption(config, headers, cached.sessionId)
@@ -86,7 +86,7 @@ export class McpClientManager implements IMcpClientManager {
                 return state
             } catch {
                 logger.info(`Session resumption failed for "${config.name}", falling back to fresh connect`)
-                await mcpStorage.clearSessionCache(config.id)
+                await mcpServerStorage.clearSessionCache(config.id)
             }
         }
 
@@ -176,7 +176,7 @@ export class McpClientManager implements IMcpClientManager {
     ): Promise<void> {
         const sessionId = transport.sessionId
         if (sessionId) {
-            await mcpStorage.saveSessionCache(serverId, { sessionId, tools })
+            await mcpServerStorage.saveSessionCache(serverId, { sessionId, tools })
         }
     }
 
@@ -200,7 +200,7 @@ export class McpClientManager implements IMcpClientManager {
      */
     async disconnectAndClearCache(serverId: string): Promise<void> {
         await this.disconnectServer(serverId)
-        await mcpStorage.clearSessionCache(serverId)
+        await mcpServerStorage.clearSessionCache(serverId)
     }
 
     /** Disconnect all servers. Preserves session caches for next sidepanel open. */

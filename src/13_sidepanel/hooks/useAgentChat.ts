@@ -3,9 +3,9 @@ import * as loggerModule from "@/0_common/utils/logger"
 import { AgentLoop, AgentError } from "../agent/AgentLoop"
 import type { McpToolCallbacks } from "../agent/AgentLoop"
 import * as embeddingClient from "../api/EmbeddingClient"
-import { todoManager } from "../services/TodoManager"
+import { todoManager } from "@/13_sidepanel/services/TodoManager"
 import type { ChatMessage, TodoItem, AgentCallbacks, ContentBlock, TextBlock, ToolCallBlock } from "../types"
-import * as storageService from "../services/StorageService"
+import { storageService } from "@/13_sidepanel/services/StorageService"
 
 const logger = loggerModule.createLogger("useAgentChat")
 
