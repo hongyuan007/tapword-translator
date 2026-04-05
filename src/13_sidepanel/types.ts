@@ -50,7 +50,28 @@ export interface CompactionBlock {
     tokensAfter: number
 }
 
-export type ContentBlock = ThinkingBlock | TextBlock | ToolCallBlock | CompactionBlock
+export interface SubagentBlock {
+    type: "subagent"
+    /** Unique tool call ID from the parent's tool_use block. */
+    toolCallId: string
+    /** Short description of the subtask. */
+    description: string
+    /** Current execution status. */
+    status: "running" | "completed" | "error"
+    /** Number of LLM rounds the subagent took. */
+    rounds?: number
+    /** Number of tool calls executed. */
+    toolCallCount?: number
+    /** The summary result. */
+    summary?: string
+    /**
+     * Nested content blocks streamed from the subagent in real-time.
+     * Uses the same block types as the parent (ThinkingBlock, TextBlock, ToolCallBlock).
+     */
+    nestedBlocks: ContentBlock[]
+}
+
+export type ContentBlock = ThinkingBlock | TextBlock | ToolCallBlock | CompactionBlock | SubagentBlock
 
 // ─── ChatMessage ───────────────────────────────────────────────
 
@@ -86,6 +107,23 @@ export interface AgentCallbacks {
     onTextUpdate: (textDelta: string, textSnapshot: string) => void
     onThinkingUpdate: (thinkingDelta: string, thinkingSnapshot: string) => void
     onThinkingComplete: () => void
+    /**
+     * Fired when a subagent tool starts execution.
+     * Creates a SubagentBlock in the UI instead of a regular ToolCallBlock.
+     * @param toolCallId - Unique ID from the tool_use block
+     * @param description - Short description of the subtask
+     */
+    onSubagentStart: (toolCallId: string, description: string) => void
+    /**
+     * Fired when a running subagent emits a streaming update.
+     * The hook uses this to mutate the SubagentBlock's nestedBlocks.
+     * @param toolCallId - Matches the subagent's parent tool call ID
+     * @param updater - Function that receives current nestedBlocks and returns updated nestedBlocks
+     */
+    onSubagentBlockUpdate: (
+        toolCallId: string,
+        updater: (currentBlocks: ContentBlock[]) => ContentBlock[],
+    ) => void
     /**
      * Fired immediately before tool execution begins.
      * @param toolCallId - Unique ID from the tool_use block

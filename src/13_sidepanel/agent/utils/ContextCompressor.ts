@@ -14,13 +14,13 @@ const COMPRESSION_RATIO = 0.80
 /** Reserved output tokens per LLM call. */
 const MAX_TOKENS = 10000
 /** Number of recent tool result entries to keep intact during micro-compact. */
-const KEEP_RECENT_TOOL_RESULTS = 3
+const KEEP_RECENT_TOOL_RESULTS = 16
 /** Max characters of conversation JSON fed to the summarization prompt. */
 const SUMMARIZATION_INPUT_CAP = 80000
 /** Max tokens for the summarization LLM call. */
 const SUMMARIZATION_MAX_TOKENS = 2000
 /** Minimum messages to keep when mechanical truncation is used as fallback. */
-const MECHANICAL_TRUNCATION_KEEP = 6
+const MECHANICAL_TRUNCATION_KEEP = 12
 
 // ─── CJK Detection ────────────────────────────────────────────
 

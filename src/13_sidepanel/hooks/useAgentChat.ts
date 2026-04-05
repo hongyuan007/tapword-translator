@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import * as loggerModule from "@/0_common/utils/logger"
-import { AgentLoop, AgentError } from "../agent/AgentLoop"
+import { AgentLoop, AgentError, AgentAbortError } from "../agent/AgentLoop"
 import type { McpToolCallbacks } from "../agent/AgentLoop"
 import * as embeddingClient from "../api/EmbeddingClient"
+import * as storageManagerModule from "@/0_common/utils/storageManager"
 import { todoManager } from "@/13_sidepanel/services/TodoManager"
-import type { ChatMessage, TodoItem, AgentCallbacks, ContentBlock, TextBlock, ToolCallBlock, CompactionBlock, ContextUsage } from "../types"
+import type { ChatMessage, TodoItem, AgentCallbacks, ContentBlock, TextBlock, CompactionBlock, ContextUsage } from "../types"
 import { storageService } from "@/13_sidepanel/services/StorageService"
 
 const logger = loggerModule.createLogger("useAgentChat")
@@ -19,6 +20,7 @@ interface UseAgentChatResult {
     isTaskCompleted: boolean
     contextUsage: ContextUsage | null
     sendMessage: (text: string) => Promise<void>
+    abortAgent: () => void
     clearChat: () => void
     dismissAuthError: () => void
 }
@@ -50,13 +52,16 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
     useEffect(() => {
         if (apiKey) {
             embeddingClient.setApiKey(apiKey)
-            const agent = new AgentLoop(apiKey, mcpCallbacks)
-            agentRef.current = agent
-            // Restore LLM history from persisted messages
-            if (loadedMessagesRef.current && loadedMessagesRef.current.length > 0) {
-                agent.restoreHistory(loadedMessagesRef.current.filter((m) => !m.isError).map((m) => ({ role: m.role, content: m.content })))
-                loadedMessagesRef.current = null
-            }
+            storageManagerModule.getUserSettings().then((settings) => {
+                const model = settings.agentSettings?.model || import.meta.env.VITE_AGENT_MODEL || ""
+                const agent = new AgentLoop(apiKey, mcpCallbacks, model)
+                agentRef.current = agent
+                // Restore LLM history from persisted messages
+                if (loadedMessagesRef.current && loadedMessagesRef.current.length > 0) {
+                    agent.restoreHistory(loadedMessagesRef.current.filter((m) => !m.isError).map((m) => ({ role: m.role, content: m.content })))
+                    loadedMessagesRef.current = null
+                }
+            })
         } else {
             agentRef.current = null
         }
@@ -105,6 +110,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
 
             function appendBlock(block: ContentBlock): void {
                 setMessages((prev) => {
+                    if (assistantIndex >= prev.length) return prev
                     const updated = [...prev]
                     const msg = updated[assistantIndex]!
                     const blocks = [...(msg.blocks || []), block]
@@ -115,6 +121,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
 
             function updateLastBlock(patch: Partial<ContentBlock>): void {
                 setMessages((prev) => {
+                    if (assistantIndex >= prev.length) return prev
                     const updated = [...prev]
                     const msg = updated[assistantIndex]!
                     const blocks = [...(msg.blocks || [])]
@@ -127,20 +134,20 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
                 })
             }
 
-            function updateToolBlock(toolCallId: string, patch: Partial<ToolCallBlock>): void {
-                setMessages((prev) => {
-                    const updated = [...prev]
-                    const msg = updated[assistantIndex]!
-                    const blocks = (msg.blocks || []).map((b) => (b.type === "tool_call" && b.toolCallId === toolCallId ? { ...b, ...patch } : b))
-                    updated[assistantIndex] = { ...msg, blocks }
-                    return updated
-                })
+            /** Finalize the current streaming block (set isStreaming=false) before starting a new phase. */
+            function finalizeCurrentStreamingBlock(): void {
+                if (phaseRef.current === "text" || phaseRef.current === "thinking") {
+                    updateLastBlock({ isStreaming: false })
+                }
             }
+
+
 
             try {
                 const agentCallbacks: AgentCallbacks = {
                     onThinkingUpdate: (_delta, snapshot) => {
                         if (phaseRef.current !== "thinking") {
+                            finalizeCurrentStreamingBlock()
                             phaseRef.current = "thinking"
                             appendBlock({ type: "thinking", content: snapshot, isStreaming: true })
                         } else {
@@ -153,6 +160,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
                     },
                     onTextUpdate: (_delta, snapshot) => {
                         if (phaseRef.current !== "text") {
+                            finalizeCurrentStreamingBlock()
                             phaseRef.current = "text"
                             appendBlock({ type: "text", content: snapshot, isStreaming: true })
                         } else {
@@ -160,6 +168,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
                         }
                     },
                     onToolCallStart: (toolCallId, toolName, toolLabel, input) => {
+                        finalizeCurrentStreamingBlock()
                         phaseRef.current = "idle"
                         appendBlock({
                             type: "tool_call",
@@ -171,10 +180,60 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
                         })
                     },
                     onToolCallComplete: (toolCallId, result, isError) => {
-                        updateToolBlock(toolCallId, {
-                            result,
-                            isError,
-                            status: isError ? "error" : "completed",
+                        const completedStatus = isError ? "error" as const : "completed" as const
+                        // Handle both regular ToolCallBlock and SubagentBlock completion
+                        setMessages((prev) => {
+                            if (assistantIndex >= prev.length) return prev
+                            const updated = [...prev]
+                            const msg = updated[assistantIndex]!
+                            const blocks = (msg.blocks || []).map((b) => {
+                                if (b.type === "subagent" && b.toolCallId === toolCallId) {
+                                    return {
+                                        ...b,
+                                        status: completedStatus,
+                                        summary: result,
+                                        // Finalize all nested streaming blocks
+                                        nestedBlocks: b.nestedBlocks.map((nb: ContentBlock) =>
+                                            "isStreaming" in nb ? { ...nb, isStreaming: false } : nb,
+                                        ),
+                                    }
+                                }
+                                if (b.type === "tool_call" && b.toolCallId === toolCallId) {
+                                    return { ...b, result, isError, status: completedStatus }
+                                }
+                                return b
+                            })
+                            updated[assistantIndex] = { ...msg, blocks }
+                            return updated
+                        })
+                    },
+                    onSubagentStart: (toolCallId, description) => {
+                        finalizeCurrentStreamingBlock()
+                        phaseRef.current = "idle"
+                        appendBlock({
+                            type: "subagent",
+                            toolCallId,
+                            description,
+                            status: "running",
+                            nestedBlocks: [],
+                        })
+                    },
+                    onSubagentBlockUpdate: (toolCallId, updater) => {
+                        setMessages((prev) => {
+                            if (assistantIndex >= prev.length) return prev
+                            const updated = [...prev]
+                            const msg = updated[assistantIndex]!
+                            const blocks = (msg.blocks || []).map((b) => {
+                                if (b.type === "subagent" && b.toolCallId === toolCallId) {
+                                    return {
+                                        ...b,
+                                        nestedBlocks: updater(b.nestedBlocks),
+                                    }
+                                }
+                                return b
+                            })
+                            updated[assistantIndex] = { ...msg, blocks }
+                            return updated
                         })
                     },
                     onCompactionStart: (compressedCount) => {
@@ -194,6 +253,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
                             blocks: [compactionBlock],
                         }
                         setMessages((prev) => {
+                            if (assistantIndex >= prev.length) return prev
                             const updated = [...prev]
                             updated.splice(assistantIndex, 0, compactionMessage)
                             return updated
@@ -234,6 +294,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
 
                 // Post-loop content denormalization
                 setMessages((prev) => {
+                    if (assistantIndex >= prev.length) return prev
                     const updated = [...prev]
                     const msg = updated[assistantIndex]!
                     const blocks = msg.blocks || []
@@ -244,17 +305,60 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
                         .map((b) => b.content)
                         .join("\n\n")
 
-                    // Mark all blocks as not streaming
-                    const finalBlocks = blocks.map((b) => ("isStreaming" in b ? { ...b, isStreaming: false } : b))
+                    // Mark all blocks as not streaming (including nested subagent blocks)
+                    const finalBlocks = blocks.map((b) => {
+                        if (b.type === "subagent") {
+                            return {
+                                ...b,
+                                nestedBlocks: b.nestedBlocks.map((nb: ContentBlock) =>
+                                    "isStreaming" in nb ? { ...nb, isStreaming: false } : nb,
+                                ),
+                            }
+                        }
+                        return "isStreaming" in b ? { ...b, isStreaming: false } : b
+                    })
 
                     updated[assistantIndex] = { ...msg, content, blocks: finalBlocks }
                     return updated
                 })
             } catch (error) {
+                // Abort is not an error — just finalize the UI state
+                if (error instanceof AgentAbortError) {
+                    logger.info("Agent aborted by user")
+                    setMessages((prev) => {
+                        if (assistantIndex >= prev.length) return prev
+                        const updated = [...prev]
+                        const msg = updated[assistantIndex]!
+                        const blocks = (msg.blocks || []).map((b) => {
+                            if (b.type === "subagent") {
+                                return {
+                                    ...b,
+                                    status: b.status === "running" ? "error" as const : b.status,
+                                    nestedBlocks: b.nestedBlocks.map((nb: ContentBlock) =>
+                                        "isStreaming" in nb ? { ...nb, isStreaming: false } : nb,
+                                    ),
+                                }
+                            }
+                            if (b.type === "tool_call" && b.status === "running") {
+                                return { ...b, status: "error" as const, result: "Aborted", isError: true }
+                            }
+                            return "isStreaming" in b ? { ...b, isStreaming: false } : b
+                        })
+                        const content = blocks
+                            .filter((b): b is TextBlock => b.type === "text")
+                            .map((b) => b.content)
+                            .join("\n\n")
+                        updated[assistantIndex] = { ...msg, content, blocks }
+                        return updated
+                    })
+                    return
+                }
+
                 const isAuthErr = error instanceof AgentError && error.isAuthError
                 const errorMsg = error instanceof Error ? error.message : String(error)
                 logger.error("Agent request failed:", error)
                 setMessages((prev) => {
+                    if (assistantIndex >= prev.length) return prev
                     const updated = [...prev]
                     const current = updated[assistantIndex]!
                     updated[assistantIndex] = {
@@ -286,6 +390,13 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
         storageService.clearSessionTodos()
     }
 
+    /** Abort the currently running agent invocation. */
+    function abortAgent() {
+        if (agentRef.current && isLoading) {
+            agentRef.current.abort()
+        }
+    }
+
     function dismissAuthError() {
         setShowAuthError(false)
     }
@@ -298,6 +409,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
         isTaskCompleted,
         contextUsage,
         sendMessage,
+        abortAgent,
         clearChat,
         dismissAuthError,
     }

@@ -27,7 +27,7 @@ export default function App() {
 
     const { apiKey, isLoaded: keyLoaded } = useApiKey()
     const { serverStates, addServer, removeServer, toggleServer, toggleTool, reconnectServer, mcpCallbacks } = useMcpServers()
-    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, contextUsage, sendMessage, clearChat, dismissAuthError } = useAgentChat(apiKey, mcpCallbacks)
+    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, contextUsage, sendMessage, abortAgent, clearChat, dismissAuthError } = useAgentChat(apiKey, mcpCallbacks)
 
     // Load skill metadata on mount
     useEffect(() => {
@@ -114,7 +114,7 @@ export default function App() {
             ) : (
                 <>
                     <MessageList messages={messages} />
-                    <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} isLoading={isLoading} disabled={!apiKey} contextUsage={contextUsage} />
+                    <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} onAbort={abortAgent} isLoading={isLoading} disabled={!apiKey} contextUsage={contextUsage} />
                 </>
             )}
         </div>

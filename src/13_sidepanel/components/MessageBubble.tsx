@@ -4,6 +4,7 @@ import type { ChatMessage, ContentBlock } from "../types"
 import { ThinkingCard } from "./ThinkingCard"
 import { ToolCallCard } from "./ToolCallCard"
 import { CompactionCard } from "./CompactionCard"
+import { SubagentCard } from "./SubagentCard"
 import { MarkdownBlock } from "./MarkdownBlock"
 
 const BOT_AVATAR_URL = chrome.runtime.getURL("assets/pic/bot_avator.jpg")
@@ -17,6 +18,7 @@ interface MessageBubbleProps {
 function isVisibleBlock(block: ContentBlock): boolean {
     if (block.type === "tool_call") return true
     if (block.type === "compaction") return true
+    if (block.type === "subagent") return true
     return block.content !== "" || block.isStreaming
 }
 
@@ -102,6 +104,8 @@ function renderBlock(block: ContentBlock, index: number, isError?: boolean) {
             return <ToolCallCard key={index} block={block} />
         case "compaction":
             return <CompactionCard key={index} block={block} />
+        case "subagent":
+            return <SubagentCard key={index} block={block} />
         default:
             return null
     }

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from "react"
-import { Send, Loader2 } from "lucide-react"
+import { Send, Square } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 import { ContextUsageIndicator } from "./ContextUsageBar"
 import type { ContextUsage } from "../types"
@@ -14,12 +14,13 @@ interface ChatInputBarProps {
     input: string
     onInputChange: (value: string) => void
     onSend: () => void
+    onAbort?: () => void
     isLoading: boolean
     disabled: boolean
     contextUsage?: ContextUsage | null
 }
 
-export function ChatInputBar({ input, onInputChange, onSend, isLoading, disabled, contextUsage }: ChatInputBarProps) {
+export function ChatInputBar({ input, onInputChange, onSend, onAbort, isLoading, disabled, contextUsage }: ChatInputBarProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     const adjustHeight = useCallback(() => {
@@ -65,8 +66,17 @@ export function ChatInputBar({ input, onInputChange, onSend, isLoading, disabled
                         onClick={onSend}
                         disabled={isLoading || !input.trim() || disabled}
                     >
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                        <Send className="w-4 h-4" />
                     </button>
+                    {isLoading && (
+                        <button
+                            className="p-1 rounded-md text-red-500 hover:text-red-400"
+                            onClick={onAbort}
+                            title="Stop generation"
+                        >
+                            <Square className="w-4 h-4 fill-current" />
+                        </button>
+                    )}
                 </div>
                 <ContextUsageIndicator usage={contextUsage ?? null} />
             </div>

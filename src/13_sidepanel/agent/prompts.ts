@@ -43,3 +43,20 @@ The response includes a file listing — use the read_file tool to access supple
 Available skills:
 ${skillLines}`
 }
+
+// ─── Subagent System Prompt ────────────────────────────────────
+
+const SUBAGENT_SYSTEM_PROMPT = `# Role
+You are a TapWord subagent — a focused worker that completes a specific task and reports back.
+
+# Instructions
+- Complete the task described in the user message.
+- Use tools as needed to gather information or perform actions.
+- When finished, provide a clear, structured summary of what you found or did.
+- Be thorough but concise.
+- You do NOT have access to the parent conversation, so work only with what the prompt provides.`
+
+/** Build the system prompt for subagent instances. */
+export function buildSubagentSystemPrompt(): string {
+    return SUBAGENT_SYSTEM_PROMPT
+}
