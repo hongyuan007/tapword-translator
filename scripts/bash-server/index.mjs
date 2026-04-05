@@ -77,6 +77,7 @@ function registerRunCommandTool(server) {
         timeout: z.number().optional().describe("Max execution time in ms (default: 30000, max: 120000)"),
     },
 }, async (args) => {
+    console.log(`[TOOL CALL] run_command | args:`, args)
     const { command, cwd, timeout } = args
 
     // Safety check
@@ -144,6 +145,7 @@ function registerReadFileTool(server) {
         maxSize: z.number().optional().describe("Max file size in bytes (default: 1048576 = 1MB). Rejects larger files."),
     },
 }, async (args) => {
+    console.log(`[TOOL CALL] read_file | args:`, args)
     const { path: filePath, encoding, maxSize } = args
     const effectiveEncoding = encoding || DEFAULT_ENCODING
     const effectiveMaxSize = maxSize || DEFAULT_MAX_FILE_SIZE
@@ -196,6 +198,8 @@ app.use(express.json())
  */
 app.post(MCP_ENDPOINT, async (req, res) => {
     const sessionId = req.headers["mcp-session-id"]
+    const rpcMethod = req.body?.method || "unknown_method"
+    console.log(`\n[HTTP POST] /mcp | Session: ${sessionId || 'NEW'} | RPC Method: ${rpcMethod}`)
 
     // Route to existing session
     if (sessionId && sessions.has(sessionId)) {
@@ -206,8 +210,11 @@ app.post(MCP_ENDPOINT, async (req, res) => {
 
     // Reject non-initialization requests without a valid session
     if (sessionId && !sessions.has(sessionId)) {
-        res.status(404).json({ error: "Session not found. Please re-initialize." })
-        return
+        if (rpcMethod !== "initialize") {
+            res.status(404).json({ error: "Session not found. Please re-initialize." })
+            return
+        }
+        console.log(`[Session] Received initialize with invalid/expired session ${sessionId}. Creating fresh session.`)
     }
 
     // New session: create server + transport
@@ -244,6 +251,7 @@ app.post(MCP_ENDPOINT, async (req, res) => {
  */
 app.get(MCP_ENDPOINT, async (req, res) => {
     const sessionId = req.headers["mcp-session-id"]
+    console.log(`\n[HTTP GET]  /mcp | Session: ${sessionId || 'NONE'} | Establishing SSE Stream...`)
     if (sessionId && sessions.has(sessionId)) {
         const transport = sessions.get(sessionId)
         await transport.handleRequest(req, res)

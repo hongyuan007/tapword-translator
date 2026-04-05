@@ -24,6 +24,7 @@
         "prebuild:community": "node scripts/prepare-community-credentials.mjs",
         "dev:community": "npm run prebuild:community && vite -c vite.config.ts --mode community",
         "build:community": "npm run clean && npm run prebuild:community && cross-env NODE_ENV=production vite build -c vite.config.ts --mode community",
+        "start:bash-mcp": "node scripts/bash-server/index.mjs",
         "type-check": "tsc --noEmit",
         "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
         "test": "vitest --config config/vitest.config.ts",
