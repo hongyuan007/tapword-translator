@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Upload, Trash2, ChevronDown, ChevronUp, Zap, Loader2 } from "lucide-react"
+import { Download, Trash2, ChevronDown, ChevronUp, Zap, Loader2 } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 import * as skillStorageService from "../services/SkillStorageService"
 import type { SkillMeta } from "../types"
@@ -63,7 +63,7 @@ export function SkillsPanel({ skills, onDeleteSkill, onToggleSkill }: SkillsPane
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-medium transition-colors"
                         onClick={handleOpenImportWindow}
                     >
-                        <Upload className="w-3.5 h-3.5" />
+                        <Download className="w-3.5 h-3.5" />
                         {i18nModule.translate("sidepanel.skills.import")}
                     </button>
                 </div>
@@ -85,7 +85,7 @@ export function SkillsPanel({ skills, onDeleteSkill, onToggleSkill }: SkillsPane
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-medium transition-colors"
                     onClick={handleOpenImportWindow}
                 >
-                    <Upload className="w-3.5 h-3.5" />
+                    <Download className="w-3.5 h-3.5" />
                     {i18nModule.translate("sidepanel.skills.import")}
                 </button>
             </div>

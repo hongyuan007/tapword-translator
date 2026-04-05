@@ -119,6 +119,7 @@ export default defineConfig(({ mode }) => {
 			emptyOutDir: true,
 			sourcemap: process.env.NODE_ENV !== 'production' ? 'inline' : false,
 			minify: process.env.NODE_ENV === 'production',
+			chunkSizeWarningLimit: 800,
 		},
 	};
 });

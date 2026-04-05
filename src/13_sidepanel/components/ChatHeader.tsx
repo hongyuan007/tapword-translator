@@ -26,15 +26,6 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettin
                 </button>
                 <button
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                        activeTab === "knowledge" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
-                    }`}
-                    onClick={() => onTabChange("knowledge")}
-                >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    {i18nModule.translate("sidepanel.tab.knowledge")}
-                </button>
-                <button
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                         activeTab === "skills" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
                     }`}
                     onClick={() => onTabChange("skills")}
@@ -44,21 +35,30 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettin
                 </button>
                 <button
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-                        activeTab === "files" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
-                    }`}
-                    onClick={() => onTabChange("files")}
-                >
-                    <FolderOpen className="w-3.5 h-3.5" />
-                    {i18nModule.translate("sidepanel.tab.files")}
-                </button>
-                <button
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                         activeTab === "mcp" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
                     }`}
                     onClick={() => onTabChange("mcp")}
                 >
                     <Plug className="w-3.5 h-3.5" />
                     {i18nModule.translate("sidepanel.tab.mcp")}
+                </button>
+                <button
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                        activeTab === "knowledge" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
+                    }`}
+                    onClick={() => onTabChange("knowledge")}
+                >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    {i18nModule.translate("sidepanel.tab.knowledge")}
+                </button>
+                <button
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                        activeTab === "files" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
+                    }`}
+                    onClick={() => onTabChange("files")}
+                >
+                    <FolderOpen className="w-3.5 h-3.5" />
+                    {i18nModule.translate("sidepanel.tab.files")}
                 </button>
             </div>
             <div className="flex items-center gap-1">

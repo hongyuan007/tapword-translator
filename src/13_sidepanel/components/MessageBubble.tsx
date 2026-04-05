@@ -3,6 +3,7 @@ import * as i18nModule from "@/0_common/utils/i18n"
 import type { ChatMessage, ContentBlock } from "../types"
 import { ThinkingCard } from "./ThinkingCard"
 import { ToolCallCard } from "./ToolCallCard"
+import { MarkdownBlock } from "./MarkdownBlock"
 
 const BOT_AVATAR_URL = chrome.runtime.getURL("assets/pic/bot_avator.jpg")
 const USER_AVATAR_URL = chrome.runtime.getURL("assets/pic/user_avator.png")
@@ -82,13 +83,17 @@ function renderBlock(block: ContentBlock, index: number, isError?: boolean) {
             return (
                 <div
                     key={index}
-                    className={`rounded-xl px-3 py-2 text-sm whitespace-pre-wrap break-words ${
+                    className={`rounded-xl px-3 py-2 text-sm break-words ${
                         isError
                             ? "bg-red-50 text-red-800 rounded-bl-md border border-red-200"
                             : "bg-white text-stone-800 rounded-bl-md border border-stone-200"
                     }`}
                 >
-                    {block.content || (block.isStreaming && <span className="text-stone-400 italic text-xs">…</span>)}
+                    {block.content ? (
+                        <MarkdownBlock content={block.content} isStreaming={block.isStreaming} />
+                    ) : (
+                        block.isStreaming && <span className="text-stone-400 italic text-xs">…</span>
+                    )}
                 </div>
             )
         case "tool_call":
