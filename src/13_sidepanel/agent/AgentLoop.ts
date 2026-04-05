@@ -10,6 +10,7 @@ import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
 import { createSubagentTool, TASK_TOOL_NAME } from "./tools/subagentTool"
 import type { SubagentToolRegistration } from "./tools/subagentTool"
 import { contextCompressor } from "./utils/ContextCompressor"
+import { isProxyArtifact } from "./utils/isProxyArtifact"
 import { retryWithBackoff } from "./utils/retryWithBackoff"
 
 const logger = loggerModule.createLogger("AgentLoop")
@@ -268,6 +269,9 @@ export class AgentLoop {
                 })
 
                 stream.on("text", (delta, snapshot) => {
+                    if (isProxyArtifact(snapshot)) {
+                        logger.warn("Proxy artifact detected in text stream", snapshot.slice(0, 200))
+                    }
                     accumulatedText = snapshot
                     callbacks.onTextUpdate(delta, snapshot)
                 })

@@ -2,6 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk"
 import * as loggerModule from "@/0_common/utils/logger"
 import type { ToolRegistration } from "./tools/types"
 import type { McpToolCallbacks } from "./AgentLoop"
+import { isProxyArtifact } from "./utils/isProxyArtifact"
 import { retryWithBackoff } from "./utils/retryWithBackoff"
 
 const logger = loggerModule.createLogger("SubagentRunner")
@@ -83,6 +84,9 @@ export async function runSubagent(
             })
 
             stream.on("text", (delta, snapshot) => {
+                if (isProxyArtifact(snapshot)) {
+                    logger.warn("Proxy artifact detected in text stream", snapshot.slice(0, 200))
+                }
                 callbacks?.onTextUpdate?.(delta, snapshot)
             })
 
