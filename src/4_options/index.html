@@ -38,6 +38,7 @@
           <a href="#display-settings" class="nav-item" data-section="display-settings" data-i18n-key="popup.section.text">Text</a>
           <a href="#audio-settings" class="nav-item" data-section="audio-settings" data-i18n-key="popup.section.audio">Audio</a>
           <a href="#advanced-settings" class="nav-item" data-section="advanced-settings" data-i18n-key="popup.section.advanced">Advanced</a>
+          <a href="#chat-assistant-settings" class="nav-item" id="chatAssistantNavItem" data-section="chat-assistant-settings" data-i18n-key="options.section.chatAssistant" style="display: none;">Chat Assistant</a>
         </nav>
       </aside>
       <section class="content">
@@ -729,6 +730,127 @@
                     <p class="validation-status" id="testBingTranslateStatus"></p>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Assistant Settings Section (hidden unless AGENT_PANEL_ENABLED) -->
+        <div id="chat-assistant-settings" class="settings-section" style="display: none;">
+          <div class="section-header">
+            <h2 data-i18n-key="options.section.chatAssistant">Chat Assistant</h2>
+          </div>
+
+          <!-- Enable toggle -->
+          <div class="card settings-card">
+            <div class="setting-item setting-item-master">
+              <div class="setting-info">
+                <label class="setting-label master-label" for="enableChatAssistant">
+                  <span data-i18n-key="options.chatAssistant.enable.label">Enable Chat Assistant</span>
+                </label>
+                <p class="setting-helper" data-i18n-key="options.chatAssistant.enable.helper">
+                  Show the AI chat assistant floating button on web pages.
+                </p>
+              </div>
+              <label class="toggle-switch toggle-switch-master">
+                <input type="checkbox" id="enableChatAssistant" data-setting="enableChatAssistant">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Main LLM config -->
+          <h3 class="card-title" style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: var(--text-primary); padding-left: 2px;"
+              data-i18n-key="options.chatAssistant.llm.title">LLM Provider</h3>
+          <div class="card settings-card" id="agentLlmCard" style="margin-bottom: 32px;">
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="agentBaseUrl"
+                       data-i18n-key="options.chatAssistant.baseUrl.label">API Base URL</label>
+                <p class="setting-helper" data-i18n-key="options.chatAssistant.baseUrl.helper">
+                  Example: https://api.fireworks.ai/inference
+                </p>
+              </div>
+              <div class="setting-control">
+                <input type="url" id="agentBaseUrl" class="select-input"
+                       placeholder="https://api.example.com/v1" />
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="agentApiKey"
+                       data-i18n-key="options.chatAssistant.apiKey.label">API Key</label>
+                <p class="setting-helper" data-i18n-key="options.chatAssistant.apiKey.helper">
+                  Stored locally in browser storage.
+                </p>
+              </div>
+              <div class="setting-control">
+                <input type="password" id="agentApiKey" class="select-input"
+                       placeholder="sk-..." autocomplete="new-password" />
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="agentModel"
+                       data-i18n-key="options.chatAssistant.model.label">Model</label>
+                <p class="setting-helper" data-i18n-key="options.chatAssistant.model.helper">
+                  Example: accounts/fireworks/routers/kimi-k2p5-turbo
+                </p>
+              </div>
+              <div class="setting-control">
+                <input type="text" id="agentModel" class="select-input"
+                       placeholder="model-name" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Embedding config -->
+          <h3 class="card-title" style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: var(--text-primary); padding-left: 2px;"
+              data-i18n-key="options.chatAssistant.embedding.title">Embedding Provider</h3>
+          <div class="card settings-card" id="agentEmbeddingCard">
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="agentEmbeddingBaseUrl"
+                       data-i18n-key="options.chatAssistant.embeddingBaseUrl.label">Embedding Base URL</label>
+                <p class="setting-helper" data-i18n-key="options.chatAssistant.embeddingBaseUrl.helper">
+                  Example: https://dashscope.aliyuncs.com/compatible-mode/v1
+                </p>
+              </div>
+              <div class="setting-control">
+                <input type="url" id="agentEmbeddingBaseUrl" class="select-input"
+                       placeholder="https://..." />
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="agentEmbeddingApiKey"
+                       data-i18n-key="options.chatAssistant.embeddingApiKey.label">Embedding API Key</label>
+                <p class="setting-helper" data-i18n-key="options.chatAssistant.embeddingApiKey.helper">
+                  Stored locally in browser storage.
+                </p>
+              </div>
+              <div class="setting-control">
+                <input type="password" id="agentEmbeddingApiKey" class="select-input"
+                       placeholder="sk-..." autocomplete="new-password" />
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="agentEmbeddingModel"
+                       data-i18n-key="options.chatAssistant.embeddingModel.label">Embedding Model</label>
+                <p class="setting-helper" data-i18n-key="options.chatAssistant.embeddingModel.helper">
+                  Example: text-embedding-v4
+                </p>
+              </div>
+              <div class="setting-control">
+                <input type="text" id="agentEmbeddingModel" class="select-input"
+                       placeholder="text-embedding-v4" />
               </div>
             </div>
           </div>

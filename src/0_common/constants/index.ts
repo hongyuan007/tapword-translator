@@ -5,6 +5,7 @@
 export const APP_EDITION = import.meta.env.VITE_APP_EDITION || "official"
 export const PRIVATE_CLOUD_ENABLED = import.meta.env.VITE_ENABLE_PRIVATE_CLOUD === "true"
 export const ADVANCED_FEATURES_ENABLED = import.meta.env.VITE_ENABLE_ADVANCED_FEATURES !== "false"
+export const AGENT_PANEL_ENABLED = import.meta.env.VITE_ENABLE_AGENT_PANEL === "true"
 
 export { ERROR_MESSAGES } from "./errorMessages"
 export {

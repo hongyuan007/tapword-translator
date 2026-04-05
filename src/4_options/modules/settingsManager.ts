@@ -245,6 +245,16 @@ export async function loadSettings(): Promise<void> {
             setValue("mtranserverKey", settings.mtranserver.key || "")
         }
 
+        // Load Chat Assistant (Agent) settings
+        if (settings.agentSettings) {
+            setValue("agentBaseUrl", settings.agentSettings.baseUrl)
+            setValue("agentApiKey", settings.agentSettings.apiKey)
+            setValue("agentModel", settings.agentSettings.model)
+            setValue("agentEmbeddingBaseUrl", settings.agentSettings.embeddingBaseUrl)
+            setValue("agentEmbeddingApiKey", settings.agentSettings.embeddingApiKey)
+            setValue("agentEmbeddingModel", settings.agentSettings.embeddingModel)
+        }
+
         // Initialize Custom Selects with loaded values
         const customSelects = document.querySelectorAll(".custom-select-wrapper[data-setting]")
         customSelects.forEach((wrapper) => {
@@ -275,8 +285,35 @@ export async function saveSetting(settingKey: keyof types.UserSettings, value: b
     }
 }
 
+const AGENT_INPUT_MAP: Record<string, keyof types.AgentSettings> = {
+    agentBaseUrl: "baseUrl",
+    agentApiKey: "apiKey",
+    agentModel: "model",
+    agentEmbeddingBaseUrl: "embeddingBaseUrl",
+    agentEmbeddingApiKey: "embeddingApiKey",
+    agentEmbeddingModel: "embeddingModel",
+}
+
+function setupAgentSettingChangeListeners(): void {
+    Object.keys(AGENT_INPUT_MAP).forEach((id) => {
+        const input = document.getElementById(id) as HTMLInputElement | null
+        if (!input) return
+        input.addEventListener("change", async () => {
+            const current = await storageManagerModule.getUserSettings()
+            const key = AGENT_INPUT_MAP[id]!
+            await storageManagerModule.updateUserSettings({
+                agentSettings: {
+                    ...current.agentSettings,
+                    [key]: input.value.trim(),
+                },
+            })
+        })
+    })
+}
+
 export function setupSettingChangeListeners(): void {
     setupCustomSelects()
+    setupAgentSettingChangeListeners()
 
     const checkboxes = document.querySelectorAll('input[type="checkbox"][data-setting]')
     checkboxes.forEach((checkbox) => {

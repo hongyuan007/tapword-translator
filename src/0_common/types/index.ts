@@ -329,6 +329,22 @@ export interface BingTranslateSettings {
     enabled: boolean
 }
 
+/** Agent (Chat Assistant) LLM and embedding API configuration */
+export interface AgentSettings {
+    /** Main LLM API key */
+    apiKey: string
+    /** Main LLM base URL */
+    baseUrl: string
+    /** Main LLM model name */
+    model: string
+    /** Embedding service base URL */
+    embeddingBaseUrl: string
+    /** Embedding service API key */
+    embeddingApiKey: string
+    /** Embedding model name */
+    embeddingModel: string
+}
+
 export interface UserSettings {
     /** Master switch to enable all translation features */
     enableTapWord: boolean
@@ -401,6 +417,10 @@ export interface UserSettings {
     enableAutoTranslate: boolean
     /** User language proficiency level for auto-translation candidate selection */
     userLanguageProficiency: LanguageProficiency
+    /** Whether the Chat Assistant (sidepanel) feature is enabled */
+    enableChatAssistant: boolean
+    /** Agent (Chat Assistant) LLM and embedding API configuration */
+    agentSettings: AgentSettings
 }
 
 /**
@@ -453,6 +473,15 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     networkRegion: "auto",
     enableAutoTranslate: false,
     userLanguageProficiency: "Intermediate",
+    enableChatAssistant: true,
+    agentSettings: {
+        apiKey: "",
+        baseUrl: "",
+        model: "",
+        embeddingBaseUrl: "",
+        embeddingApiKey: "",
+        embeddingModel: "",
+    },
 }
 
 export const DEFAULT_SUPPRESS_NATIVE_LANGUAGE = DEFAULT_USER_SETTINGS.suppressNativeLanguage

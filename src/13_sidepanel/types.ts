@@ -34,7 +34,23 @@ export interface ToolCallBlock {
     status: "running" | "completed" | "error"
 }
 
-export type ContentBlock = ThinkingBlock | TextBlock | ToolCallBlock
+export interface CompactionBlock {
+    type: "compaction"
+    /** Current compression status */
+    status: "compressing" | "completed"
+    /** The summary text produced by the LLM */
+    summary: string
+    /** Timestamp when compression occurred */
+    timestamp: number
+    /** Number of messages that were compressed */
+    compressedMessageCount: number
+    /** Estimated tokens before compression */
+    tokensBefore: number
+    /** Estimated tokens after compression */
+    tokensAfter: number
+}
+
+export type ContentBlock = ThinkingBlock | TextBlock | ToolCallBlock | CompactionBlock
 
 // ─── ChatMessage ───────────────────────────────────────────────
 
@@ -53,6 +69,16 @@ export interface ChatMessage {
      */
     blocks?: ContentBlock[]
     isError?: boolean
+}
+
+/** Snapshot of context window usage for the progress indicator. */
+export interface ContextUsage {
+    /** Estimated history tokens currently consumed. */
+    tokensUsed: number
+    /** Token threshold that triggers auto-compression. */
+    threshold: number
+    /** Usage percentage (0-100, capped). */
+    percentage: number
 }
 
 /** Callbacks for streaming events from the agent loop. */
@@ -75,6 +101,25 @@ export interface AgentCallbacks {
      * @param isError - Whether execution failed
      */
     onToolCallComplete: (toolCallId: string, result: string, isError: boolean) => void
+    /**
+     * Fired immediately before context compression begins.
+     * @param compressedCount - Number of messages about to be compressed
+     */
+    onCompactionStart: (compressedCount: number) => void
+    /**
+     * Fired after context compression completes.
+     * @param summary - LLM-generated summary of compressed context
+     * @param stats - Compression statistics
+     */
+    onCompactionComplete: (
+        summary: string,
+        stats: { compressedCount: number; tokensBefore: number; tokensAfter: number },
+    ) => void
+    /**
+     * Fired with updated context usage stats so the UI can show a progress bar.
+     * @param usage - Current context window usage snapshot
+     */
+    onContextUsageUpdate: (usage: ContextUsage) => void
 }
 
 // ─── Skill Types ───────────────────────────────────────────────

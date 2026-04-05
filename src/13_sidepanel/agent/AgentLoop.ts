@@ -3,9 +3,11 @@ import * as loggerModule from "@/0_common/utils/logger"
 import { createAnthropicClient } from "../api/AnthropicClient"
 import { todoManager } from "@/13_sidepanel/services/TodoManager"
 import type { AgentCallbacks } from "../types"
+import type { ContextUsage } from "../types"
 import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import { buildSystemPrompt } from "./prompts"
 import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
+import { contextCompressor } from "./ContextCompressor"
 
 const logger = loggerModule.createLogger("AgentLoop")
 
@@ -13,6 +15,8 @@ const DEFAULT_MODEL = import.meta.env.VITE_AGENT_MODEL || "qwen3.5-plus"
 const MAX_TOKENS = 10000
 /** Max rounds without a todo update before injecting a nag reminder. */
 const TODO_NAG_THRESHOLD = 3
+/** Cap percentage at this value to avoid displaying > 100%. */
+const MAX_PERCENTAGE = 100
 
 /** MCP tool integration callbacks. */
 export interface McpToolCallbacks {
@@ -100,8 +104,38 @@ export class AgentLoop {
         const mcpToolDefs = this.mcpCallbacks?.getMcpToolDefinitions() ?? []
         const allToolDefs = [...localToolDefs, ...mcpToolDefs]
 
+        // Compute token budgets once for this invocation
+        const systemTokens = contextCompressor.estimateTokens(baseSystemPrompt)
+        const toolTokens = contextCompressor.estimateTokens(JSON.stringify(allToolDefs))
+
+        // Prevent infinite compression within a single runAgent call
+        let compressionCooldown = false
+
         while (true) {
             try {
+                // ── Layer 1: Micro-compact (every turn) ──
+                this.history = contextCompressor.microCompact(this.history)
+
+                // ── Emit context usage for the UI progress bar ──
+                this.emitContextUsage(callbacks, systemTokens, toolTokens)
+
+                // ── Layer 2: Auto-compact (threshold check) ──
+                if (!compressionCooldown && contextCompressor.shouldCompress(this.history, systemTokens, toolTokens)) {
+                    callbacks.onCompactionStart(this.history.length)
+                    const result = await contextCompressor.autoCompact(
+                        this.client,
+                        DEFAULT_MODEL,
+                        this.history,
+                    )
+                    this.history = result.history
+                    compressionCooldown = true
+                    callbacks.onCompactionComplete(result.summary, {
+                        compressedCount: result.compressedCount,
+                        tokensBefore: result.tokensBefore,
+                        tokensAfter: result.tokensAfter,
+                    })
+                }
+
                 // Compute effective system prompt with optional nag reminder
                 let effectiveSystem = baseSystemPrompt
                 if (this.roundsSinceTodoUpdate >= TODO_NAG_THRESHOLD && todoManager.getItems().length > 0) {
@@ -150,6 +184,7 @@ export class AgentLoop {
 
                 // If no tool use, we're done
                 if (response.stop_reason !== "tool_use") {
+                    this.emitContextUsage(callbacks, systemTokens, toolTokens)
                     return accumulatedText
                 }
 
@@ -229,5 +264,21 @@ export class AgentLoop {
         this.history = []
         this.roundsSinceTodoUpdate = 0
         logger.info("Conversation history cleared")
+    }
+
+    /** Compute and emit a context usage snapshot. */
+    private emitContextUsage(
+        callbacks: AgentCallbacks,
+        systemTokens: number,
+        toolTokens: number,
+    ): void {
+        const threshold = contextCompressor.getThreshold(systemTokens, toolTokens)
+        const tokensUsed = contextCompressor.estimateTokens(JSON.stringify(this.history))
+        const percentage = Math.min(
+            Math.round((tokensUsed / threshold) * MAX_PERCENTAGE),
+            MAX_PERCENTAGE,
+        )
+        const usage: ContextUsage = { tokensUsed, threshold: Math.round(threshold), percentage }
+        callbacks.onContextUsageUpdate(usage)
     }
 }

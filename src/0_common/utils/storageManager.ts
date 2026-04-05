@@ -98,6 +98,11 @@ function normalizeUserSettings(
         ...(settings.bingTranslate ?? {}),
     }
 
+    const mergedAgentSettings: types.AgentSettings = {
+        ...DEFAULT_USER_SETTINGS.agentSettings,
+        ...(settings.agentSettings ?? {}),
+    }
+
     const normalizedCustomApi: types.CustomApiSettings = {
         baseUrl: normalizeString(mergedCustomApi.baseUrl),
         apiKey: normalizeString(mergedCustomApi.apiKey),
@@ -175,6 +180,9 @@ function normalizeUserSettings(
         userLanguageProficiency: VALID_PROFICIENCY_LEVELS.includes(mergedSettings.userLanguageProficiency)
             ? mergedSettings.userLanguageProficiency
             : DEFAULT_USER_SETTINGS.userLanguageProficiency,
+        // Chat Assistant settings with safe defaults for existing users
+        enableChatAssistant: mergedSettings.enableChatAssistant ?? DEFAULT_USER_SETTINGS.enableChatAssistant,
+        agentSettings: mergedAgentSettings,
     }
 }
 

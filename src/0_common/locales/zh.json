@@ -270,6 +270,12 @@
     "sidepanel.todo.completing": "完成任务...",
     "sidepanel.todo.planning": "规划任务中...",
 
+    "sidepanel.compaction.title": "上下文已压缩",
+    "sidepanel.compaction.compressing": "正在压缩上下文...",
+    "sidepanel.compaction.messages": "条消息",
+    "sidepanel.compaction.summary": "摘要",
+    "sidepanel.compaction.saved": "节省",
+
     "sidepanel.importPopup.title": "导入技能文件夹",
     "sidepanel.importPopup.subtitle": "选择包含 SKILL.md 文件的文件夹。",
     "sidepanel.importPopup.chooseFolder": "选择文件夹",
@@ -281,5 +287,24 @@
     "sidepanel.importPopup.importedSkill": "已导入 \"{name}\"",
     "sidepanel.importPopup.closingAutomatically": "即将自动关闭...",
     "sidepanel.importPopup.close": "关闭",
-    "sidepanel.importPopup.cancel": "取消"
+    "sidepanel.importPopup.cancel": "取消",
+    "sidepanel.contextUsage.tooltip": "上下文用量：",
+    "options.section.chatAssistant": "对话助手",
+    "options.chatAssistant.enable.label": "启用对话助手",
+    "options.chatAssistant.enable.helper": "在网页上显示 AI 对话助手浮动按钮。",
+    "options.chatAssistant.llm.title": "语言模型配置",
+    "options.chatAssistant.baseUrl.label": "API Base URL",
+    "options.chatAssistant.baseUrl.helper": "示例：https://api.fireworks.ai/inference",
+    "options.chatAssistant.apiKey.label": "API Key",
+    "options.chatAssistant.apiKey.helper": "存储在本地浏览器 storage 中。",
+    "options.chatAssistant.model.label": "模型名称",
+    "options.chatAssistant.model.helper": "示例：accounts/fireworks/routers/kimi-k2p5-turbo",
+    "options.chatAssistant.embedding.title": "向量嵌入配置",
+    "options.chatAssistant.embeddingBaseUrl.label": "Embedding Base URL",
+    "options.chatAssistant.embeddingBaseUrl.helper": "示例：https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "options.chatAssistant.embeddingApiKey.label": "Embedding API Key",
+    "options.chatAssistant.embeddingApiKey.helper": "存储在本地浏览器 storage 中。",
+    "options.chatAssistant.embeddingModel.label": "Embedding 模型",
+    "options.chatAssistant.embeddingModel.helper": "示例：text-embedding-v4",
+    "sidepanel.apiKeySetup.openOptions": "打开设置页面"
 }

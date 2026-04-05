@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react"
-import { storageService } from "@/13_sidepanel/services/StorageService"
+import * as storageManagerModule from "@/0_common/utils/storageManager"
 
 interface UseApiKeyResult {
     apiKey: string | null
     isLoaded: boolean
-    apiKeyInput: string
-    setApiKeyInput: (value: string) => void
-    saveKey: () => Promise<void>
 }
 
 export function useApiKey(): UseApiKeyResult {
     const [apiKey, setApiKey] = useState<string | null>(null)
     const [isLoaded, setIsLoaded] = useState(false)
-    const [apiKeyInput, setApiKeyInput] = useState("")
 
     useEffect(() => {
         loadApiKey()
@@ -20,13 +16,15 @@ export function useApiKey(): UseApiKeyResult {
 
     async function loadApiKey() {
         try {
-            // Check env variable first (development mode)
+            // Development fallback via env var
             const envKey = import.meta.env.VITE_AGENT_API_KEY
             if (envKey) {
                 setApiKey(envKey)
                 return
             }
-            const storedKey = await storageService.loadApiKeyFromStorage()
+
+            const settings = await storageManagerModule.getUserSettings()
+            const storedKey = settings.agentSettings?.apiKey
             if (storedKey) {
                 setApiKey(storedKey)
             }
@@ -35,13 +33,5 @@ export function useApiKey(): UseApiKeyResult {
         }
     }
 
-    async function saveKey() {
-        const trimmed = apiKeyInput.trim()
-        if (!trimmed) return
-        await storageService.saveApiKeyToStorage(trimmed)
-        setApiKey(trimmed)
-        setApiKeyInput("")
-    }
-
-    return { apiKey, isLoaded, apiKeyInput, setApiKeyInput, saveKey }
+    return { apiKey, isLoaded }
 }

@@ -270,6 +270,12 @@
     "sidepanel.todo.completing": "Completing task...",
     "sidepanel.todo.planning": "Planning tasks...",
 
+    "sidepanel.compaction.title": "Context Compressed",
+    "sidepanel.compaction.compressing": "Compressing context...",
+    "sidepanel.compaction.messages": "messages",
+    "sidepanel.compaction.summary": "summary",
+    "sidepanel.compaction.saved": "saved",
+
     "sidepanel.importPopup.title": "Import Skill Folder",
     "sidepanel.importPopup.subtitle": "Select a folder containing a SKILL.md file.",
     "sidepanel.importPopup.chooseFolder": "Choose Folder",
@@ -281,5 +287,24 @@
     "sidepanel.importPopup.importedSkill": "Imported \"{name}\"",
     "sidepanel.importPopup.closingAutomatically": "Closing automatically...",
     "sidepanel.importPopup.close": "Close",
-    "sidepanel.importPopup.cancel": "Cancel"
+    "sidepanel.importPopup.cancel": "Cancel",
+    "sidepanel.contextUsage.tooltip": "Context usage:",
+    "options.section.chatAssistant": "Chat Assistant",
+    "options.chatAssistant.enable.label": "Enable Chat Assistant",
+    "options.chatAssistant.enable.helper": "Show the AI chat assistant floating button on web pages.",
+    "options.chatAssistant.llm.title": "LLM Provider",
+    "options.chatAssistant.baseUrl.label": "API Base URL",
+    "options.chatAssistant.baseUrl.helper": "Example: https://api.fireworks.ai/inference",
+    "options.chatAssistant.apiKey.label": "API Key",
+    "options.chatAssistant.apiKey.helper": "Stored locally in browser storage.",
+    "options.chatAssistant.model.label": "Model",
+    "options.chatAssistant.model.helper": "Example: accounts/fireworks/routers/kimi-k2p5-turbo",
+    "options.chatAssistant.embedding.title": "Embedding Provider",
+    "options.chatAssistant.embeddingBaseUrl.label": "Embedding Base URL",
+    "options.chatAssistant.embeddingBaseUrl.helper": "Example: https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "options.chatAssistant.embeddingApiKey.label": "Embedding API Key",
+    "options.chatAssistant.embeddingApiKey.helper": "Stored locally in browser storage.",
+    "options.chatAssistant.embeddingModel.label": "Embedding Model",
+    "options.chatAssistant.embeddingModel.helper": "Example: text-embedding-v4",
+    "sidepanel.apiKeySetup.openOptions": "Open Options Page"
 }

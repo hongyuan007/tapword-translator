@@ -4,7 +4,7 @@ import { AgentLoop, AgentError } from "../agent/AgentLoop"
 import type { McpToolCallbacks } from "../agent/AgentLoop"
 import * as embeddingClient from "../api/EmbeddingClient"
 import { todoManager } from "@/13_sidepanel/services/TodoManager"
-import type { ChatMessage, TodoItem, AgentCallbacks, ContentBlock, TextBlock, ToolCallBlock } from "../types"
+import type { ChatMessage, TodoItem, AgentCallbacks, ContentBlock, TextBlock, ToolCallBlock, CompactionBlock, ContextUsage } from "../types"
 import { storageService } from "@/13_sidepanel/services/StorageService"
 
 const logger = loggerModule.createLogger("useAgentChat")
@@ -17,6 +17,7 @@ interface UseAgentChatResult {
     showAuthError: boolean
     todoItems: readonly TodoItem[]
     isTaskCompleted: boolean
+    contextUsage: ContextUsage | null
     sendMessage: (text: string) => Promise<void>
     clearChat: () => void
     dismissAuthError: () => void
@@ -28,6 +29,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
     const [showAuthError, setShowAuthError] = useState(false)
     const [todoItems, setTodoItems] = useState<readonly TodoItem[]>([])
     const [isTaskCompleted, setIsTaskCompleted] = useState(false)
+    const [contextUsage, setContextUsage] = useState<ContextUsage | null>(null)
 
     const agentRef = useRef<AgentLoop | null>(null)
     const loadedMessagesRef = useRef<ChatMessage[] | null>(null)
@@ -96,7 +98,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
             setShowAuthError(false)
 
             // Add a placeholder assistant message with empty blocks
-            const assistantIndex = messages.length + 1
+            let assistantIndex = messages.length + 1
             setMessages((prev) => [...prev, { role: "assistant", content: "", blocks: [] }])
 
             // ─── Block manipulation helpers ───────────────────────────
@@ -175,6 +177,57 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
                             status: isError ? "error" : "completed",
                         })
                     },
+                    onCompactionStart: (compressedCount) => {
+                        // Insert a placeholder compaction message before the current assistant message
+                        const compactionBlock: CompactionBlock = {
+                            type: "compaction",
+                            status: "compressing",
+                            summary: "",
+                            timestamp: Date.now(),
+                            compressedMessageCount: compressedCount,
+                            tokensBefore: 0,
+                            tokensAfter: 0,
+                        }
+                        const compactionMessage: ChatMessage = {
+                            role: "assistant",
+                            content: "",
+                            blocks: [compactionBlock],
+                        }
+                        setMessages((prev) => {
+                            const updated = [...prev]
+                            updated.splice(assistantIndex, 0, compactionMessage)
+                            return updated
+                        })
+                        assistantIndex++
+                    },
+                    onCompactionComplete: (summary, stats) => {
+                        // Find the existing "compressing" compaction message and update it to "completed"
+                        setMessages((prev) => {
+                            const updated = [...prev]
+                            // Search backward for the last compaction message with status "compressing"
+                            for (let i = updated.length - 1; i >= 0; i--) {
+                                const msg = updated[i]!
+                                const block = msg.blocks?.[0]
+                                if (block?.type === "compaction" && block.status === "compressing") {
+                                    const updatedBlock: CompactionBlock = {
+                                        ...block,
+                                        status: "completed",
+                                        summary,
+                                        compressedMessageCount: stats.compressedCount,
+                                        tokensBefore: stats.tokensBefore,
+                                        tokensAfter: stats.tokensAfter,
+                                    }
+                                    updated[i] = { ...msg, blocks: [updatedBlock] }
+                                    break
+                                }
+                            }
+                            return updated
+                        })
+                    },
+                    onContextUsageUpdate: (usage) => {
+                        console.log("[ContextUsage]", usage)
+                        setContextUsage(usage)
+                    },
                 }
 
                 await agentRef.current.runAgent(text, agentCallbacks)
@@ -225,6 +278,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
         agentRef.current?.clearHistory()
         setMessages([])
         setShowAuthError(false)
+        setContextUsage(null)
         storageService.clearSessionMessages()
         todoManager.clear()
         setTodoItems([])
@@ -242,6 +296,7 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
         showAuthError,
         todoItems,
         isTaskCompleted,
+        contextUsage,
         sendMessage,
         clearChat,
         dismissAuthError,

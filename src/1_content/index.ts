@@ -10,7 +10,7 @@
 
 import type { PageActivatedMessage, UserSettings } from "@/0_common/types"
 import { DEFAULT_USER_SETTINGS } from "@/0_common/types"
-import { UNDERLINE_OPACITY, UNDERLINE_OFFSET_INTERNAL_SHIFT_PX } from "@/0_common/constants"
+import { UNDERLINE_OPACITY, UNDERLINE_OFFSET_INTERNAL_SHIFT_PX, AGENT_PANEL_ENABLED } from "@/0_common/constants"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as storageManager from "@/0_common/utils/storageManager"
 import * as colorUtils from "@/0_common/utils/colorUtils"
@@ -81,6 +81,17 @@ async function initializeUserSettings(): Promise<void> {
             userSettings = newSettings
             applyDynamicStyles(userSettings)
             logger.info("User settings updated:", newSettings)
+
+            // Dynamically sync sidepanel button visibility with enableChatAssistant toggle
+            if (AGENT_PANEL_ENABLED) {
+                if (newSettings.enableChatAssistant && !sidepanelButton) {
+                    sidepanelButton = new SidepanelButtonManager()
+                    sidepanelButton.initialize()
+                } else if (!newSettings.enableChatAssistant && sidepanelButton) {
+                    sidepanelButton.destroy()
+                    sidepanelButton = null
+                }
+            }
         }
     })
 }
@@ -139,9 +150,11 @@ async function init(): Promise<void> {
         logger.error("Failed to initialize floating button:", error)
     })
 
-    // Initialize sidepanel floating button
-    sidepanelButton = new SidepanelButtonManager()
-    sidepanelButton.initialize()
+    // Initialize sidepanel floating button (community/dev builds only, if enabled by user)
+    if (AGENT_PANEL_ENABLED && userSettings?.enableChatAssistant !== false) {
+        sidepanelButton = new SidepanelButtonManager()
+        sidepanelButton.initialize()
+    }
 
     // Listen for messages from popup/background
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

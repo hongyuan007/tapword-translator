@@ -3,6 +3,7 @@ import * as i18nModule from "@/0_common/utils/i18n"
 import type { ChatMessage, ContentBlock } from "../types"
 import { ThinkingCard } from "./ThinkingCard"
 import { ToolCallCard } from "./ToolCallCard"
+import { CompactionCard } from "./CompactionCard"
 import { MarkdownBlock } from "./MarkdownBlock"
 
 const BOT_AVATAR_URL = chrome.runtime.getURL("assets/pic/bot_avator.jpg")
@@ -15,6 +16,7 @@ interface MessageBubbleProps {
 /** Check if a block should be rendered (filter out empty non-streaming blocks). */
 function isVisibleBlock(block: ContentBlock): boolean {
     if (block.type === "tool_call") return true
+    if (block.type === "compaction") return true
     return block.content !== "" || block.isStreaming
 }
 
@@ -98,6 +100,8 @@ function renderBlock(block: ContentBlock, index: number, isError?: boolean) {
             )
         case "tool_call":
             return <ToolCallCard key={index} block={block} />
+        case "compaction":
+            return <CompactionCard key={index} block={block} />
         default:
             return null
     }

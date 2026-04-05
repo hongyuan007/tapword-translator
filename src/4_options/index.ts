@@ -1,4 +1,4 @@
-import { APP_EDITION, UNDERLINE_OPACITY, UNDERLINE_OFFSET_INTERNAL_SHIFT_PX } from "@/0_common/constants"
+import { APP_EDITION, AGENT_PANEL_ENABLED, UNDERLINE_OPACITY, UNDERLINE_OFFSET_INTERNAL_SHIFT_PX } from "@/0_common/constants"
 import * as i18nModule from "@/0_common/utils/i18n"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as colorUtils from "@/0_common/utils/colorUtils"
@@ -44,6 +44,14 @@ function computePreviewTooltipFontPx(minFontPx: number, effectiveUnderlineOffset
     const requiredLineHeightPx = PREVIEW_ORIGINAL_LINE_HEIGHT_PX + increase
 
     return { tooltipFontPx, requiredLineHeightPx }
+}
+
+function applyChatAssistantVisibility(): void {
+    if (!AGENT_PANEL_ENABLED) return
+    const navItem = document.getElementById("chatAssistantNavItem")
+    if (navItem) navItem.style.display = ""
+    const section = document.getElementById("chat-assistant-settings")
+    if (section) section.style.display = ""
 }
 
 function applyCommunityUiOverrides(): void {
@@ -564,6 +572,7 @@ async function initializeOptions(): Promise<void> {
     try {
         i18nModule.initI18n()
         applyCommunityUiOverrides()
+        applyChatAssistantVisibility()
         i18nModule.applyTranslations()
 
         await settingsManagerModule.loadSettings()

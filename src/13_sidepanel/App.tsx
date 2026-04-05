@@ -6,7 +6,7 @@ import { ChatHeader } from "./components/ChatHeader"
 import type { SidePanelTab } from "./components/ChatHeader"
 import { MessageList } from "./components/MessageList"
 import { ChatInputBar } from "./components/ChatInputBar"
-import { SettingsDrawer } from "./components/SettingsDrawer"
+
 import { AuthBanner } from "./components/AuthBanner"
 import { ApiKeySetup } from "./components/ApiKeySetup"
 import { KnowledgePanel } from "./components/KnowledgePanel"
@@ -22,13 +22,12 @@ import type { SkillMeta } from "./types"
 
 export default function App() {
     const [activeTab, setActiveTab] = useState<SidePanelTab>("chat")
-    const [showSettings, setShowSettings] = useState(false)
     const [input, setInput] = useState("")
     const [skills, setSkills] = useState<SkillMeta[]>([])
 
-    const { apiKey, isLoaded: keyLoaded, apiKeyInput, setApiKeyInput, saveKey } = useApiKey()
+    const { apiKey, isLoaded: keyLoaded } = useApiKey()
     const { serverStates, addServer, removeServer, toggleServer, toggleTool, reconnectServer, mcpCallbacks } = useMcpServers()
-    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } = useAgentChat(apiKey, mcpCallbacks)
+    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, contextUsage, sendMessage, clearChat, dismissAuthError } = useAgentChat(apiKey, mcpCallbacks)
 
     // Load skill metadata on mount
     useEffect(() => {
@@ -63,11 +62,6 @@ export default function App() {
         await sendMessage(trimmed)
     }
 
-    async function handleSaveKey() {
-        await saveKey()
-        setShowSettings(false)
-    }
-
     // Wait for key loading before rendering
     if (!keyLoaded) {
         return (
@@ -79,7 +73,7 @@ export default function App() {
 
     // API key setup screen
     if (!apiKey) {
-        return <ApiKeySetup apiKeyInput={apiKeyInput} onApiKeyInputChange={setApiKeyInput} onSave={handleSaveKey} />
+        return <ApiKeySetup />
     }
 
     return (
@@ -88,22 +82,11 @@ export default function App() {
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
                 onClearChat={clearChat}
-                onToggleSettings={() => setShowSettings(!showSettings)}
                 showClearButton={activeTab === "chat"}
             />
-            {showSettings && (
-                <SettingsDrawer
-                    apiKeyInput={apiKeyInput}
-                    onApiKeyInputChange={setApiKeyInput}
-                    onSave={handleSaveKey}
-                    onClose={() => setShowSettings(false)}
-                    currentKeyPreview={apiKey}
-                />
-            )}
             {showAuthError && (
                 <AuthBanner
                     onOpenSettings={() => {
-                        setShowSettings(true)
                         dismissAuthError()
                     }}
                 />
@@ -131,7 +114,7 @@ export default function App() {
             ) : (
                 <>
                     <MessageList messages={messages} />
-                    <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} isLoading={isLoading} disabled={!apiKey} />
+                    <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} isLoading={isLoading} disabled={!apiKey} contextUsage={contextUsage} />
                 </>
             )}
         </div>

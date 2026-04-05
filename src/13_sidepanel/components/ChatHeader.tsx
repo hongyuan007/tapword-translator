@@ -1,4 +1,4 @@
-import { MessageSquare, BookOpen, Zap, FolderOpen, Plug, Trash2, Settings } from "lucide-react"
+import { MessageSquare, BookOpen, Zap, FolderOpen, Plug, Trash2 } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 
 export type SidePanelTab = "chat" | "knowledge" | "skills" | "files" | "mcp"
@@ -7,11 +7,10 @@ interface ChatHeaderProps {
     activeTab: SidePanelTab
     onTabChange: (tab: SidePanelTab) => void
     onClearChat: () => void
-    onToggleSettings: () => void
     showClearButton: boolean
 }
 
-export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettings, showClearButton }: ChatHeaderProps) {
+export function ChatHeader({ activeTab, onTabChange, onClearChat, showClearButton }: ChatHeaderProps) {
     return (
         <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-stone-200">
             <div className="flex items-center gap-1">
@@ -71,13 +70,7 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, onToggleSettin
                         <Trash2 className="w-4 h-4" />
                     </button>
                 )}
-                <button
-                    className="p-1.5 rounded-md hover:bg-stone-100 text-stone-400 hover:text-stone-600"
-                    onClick={onToggleSettings}
-                    title={i18nModule.translate("sidepanel.settings")}
-                >
-                    <Settings className="w-4 h-4" />
-                </button>
+
             </div>
         </header>
     )
