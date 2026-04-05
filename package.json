@@ -34,6 +34,8 @@
     },
     "dependencies": {
         "@anthropic-ai/sdk": "0.82.0",
+        "@modelcontextprotocol/sdk": "1.27.1",
+        "@mozilla/readability": "0.6.0",
         "@vitejs/plugin-react": "4.7.0",
         "crypto-js": "4.2.0",
         "franc-min": "6.2.0",
@@ -41,6 +43,7 @@
         "openai": "6.15.0",
         "react": "19.2.4",
         "react-dom": "19.2.4",
+        "turndown": "7.2.4",
         "voyageai": "0.2.1"
     },
     "devDependencies": {
@@ -52,6 +55,7 @@
         "@types/node": "^20.12.7",
         "@types/react": "19.2.14",
         "@types/react-dom": "19.2.3",
+        "@types/turndown": "5.0.6",
         "@typescript-eslint/eslint-plugin": "8.46.2",
         "@typescript-eslint/parser": "8.46.2",
         "@vitest/ui": "4.0.3",

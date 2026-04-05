@@ -14,7 +14,15 @@ const MAX_TOKENS = 10000
 /** Max rounds without a todo update before injecting a nag reminder. */
 const TODO_NAG_THRESHOLD = 3
 
-const TOOL_DEFINITIONS = Array.from(TOOL_REGISTRY.values()).map((t) => t.definition)
+/** MCP tool integration callbacks. */
+export interface McpToolCallbacks {
+    /** Get Anthropic-format tool definitions for enabled MCP tools. */
+    getMcpToolDefinitions: () => Anthropic.Tool[]
+    /** Route a tool call to the appropriate MCP server. */
+    callMcpTool: (serverId: string, toolName: string, args: Record<string, unknown>) => Promise<string>
+    /** Get a Map<toolName, serverId> for enabled MCP tools. */
+    getMcpToolMap: () => Map<string, string>
+}
 
 // --- Error types ---
 
@@ -57,9 +65,11 @@ export class AgentLoop {
     private client: Anthropic
     private history: Anthropic.MessageParam[] = []
     private roundsSinceTodoUpdate: number = 0
+    private mcpCallbacks: McpToolCallbacks | null = null
 
-    constructor(apiKey: string) {
+    constructor(apiKey: string, mcpCallbacks?: McpToolCallbacks) {
         this.client = createAnthropicClient(apiKey)
+        this.mcpCallbacks = mcpCallbacks ?? null
     }
 
     // Restore LLM conversation history from simplified message pairs
@@ -85,6 +95,11 @@ export class AgentLoop {
         const skillMetas = await skillStorageService.loadSkillMetas()
         const baseSystemPrompt = buildSystemPrompt(skillMetas)
 
+        // Build dynamic tool list: local tools + MCP tools (fixed for this runAgent invocation)
+        const localToolDefs = Array.from(TOOL_REGISTRY.values()).map((t) => t.definition)
+        const mcpToolDefs = this.mcpCallbacks?.getMcpToolDefinitions() ?? []
+        const allToolDefs = [...localToolDefs, ...mcpToolDefs]
+
         while (true) {
             try {
                 // Compute effective system prompt with optional nag reminder
@@ -101,7 +116,7 @@ export class AgentLoop {
                         model: DEFAULT_MODEL,
                         system: effectiveSystem,
                         messages: this.history,
-                        tools: TOOL_DEFINITIONS,
+                        tools: allToolDefs,
                         max_tokens: MAX_TOKENS,
                     })
 
@@ -192,10 +207,22 @@ export class AgentLoop {
         }
     }
 
+    /** Execute a tool by name: local tools take priority, then MCP tools. */
     private async executeTool(name: string, input: Record<string, unknown>): Promise<string> {
-        const tool = TOOL_REGISTRY.get(name)
-        if (!tool) throw new Error(`Unknown tool: ${name}`)
-        return tool.execute(input)
+        // Local tools take priority
+        const localTool = TOOL_REGISTRY.get(name)
+        if (localTool) return localTool.execute(input)
+
+        // Try MCP tools
+        if (this.mcpCallbacks) {
+            const mcpToolMap = this.mcpCallbacks.getMcpToolMap()
+            const serverId = mcpToolMap.get(name)
+            if (serverId) {
+                return this.mcpCallbacks.callMcpTool(serverId, name, input)
+            }
+        }
+
+        throw new Error(`Unknown tool: ${name}`)
     }
 
     clearHistory(): void {

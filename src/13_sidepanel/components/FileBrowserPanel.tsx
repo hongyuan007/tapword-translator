@@ -130,7 +130,7 @@ export function FileBrowserPanel() {
     }, [loadDir])
 
     /** Toggle expand/collapse for a directory node. */
-    const toggleDir = useCallback(async (targetPath: string) => {
+    const toggleDir = useCallback(async (targetPath: string, currentlyExpanded: boolean, depth: number) => {
         /** Recursively find and update the target node in the tree. */
         function updateNode(nodes: TreeNode[], updater: (node: TreeNode) => TreeNode): TreeNode[] {
             return nodes.map((node) => {
@@ -144,55 +144,21 @@ export function FileBrowserPanel() {
             })
         }
 
-        // Check if the node is currently expanded (read from current state)
-        let isCurrentlyExpanded = false
-        setRootNodes((prev) => {
-            // Find the target node to check its state
-            function findExpanded(nodes: TreeNode[]): boolean {
-                for (const n of nodes) {
-                    if (n.path === targetPath) return !!n.isExpanded
-                    if (n.children) { const found = findExpanded(n.children); if (found) return true }
-                }
-                return false
-            }
-            isCurrentlyExpanded = findExpanded(prev)
-            return prev // No-op update, just reading
-        })
-
-        if (isCurrentlyExpanded) {
-            // Collapse: synchronous state update
+        if (currentlyExpanded) {
+            // Collapse: clear children so all descendants reset to collapsed
             setRootNodes((prev) => updateNode(prev, (node) => ({
                 ...node, isExpanded: false, children: undefined,
             })))
         } else {
-            // Expand: mark loading → load children → update
+            if (depth >= MAX_DEPTH) return
+
+            // Mark loading
             setRootNodes((prev) => updateNode(prev, (node) => ({
                 ...node, isLoading: true,
             })))
 
-            // Find the depth of the target node
-            let targetDepth = 0
-            setRootNodes((prev) => {
-                function findDepth(nodes: TreeNode[]): number {
-                    for (const n of nodes) {
-                        if (n.path === targetPath) return n.depth
-                        if (n.children) { const d = findDepth(n.children); if (d >= 0) return d }
-                    }
-                    return -1
-                }
-                targetDepth = findDepth(prev)
-                return prev
-            })
-
-            if (targetDepth >= MAX_DEPTH) {
-                setRootNodes((prev) => updateNode(prev, (node) => ({
-                    ...node, isLoading: false,
-                })))
-                return
-            }
-
             try {
-                const children = await loadDir(targetPath, targetDepth + 1)
+                const children = await loadDir(targetPath, depth + 1)
                 setRootNodes((prev) => updateNode(prev, (node) => ({
                     ...node,
                     isExpanded: true,
@@ -242,7 +208,7 @@ export function FileBrowserPanel() {
                             : ""
                     }`}
                     style={{ paddingLeft: `${indent + 12}px` }}
-                    onClick={isDir ? () => toggleDir(node.path) : () => openPreview(node)}
+                    onClick={isDir ? () => toggleDir(node.path, !!node.isExpanded, node.depth) : () => openPreview(node)}
                 >
                     {/* Expand/collapse chevron for directories */}
                     {isDir ? (

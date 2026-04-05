@@ -17,7 +17,8 @@
     ],
     "host_permissions": [
         "https://*.bing.com/*",
-        "https://dashscope.aliyuncs.com/*"
+        "https://dashscope.aliyuncs.com/*",
+        "<all_urls>"
     ],
     "side_panel": {
         "default_path": "sidepanel.html"

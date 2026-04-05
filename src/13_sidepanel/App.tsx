@@ -12,8 +12,10 @@ import { ApiKeySetup } from "./components/ApiKeySetup"
 import { KnowledgePanel } from "./components/KnowledgePanel"
 import { SkillsPanel } from "./components/SkillsPanel"
 import { FileBrowserPanel } from "./components/FileBrowserPanel"
+import { McpPanel } from "./components/McpPanel"
 import { TodoPanel } from "./components/TodoPanel"
 import * as skillStorageService from "./services/SkillStorageService"
+import { useMcpServers } from "./hooks/useMcpServers"
 import type { SkillMeta } from "./types"
 
 // --- Component ---
@@ -25,7 +27,8 @@ export default function App() {
     const [skills, setSkills] = useState<SkillMeta[]>([])
 
     const { apiKey, isLoaded: keyLoaded, apiKeyInput, setApiKeyInput, saveKey } = useApiKey()
-    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } = useAgentChat(apiKey)
+    const { serverStates, addServer, removeServer, toggleServer, toggleTool, reconnectServer, mcpCallbacks } = useMcpServers()
+    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, sendMessage, clearChat, dismissAuthError } = useAgentChat(apiKey, mcpCallbacks)
 
     // Load skill metadata on mount
     useEffect(() => {
@@ -116,6 +119,15 @@ export default function App() {
                 />
             ) : activeTab === "files" ? (
                 <FileBrowserPanel />
+            ) : activeTab === "mcp" ? (
+                <McpPanel
+                    serverStates={serverStates}
+                    onAddServer={addServer}
+                    onRemoveServer={removeServer}
+                    onToggleServer={toggleServer}
+                    onToggleTool={toggleTool}
+                    onReconnectServer={reconnectServer}
+                />
             ) : (
                 <>
                     <MessageList messages={messages} />

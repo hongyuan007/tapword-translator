@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import * as loggerModule from "@/0_common/utils/logger"
 import { AgentLoop, AgentError } from "../agent/AgentLoop"
+import type { McpToolCallbacks } from "../agent/AgentLoop"
 import * as embeddingClient from "../api/EmbeddingClient"
 import { todoManager } from "../services/TodoManager"
 import type { ChatMessage, TodoItem, AgentCallbacks, ContentBlock, TextBlock, ToolCallBlock } from "../types"
@@ -21,7 +22,7 @@ interface UseAgentChatResult {
     dismissAuthError: () => void
 }
 
-export function useAgentChat(apiKey: string | null): UseAgentChatResult {
+export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallbacks): UseAgentChatResult {
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [showAuthError, setShowAuthError] = useState(false)
@@ -43,11 +44,11 @@ export function useAgentChat(apiKey: string | null): UseAgentChatResult {
         loadPersistedTodos()
     }, [])
 
-    // Recreate AgentLoop when apiKey changes
+    // Recreate AgentLoop when apiKey or mcpCallbacks changes
     useEffect(() => {
         if (apiKey) {
             embeddingClient.setApiKey(apiKey)
-            const agent = new AgentLoop(apiKey)
+            const agent = new AgentLoop(apiKey, mcpCallbacks)
             agentRef.current = agent
             // Restore LLM history from persisted messages
             if (loadedMessagesRef.current && loadedMessagesRef.current.length > 0) {
@@ -57,7 +58,7 @@ export function useAgentChat(apiKey: string | null): UseAgentChatResult {
         } else {
             agentRef.current = null
         }
-    }, [apiKey])
+    }, [apiKey, mcpCallbacks])
 
     // Persist messages to session storage after interaction completes
     useEffect(() => {

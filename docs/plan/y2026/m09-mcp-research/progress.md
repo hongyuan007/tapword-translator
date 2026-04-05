@@ -10,7 +10,7 @@
 | Phase | Description | Status | Notes |
 |-------|-------------|--------|-------|
 | 1. Feasibility Research | Evaluate whether MCP can run in browser/extension context | ✅ Complete | See analysis document |
-| 2. SDK Validation | Test `@modelcontextprotocol/sdk` bundling with Vite | ⬜ Not Started | — |
+| 2. SDK Validation | Test `@modelcontextprotocol/sdk` bundling with Vite | ✅ Complete | SDK v1.27.1, clean build |
 | 3. Core Integration | Implement McpClientManager + UnifiedToolRegistry | ⬜ Not Started | — |
 | 4. Configuration UI | Add server config to options/popup page | ⬜ Not Started | — |
 | 5. Multi-Server & Polish | Multiple servers, error recovery, tool management | ⬜ Not Started | — |
@@ -33,6 +33,26 @@
 - Fallback: A minimal custom transport implementation is ~200 lines of code using raw `fetch()` + `ReadableStream`.
 
 **Decision**: Proceed to Phase 2 — SDK Validation.
+
+---
+
+### Phase 2: SDK Validation — ✅ Complete (2026-07-16)
+
+**Actions performed**:
+1. Installed `@modelcontextprotocol/sdk@1.27.1` as a project dependency.
+2. Verified SDK exports: `Client`, `StreamableHTTPClientTransport`, `auth`, `sse`, `websocket`, `middleware` all available under `./client` subpath.
+3. Checked for Node.js dependencies in the import chain:
+   - `streamableHttp.js` → imports only from `shared/transport.js`, `types.js`, `auth.js`, and `eventsource-parser/stream` — **NO Node.js imports**.
+   - `index.js` (Client class) → imports from `shared/protocol.js`, `types.js`, `validation/ajv-provider.js`, `server/zod-compat.js`, `experimental/tasks/` — **NO Node.js imports**.
+   - `shared/` modules → **NO Node.js imports**.
+   - Only `stdio.js` contains `node:process`, `node:stream` imports — this module is NOT imported by our code path.
+4. TypeScript type-check (`npm run type-check`) — **PASSED** cleanly.
+5. Vite build (`npm run build`) — **PASSED** with no Node.js polyfill errors or warnings.
+6. Node.js runtime verification: `Client` and `StreamableHTTPClientTransport` both resolve as functions and instantiate successfully.
+
+**Conclusion**: The official SDK (`@modelcontextprotocol/sdk@1.27.1`) is **fully browser-compatible** when only the `Client` + `StreamableHTTPClientTransport` modules are imported. No custom transport implementation is needed.
+
+**Decision**: Proceed to Phase 3 — Core Integration.
 
 ---
 
