@@ -54,3 +54,7 @@ export const loadSkillTool: ToolRegistration = {
         return `<skill name="${name}" path="${folderPath}/">\n<files>\n${filesSection}\n</files>\n<content>\n${body}\n</content>\n</skill>`
     },
 }
+
+// Self-register with the global tool registry
+import { toolRegistry } from "./ToolRegistry"
+toolRegistry.add(loadSkillTool)

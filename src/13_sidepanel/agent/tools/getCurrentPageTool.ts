@@ -35,3 +35,7 @@ export const getCurrentPageTool: ToolRegistration = {
         throw new Error(typed?.error || "Failed to get page content")
     },
 }
+
+// Self-register with the global tool registry
+import { toolRegistry } from "./ToolRegistry"
+toolRegistry.add(getCurrentPageTool)

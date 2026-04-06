@@ -102,3 +102,8 @@ export const storeKnowledgeTool: ToolRegistration = {
         return `Successfully saved "${title}" to knowledge base (id: ${id}).`
     },
 }
+
+// Self-register with the global tool registry
+import { toolRegistry } from "./ToolRegistry"
+toolRegistry.add(searchKnowledgeTool)
+toolRegistry.add(storeKnowledgeTool)

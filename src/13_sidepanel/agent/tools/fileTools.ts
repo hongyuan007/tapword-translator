@@ -222,3 +222,11 @@ export const deleteDirectoryTool: ToolRegistration = {
         }
     },
 }
+
+// Self-register with the global tool registry
+import { toolRegistry } from "./ToolRegistry"
+toolRegistry.add(readFileTool)
+toolRegistry.add(listDirectoryTool)
+toolRegistry.add(writeFileTool)
+toolRegistry.add(deleteFileTool)
+toolRegistry.add(deleteDirectoryTool)

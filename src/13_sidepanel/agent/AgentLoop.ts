@@ -6,9 +6,14 @@ import type { AgentCallbacks } from "../types"
 import type { ContextUsage } from "../types"
 import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import { buildSystemPrompt } from "./prompts"
-import { TOOL_REGISTRY, TODO_TOOL_NAMES } from "./tools"
-import { createSubagentTool, TASK_TOOL_NAME } from "./tools/subagentTool"
-import type { SubagentToolRegistration } from "./tools/subagentTool"
+import { toolRegistry } from "./tools/ToolRegistry"
+import { TODO_TOOL_NAMES } from "./tools/todoTools"
+import type { ToolRegistration } from "./tools/types"
+
+// Side-effect import: auto-discover and register all tool modules
+import "./tools/registerAll"
+import { createSubagentTool, TASK_TOOL_NAME } from "./tools/subagentToolFactory"
+import type { SubagentToolRegistration } from "./tools/subagentToolFactory"
 import { contextCompressor } from "./utils/ContextCompressor"
 import { isProxyArtifact } from "./utils/isProxyArtifact"
 import { retryWithBackoff } from "./utils/retryWithBackoff"
@@ -84,6 +89,8 @@ interface RunInvocationContext {
     allToolDefs: Anthropic.Tool[]
     systemTokens: number
     toolTokens: number
+    /** Runtime tool registry = static tools + dynamically created subagent tool. */
+    runtimeToolRegistry: Map<string, ToolRegistration>
 }
 
 // --- AgentLoop ---
@@ -94,8 +101,6 @@ export class AgentLoop {
     private history: Anthropic.MessageParam[] = []
     private roundsSinceTodoUpdate: number = 0
     private mcpCallbacks: McpToolCallbacks | null = null
-    /** Runtime tool registry = static tools + dynamically created subagent tool. */
-    private runtimeToolRegistry = new Map(TOOL_REGISTRY)
     /** Abort controller for the current `runAgent()` invocation. */
     private abortController: AbortController | null = null
 
@@ -172,7 +177,7 @@ export class AgentLoop {
                 if (signal.aborted) throw new AgentAbortError()
 
                 // ── Tool execution round ──
-                const toolResults = await this.processToolCalls(response, callbacks)
+                const toolResults = await this.processToolCalls(response, callbacks, ctx)
                 this.history.push({ role: "user", content: toolResults })
                 this.updateTodoProgress(response)
             } catch (error) {
@@ -194,19 +199,19 @@ export class AgentLoop {
         const baseSystemPrompt = buildSystemPrompt(skillMetas)
 
         // Create subagent tool (bound to this loop's client/model), passing abort signal
-        const subagentTool = createSubagentTool(this.client, this.model, TOOL_REGISTRY, this.mcpCallbacks, signal)
-        this.runtimeToolRegistry = new Map(TOOL_REGISTRY)
-        this.runtimeToolRegistry.set(subagentTool.definition.name, subagentTool)
+        const subagentTool = createSubagentTool(this.client, this.model, toolRegistry.getAll(), this.mcpCallbacks, signal)
+        const runtimeToolRegistry = new Map<string, ToolRegistration>(toolRegistry.getAll())
+        runtimeToolRegistry.set(subagentTool.definition.name, subagentTool)
 
         // Build dynamic tool list: local tools + MCP tools
-        const localToolDefs = Array.from(this.runtimeToolRegistry.values()).map((t) => t.definition)
+        const localToolDefs = Array.from(runtimeToolRegistry.values()).map((t) => t.definition)
         const mcpToolDefs = this.mcpCallbacks?.getMcpToolDefinitions() ?? []
         const allToolDefs = [...localToolDefs, ...mcpToolDefs]
 
         const systemTokens = contextCompressor.estimateTokens(baseSystemPrompt)
         const toolTokens = contextCompressor.estimateTokens(JSON.stringify(allToolDefs))
 
-        return { baseSystemPrompt, allToolDefs, systemTokens, toolTokens }
+        return { baseSystemPrompt, allToolDefs, systemTokens, toolTokens, runtimeToolRegistry }
     }
 
     /** Build the system prompt, appending a todo-nag reminder when the agent hasn't updated todos recently. */
@@ -295,13 +300,14 @@ export class AgentLoop {
     private async processToolCalls(
         response: Anthropic.Message,
         callbacks: AgentCallbacks,
+        ctx: RunInvocationContext,
     ): Promise<Anthropic.ToolResultBlockParam[]> {
         const toolResults: Anthropic.ToolResultBlockParam[] = []
 
         for (const block of response.content) {
             if (block.type !== "tool_use") continue
 
-            const toolReg = this.runtimeToolRegistry.get(block.name)
+            const toolReg = ctx.runtimeToolRegistry.get(block.name)
             const toolLabel = toolReg?.label || this.resolveMcpToolLabel(block.name)
             logger.info(`Tool call: ${block.name}`, JSON.stringify(block.input))
 
@@ -318,7 +324,7 @@ export class AgentLoop {
             }
 
             try {
-                const result = await this.executeTool(block.name, block.input as Record<string, unknown>)
+                const result = await this.executeTool(block.name, block.input as Record<string, unknown>, ctx)
                 const preview =
                     result.length > 500
                         ? `${result.substring(0, 250)}...[${result.length} chars]...${result.substring(result.length - 250)}`
@@ -370,9 +376,9 @@ export class AgentLoop {
     }
 
     /** Execute a tool by name: local tools take priority, then MCP tools. */
-    private async executeTool(name: string, input: Record<string, unknown>): Promise<string> {
+    private async executeTool(name: string, input: Record<string, unknown>, ctx: RunInvocationContext): Promise<string> {
         // Local tools take priority (includes dynamically registered subagent tool)
-        const localTool = this.runtimeToolRegistry.get(name)
+        const localTool = ctx.runtimeToolRegistry.get(name)
         if (localTool) return localTool.execute(input)
 
         // Try MCP tools

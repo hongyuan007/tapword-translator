@@ -1,32 +1,30 @@
-import type { ToolRegistration } from "./types"
-import { getCurrentPageTool } from "./getCurrentPage"
+import { getCurrentPageTool } from "./getCurrentPageTool"
 import { searchKnowledgeTool, storeKnowledgeTool } from "./knowledgeTools"
 import { loadSkillTool } from "./skillTools"
 import { readFileTool, listDirectoryTool, writeFileTool, deleteFileTool, deleteDirectoryTool } from "./fileTools"
 import { fetchUrlTool } from "./fetchUrlTool"
 import { searchFilesTool } from "./searchFilesTool"
 import { createTodosTool, updateTodoStatusTool, completeTodosTool } from "./todoTools"
+import { toolRegistry } from "./ToolRegistry"
 
 /** Tool names related to todo management. */
 export const TODO_TOOL_NAMES = new Set([createTodosTool.definition.name, updateTodoStatusTool.definition.name, completeTodosTool.definition.name])
 
-/** All registered tools, keyed by tool name. */
-const TOOL_REGISTRY = new Map<string, ToolRegistration>([
-    [getCurrentPageTool.definition.name, getCurrentPageTool],
-    [searchKnowledgeTool.definition.name, searchKnowledgeTool],
-    [storeKnowledgeTool.definition.name, storeKnowledgeTool],
-    [createTodosTool.definition.name, createTodosTool],
-    [updateTodoStatusTool.definition.name, updateTodoStatusTool],
-    [completeTodosTool.definition.name, completeTodosTool],
-    [loadSkillTool.definition.name, loadSkillTool],
-    [readFileTool.definition.name, readFileTool],
-    [listDirectoryTool.definition.name, listDirectoryTool],
-    [writeFileTool.definition.name, writeFileTool],
-    [deleteFileTool.definition.name, deleteFileTool],
-    [deleteDirectoryTool.definition.name, deleteDirectoryTool],
-    [fetchUrlTool.definition.name, fetchUrlTool],
-    [searchFilesTool.definition.name, searchFilesTool],
-])
+// Register all built-in tools
+toolRegistry.add(getCurrentPageTool)
+toolRegistry.add(searchKnowledgeTool)
+toolRegistry.add(storeKnowledgeTool)
+toolRegistry.add(createTodosTool)
+toolRegistry.add(updateTodoStatusTool)
+toolRegistry.add(completeTodosTool)
+toolRegistry.add(loadSkillTool)
+toolRegistry.add(readFileTool)
+toolRegistry.add(listDirectoryTool)
+toolRegistry.add(writeFileTool)
+toolRegistry.add(deleteFileTool)
+toolRegistry.add(deleteDirectoryTool)
+toolRegistry.add(fetchUrlTool)
+toolRegistry.add(searchFilesTool)
 
-export { TOOL_REGISTRY }
+export { toolRegistry }
 export type { ToolRegistration } from "./types"

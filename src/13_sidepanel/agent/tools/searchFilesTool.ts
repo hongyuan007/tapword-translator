@@ -170,3 +170,7 @@ export const searchFilesTool: ToolRegistration = {
         }
     },
 }
+
+// Self-register with the global tool registry
+import { toolRegistry } from "./ToolRegistry"
+toolRegistry.add(searchFilesTool)

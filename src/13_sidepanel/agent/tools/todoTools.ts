@@ -5,6 +5,9 @@ import type { ToolRegistration } from "./types"
 
 const logger = loggerModule.createLogger("todoTools")
 
+/** Tool names related to todo management. */
+export const TODO_TOOL_NAMES = new Set(["create_todos", "update_todo_status", "complete_task"])
+
 // --- createTodos ---
 
 export const createTodosTool: ToolRegistration = {
@@ -106,3 +109,9 @@ export const completeTodosTool: ToolRegistration = {
         return result
     },
 }
+
+// Self-register with the global tool registry
+import { toolRegistry } from "./ToolRegistry"
+toolRegistry.add(createTodosTool)
+toolRegistry.add(updateTodoStatusTool)
+toolRegistry.add(completeTodosTool)
