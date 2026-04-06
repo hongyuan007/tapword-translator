@@ -21,7 +21,7 @@ import * as iconManager from "@/1_content/ui/iconManager"
 import * as spaNavigationHandler from "@/1_content/handlers/SpaNavigationHandler"
 import * as fullTranslateHandler from "@/1_content/handlers/FullTranslateHandler"
 import * as floatingButtonIntegration from "@/1_content/handlers/FloatingButtonIntegration"
-import * as currentPageMarkdown from "@/1_content/utils/currentPageMarkdown"
+import { agentPanelMessageHandler } from "@/1_content/handlers/AgentPanelMessageHandler"
 import { SidepanelButtonManager } from "@/12_floating_button"
 
 const logger = loggerModule.createLogger("content-script")
@@ -168,8 +168,11 @@ async function init(): Promise<void> {
             return false
         }
         if (message.type === "GET_PAGE_CONTENT") {
-            const content = currentPageMarkdown.extractCurrentPageMarkdown()
-            sendResponse({ success: true, content })
+            agentPanelMessageHandler.handleGetPageContent(sendResponse)
+            return false
+        }
+        if (message.type === "GET_SELECTED_TEXT") {
+            agentPanelMessageHandler.handleGetSelectedText(sendResponse)
             return false
         }
         return false

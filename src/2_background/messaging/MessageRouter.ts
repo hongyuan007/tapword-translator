@@ -200,6 +200,30 @@ export function setupMessageListener(): void {
                 return true
             }
 
+            case "GET_SELECTED_TEXT": {
+                try {
+                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                        if (tabs[0]?.id) {
+                            // Target main frame only (frameId: 0) to avoid iframe content
+                            chrome.tabs.sendMessage(tabs[0].id, message, { frameId: 0 }, (response) => {
+                                if (chrome.runtime.lastError) {
+                                    logger.warn("Failed to get selected text:", chrome.runtime.lastError.message)
+                                    sendResponse({ success: false, error: "No content script available on this page" })
+                                } else {
+                                    sendResponse(response ?? { success: false, error: "No response from content script" })
+                                }
+                            })
+                        } else {
+                            sendResponse({ success: false, error: "No active tab found" })
+                        }
+                    })
+                } catch (error) {
+                    logger.error("Failed to get selected text:", error)
+                    sendResponse({ success: false, error: String(error) })
+                }
+                return true
+            }
+
             case "FETCH_URL": {
                 const url = message.url as string
                 if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
