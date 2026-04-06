@@ -10,6 +10,7 @@
 
 export const CSS_CLASSES = {
     ICON: "ai-translator-icon",
+    EXPLAIN_ICON: "ai-explain-icon",
     ANCHOR: "ai-translator-anchor",
     TOOLTIP: "ai-translator-tooltip",
     LOADING: "ai-translator-loading",

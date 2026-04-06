@@ -10,8 +10,12 @@ import type * as types from "@/0_common/types"
 
 // Global state
 let currentIcon: HTMLElement | null = null
+let currentExplainIcon: HTMLElement | null = null
 let showIconTimeoutId: number | null = null // For delayed show
 const DOUBLE_CLICK_THRESHOLD = 20 // ms
+const EXPLAIN_ICON_COLOR = "#4A90D9"
+const ICON_GAP_PX = 4
+const ICON_CONTAINER_SIZE_PX = 32 // Must match .ai-translator-icon / .ai-explain-icon width in CSS
 
 /**
  * Create the translation icon element
@@ -108,5 +112,74 @@ export function removeTranslationIcon(): void {
             iconToRemove.remove()
         }, 200) // Wait for fade-out animation to complete
         currentIcon = null
+    }
+
+    // Always remove explain icon together with translation icon
+    removeExplainIcon()
+}
+
+/**
+ * Create the explain icon element (question-mark circle)
+ */
+function createExplainIcon(onClick: (event: Event) => void): HTMLElement {
+    const icon = document.createElement("div")
+    icon.className = constants.CSS_CLASSES.EXPLAIN_ICON
+    icon.setAttribute(commonConstants.EXTENSION_OWNED_ATTRIBUTE, "")
+    icon.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" fill="${EXPLAIN_ICON_COLOR}" opacity="0.85"/>
+            <text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial, sans-serif">?</text>
+        </svg>
+    `
+    icon.title = "Click to explain"
+    // Prevent the selection from collapsing when the user clicks the icon.
+    icon.addEventListener("mousedown", (e) => e.preventDefault())
+    icon.addEventListener("click", onClick)
+    return icon
+}
+
+/**
+ * Show the explain icon to the right of the translation icon.
+ * Must be called after showTranslationIcon() so that `currentIcon` is positioned.
+ */
+export function showExplainIcon(_range: Range, onClick: (event: Event) => void): void {
+    removeExplainIcon()
+
+    // Wait for the translation icon to be created (same timeout + small extra)
+    const waitMs = DOUBLE_CLICK_THRESHOLD + 5
+    setTimeout(() => {
+        if (!currentIcon) return
+
+        const icon = createExplainIcon(onClick)
+
+        // Read stable absolute coordinates directly from the translation icon's inline style
+        // (getBoundingClientRect is unreliable here because the icon may still have transform: scale(0.8))
+        const top = parseFloat(currentIcon.style.top)
+        const left = parseFloat(currentIcon.style.left) + ICON_CONTAINER_SIZE_PX + ICON_GAP_PX
+
+        icon.style.top = `${top}px`
+        icon.style.left = `${left}px`
+
+        document.body.appendChild(icon)
+        currentExplainIcon = icon
+
+        // Trigger fade-in animation
+        setTimeout(() => {
+            icon.classList.add("visible")
+        }, 10)
+    }, waitMs)
+}
+
+/**
+ * Remove the explain icon
+ */
+export function removeExplainIcon(): void {
+    if (currentExplainIcon) {
+        const iconToRemove = currentExplainIcon
+        iconToRemove.classList.remove("visible")
+        setTimeout(() => {
+            iconToRemove.remove()
+        }, 200)
+        currentExplainIcon = null
     }
 }

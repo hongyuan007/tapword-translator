@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from "react"
-import { Send, Square } from "lucide-react"
+import { Send, Square, X } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 import { ContextUsageIndicator } from "./ContextUsageBar"
 import type { ContextUsage } from "../types"
@@ -18,9 +18,11 @@ interface ChatInputBarProps {
     isLoading: boolean
     disabled: boolean
     contextUsage?: ContextUsage | null
+    pendingMessage?: string | null
+    onCancelPending?: () => void
 }
 
-export function ChatInputBar({ input, onInputChange, onSend, onAbort, isLoading, disabled, contextUsage }: ChatInputBarProps) {
+export function ChatInputBar({ input, onInputChange, onSend, onAbort, isLoading, disabled, contextUsage, pendingMessage, onCancelPending }: ChatInputBarProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     const adjustHeight = useCallback(() => {
@@ -43,6 +45,18 @@ export function ChatInputBar({ input, onInputChange, onSend, onAbort, isLoading,
 
     return (
         <footer className="bg-white border-t border-stone-200">
+            {pendingMessage && (
+                <div className="flex items-center justify-between mx-3 mt-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-700">
+                    <span className="truncate">Message queued, waiting for current task to complete…</span>
+                    <button
+                        className="ml-2 flex-shrink-0 p-0.5 rounded hover:bg-amber-200 text-amber-500 hover:text-amber-700"
+                        onClick={onCancelPending}
+                        title="Cancel pending message"
+                    >
+                        <X className="w-3.5 h-3.5" />
+                    </button>
+                </div>
+            )}
             <div className="flex flex-col gap-1 bg-stone-100 rounded-lg mx-3 my-2 px-3 py-2">
                 <div className="flex items-end gap-2">
                     <textarea

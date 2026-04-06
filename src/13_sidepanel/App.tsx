@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Loader2 } from "lucide-react"
 import { useApiKey } from "./hooks/useApiKey"
 import { useAgentChat } from "./hooks/useAgentChat"
@@ -16,6 +16,7 @@ import { McpPanel } from "./components/McpPanel"
 import { TodoPanel } from "./components/TodoPanel"
 import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import { useMcpServers } from "./hooks/useMcpServers"
+import * as explainPromptModule from "./agent/prompts/explainTextPrompt"
 import type { SkillMeta } from "./types"
 
 // --- Component ---
@@ -27,23 +28,40 @@ export default function App() {
 
     const { apiKey, isLoaded: keyLoaded } = useApiKey()
     const { serverStates, addServer, removeServer, toggleServer, toggleTool, reconnectServer, mcpCallbacks } = useMcpServers()
-    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, contextUsage, sendMessage, abortAgent, clearChat, dismissAuthError } = useAgentChat(apiKey, mcpCallbacks)
+    const { messages, isLoading, showAuthError, todoItems, isTaskCompleted, contextUsage, pendingMessage, sendMessage, enqueuePendingMessage, cancelPendingMessage, abortAgent, clearChat, dismissAuthError } = useAgentChat(apiKey, mcpCallbacks)
 
     // Load skill metadata on mount
     useEffect(() => {
         skillStorageService.loadSkillMetas().then(setSkills)
     }, [])
 
-    // Listen for skill-imported messages from the relay popup window
+    // Handle incoming explain-text requests from content script
+    const handleExplainTextRequest = useCallback(
+        (data: { text: string; contextText: string; blockText: string }) => {
+            setActiveTab("chat")
+            const prompt = explainPromptModule.buildExplainTextPrompt(data.text, data.contextText, data.blockText)
+            if (isLoading) {
+                enqueuePendingMessage(prompt)
+            } else {
+                void sendMessage(prompt)
+            }
+        },
+        [isLoading, sendMessage, enqueuePendingMessage],
+    )
+
+    // Listen for skill-imported and EXPLAIN_TEXT_REQUEST messages
     useEffect(() => {
         const handler = (message: any) => {
             if (message?.type === "skill-imported" && message.skillMeta) {
                 setSkills((prev) => [...prev.filter((s) => s.id !== message.skillMeta.id), message.skillMeta])
             }
+            if (message?.type === "EXPLAIN_TEXT_REQUEST" && message.data) {
+                handleExplainTextRequest(message.data)
+            }
         }
         chrome.runtime.onMessage.addListener(handler)
         return () => chrome.runtime.onMessage.removeListener(handler)
-    }, [])
+    }, [handleExplainTextRequest])
 
     const handleDeleteSkill = async (skillId: string) => {
         await skillStorageService.deleteSkill(skillId)
@@ -114,7 +132,7 @@ export default function App() {
             ) : (
                 <>
                     <MessageList messages={messages} />
-                    <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} onAbort={abortAgent} isLoading={isLoading} disabled={!apiKey} contextUsage={contextUsage} />
+                    <ChatInputBar input={input} onInputChange={setInput} onSend={handleSend} onAbort={abortAgent} isLoading={isLoading} disabled={!apiKey} contextUsage={contextUsage} pendingMessage={pendingMessage} onCancelPending={cancelPendingMessage} />
                 </>
             )}
         </div>

@@ -55,6 +55,42 @@
     height: 100%;
 }
 
+/* Explain Icon - Appears next to translation icon */
+.ai-explain-icon {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    z-index: 999999;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+}
+
+.ai-explain-icon.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ai-explain-icon:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 12px rgba(74, 144, 217, 0.3));
+}
+
+.ai-explain-icon:active {
+    transform: scale(0.95);
+}
+
+.ai-explain-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 /* Highlighted translated text */
 .ai-translator-anchor {
     position: relative;
@@ -144,6 +180,7 @@
 
 /* Prevent selection conflicts */
 .ai-translator-icon *,
+.ai-explain-icon *,
 .ai-translator-tooltip * {
     user-select: none;
     -webkit-user-select: none;

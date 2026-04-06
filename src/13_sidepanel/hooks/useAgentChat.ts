@@ -19,7 +19,10 @@ interface UseAgentChatResult {
     todoItems: readonly TodoItem[]
     isTaskCompleted: boolean
     contextUsage: ContextUsage | null
+    pendingMessage: string | null
     sendMessage: (text: string) => Promise<void>
+    enqueuePendingMessage: (text: string) => void
+    cancelPendingMessage: () => void
     abortAgent: () => void
     clearChat: () => void
     dismissAuthError: () => void
@@ -32,10 +35,12 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
     const [todoItems, setTodoItems] = useState<readonly TodoItem[]>([])
     const [isTaskCompleted, setIsTaskCompleted] = useState(false)
     const [contextUsage, setContextUsage] = useState<ContextUsage | null>(null)
+    const [pendingMessage, setPendingMessage] = useState<string | null>(null)
 
     const agentRef = useRef<AgentLoop | null>(null)
     const loadedMessagesRef = useRef<ChatMessage[] | null>(null)
     const phaseRef = useRef<StreamPhase>("idle")
+    const pendingMessageRef = useRef<string | null>(null)
 
     // Load session messages and todos on mount; wire up TodoManager callback
     useEffect(() => {
@@ -73,6 +78,19 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
             storageService.saveSessionMessages(messages)
         }
     }, [messages, isLoading])
+
+    // Auto-send pending message when agent finishes (isLoading: true → false)
+    const prevIsLoadingRef = useRef(isLoading)
+    useEffect(() => {
+        const wasLoading = prevIsLoadingRef.current
+        prevIsLoadingRef.current = isLoading
+        if (wasLoading && !isLoading && pendingMessageRef.current) {
+            const queued = pendingMessageRef.current
+            pendingMessageRef.current = null
+            setPendingMessage(null)
+            void sendMessage(queued)
+        }
+    }, [isLoading]) // sendMessage is intentionally omitted to avoid re-triggering
 
     async function loadPersistedMessages() {
         const saved = await storageService.loadSessionMessages()
@@ -390,6 +408,18 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
         storageService.clearSessionTodos()
     }
 
+    /** Queue a message to be sent once the current agent run completes. Latest wins. */
+    function enqueuePendingMessage(text: string) {
+        pendingMessageRef.current = text
+        setPendingMessage(text)
+    }
+
+    /** Cancel any queued pending message. */
+    function cancelPendingMessage() {
+        pendingMessageRef.current = null
+        setPendingMessage(null)
+    }
+
     /** Abort the currently running agent invocation. */
     function abortAgent() {
         if (agentRef.current && isLoading) {
@@ -408,7 +438,10 @@ export function useAgentChat(apiKey: string | null, mcpCallbacks?: McpToolCallba
         todoItems,
         isTaskCompleted,
         contextUsage,
+        pendingMessage,
         sendMessage,
+        enqueuePendingMessage,
+        cancelPendingMessage,
         abortAgent,
         clearChat,
         dismissAuthError,

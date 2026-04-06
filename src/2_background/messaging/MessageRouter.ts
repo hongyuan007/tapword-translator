@@ -148,6 +148,24 @@ export function setupMessageListener(): void {
                 return true
             }
 
+            case "OPEN_SIDE_PANEL": {
+                const windowId = sender.tab?.windowId
+                if (windowId === undefined) {
+                    sendResponse({ success: false, error: 'No window context' })
+                    return true
+                }
+                chrome.sidePanel.open({ windowId })
+                    .then(() => {
+                        sidepanelOpenState.set(windowId, true)
+                        sendResponse({ success: true })
+                    })
+                    .catch((error) => {
+                        logger.warn('Failed to open side panel:', error)
+                        sendResponse({ success: false, error: String(error) })
+                    })
+                return true
+            }
+
             case "TOGGLE_SIDE_PANEL": {
                 const windowId = sender.tab?.windowId
                 if (windowId === undefined) {
