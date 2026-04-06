@@ -16,6 +16,7 @@ import { createSubagentTool, TASK_TOOL_NAME } from "./tools/subagentToolFactory"
 import type { SubagentToolRegistration } from "./tools/subagentToolFactory"
 import { contextCompressor } from "./utils/ContextCompressor"
 import { isProxyArtifact } from "./utils/isProxyArtifact"
+import * as rateLimiterModule from "./utils/RateLimiter"
 import { retryWithBackoff } from "./utils/retryWithBackoff"
 
 const logger = loggerModule.createLogger("AgentLoop")
@@ -257,6 +258,9 @@ export class AgentLoop {
         let accumulatedText = ""
 
         try {
+            // Proactive rate limiting — shared across AgentLoop + SubagentRunner
+            await rateLimiterModule.llmRateLimiter.acquire(signal)
+
             const response = await retryWithBackoff("AgentLoop", async () => {
                 const stream = this.client.messages.stream(
                     {

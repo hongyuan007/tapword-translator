@@ -3,6 +3,7 @@ import * as loggerModule from "@/0_common/utils/logger"
 import type { ToolRegistration } from "./tools/types"
 import type { McpToolCallbacks } from "./AgentLoop"
 import { isProxyArtifact } from "./utils/isProxyArtifact"
+import * as rateLimiterModule from "./utils/RateLimiter"
 import { retryWithBackoff } from "./utils/retryWithBackoff"
 
 const logger = loggerModule.createLogger("SubagentRunner")
@@ -65,6 +66,9 @@ export async function runSubagent(
         }
 
         rounds++
+
+        // Proactive rate limiting — shared across AgentLoop + SubagentRunner
+        await rateLimiterModule.llmRateLimiter.acquire(signal)
 
         // Stream LLM response with real-time event forwarding (retry on transient errors)
         const response = await retryWithBackoff("SubagentRunner", async () => {
