@@ -6,7 +6,7 @@
  * and this module resolves them to precise DOM positions for rendering.
  */
 
-import type { TextNodeSegment } from "@/9_inline_translate/utils/blockTextExtractor"
+import type { TextNodeSegment } from "@/14_inline_translate/utils/blockTextExtractor"
 import * as loggerModule from "@/0_common/utils/logger"
 
 const logger = loggerModule.createLogger("candidateDomMapper")

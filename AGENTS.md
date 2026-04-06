@@ -21,10 +21,17 @@ A smart AI-powered translation browser extension that provides context-aware tra
 │   ├── 1_content/          # Content scripts injected into web pages
 │   ├── 2_background/       # Background service worker
 │   ├── 3_popup/            # Extension popup UI
+│   ├── 4_options/          # Extension options/settings page
 │   ├── 5_backend/          # Generic API infrastructure (service, types)
 │   ├── 6_translate/        # Translation business logic
 │   ├── 7_speech/           # Speech synthesis module
-│   └── 8_generate/         # Text generation module
+│   ├── 8_generate/         # Text generation module
+│   ├── 14_inline_translate/ # Inline translation module
+│   ├── 9_offscreen/        # Offscreen document for background tasks
+│   ├── 10_welcome/         # Welcome/onboarding page
+│   ├── 11_full_translate/  # Full-page translation module
+│   ├── 12_floating_button/ # Floating ball button module
+│   └── 13_sidepanel/       # AI chat assistant side panel
 ├── test/                   # Unit and integration tests
 ├── package.json            # NPM package configuration
 ├── tsconfig.json           # TypeScript configuration
@@ -38,10 +45,16 @@ A smart AI-powered translation browser extension that provides context-aware tra
 - `src/1_content/README.md`
 - `src/2_background/README.md`
 - `src/3_popup/README.md`
+- `src/4_options/README.md`
 - `src/5_backend/README.md`
 - `src/6_translate/README.md`
 - `src/7_speech/README.md`
 - `src/8_generate/README.md`
+- `src/14_inline_translate/README.md`
+- `src/9_offscreen/README.md`
+- `src/11_full_translate/README.md`
+- `src/12_floating_button/README.md`
+- `src/13_sidepanel/README.md`
 
 ## Technical Stack
 

@@ -1,4 +1,4 @@
-# 9_inline_translate — Inline Translation Module
+# 14_inline_translate — Inline Translation Module
 
 ## Purpose
 
@@ -13,7 +13,7 @@ Content-script-level orchestration and DOM utilities for inline (auto) translati
 ## Module Structure
 
 ```
-src/9_inline_translate/
+src/14_inline_translate/
   index.ts                              — Module exports
   README.md                             — This file
   services/

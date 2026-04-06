@@ -23,9 +23,9 @@ import type { DisplayUserSettings } from "@/1_content/ui/translationDisplayV2"
 import type { SuccessState } from "@/1_content/ui/translationDisplayV2/types"
 import * as translationOverlapDetector from "@/1_content/handlers/utils/translationOverlapDetectorV2"
 import * as domSanitizer from "@/1_content/utils/domSanitizer"
-import * as blockTextExtractor from "@/9_inline_translate/utils/blockTextExtractor"
-import type { TextNodeSegment } from "@/9_inline_translate/utils/blockTextExtractor"
-import * as candidateDomMapper from "@/9_inline_translate/utils/candidateDomMapper"
+import * as blockTextExtractor from "@/14_inline_translate/utils/blockTextExtractor"
+import type { TextNodeSegment } from "@/14_inline_translate/utils/blockTextExtractor"
+import * as candidateDomMapper from "@/14_inline_translate/utils/candidateDomMapper"
 
 const logger = loggerModule.createLogger("InlineTranslationService")
 
