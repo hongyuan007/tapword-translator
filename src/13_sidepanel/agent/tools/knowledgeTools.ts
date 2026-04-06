@@ -30,6 +30,7 @@ export const searchKnowledgeTool: ToolRegistration = {
         },
     },
     label: "Searching knowledge...",
+    descriptionCN: "搜索知识库中的已保存内容",
     execute: async (input) => {
         const query = input.query as string
         const topK = (input.topK as number) || 5
@@ -79,6 +80,7 @@ export const storeKnowledgeTool: ToolRegistration = {
         },
     },
     label: "Saving knowledge...",
+    descriptionCN: "将信息保存到知识库",
     execute: async (input) => {
         const text = input.text as string
         const title = input.title as string

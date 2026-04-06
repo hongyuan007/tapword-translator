@@ -1,7 +1,7 @@
-import { MessageSquare, BookOpen, Zap, FolderOpen, Plug, Trash2 } from "lucide-react"
+import { MessageSquare, BookOpen, Zap, FolderOpen, Plug, Wrench, Trash2 } from "lucide-react"
 import * as i18nModule from "@/0_common/utils/i18n"
 
-export type SidePanelTab = "chat" | "knowledge" | "skills" | "files" | "mcp"
+export type SidePanelTab = "chat" | "tools" | "knowledge" | "skills" | "files" | "mcp"
 
 interface ChatHeaderProps {
     activeTab: SidePanelTab
@@ -22,6 +22,15 @@ export function ChatHeader({ activeTab, onTabChange, onClearChat, showClearButto
                 >
                     <MessageSquare className="w-3.5 h-3.5" />
                     {i18nModule.translate("sidepanel.tab.chat")}
+                </button>
+                <button
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                        activeTab === "tools" ? "text-stone-900 border-b-2 border-stone-900" : "text-stone-400 hover:text-stone-600"
+                    }`}
+                    onClick={() => onTabChange("tools")}
+                >
+                    <Wrench className="w-3.5 h-3.5" />
+                    {i18nModule.translate("sidepanel.tab.tools")}
                 </button>
                 <button
                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${

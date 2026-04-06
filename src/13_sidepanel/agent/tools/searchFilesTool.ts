@@ -72,6 +72,7 @@ export const searchFilesTool: ToolRegistration = {
         },
     },
     label: "Searching files...",
+    descriptionCN: "在文件系统中搜索文件",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const query = input.query as string
         const path = (input.path as string) ?? VFS_PATH_PREFIX

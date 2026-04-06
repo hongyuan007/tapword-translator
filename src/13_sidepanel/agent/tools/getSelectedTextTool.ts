@@ -17,6 +17,7 @@ export const getSelectedTextTool: ToolRegistration = {
         },
     },
     label: "Reading selection...",
+    descriptionCN: "获取用户在网页上选中的文本及上下文",
     execute: async () => {
         let response: unknown
         try {

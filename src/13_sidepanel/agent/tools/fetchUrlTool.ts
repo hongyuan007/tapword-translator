@@ -92,6 +92,7 @@ export const fetchUrlTool: ToolRegistration = {
         },
     },
     label: "Fetching URL...",
+    descriptionCN: "获取指定 URL 的网页内容",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const url = input.url as string
         const maxLength = (input.max_length as number) ?? DEFAULT_MAX_LENGTH

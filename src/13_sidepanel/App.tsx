@@ -13,6 +13,7 @@ import { KnowledgePanel } from "./components/KnowledgePanel"
 import { SkillsPanel } from "./components/SkillsPanel"
 import { FileBrowserPanel } from "./components/FileBrowserPanel"
 import { McpPanel } from "./components/McpPanel"
+import { ToolsPanel } from "./components/ToolsPanel"
 import { TodoPanel } from "./components/TodoPanel"
 import { skillStorageService } from "@/13_sidepanel/services/SkillStorageService"
 import { useMcpServers } from "./hooks/useMcpServers"
@@ -110,7 +111,9 @@ export default function App() {
                 />
             )}
             {todoItems.length > 0 && <TodoPanel items={todoItems} isTaskCompleted={isTaskCompleted} />}
-            {activeTab === "knowledge" ? (
+            {activeTab === "tools" ? (
+                <ToolsPanel />
+            ) : activeTab === "knowledge" ? (
                 <KnowledgePanel />
             ) : activeTab === "skills" ? (
                 <SkillsPanel

@@ -17,6 +17,7 @@ export const getCurrentPageTool: ToolRegistration = {
         },
     },
     label: "Reading page...",
+    descriptionCN: "获取当前网页的结构化 Markdown 快照",
     execute: async () => {
         let response: unknown
         try {

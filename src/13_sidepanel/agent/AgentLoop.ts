@@ -12,7 +12,7 @@ import type { ToolRegistration } from "./tools/types"
 
 // Side-effect import: auto-discover and register all tool modules
 import "./tools/registerAll"
-import { createSubagentTool, TASK_TOOL_NAME } from "./tools/subagentToolFactory"
+import { createSubagentTool, SUBAGENT_TOOL_NAME } from "./tools/subagentToolFactory"
 import type { SubagentToolRegistration } from "./tools/subagentToolFactory"
 import { contextCompressor } from "./utils/ContextCompressor"
 import { isProxyArtifact } from "./utils/isProxyArtifact"
@@ -200,9 +200,13 @@ export class AgentLoop {
         const baseSystemPrompt = buildSystemPrompt(skillMetas)
 
         // Create subagent tool (bound to this loop's client/model), passing abort signal
-        const subagentTool = createSubagentTool(this.client, this.model, toolRegistry.getAll(), this.mcpCallbacks, signal)
-        const runtimeToolRegistry = new Map<string, ToolRegistration>(toolRegistry.getAll())
-        runtimeToolRegistry.set(subagentTool.definition.name, subagentTool)
+        const runtimeToolRegistry = new Map<string, ToolRegistration>(toolRegistry.getEnabled())
+
+        // Only add subagent tool if it's enabled in the user's tool preferences
+        if (toolRegistry.isEnabled(SUBAGENT_TOOL_NAME)) {
+            const subagentTool = createSubagentTool(this.client, this.model, toolRegistry.getEnabled(), this.mcpCallbacks, signal)
+            runtimeToolRegistry.set(subagentTool.definition.name, subagentTool)
+        }
 
         // Build dynamic tool list: local tools + MCP tools
         const localToolDefs = Array.from(runtimeToolRegistry.values()).map((t) => t.definition)
@@ -316,7 +320,7 @@ export class AgentLoop {
             logger.info(`Tool call: ${block.name}`, JSON.stringify(block.input))
 
             // Subagent tool: emit SubagentBlock and inject execution context
-            if (block.name === TASK_TOOL_NAME) {
+            if (block.name === SUBAGENT_TOOL_NAME) {
                 const description = (block.input as Record<string, unknown>).description as string || "subtask"
                 callbacks.onSubagentStart(block.id, description)
 

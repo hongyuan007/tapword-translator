@@ -33,6 +33,7 @@ export const listDirectoryTool: ToolRegistration = {
         },
     },
     label: "Listing directory...",
+    descriptionCN: "列出目录中的文件和文件夹",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const path = input.path as string
         const error = validatePath(path)
@@ -79,6 +80,7 @@ export const writeFileTool: ToolRegistration = {
         },
     },
     label: "Writing file...",
+    descriptionCN: "创建或写入文件",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const path = input.path as string
         const content = (input.content as string) ?? ""
@@ -120,6 +122,7 @@ export const deleteFileTool: ToolRegistration = {
         },
     },
     label: "Deleting file...",
+    descriptionCN: "删除指定文件",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const path = input.path as string
         const error = validatePath(path)
@@ -165,6 +168,7 @@ export const readFileTool: ToolRegistration = {
         },
     },
     label: "Reading file...",
+    descriptionCN: "读取指定文件的内容",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const path = input.path as string
         const error = validatePath(path)
@@ -201,6 +205,7 @@ export const deleteDirectoryTool: ToolRegistration = {
         },
     },
     label: "Deleting directory...",
+    descriptionCN: "删除指定目录",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const path = input.path as string
         const error = validatePath(path)

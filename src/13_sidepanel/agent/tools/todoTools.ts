@@ -52,6 +52,7 @@ export const createTodosTool: ToolRegistration = {
         },
     },
     label: "Planning tasks...",
+    descriptionCN: "创建待办事项列表",
     execute: async (input) => {
         const rendered = todoManager.createTodos(input.items as Array<Record<string, unknown>>)
         logger.info("Todo list created successfully")
@@ -83,6 +84,7 @@ export const updateTodoStatusTool: ToolRegistration = {
         },
     },
     label: "Updating task status...",
+    descriptionCN: "更新待办事项的状态",
     execute: async (input) => {
         const rendered = todoManager.updateTodoStatus(input.id as string, input.status as TodoStatus)
         logger.info(`Todo #${input.id} updated to ${input.status}`)
@@ -103,6 +105,7 @@ export const completeTodosTool: ToolRegistration = {
         },
     },
     label: "Completing task...",
+    descriptionCN: "标记任务为已完成",
     execute: async () => {
         const result = todoManager.completeTask()
         logger.info("Task completed")

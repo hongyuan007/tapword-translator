@@ -6,18 +6,19 @@ import type { SubagentCallbacks } from "../SubagentRunner"
 import { buildSubagentSystemPrompt } from "../prompts"
 import type { AgentCallbacks } from "../../types"
 import type { McpToolCallbacks } from "../AgentLoop"
+import { toolRegistry } from "./ToolRegistry"
 
 const logger = loggerModule.createLogger("subagentTool")
 
 /** Tool name for the subagent dispatch tool. */
-export const TASK_TOOL_NAME = "task"
+export const SUBAGENT_TOOL_NAME = "subagent"
 
 /** Maximum characters for the subagent summary returned to the parent. */
 const MAX_SUMMARY_LENGTH = 5000
 
 /** Tool names excluded from the subagent's toolset. */
 const EXCLUDED_TOOLS = new Set([
-    TASK_TOOL_NAME,        // Prevent recursive subagent spawning
+    SUBAGENT_TOOL_NAME,        // Prevent recursive subagent spawning
     "create_todos",        // Todo management is parent-only
     "update_todo_status",
     "complete_task",
@@ -133,7 +134,7 @@ export function createSubagentTool(
 
     return {
         definition: {
-            name: TASK_TOOL_NAME,
+            name: SUBAGENT_TOOL_NAME,
             description:
                 "Spawn a subagent with a fresh context to handle an independent subtask. " +
                 "The subagent shares the filesystem but NOT conversation history. " +
@@ -204,3 +205,28 @@ export function createSubagentTool(
         },
     }
 }
+
+// --- Static display-only placeholder for ToolsPanel UI ---
+
+const SUBAGENT_TOOL_DESCRIPTION =
+    "Spawn a subagent with a fresh context to handle an independent subtask. " +
+    "The subagent shares the filesystem but NOT conversation history. " +
+    "Only its final summary is returned to you. " +
+    "Use this for exploration, research, or self-contained work that doesn't need your full context."
+
+/** Static placeholder for ToolsPanel display. Overwritten at runtime by createSubagentTool(). */
+export const subagentToolPlaceholder: ToolRegistration = {
+    definition: {
+        name: SUBAGENT_TOOL_NAME,
+        description: SUBAGENT_TOOL_DESCRIPTION,
+        input_schema: { type: "object" as const, properties: {} },
+    },
+    label: "Running subagent...",
+    descriptionCN: "启动子代理执行复杂的多步骤任务",
+    category: "capability",
+    execute: async () => {
+        throw new Error("Subagent tool must be created with createSubagentTool()")
+    },
+}
+
+toolRegistry.add(subagentToolPlaceholder)

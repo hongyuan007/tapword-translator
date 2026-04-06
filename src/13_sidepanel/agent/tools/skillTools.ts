@@ -23,6 +23,8 @@ export const loadSkillTool: ToolRegistration = {
         },
     },
     label: "Loading skill...",
+    descriptionCN: "加载技能文件以增强能力",
+    category: "skill",
     execute: async (input: Record<string, unknown>): Promise<string> => {
         const skillId = input.skill_id as string
         if (!skillId) {

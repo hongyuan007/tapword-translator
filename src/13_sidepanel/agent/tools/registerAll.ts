@@ -6,3 +6,7 @@ import.meta.glob(
     ['./*Tool.ts', './*Tools.ts'],
     { eager: true },
 )
+
+// subagentToolFactory is a factory (not matched by the glob convention above),
+// but its static placeholder needs to register for the Tools panel display.
+import "./subagentToolFactory"
