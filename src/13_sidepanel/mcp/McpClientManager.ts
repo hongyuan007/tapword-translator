@@ -12,6 +12,8 @@ const TOOL_CALL_TIMEOUT_MS = 15_000
 // ─── Public Interface ──────────────────────────────────────────
 
 export interface IMcpClientManager {
+    /** Optional callback invoked when a server disconnects unexpectedly (SSE stream lost). */
+    onDisconnect?: (serverId: string, serverName: string) => void
     /** Connect to an MCP server with session resumption support. */
     connectServer(config: McpServerConfig): Promise<McpServerState>
     /** Disconnect a server, preserving session cache for reconnection. */
@@ -44,6 +46,7 @@ interface ServerConnection {
  * Manages connections to multiple MCP servers and routes tool calls.
  */
 export class McpClientManager implements IMcpClientManager {
+    onDisconnect?: (serverId: string, serverName: string) => void
     private connections = new Map<string, ServerConnection>()
 
     /**
@@ -103,6 +106,7 @@ export class McpClientManager implements IMcpClientManager {
             )
 
             await client.connect(transport)
+            this.installDisconnectHandler(config.id, config.name, client)
 
             const toolsResult = await client.listTools()
             const tools = this.mapTools(toolsResult.tools, config)
@@ -145,12 +149,34 @@ export class McpClientManager implements IMcpClientManager {
 
         // connect() skips initialize when transport.sessionId is set
         await client.connect(transport)
+        this.installDisconnectHandler(config.id, config.name, client)
 
         // Verify the session by listing tools — throws on 404/409/error
         const toolsResult = await client.listTools()
         const tools = this.mapTools(toolsResult.tools, config)
 
         return { client, transport, tools }
+    }
+
+    /**
+     * Install onerror handler on a connected client to detect server disconnection.
+     * Must be called AFTER client.connect() returns.
+     */
+    private installDisconnectHandler(serverId: string, serverName: string, client: Client): void {
+        client.onerror = (error: Error) => {
+            const message = error.message ?? String(error)
+            if (message.includes("Maximum reconnection attempts")) {
+                logger.warn(`Server "${serverName}" disconnected (reconnection exhausted)`)
+                const conn = this.connections.get(serverId)
+                if (conn) {
+                    conn.state.status = "disconnected"
+                    conn.state.errorMessage = "Server disconnected — SSE stream lost after max reconnection attempts"
+                }
+                this.onDisconnect?.(serverId, serverName)
+            } else {
+                logger.warn(`MCP client error for "${serverName}":`, message)
+            }
+        }
     }
 
     /** Map raw MCP SDK tool objects to our McpToolEntry type. */
@@ -248,6 +274,9 @@ export class McpClientManager implements IMcpClientManager {
     ): Promise<string> {
         const conn = this.connections.get(serverId)
         if (!conn) throw new Error(`MCP server "${serverId}" is not connected`)
+        if (conn.state.status === "disconnected") {
+            throw new Error(`MCP server "${conn.state.config.name}" is disconnected — the SSE stream was lost. Please reconnect.`)
+        }
         if (conn.state.status !== "connected") {
             throw new Error(`MCP server "${conn.state.config.name}" status: ${conn.state.status}`)
         }

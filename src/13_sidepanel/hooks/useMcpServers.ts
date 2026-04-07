@@ -4,6 +4,9 @@ import { McpClientManager } from "../mcp/McpClientManager"
 import { mcpServerStorage } from "@/13_sidepanel/mcp/McpServerStorage"
 import type { McpServerConfig, McpServerState } from "../mcp/types"
 import type { McpToolCallbacks } from "../agent/AgentLoop"
+import * as loggerModule from "@/0_common/utils/logger"
+
+const logger = loggerModule.createLogger("useMcpServers")
 
 // --- Public interface ---
 
@@ -26,6 +29,17 @@ export function useMcpServers(): UseMcpServersResult {
     // Mount: load configs, auto-connect enabled servers, apply tool enabled states
     useEffect(() => {
         let cancelled = false
+
+        managerRef.current.onDisconnect = (serverId, serverName) => {
+            logger.warn(`MCP server disconnected: "${serverName}" (${serverId})`)
+            setServerStates((prev) =>
+                prev.map((s) =>
+                    s.config.id === serverId
+                        ? { ...s, status: "disconnected" as const, errorMessage: "Server connection lost" }
+                        : s
+                )
+            )
+        }
 
         async function init() {
             const configs = await mcpServerStorage.loadServerConfigs()
