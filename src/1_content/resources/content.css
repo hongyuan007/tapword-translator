@@ -21,7 +21,7 @@
 
 /* Translation Icon - Appears next to selected text */
 .ai-translator-icon {
-    position: absolute;
+    position: fixed;
     width: 32px;
     height: 32px;
     cursor: pointer;
@@ -74,7 +74,7 @@
 
 /* Translation tooltip/card - subtitle style */
 .ai-translator-tooltip {
-    position: absolute;
+    position: fixed;
     /* Positioned dynamically via JS relative to chosen line rect */
     z-index: 999998;
     margin-top: 0px;
