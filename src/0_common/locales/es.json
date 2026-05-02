@@ -148,5 +148,9 @@
     "error.short.bingTranslateError": "Error de Bing Translate",
     "error.mtranserverConfigMissing": "Introduce primero la URL de MTranServer en la configuración",
     "error.mtranserverError": "Fallo de conexión con MTranServer, verifica la URL y la configuración",
-    "error.bingTranslateError": "Bing Translate falló, verifica tu conexión a Internet"
+    "error.bingTranslateError": "Bing Translate falló, verifica tu conexión a Internet",
+    "error.networkError": "No se puede conectar al servidor de traducción. Verifica tu red o intenta con otra conexión.",
+    "error.networkTimeout": "La solicitud de traducción expiró. Verifica tu conexión a Internet.",
+    "error.short.networkError": "Error de red",
+    "error.short.networkTimeout": "Tiempo agotado"
 }

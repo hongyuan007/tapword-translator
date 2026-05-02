@@ -148,5 +148,9 @@
     "error.short.bingTranslateError": "Erreur Bing Translate",
     "error.mtranserverConfigMissing": "Veuillez d'abord saisir l'URL MTranServer dans les paramètres",
     "error.mtranserverError": "Échec de connexion à MTranServer, vérifiez l'URL et la configuration",
-    "error.bingTranslateError": "Bing Translate a échoué, vérifiez votre connexion réseau"
+    "error.bingTranslateError": "Bing Translate a échoué, vérifiez votre connexion réseau",
+    "error.networkError": "Impossible de se connecter au serveur de traduction. Vérifiez votre réseau ou essayez une autre connexion.",
+    "error.networkTimeout": "La demande de traduction a expiré. Vérifiez votre connexion réseau.",
+    "error.short.networkError": "Erreur réseau",
+    "error.short.networkTimeout": "Délai expiré"
 }

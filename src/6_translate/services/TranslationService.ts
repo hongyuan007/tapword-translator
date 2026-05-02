@@ -27,6 +27,8 @@ import { translateWithBingTranslate, BingTranslateError } from "./BingTranslateS
 
 const logger = createLogger("TranslationService")
 
+const TRANSLATION_REQUEST_TIMEOUT_MS = 15000
+
 let localWordServicePromise: Promise<WordTranslationService> | null = null
 let localFragmentServicePromise: Promise<FragmentTranslationService> | null = null
 let cachedLocalConfigSignature: string | null = null
@@ -179,6 +181,22 @@ function handleAPIError(error: APIError): never {
         case "serverAlert":
             throw new TranslationError(error.message || i18nModule.translate("error.serverBusy"), i18nModule.translate("error.short.serverBusy"))
 
+        // Network-level errors: user's network is blocking or unreachable
+        case "timeout":
+            throw new TranslationError(i18nModule.translate("error.networkTimeout"), i18nModule.translate("error.short.networkTimeout"))
+
+        case "requestError":
+            if (error.code && error.code >= 500) {
+                // 5xx = server-side issue
+                throw new TranslationError(i18nModule.translate("error.serverBusy"), i18nModule.translate("error.short.serverBusy"))
+            }
+            // 4xx or no code = likely network/proxy issue
+            throw new TranslationError(i18nModule.translate("error.networkError"), i18nModule.translate("error.short.networkError"))
+
+        case "unexpectedError":
+            // "Failed to fetch" = network blocked/unreachable
+            throw new TranslationError(i18nModule.translate("error.networkError"), i18nModule.translate("error.short.networkError"))
+
         default:
             throw new TranslationError(i18nModule.translate("error.serverBusy"), i18nModule.translate("error.short.serverBusy"))
     }
@@ -204,7 +222,7 @@ async function translateWordWithCloud(params: TranslateParams): Promise<Translat
 
     logger.info("Sending translation request:", request)
 
-    const data = await post<TranslationApiResponse, TranslationApiRequest>(TRANSLATION_API_ENDPOINTS.TRANSLATE, request)
+    const data = await post<TranslationApiResponse, TranslationApiRequest>(TRANSLATION_API_ENDPOINTS.TRANSLATE, request, { timeout: TRANSLATION_REQUEST_TIMEOUT_MS })
 
     logger.info("Translation response data:", data)
 
@@ -484,7 +502,7 @@ export async function translateFragment(params: TranslateFragmentParams): Promis
         logger.info("Sending fragment translation request:", request)
 
         // Make API request - post() now returns data directly and handles errors
-        const data = await post<FragmentTranslationApiResponse, FragmentTranslationApiRequest>(TRANSLATION_API_ENDPOINTS.TRANSLATE_FRAGMENT, request)
+        const data = await post<FragmentTranslationApiResponse, FragmentTranslationApiRequest>(TRANSLATION_API_ENDPOINTS.TRANSLATE_FRAGMENT, request, { timeout: TRANSLATION_REQUEST_TIMEOUT_MS })
 
         logger.info("Fragment translation response data:", data)
 
