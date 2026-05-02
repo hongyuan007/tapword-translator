@@ -9,6 +9,7 @@ const DEFAULT_FALLBACK_LOCALE = "en"
 const LANGUAGE_NAME_MAP: Record<string, string> = {
     en: "English",
     zh: "中文",
+    "zh-tw": "繁體中文",
     es: "Español",
     ja: "日本語",
     fr: "Français",

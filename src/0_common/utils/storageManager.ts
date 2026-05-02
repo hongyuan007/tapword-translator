@@ -13,6 +13,7 @@
  */
 
 import { APP_EDITION } from "@/0_common/constants"
+import { TARGET_LANGUAGE_CODES } from "@/0_common/constants/languages"
 import type * as types from "@/0_common/types"
 import { DEFAULT_USER_SETTINGS } from "@/0_common/types"
 import * as translationFontSizeModule from "@/0_common/constants/translationFontSize"
@@ -246,18 +247,24 @@ export async function getUserSettings(): Promise<types.UserSettings> {
  * @returns Language code for target language
  */
 function detectBrowserLanguage(): string {
-    const SUPPORTED_LANGUAGES = ["en", "zh", "es", "ja", "fr", "de", "ko", "ru"]
-
-    // Get browser language (e.g., "zh-CN", "en-US", "ja")
+    // Get browser language (e.g., "zh-CN", "en-US", "zh-TW", "ja")
     // Use optional chaining and nullish coalescing for safe access
     const browserLang = navigator.language || navigator.languages?.[0] || "en"
+
+    // Special case: Traditional Chinese variants (zh-TW, zh-HK, zh-Hant)
+    const lowerLang = browserLang.toLowerCase()
+    const TRADITIONAL_CHINESE_PREFIXES = ["zh-tw", "zh-hk", "zh-hant", "zh-mo"]
+    if (TRADITIONAL_CHINESE_PREFIXES.some(prefix => lowerLang.startsWith(prefix))) {
+        logger.info("Browser language matched (Traditional Chinese):", lowerLang, "-> zh-tw")
+        return "zh-tw"
+    }
 
     // Extract primary language code (before hyphen)
     const parts = browserLang.split("-")
     const primaryLang = parts[0]?.toLowerCase() || "en"
 
     // Check if primary language is in supported list
-    if (SUPPORTED_LANGUAGES.includes(primaryLang)) {
+    if (TARGET_LANGUAGE_CODES.includes(primaryLang)) {
         logger.info("Browser language matched:", primaryLang)
         return primaryLang
     }

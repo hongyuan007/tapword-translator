@@ -18,6 +18,7 @@ const MTRANSERVER_TIMEOUT = 10000 // 10 seconds timeout
  */
 const LANGUAGE_CODE_MAP: Record<string, string> = {
     zh: "zh-Hans",
+    "zh-tw": "zh-Hant",
     "zh-Hant": "zh-Hant",
     en: "en",
     ja: "ja",
