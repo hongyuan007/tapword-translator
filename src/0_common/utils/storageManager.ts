@@ -149,11 +149,14 @@ function normalizeUserSettings(
     //         - 'mergedSettings' already contains correct defaults or updated values.
     //         - Default is Single=TRUE, DoubleV2=FALSE.
 
-    const resolvedFont = translationFontSizeModule.resolveTranslationFontSize(mergedSettings.translationFontSizePreset)
+    // translationFontSizePresetV2 is optional; old users without it fall back to DEFAULT ("large")
+    const effectivePreset = mergedSettings.translationFontSizePresetV2 ?? translationFontSizeModule.DEFAULT_TRANSLATION_FONT_SIZE_PRESET
+    const resolvedFont = translationFontSizeModule.resolveTranslationFontSize(effectivePreset)
 
     return {
         ...mergedSettings,
         translationFontSizePreset: resolvedFont.preset,
+        translationFontSizePresetV2: resolvedFont.preset,
         translationFontSize: resolvedFont.px,
         tooltipNextLineGapPx: mergedSettings.tooltipNextLineGapPx ?? DEFAULT_USER_SETTINGS.tooltipNextLineGapPx,
         tooltipNextLineGapPxV2: mergedSettings.tooltipNextLineGapPxV2 ?? DEFAULT_USER_SETTINGS.tooltipNextLineGapPxV2,

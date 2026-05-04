@@ -177,7 +177,7 @@ export function setupSettingChangeListeners(): void {
                 await saveSetting(settingKey, value)
 
                 // Show refresh reminder toast for translation font size preset change
-                if (settingKey === "translationFontSizePreset") {
+                if (settingKey === "translationFontSizePresetV2") {
                     const message = i18nModule.translate("popup.refreshReminder")
                     toastManagerModule.showToast(message, "info")
                 }

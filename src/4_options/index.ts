@@ -160,7 +160,7 @@ async function setupTooltipSpacingPreview(): Promise<void> {
     const textOffsetInput = document.getElementById("tooltipTextOffsetPxV3") as HTMLInputElement | null
     const bottomSpacingInput = document.getElementById("tooltipBottomSpacingPxV3") as HTMLInputElement | null
 
-    const fontPresetSelect = document.getElementById("translationFontSizePreset") as HTMLSelectElement | null
+    const fontPresetSelect = document.getElementById("translationFontSizePresetV2") as HTMLSelectElement | null
     const autoAdjustHeightInput = document.getElementById("autoAdjustHeight") as HTMLInputElement | null
 
     if (

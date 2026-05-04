@@ -401,6 +401,11 @@ export interface UserSettings {
     enableAutoTranslate: boolean
     /** User language proficiency level for auto-translation candidate selection */
     userLanguageProficiency: LanguageProficiency
+    /**
+     * Font size preset (v2 key). Optional so old stored data without it defaults to "large" automatically.
+     * New users and migrated users all use this key. UI reads/writes this field.
+     */
+    translationFontSizePresetV2?: TranslationFontSizePreset
 }
 
 /**
@@ -420,8 +425,9 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     restoreLineHeightOnClear: false,
     autoPlayAudio: true,
     targetLanguage: "en",
-    translationFontSizePreset: "medium",
-    translationFontSize: 10,
+    translationFontSizePreset: "large",
+    translationFontSize: 14,
+    translationFontSizePresetV2: "large",
     tooltipNextLineGapPx: 4,
     tooltipNextLineGapPxV2: 6,
     tooltipVerticalOffsetPx: 2,
