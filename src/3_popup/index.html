@@ -20,41 +20,8 @@
         </h1>
       </div>
 
-      <div class="full-translate-action">
-        <button id="fullTranslateButton" class="full-translate-button">
-          <svg class="full-translate-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M2 12h20"/>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
-          <span id="fullTranslateLabel" data-i18n-key="popup.translatePage.label">Translate Page</span>
-        </button>
-        <div class="floating-button-toggle">
-          <label class="setting-label" for="floatingButtonEnabled">
-            <span data-i18n-key="popup.floatingButton.label">Show floating button</span>
-          </label>
-          <label class="toggle-switch">
-            <input type="checkbox" id="floatingButtonEnabled">
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div id="quotaSection" class="quota-section is-loading">
-        <div class="quota-header">
-          <span class="quota-title" data-i18n-key="popup.quota.title">Today's Free Quota</span>
-        </div>
-        <div class="quota-bar-wrapper">
-          <div class="quota-bar-track">
-            <div id="quotaProgressFill" class="quota-bar-fill"></div>
-          </div>
-          <span id="quotaPercentage" class="quota-percentage" data-i18n-key="popup.quota.loading">Loading...</span>
-        </div>
-        <span class="quota-sublabel" data-i18n-key="popup.quota.pageTranslation">Page Translation</span>
-      </div>
-
       <div class="settings-list">
-        <section class="section-card section-master">
+        <section class="section-card section-master" style="margin-top: 0;">
           <div class="section-body">
             <div class="setting-item setting-item-master">
               <div class="setting-gutter"></div>
@@ -68,6 +35,48 @@
                 <input type="checkbox" id="enableTapWord" data-setting="enableTapWord">
                 <span class="toggle-slider"></span>
               </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Redesigned Full Translate & Quota Section -->
+        <section class="section-card section-full-translate">
+          <div class="section-floating-title" data-title="Page Translation" data-i18n-key="popup.quota.pageTranslation" data-i18n-attr="data-title"></div>
+          <div class="section-body">
+            <div class="setting-item setting-item-column" style="border-bottom: none; padding-bottom: 4px;">
+              <button id="fullTranslateButton" class="full-translate-button">
+                <svg class="full-translate-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M2 12h20"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                <span id="fullTranslateLabel" data-i18n-key="popup.translatePage.label">Translate Page</span>
+              </button>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-gutter"></div>
+              <div class="setting-info">
+                <label class="setting-label" for="floatingButtonEnabled">
+                  <span data-i18n-key="popup.floatingButton.label">Show floating button</span>
+                </label>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="floatingButtonEnabled">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div id="quotaSection" class="setting-item setting-item-column quota-section is-loading" style="padding-top: 4px;">
+              <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                <span class="setting-label" style="font-size: 11px; color: rgba(30, 30, 30, 0.7);" data-i18n-key="popup.quota.title">Today's Free Quota</span>
+                <span id="quotaPercentage" class="quota-percentage" data-i18n-key="popup.quota.loading">Loading...</span>
+              </div>
+              <div class="quota-bar-wrapper" style="width: 100%;">
+                <div class="quota-bar-track">
+                  <div id="quotaProgressFill" class="quota-bar-fill"></div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -137,13 +146,6 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
-          </div>
-        </section>
-
-        <section class="section-card section-display">
-          <div class="section-floating-title" data-title="Display Settings" data-i18n-key="popup.section.text"
-            data-i18n-attr="data-title"></div>
-          <div class="section-body">
             <div class="setting-item">
               <div class="setting-gutter"></div>
               <div class="setting-info">

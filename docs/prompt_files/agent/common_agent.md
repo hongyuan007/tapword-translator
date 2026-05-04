@@ -1,12 +1,5 @@
----
-applyTo: '**'
----
-
 ## 1. Language & Communication Policy
-- **User Language**: User messages will be in **Chinese**.
-- **AI Language**: Please **think and respond in English**.
-- **Code Language**: Code, comments, and variable names should generally be in **English**.
-- **Technical Terms**: For Chinese-only technical terms, prefer using the original term with an English explanation.
+- Generally, I will think and respond in English. All code, comments, and variable names must be in English. If the user explicitly requests a specific language for communication, I will respond in that language. For Chinese-only technical terms, I will use the original term and provide an explanation.
 
 ## 2. Operational Workflow
 - **Git Operations**: Please avoid running `git add` or `git commit` unless explicitly requested.

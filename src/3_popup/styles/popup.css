@@ -174,10 +174,6 @@ body {
 }
 
 /* Full-Page Translate Button */
-.full-translate-action {
-    padding: 12px 18px 0;
-}
-
 .full-translate-button {
     display: flex;
     align-items: center;
@@ -235,21 +231,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Floating Button Toggle */
-.floating-button-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
-    padding: 0 2px;
-}
-
-.floating-button-toggle .setting-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(30, 30, 30, 0.7);
-}
-
 /* Settings List */
 .settings-list {
     padding: 4px 18px 8px;
@@ -260,7 +241,7 @@ body {
 
 /* ─── Quota Display Section ─── */
 .quota-section {
-    padding: 10px 20px 10px;
+    padding: 6px 10px 6px 10px;
 }
 
 .quota-header {
@@ -424,6 +405,13 @@ body {
     gap: 0;
     padding: 6px 10px 6px 0;
     position: relative;
+}
+
+.setting-item-column {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding-left: 10px;
 }
 
 .setting-item.is-disabled {
