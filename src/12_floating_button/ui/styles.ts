@@ -42,15 +42,16 @@ export const FLOATING_BUTTON_STYLES = `
     background: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     opacity: ${constants.IDLE_OPACITY};
-    transform: translateX(${constants.IDLE_TRANSLATE_X_PX}px);
-    transition: opacity ${constants.TRANSITION_DURATION_MS}ms ease,
-                transform ${constants.TRANSITION_DURATION_MS}ms ease;
+    transition: opacity ${constants.TRANSITION_DURATION_MS}ms ease;
     cursor: pointer;
     user-select: none;
     box-sizing: border-box;
 }
 
-.${constants.CLASS_CONTAINER}:hover .${constants.CLASS_MAIN_BUTTON},
+.${constants.CLASS_MAIN_BUTTON}.${constants.CLASS_TRANSLATION_ACTIVE} {
+    opacity: 1;
+}
+
 .${constants.CLASS_MAIN_BUTTON}.${constants.CSS_PREFIX}-expanded {
     opacity: 1;
     transform: translateX(0);
@@ -58,7 +59,6 @@ export const FLOATING_BUTTON_STYLES = `
 
 .${constants.CLASS_MAIN_BUTTON}.${constants.CSS_PREFIX}-dragging {
     opacity: 1;
-    transform: translateX(0);
     cursor: move;
     transition: none;
 }

@@ -58,7 +58,7 @@ export const MIN_BOTTOM_PX = 100;
 export const BUTTON_HEIGHT_PX = 40;
 
 /** Main button width in pixels */
-export const BUTTON_WIDTH_PX = 60;
+export const BUTTON_WIDTH_PX = 46;
 
 /** Close button diameter in pixels */
 export const CLOSE_BUTTON_SIZE_PX = 16;
@@ -71,13 +71,10 @@ export const DROPDOWN_WIDTH_PX = 180;
 
 // --- Visual ---
 
-/** Idle opacity (60%) */
-export const IDLE_OPACITY = 0.6;
+/** Idle opacity (70%) */
+export const IDLE_OPACITY = 0.7;
 
-/** How far the button is shifted off-screen when idle (px) */
-export const IDLE_TRANSLATE_X_PX = 15;
-
-/** Transition duration for opacity and transform */
+/** Transition duration for opacity */
 export const TRANSITION_DURATION_MS = 300;
 
 /** Active badge color */
@@ -88,6 +85,9 @@ export const BADGE_COLOR_EXHAUSTED = '#9ca3af';
 
 /** CSS class for quota-exhausted state */
 export const CLASS_EXHAUSTED_BADGE = `${CSS_PREFIX}-exhausted-badge`;
+
+/** CSS class applied to main button when translation is active or translating */
+export const CLASS_TRANSLATION_ACTIVE = `${CSS_PREFIX}-translation-active`;
 
 // --- Auto-Hide ---
 

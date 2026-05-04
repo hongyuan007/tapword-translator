@@ -13,6 +13,8 @@ import * as loggerModule from '@/0_common/utils/logger';
 import { FloatingButtonManager } from '@/12_floating_button';
 import type { FullTranslateEvent } from '@/1_content/handlers/FullTranslateHandler';
 import * as fullTranslateHandler from '@/1_content/handlers/FullTranslateHandler';
+import { getUserSettings } from '@/0_common';
+import { isPageLanguageSameAsTarget } from '@/1_content/utils/pageLanguageChecker';
 
 const logger = loggerModule.createLogger('Content/FloatingButtonIntegration');
 
@@ -22,6 +24,13 @@ let floatingButtonManager: FloatingButtonManager | null = null;
  * Initialize the floating button and wire it to translation controls.
  */
 export async function setup(): Promise<void> {
+    // Always hide floating button when page language matches target language
+    const settings = await getUserSettings();
+    if (isPageLanguageSameAsTarget(settings.targetLanguage)) {
+        logger.info('Floating button suppressed: page language matches target language');
+        return;
+    }
+
     floatingButtonManager = new FloatingButtonManager();
 
     await floatingButtonManager.initialize(() => {

@@ -9,7 +9,6 @@ import { FloatingButtonRenderer } from '@/12_floating_button/ui/FloatingButtonRe
 import { FloatingButtonConfigStore } from '@/12_floating_button/config/FloatingButtonConfigStore';
 import { DEFAULT_ICON_COLOR, AUTO_HIDE_DELAY_MS } from '@/12_floating_button/constants';
 import { DragHandler } from '@/12_floating_button/handlers/DragHandler';
-import { CloseMenuHandler } from '@/12_floating_button/handlers/CloseMenuHandler';
 
 const logger = loggerModule.createLogger('FloatingButtonManager');
 
@@ -17,7 +16,6 @@ export class FloatingButtonManager {
     private renderer: FloatingButtonRenderer;
     private configStore: FloatingButtonConfigStore;
     private dragHandler: DragHandler | null = null;
-    private closeMenuHandler: CloseMenuHandler | null = null;
     private isInitialized = false;
     private currentIconVariant: IconVariant | null = null;
     private currentIconColor: string | null = null;
@@ -75,20 +73,6 @@ export class FloatingButtonManager {
             this.dragHandler.attach();
         }
 
-        // Set up close menu handler
-        const closeButton = this.renderer.getCloseButton();
-        const dropdown = this.renderer.getDropdown();
-        if (closeButton && dropdown) {
-            this.closeMenuHandler = new CloseMenuHandler(
-                closeButton,
-                dropdown,
-                this.configStore,
-                (isOpen) => this.renderer.setExpanded(isOpen),
-                () => this.handleDisable(),
-            );
-            this.closeMenuHandler.attach();
-        }
-
         // Listen for cross-context config changes (popup, options page)
         this.configStore.onChanged((updatedConfig) => {
             this.handleConfigChanged(updatedConfig);
@@ -125,12 +109,10 @@ export class FloatingButtonManager {
     destroy(): void {
         this.clearAutoHideTimeout();
         this.dragHandler?.detach();
-        this.closeMenuHandler?.detach();
         this.configStore.destroy();
         this.renderer.destroy();
 
         this.dragHandler = null;
-        this.closeMenuHandler = null;
         this.onToggleTranslation = null;
         this.isInitialized = false;
 
@@ -188,12 +170,6 @@ export class FloatingButtonManager {
         logger.info(`Position persisted: ${ratio.toFixed(3)}`);
     }
 
-    /** Handle disable action from the dropdown */
-    private handleDisable(): void {
-        this.renderer.hide();
-        logger.info('Button hidden via disable action');
-    }
-
     /** Handle config changes from other extension contexts */
     private handleConfigChanged(config: FloatingButtonConfig): void {
         if (!this.shouldRender(config)) {
@@ -216,7 +192,6 @@ export class FloatingButtonManager {
     /** Destroy and recreate the button DOM with updated config */
     private recreateButton(config: FloatingButtonConfig): void {
         this.dragHandler?.detach();
-        this.closeMenuHandler?.detach();
         this.renderer.destroy();
 
         const iconColor = config.iconColor ?? DEFAULT_ICON_COLOR;
@@ -237,20 +212,6 @@ export class FloatingButtonManager {
                 () => this.renderer.setDragging(true),
             );
             this.dragHandler.attach();
-        }
-
-        // Re-attach close menu handler
-        const closeButton = this.renderer.getCloseButton();
-        const dropdown = this.renderer.getDropdown();
-        if (closeButton && dropdown) {
-            this.closeMenuHandler = new CloseMenuHandler(
-                closeButton,
-                dropdown,
-                this.configStore,
-                (isOpen) => this.renderer.setExpanded(isOpen),
-                () => this.handleDisable(),
-            );
-            this.closeMenuHandler.attach();
         }
 
         logger.info(`Button recreated with icon variant: ${config.iconVariant}`);

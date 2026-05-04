@@ -25,20 +25,12 @@ const EXHAUSTED_ICON_SVG = `<svg width="12" height="12" viewBox="0 0 12 12" xmln
     <text x="6" y="9" text-anchor="middle" font-size="8" font-weight="bold" fill="white">!</text>
 </svg>`;
 
-/** X icon for close button */
-const CLOSE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M18 6L6 18"/>
-    <path d="M6 6l12 12"/>
-</svg>`;
-
 export class FloatingButtonRenderer {
     private container: HTMLDivElement | null = null;
     private mainButton: HTMLDivElement | null = null;
-    private closeButton: HTMLButtonElement | null = null;
     private activeBadge: HTMLDivElement | null = null;
     private exhaustedBadge: HTMLDivElement | null = null;
     private spinner: HTMLDivElement | null = null;
-    private dropdown: HTMLDivElement | null = null;
     private styleElement: HTMLStyleElement | null = null;
     private currentState: FloatingButtonState = 'idle';
 
@@ -61,14 +53,6 @@ export class FloatingButtonRenderer {
         mainButton.className = constants.CLASS_MAIN_BUTTON;
         mainButton.innerHTML = ICON_VARIANTS[iconVariant](iconColor);
 
-        // Close button
-        const closeButton = document.createElement('button');
-        closeButton.className = constants.CLASS_CLOSE_BUTTON;
-        closeButton.type = 'button';
-        closeButton.title = 'Close floating button';
-        closeButton.innerHTML = CLOSE_ICON_SVG;
-        mainButton.appendChild(closeButton);
-
         // Active badge (green checkmark)
         const activeBadge = document.createElement('div');
         activeBadge.className = constants.CLASS_ACTIVE_BADGE;
@@ -86,20 +70,13 @@ export class FloatingButtonRenderer {
         spinner.className = constants.CLASS_SPINNER;
         mainButton.appendChild(spinner);
 
-        // Dropdown menu (initially hidden, positioned left of main button)
-        const dropdown = document.createElement('div');
-        dropdown.className = constants.CLASS_DROPDOWN;
-        mainButton.appendChild(dropdown);
-
         container.appendChild(mainButton);
 
         this.container = container;
         this.mainButton = mainButton;
-        this.closeButton = closeButton;
         this.activeBadge = activeBadge;
         this.exhaustedBadge = exhaustedBadge;
         this.spinner = spinner;
-        this.dropdown = dropdown;
 
         logger.info('Floating button DOM created');
         return container;
@@ -112,11 +89,9 @@ export class FloatingButtonRenderer {
 
         this.container = null;
         this.mainButton = null;
-        this.closeButton = null;
         this.activeBadge = null;
         this.exhaustedBadge = null;
         this.spinner = null;
-        this.dropdown = null;
         this.styleElement = null;
 
         logger.info('Floating button DOM destroyed');
@@ -128,27 +103,32 @@ export class FloatingButtonRenderer {
         this.currentState = state;
 
         const badgeVisible = `${constants.CSS_PREFIX}-visible`;
+        const translationActive = constants.CLASS_TRANSLATION_ACTIVE;
 
         switch (state) {
             case 'idle':
                 this.activeBadge?.classList.remove(badgeVisible);
                 this.exhaustedBadge?.classList.remove(badgeVisible);
                 this.spinner?.classList.remove(badgeVisible);
+                this.mainButton?.classList.remove(translationActive);
                 break;
             case 'translating':
                 this.activeBadge?.classList.remove(badgeVisible);
                 this.exhaustedBadge?.classList.remove(badgeVisible);
                 this.spinner?.classList.add(badgeVisible);
+                this.mainButton?.classList.add(translationActive);
                 break;
             case 'active':
                 this.spinner?.classList.remove(badgeVisible);
                 this.exhaustedBadge?.classList.remove(badgeVisible);
                 this.activeBadge?.classList.add(badgeVisible);
+                this.mainButton?.classList.add(translationActive);
                 break;
             case 'quota_exhausted':
                 this.spinner?.classList.remove(badgeVisible);
                 this.activeBadge?.classList.remove(badgeVisible);
                 this.exhaustedBadge?.classList.add(badgeVisible);
+                this.mainButton?.classList.remove(translationActive);
                 break;
         }
 
@@ -179,16 +159,6 @@ export class FloatingButtonRenderer {
     /** Get the main button element (used by DragHandler) */
     getMainButton(): HTMLDivElement | null {
         return this.mainButton;
-    }
-
-    /** Get the close button element (used by CloseMenuHandler) */
-    getCloseButton(): HTMLButtonElement | null {
-        return this.closeButton;
-    }
-
-    /** Get the dropdown element (used by CloseMenuHandler) */
-    getDropdown(): HTMLDivElement | null {
-        return this.dropdown;
     }
 
     /** Get the container element */
