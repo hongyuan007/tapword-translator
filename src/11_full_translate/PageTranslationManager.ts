@@ -37,6 +37,7 @@ const logger = loggerModule.createLogger('FullTranslate/PageTranslationManager')
 // ============================================================
 
 const PROGRESS_LOG_INTERVAL = 20;
+const WHITESPACE_SEQUENCE_PATTERN = /\s+/g;
 
 export class PageTranslationManager {
 
@@ -46,7 +47,7 @@ export class PageTranslationManager {
     private config: FullTranslateConfig;
 
     // --- Aggregate stats ---
-    private stats = { paragraphsProcessed: 0, unitsTranslated: 0, cacheHits: 0, errors: 0, startTime: 0 };
+    private stats = { paragraphsProcessed: 0, unitsTranslated: 0, cacheHits: 0, passthroughSkipped: 0, errors: 0, startTime: 0 };
 
     // --- Components ---
     private viewportObserver: ViewportObserver | null = null;
@@ -79,7 +80,7 @@ export class PageTranslationManager {
 
         this.isRunning = true;
         this.walkId = this.generateWalkId();
-        this.stats = { paragraphsProcessed: 0, unitsTranslated: 0, cacheHits: 0, errors: 0, startTime: Date.now() };
+        this.stats = { paragraphsProcessed: 0, unitsTranslated: 0, cacheHits: 0, passthroughSkipped: 0, errors: 0, startTime: Date.now() };
 
         this.batchQueue = new BatchQueue({
             sourceLang: this.config.sourceLang,
@@ -283,9 +284,9 @@ export class PageTranslationManager {
                 return;
             }
             removeSpinner(targetElement);
-            if (translated) {
+            if (translated && this.shouldRenderTranslation(text, translated)) {
                 insertTranslation(targetElement, translated, this.config.mode, undefined, this.buildWrapperMetadata());
-            } else {
+            } else if (!translated) {
                 logger.warn('[translateSimpleParagraph] translateText returned null', { text: text.substring(0, 50) });
             }
         } catch (error) {
@@ -347,13 +348,13 @@ export class PageTranslationManager {
         try {
             const translated = await this.translateText(unit.text);
             if (!this.canApplyTranslation(paragraphElement)) return;
-            if (translated) {
+            if (translated && this.shouldRenderTranslation(unit.text, translated)) {
                 this.stats.unitsTranslated++;
                 insertTranslation(paragraphElement, translated, this.config.mode, {
                     insertAfterNode: lastNode,
                     forceBlockTranslation: unit.forceBlockTranslation,
                 }, this.buildWrapperMetadata());
-            } else {
+            } else if (!translated) {
                 logger.warn('[translateUnit] translateText returned null', { text: unit.text.substring(0, 50) });
             }
         } catch (error) {
@@ -449,10 +450,27 @@ export class PageTranslationManager {
                 paragraphs: this.stats.paragraphsProcessed,
                 units: this.stats.unitsTranslated,
                 cacheHits: this.stats.cacheHits,
+                passthroughSkipped: this.stats.passthroughSkipped,
                 errors: this.stats.errors,
                 elapsed: `${elapsed}s`,
             });
         }
+    }
+
+    private shouldRenderTranslation(sourceText: string, translatedText: string): boolean {
+        if (this.normalizeForDisplayCompare(sourceText) !== this.normalizeForDisplayCompare(translatedText)) {
+            return true;
+        }
+
+        this.stats.passthroughSkipped++;
+        logger.debug('[shouldRenderTranslation] skipped unchanged translation', {
+            text: sourceText.substring(0, 50),
+        });
+        return false;
+    }
+
+    private normalizeForDisplayCompare(text: string): string {
+        return text.trim().replace(WHITESPACE_SEQUENCE_PATTERN, ' ');
     }
 
     /**
