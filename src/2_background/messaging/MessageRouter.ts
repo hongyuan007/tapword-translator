@@ -78,10 +78,10 @@ export function setupMessageListener(): void {
                 return true
 
             case "FULL_TRANSLATE_TOGGLE": {
-                // Forward to the active tab's content script
+                // Forward to the active tab's main frame content script only
                 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                     if (tabs[0]?.id) {
-                        chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
+                        chrome.tabs.sendMessage(tabs[0].id, message, { frameId: 0 }, (response) => {
                             if (chrome.runtime.lastError) {
                                 logger.warn("No content script on this page:", chrome.runtime.lastError.message)
                                 sendResponse({ success: false, isRunning: false, error: "No content script available on this page" })
@@ -103,7 +103,7 @@ export function setupMessageListener(): void {
             case "FULL_TRANSLATE_STATUS_REQUEST": {
                 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                     if (tabs[0]?.id) {
-                        chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
+                        chrome.tabs.sendMessage(tabs[0].id, message, { frameId: 0 }, (response) => {
                             if (chrome.runtime.lastError) {
                                 logger.warn("Unable to query full-translate status:", chrome.runtime.lastError.message)
                                 sendResponse({ success: false, isRunning: false, error: "No content script available on this page" })
