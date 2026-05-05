@@ -14,7 +14,7 @@ export const DEFAULT_ICON_COLOR = '#F472B6';
 
 /** Default configuration values */
 export const DEFAULT_CONFIG: FloatingButtonConfig = {
-    enabled: true,
+    enabled: false,
     position: 0.66,
     disabledSites: [],
     iconVariant: 'v5',

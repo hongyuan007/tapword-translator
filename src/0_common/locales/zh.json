@@ -198,7 +198,7 @@
     "popup.translatePage.label": "翻译整页",
     "popup.translatePage.loading": "翻译中...",
     "popup.translatePage.stop": "停止翻译",
-    "popup.floatingButton.label": "显示悬浮按钮",
+    "popup.floatingButton.label": "显示悬浮球",
     "popup.floatingButton.disableSite": "在此网站禁用",
     "popup.floatingButton.disableGlobally": "全局禁用",
     "options.autoHideQuota.label": "额度用完后自动隐藏悬浮球",

@@ -558,6 +558,28 @@ function setupAutoHideOnQuotaListener(): void {
     })
 }
 
+async function loadFloatingButtonEnabledSetting(): Promise<void> {
+    const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || floatingButtonConstants.DEFAULT_CONFIG
+    const checkbox = document.getElementById("floatingButtonEnabledOptions") as HTMLInputElement | null
+    if (checkbox) {
+        checkbox.checked = config.enabled ?? floatingButtonConstants.DEFAULT_CONFIG.enabled
+    }
+}
+
+function setupFloatingButtonEnabledListener(): void {
+    const checkbox = document.getElementById("floatingButtonEnabledOptions") as HTMLInputElement | null
+    if (!checkbox) return
+
+    checkbox.addEventListener("change", async () => {
+        const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+        const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || { ...floatingButtonConstants.DEFAULT_CONFIG }
+        config.enabled = checkbox.checked
+        await chrome.storage.local.set({ [floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY]: config })
+        logger.info(`Floating ball enabled: ${checkbox.checked}`)
+    })
+}
+
 async function initializeOptions(): Promise<void> {
     logger.info("Options initializing")
 
@@ -576,6 +598,8 @@ async function initializeOptions(): Promise<void> {
         initFloatingButtonColorPicker(fabColor)
         await loadAutoHideOnQuotaSetting()
         setupAutoHideOnQuotaListener()
+        await loadFloatingButtonEnabledSetting()
+        setupFloatingButtonEnabledListener()
         await setupTooltipSpacingPreview()
 
         const websiteUrl = await fetchWebsiteUrl()
