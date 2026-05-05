@@ -46,19 +46,27 @@ export class FloatingButtonManager {
         // Load persisted config
         const config = await this.configStore.load();
 
-        // Check if we should render on this page
-        if (!this.shouldRender(config)) {
-            logger.info('Floating button disabled for this context');
+        // Skip non-renderable contexts (non-HTTP pages, site disabled)
+        if (!this.isRenderableContext()) {
+            logger.info('Floating button not renderable in this context');
             return;
         }
 
-        // Create DOM and attach to body
+        // Create DOM — initially hidden to prevent flash before config is applied
         const iconColor = config.iconColor ?? DEFAULT_ICON_COLOR;
         const container = this.renderer.create(config.iconVariant, iconColor);
+        this.renderer.hide();
         this.renderer.setPosition(config.position);
         this.currentIconVariant = config.iconVariant;
         this.currentIconColor = iconColor;
         document.body.appendChild(container);
+
+        // Show only if globally enabled
+        if (config.enabled) {
+            this.renderer.show();
+        } else {
+            logger.info('Floating button created but hidden (disabled)');
+        }
 
         // Set up drag handler
         const mainButton = this.renderer.getMainButton();
@@ -142,11 +150,8 @@ export class FloatingButtonManager {
         }
     }
 
-    /** Determine if the button should render based on config and page context */
-    private shouldRender(config: FloatingButtonConfig): boolean {
-        // Globally disabled
-        if (!config.enabled) return false;
-
+    /** Check if the page context allows rendering (ignores enabled flag) */
+    private isRenderableContext(): boolean {
         // Not on HTTP/HTTPS pages
         if (!window.location.protocol.startsWith('http')) return false;
 
@@ -172,9 +177,9 @@ export class FloatingButtonManager {
 
     /** Handle config changes from other extension contexts */
     private handleConfigChanged(config: FloatingButtonConfig): void {
-        if (!this.shouldRender(config)) {
+        if (!config.enabled) {
             this.renderer.hide();
-            logger.info('Button hidden due to config change');
+            logger.info('Button hidden due to config change (disabled)');
             return;
         }
 

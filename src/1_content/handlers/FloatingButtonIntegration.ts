@@ -22,6 +22,8 @@ let floatingButtonManager: FloatingButtonManager | null = null;
 
 /**
  * Initialize the floating button and wire it to translation controls.
+ * The manager always initializes (DOM created) but hides itself when disabled.
+ * Toggling enabled via popup/options shows/hides the button without page refresh.
  */
 export async function setup(): Promise<void> {
     // Always hide floating button when page language matches target language
@@ -38,7 +40,7 @@ export async function setup(): Promise<void> {
     });
 
     if (!floatingButtonManager.isActive()) {
-        // Button was not rendered (disabled globally, disabled for site, or non-HTTP page)
+        // Not renderable (non-HTTP page or site disabled) — clean up
         floatingButtonManager = null;
         return;
     }
@@ -114,3 +116,4 @@ export function destroy(): void {
         logger.info('Floating button integration destroyed');
     }
 }
+

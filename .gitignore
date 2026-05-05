@@ -72,6 +72,7 @@ other/
 #other
 GEMINI.md
 CLAUDE.md
+.claude/
 # Playwright
 playwright-report/
 test-results/
