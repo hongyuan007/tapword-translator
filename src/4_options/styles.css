@@ -19,12 +19,14 @@ body {
   color: var(--text-color);
   margin: 0;
   font-size: 14px;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .header {
@@ -124,6 +126,7 @@ body {
   flex-grow: 1;
   overflow: hidden;
   background: linear-gradient(180deg, #f7f9fb 0%, #f0f4f8 100%);
+  min-height: 0;
 }
 
 .sidebar {
