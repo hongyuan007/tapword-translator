@@ -187,6 +187,9 @@ async function setupFullTranslateButton(): Promise<void> {
             isRunning = response.isRunning
             updateButtonState(button, label, isRunning)
             logger.info(`Full translate toggled: isRunning=${isRunning}`)
+
+            // Close popup after toggling full translation (start or stop)
+            window.close()
         })
     })
 }
