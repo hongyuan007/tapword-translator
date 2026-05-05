@@ -137,6 +137,7 @@
     "modal.button.pronounceOriginal": "Play Original",
     "modal.button.pronounceSentence": "Play Sentence",
     "modal.button.pronounceLemma": "Play Lemma",
+    "modal.autoPlay.label": "Auto-play",
     "modal.updateLabel": "Plugin update recommended",
     "error.short.serverBusy": "Translation failed",
     "error.short.serviceUnavailable": "Service unavailable",

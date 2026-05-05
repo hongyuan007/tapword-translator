@@ -122,6 +122,7 @@
     "modal.button.pronounceOriginal": "Lire l'original",
     "modal.button.pronounceSentence": "Lire la phrase",
     "modal.button.pronounceLemma": "Lire le lemme",
+    "modal.autoPlay.label": "Lecture auto",
     "modal.updateLabel": "Mise à jour du plugin recommandée",
     "error.short.serverBusy": "Échec de la traduction",
     "error.short.serviceUnavailable": "Service indisponible",

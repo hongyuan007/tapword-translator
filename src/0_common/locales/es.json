@@ -178,5 +178,6 @@
     "popup.quota.warning": "Cuota casi agotada",
     "popup.quota.loading": "Cargando...",
     "popup.quota.error": "Error al cargar la cuota",
-    "fullTranslate.quotaExhausted.toast": "La cuota de traducción gratuita de hoy se ha agotado. El contenido ya traducido seguirá visible."
+    "fullTranslate.quotaExhausted.toast": "La cuota de traducción gratuita de hoy se ha agotado. El contenido ya traducido seguirá visible.",
+    "modal.autoPlay.label": "Reproducción auto"
 }

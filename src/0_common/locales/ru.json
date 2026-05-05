@@ -178,5 +178,6 @@
     "popup.quota.warning": "Квота почти исчерпана",
     "popup.quota.loading": "Загрузка...",
     "popup.quota.error": "Не удалось загрузить квоту",
-    "fullTranslate.quotaExhausted.toast": "Бесплатная квота перевода на сегодня исчерпана. Уже переведённый контент останется видимым."
+    "fullTranslate.quotaExhausted.toast": "Бесплатная квота перевода на сегодня исчерпана. Уже переведённый контент останется видимым.",
+    "modal.autoPlay.label": "Авто-воспроизведение"
 }

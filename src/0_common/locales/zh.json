@@ -137,6 +137,7 @@
     "modal.button.pronounceOriginal": "朗读原文",
     "modal.button.pronounceSentence": "朗读整句",
     "modal.button.pronounceLemma": "朗读原型",
+    "modal.autoPlay.label": "自动播放",
     "modal.updateLabel": "建议更新插件",
     "error.short.serverBusy": "翻译失败",
     "error.short.serviceUnavailable": "服务不可用",
