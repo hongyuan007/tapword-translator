@@ -267,7 +267,7 @@ export class PageTranslationManager {
         const targetElement = unwrapDeepestOnlyHTMLChild(element, this.config.range);
         const text = extractParagraphText(targetElement, this.config.range);
 
-        if (!shouldTranslateParagraph(text, this.config.minCharactersPerNode, this.config.minWordsPerNode)) {
+        if (!shouldTranslateParagraph(text, this.config.minCharactersPerNode, this.config.minWordsPerNode, this.config.targetLang)) {
             logger.debug('[translateSimpleParagraph] skipped — did not pass shouldTranslateParagraph');
             this.stats.paragraphsProcessed++;
             this.logProgress();
@@ -320,7 +320,7 @@ export class PageTranslationManager {
 
         // Translate each inline group
         for (const unit of units) {
-            if (!shouldTranslateParagraph(unit.text, this.config.minCharactersPerNode, this.config.minWordsPerNode)) {
+            if (!shouldTranslateParagraph(unit.text, this.config.minCharactersPerNode, this.config.minWordsPerNode, this.config.targetLang)) {
                 continue;
             }
             promises.push(this.translateUnit(element, unit));

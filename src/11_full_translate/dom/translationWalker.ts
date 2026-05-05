@@ -18,6 +18,15 @@ import { extractTextContent } from './walker';
 // Re-export TranslationUnit for consumers importing from this module
 export type { TranslationUnit } from '../types';
 
+const REGEX_HAN = /\p{Script=Han}/gu;
+const REGEX_KANA = /[\p{Script=Hiragana}\p{Script=Katakana}]/u;
+const REGEX_HANGUL = /\p{Script=Hangul}/u;
+const REGEX_LATIN = /\p{Script=Latin}/gu;
+const CHINESE_TARGET_LANG = 'zh';
+const CHINESE_TARGET_MIN_HAN_COUNT = 2;
+const CHINESE_TARGET_DOMINANT_MIN_HAN_COUNT = 8;
+const CHINESE_TARGET_DOMINANT_HAN_RATIO = 0.9;
+
 // ============================================================
 // Public API
 // ============================================================
@@ -100,9 +109,11 @@ export function shouldTranslateParagraph(
     text: string,
     minChars: number,
     minWords: number,
+    targetLanguage?: string,
 ): boolean {
     if (!text.trim()) return false;
     if (isNumericContent(text)) return false;
+    if (shouldSkipChineseTargetLanguageText(text, targetLanguage)) return false;
     if (minChars > 0 && text.length < minChars) return false;
     if (minWords > 0) {
         const wordCount = text.trim().split(/\s+/).length;
@@ -114,6 +125,31 @@ export function shouldTranslateParagraph(
 // ============================================================
 // Internal Helpers
 // ============================================================
+
+/**
+ * Chinese-target optimization for full-page translation.
+ * Skips blocks that are already clearly Chinese, while mixed-language blocks
+ * still go to the backend so the model can translate the non-Chinese parts.
+ */
+function shouldSkipChineseTargetLanguageText(text: string, targetLanguage?: string): boolean {
+    const normalizedTarget = (targetLanguage || '').toLowerCase().split(/[-_]/)[0] ?? '';
+    if (normalizedTarget !== CHINESE_TARGET_LANG) return false;
+
+    const trimmed = text.trim();
+    if (!trimmed) return false;
+    if (REGEX_KANA.test(trimmed) || REGEX_HANGUL.test(trimmed)) return false;
+
+    const hanCount = trimmed.match(REGEX_HAN)?.length ?? 0;
+    if (hanCount < CHINESE_TARGET_MIN_HAN_COUNT) return false;
+
+    const latinCount = trimmed.match(REGEX_LATIN)?.length ?? 0;
+    if (latinCount === 0) return true;
+
+    const comparableCount = hanCount + latinCount;
+    const hanRatio = comparableCount === 0 ? 0 : hanCount / comparableCount;
+    return hanCount >= CHINESE_TARGET_DOMINANT_MIN_HAN_COUNT
+        && hanRatio >= CHINESE_TARGET_DOMINANT_HAN_RATIO;
+}
 
 /** Flush accumulated inline nodes into a TranslationUnit if they have text content */
 function flushInlineGroup(
