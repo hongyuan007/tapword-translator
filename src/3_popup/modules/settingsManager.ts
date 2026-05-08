@@ -47,6 +47,13 @@ function setTranslationControlsEnabled(enabled: boolean): void {
             settingItem.classList.toggle("is-disabled", !enabled)
         }
     })
+
+    // Also disable/enable the full translate button
+    const fullTranslateButton = document.getElementById("fullTranslateButton") as HTMLButtonElement | null
+    if (fullTranslateButton) {
+        fullTranslateButton.disabled = !enabled
+        fullTranslateButton.closest(".setting-item")?.classList.toggle("is-disabled", !enabled)
+    }
 }
 
 async function restoreDependentTogglesIfAllOff(): Promise<void> {
@@ -134,7 +141,7 @@ export async function saveSetting(settingKey: keyof types.UserSettings, value: b
 /**
  * Set up change listeners for all setting controls (checkboxes and selects)
  */
-export function setupSettingChangeListeners(): void {
+export function setupSettingChangeListeners(options?: { onTapWordDisabled?: () => void }): void {
     // Add change listeners to all checkboxes
     const checkboxes = document.querySelectorAll('input[type="checkbox"][data-setting]')
     checkboxes.forEach((checkbox) => {
@@ -154,6 +161,22 @@ export function setupSettingChangeListeners(): void {
                     syncMasterSectionVisualState(input.checked)
                     if (input.checked) {
                         await restoreDependentTogglesIfAllOff()
+                    } else {
+                        // Stop any running full-page translation when TapWord is disabled
+                        const stopMsg: types.FullTranslateToggleMessage = { type: "FULL_TRANSLATE_TOGGLE", data: { enabled: false } }
+                        chrome.runtime.sendMessage(stopMsg)
+
+                        // Reset full translate button to idle visual state
+                        const fullTranslateButton = document.getElementById("fullTranslateButton") as HTMLButtonElement | null
+                        const fullTranslateLabel = document.getElementById("fullTranslateLabel")
+                        if (fullTranslateButton) {
+                            fullTranslateButton.classList.remove("is-active", "is-loading", "is-quota-exhausted")
+                        }
+                        if (fullTranslateLabel) {
+                            fullTranslateLabel.textContent = i18nModule.translate("popup.translatePage.label")
+                        }
+                        // Sync the isRunning state tracked in the button handler
+                        options?.onTapWordDisabled?.()
                     }
                 }
 

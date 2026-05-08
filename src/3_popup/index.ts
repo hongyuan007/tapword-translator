@@ -45,7 +45,8 @@ async function initialize(): Promise<void> {
     await settingsManagerModule.loadSettings()
 
     // Set up setting change listeners
-    settingsManagerModule.setupSettingChangeListeners()
+    const resetFullTranslateState = await setupFullTranslateButton()
+    settingsManagerModule.setupSettingChangeListeners({ onTapWordDisabled: resetFullTranslateState })
 
     // Set up tooltip interactions
     const helpIcons = document.querySelectorAll<HTMLElement>(".help-icon")
@@ -91,9 +92,6 @@ async function initialize(): Promise<void> {
             communitySubtitle.style.display = "block"
         }
     }
-
-    // Setup full-page translate button
-    await setupFullTranslateButton()
 
     // Setup floating button toggle
     await setupFloatingButtonToggle()
@@ -144,12 +142,12 @@ async function setupFloatingButtonToggle(): Promise<void> {
 /**
  * Setup full-page translate button with toggle behavior
  */
-async function setupFullTranslateButton(): Promise<void> {
+async function setupFullTranslateButton(): Promise<() => void> {
     const button = document.getElementById("fullTranslateButton") as HTMLButtonElement | null
     const label = document.getElementById("fullTranslateLabel")
     if (!button || !label) {
         logger.warn("Full translate button not found")
-        return
+        return () => { /* no-op: button not found */ }
     }
 
     let isRunning = await getFullTranslateStatus()
@@ -192,6 +190,11 @@ async function setupFullTranslateButton(): Promise<void> {
             window.close()
         })
     })
+
+    // Return a callback to reset the running state when TapWord is disabled externally
+    return () => {
+        isRunning = false
+    }
 }
 
 function getFullTranslateStatus(): Promise<boolean> {
