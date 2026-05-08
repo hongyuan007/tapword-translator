@@ -21,24 +21,6 @@
       </div>
 
       <div class="settings-list">
-        <section class="section-card section-master" style="margin-top: 0;">
-          <div class="section-body">
-            <div class="setting-item setting-item-master">
-              <div class="setting-gutter"></div>
-              <div class="setting-info">
-                <label class="setting-label master-label" for="enableTapWord">
-                  <span class="master-label-text" data-i18n-key="popup.enableTapWord.label">Enable TapWord</span>
-                  <span class="help-icon" data-i18n-key="popup.enableTapWord.helper" data-i18n-attr="data-tooltip">?</span>
-                </label>
-              </div>
-              <label class="toggle-switch toggle-switch-master">
-                <input type="checkbox" id="enableTapWord" data-setting="enableTapWord">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-        </section>
-
         <!-- Redesigned Full Translate & Quota Section -->
         <section class="section-card section-full-translate">
           <div class="section-floating-title" data-title="Page Translation" data-i18n-key="popup.quota.pageTranslation" data-i18n-attr="data-title"></div>
@@ -88,6 +70,19 @@
             <div class="setting-item">
               <div class="setting-gutter"></div>
               <div class="setting-info">
+                <label class="setting-label" for="enableTapWord">
+                  <span data-i18n-key="popup.enableTapWord.label">Enable TapWord</span>
+                  <span class="help-icon" data-i18n-key="popup.enableTapWord.helper" data-i18n-attr="data-tooltip">?</span>
+                </label>
+              </div>
+              <label class="toggle-switch toggle-switch-pink">
+                <input type="checkbox" id="enableTapWord" data-setting="enableTapWord">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-gutter"></div>
+              <div class="setting-info">
                 <label class="setting-label" for="targetLanguage" data-i18n-key="popup.targetLanguage.label">Target
                   Language</label>
               </div>
@@ -113,7 +108,7 @@
                   <span data-i18n-key="popup.singleClickTranslate.label">Single-click to translate word</span>
                 </label>
               </div>
-              <label class="toggle-switch toggle-switch-pink">
+              <label class="toggle-switch">
                 <input type="checkbox" id="singleClickTranslate" data-setting="singleClickTranslate">
                 <span class="toggle-slider"></span>
               </label>
