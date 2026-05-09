@@ -417,6 +417,7 @@ async function selectIconVariant(variant: IconVariant): Promise<void> {
     config.iconVariant = variant
     await chrome.storage.local.set({ [floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY]: config })
     highlightSelectedVariant(variant)
+    updateAppearancePreview().catch((err) => logger.warn("Failed to update appearance preview", err))
 }
 
 function initIconVariantPicker(color: string): void {
@@ -520,6 +521,7 @@ function initFloatingButtonColorPicker(currentColor: string): void {
             updateFloatingButtonColorDisplay(wrapper, color)
             refreshIconVariantPreviews(color)
             wrapper.classList.remove("open")
+            updateAppearancePreview().catch((err) => logger.warn("Failed to update appearance preview", err))
         })
     })
 }
@@ -580,6 +582,53 @@ function setupFloatingButtonEnabledListener(): void {
     })
 }
 
+async function updateAppearancePreview(): Promise<void> {
+    const fabLightEl = document.getElementById("preview-fab-light")
+    const fabDarkEl = document.getElementById("preview-fab-dark")
+    const fullTransLightEl = document.getElementById("ap-full-trans-light")
+    const fullTransDarkEl = document.getElementById("ap-full-trans-dark")
+    const wordTooltipLightEl = document.getElementById("ap-word-tooltip-light")
+    const wordTooltipDarkEl = document.getElementById("ap-word-tooltip-dark")
+    const sentTooltipLightEl = document.getElementById("ap-sent-tooltip-light")
+    const sentTooltipDarkEl = document.getElementById("ap-sent-tooltip-dark")
+
+    const storageResult = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const fabConfig = storageResult[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || floatingButtonConstants.DEFAULT_CONFIG
+    const iconColor: string = fabConfig.iconColor || floatingButtonConstants.DEFAULT_ICON_COLOR
+    const iconVariant: IconVariant = fabConfig.iconVariant || "v1"
+
+    const settings = await storageManagerModule.getUserSettings()
+
+    const lightSelectEl = document.getElementById("fullTranslateLightColorSelect")
+    const darkSelectEl = document.getElementById("fullTranslateDarkColorSelect")
+    const lightColor = lightSelectEl?.dataset.value || settings.fullTranslateLightColor || "#065f46"
+    const darkColor = darkSelectEl?.dataset.value || settings.fullTranslateDarkColor || "#6ee7b7"
+
+    const wordSelectEl = document.getElementById("wordUnderlineColorSelect")
+    const wordUnderlineColor = wordSelectEl?.dataset.value || settings.wordUnderlineColorV2
+    const sentenceSelectEl = document.getElementById("sentenceUnderlineColorSelect")
+    const sentenceUnderlineColor = sentenceSelectEl?.dataset.value || settings.sentenceUnderlineColor
+
+    // Floating ball SVG
+    if (fabLightEl || fabDarkEl) {
+        const fabSvg = iconVariantsModule.ICON_VARIANTS[iconVariant](iconColor)
+        if (fabLightEl) fabLightEl.innerHTML = fabSvg
+        if (fabDarkEl) fabDarkEl.innerHTML = fabSvg
+    }
+
+    // Full-translate text color
+    if (fullTransLightEl) fullTransLightEl.style.color = lightColor
+    if (fullTransDarkEl) fullTransDarkEl.style.color = darkColor
+
+    // Underline preview colors — replicates content script: border-top with opacity
+    const wordBorderColor = colorUtils.addOpacityToHex(wordUnderlineColor, UNDERLINE_OPACITY)
+    const sentBorderColor = colorUtils.addOpacityToHex(sentenceUnderlineColor, UNDERLINE_OPACITY)
+    if (wordTooltipLightEl) wordTooltipLightEl.style.borderTopColor = wordBorderColor
+    if (wordTooltipDarkEl) wordTooltipDarkEl.style.borderTopColor = wordBorderColor
+    if (sentTooltipLightEl) sentTooltipLightEl.style.borderTopColor = sentBorderColor
+    if (sentTooltipDarkEl) sentTooltipDarkEl.style.borderTopColor = sentBorderColor
+}
+
 async function initializeOptions(): Promise<void> {
     logger.info("Options initializing")
 
@@ -601,6 +650,15 @@ async function initializeOptions(): Promise<void> {
         await loadFloatingButtonEnabledSetting()
         setupFloatingButtonEnabledListener()
         await setupTooltipSpacingPreview()
+        await updateAppearancePreview()
+
+        document.addEventListener("settingChange", (event: Event) => {
+            const customEvent = event as CustomEvent
+            const relevantKeys = ["wordUnderlineColorV2", "sentenceUnderlineColor", "fullTranslateLightColor", "fullTranslateDarkColor"]
+            if (relevantKeys.includes(customEvent.detail?.key)) {
+                updateAppearancePreview().catch((err) => logger.warn("Failed to update appearance preview", err))
+            }
+        })
 
         const websiteUrl = await fetchWebsiteUrl()
 

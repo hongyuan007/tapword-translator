@@ -33,6 +33,8 @@ export interface InsertTranslationOptions {
     insertAfterNode?: Node;
     /** Force block-style insertion regardless of element classification. */
     forceBlockTranslation?: boolean;
+    /** Text color to apply to the translated span (hex). */
+    translationTextColor?: string;
 }
 import { DomBatcher } from '../utils/DomBatcher';
 import { isHTMLElement, isCustomForceBlockTranslation, isForceInlineTranslation, deepQuerySelectorAll } from './filter';
@@ -86,6 +88,9 @@ export function insertTranslation(
 
     const translatedSpan = document.createElement('span');
     translatedSpan.textContent = translatedText;
+    if (options?.translationTextColor) {
+        translatedSpan.style.color = options.translationTextColor;
+    }
 
     if (useInline) {
         appendInlineSeparator(wrapperSpan);

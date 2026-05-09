@@ -6,6 +6,7 @@
 import * as loggerModule from '@/0_common/utils/logger';
 import * as storageManager from '@/0_common/utils/storageManager';
 import * as i18nModule from '@/0_common/utils/i18n';
+import { isDarkThemeContext } from '@/1_content/utils/styleCalculator/dom';
 import type {
     FullTranslateStatusResponseMessage,
     FullTranslateToggleResponseMessage,
@@ -175,6 +176,10 @@ export function handleStatusRequest(
  */
 async function buildConfig(): Promise<FullTranslateConfig> {
     const settings = await storageManager.getUserSettings();
+    const isDark = isDarkThemeContext();
+    const translationTextColor = isDark
+        ? (settings.fullTranslateDarkColor ?? '#ffffff')
+        : (settings.fullTranslateLightColor ?? '#000000');
 
     return {
         mode: DEFAULT_MODE,
@@ -187,5 +192,6 @@ async function buildConfig(): Promise<FullTranslateConfig> {
         minWordsPerNode: DEFAULT_MIN_WORDS_PER_NODE,
         sourceLang: DEFAULT_SOURCE_LANG,
         targetLang: settings.targetLanguage || DEFAULT_TARGET_LANG,
+        translationTextColor,
     };
 }

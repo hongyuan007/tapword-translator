@@ -20,6 +20,8 @@ export interface FullTranslateConfig {
     minWordsPerNode: number;
     sourceLang: string;
     targetLang: string;
+    /** Resolved hex color for translated text (based on page dark/light mode) */
+    translationTextColor?: string;
 }
 
 // IntersectionObserver preload settings

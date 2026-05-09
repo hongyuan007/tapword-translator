@@ -25,7 +25,7 @@ export interface BackgroundResolutionResult {
  * element's `dark` class (common in Tailwind/Bootstrap projects) and the CSS
  * `color-scheme` computed property.
  */
-function isDarkThemeContext(): boolean {
+export function isDarkThemeContext(): boolean {
     const rootElement = document.documentElement
     if (rootElement.classList.contains(DARK_THEME_CLASS)) {
         return true

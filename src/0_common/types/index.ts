@@ -406,6 +406,10 @@ export interface UserSettings {
      * New users and migrated users all use this key. UI reads/writes this field.
      */
     translationFontSizePresetV2?: TranslationFontSizePreset
+    /** Text color for full-page translated text on light-mode websites (hex) */
+    fullTranslateLightColor?: string
+    /** Text color for full-page translated text on dark-mode websites (hex) */
+    fullTranslateDarkColor?: string
 }
 
 /**
@@ -459,6 +463,8 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     networkRegion: "auto",
     enableAutoTranslate: false,
     userLanguageProficiency: "Intermediate",
+    fullTranslateLightColor: "#065f46",
+    fullTranslateDarkColor: "#6ee7b7",
 }
 
 export const DEFAULT_SUPPRESS_NATIVE_LANGUAGE = DEFAULT_USER_SETTINGS.suppressNativeLanguage

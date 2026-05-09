@@ -285,7 +285,7 @@ export class PageTranslationManager {
             }
             removeSpinner(targetElement);
             if (translated && this.shouldRenderTranslation(text, translated)) {
-                insertTranslation(targetElement, translated, this.config.mode, undefined, this.buildWrapperMetadata());
+                insertTranslation(targetElement, translated, this.config.mode, { translationTextColor: this.config.translationTextColor }, this.buildWrapperMetadata());
             } else if (!translated) {
                 logger.warn('[translateSimpleParagraph] translateText returned null', { text: text.substring(0, 50) });
             }
@@ -353,6 +353,7 @@ export class PageTranslationManager {
                 insertTranslation(paragraphElement, translated, this.config.mode, {
                     insertAfterNode: lastNode,
                     forceBlockTranslation: unit.forceBlockTranslation,
+                    translationTextColor: this.config.translationTextColor,
                 }, this.buildWrapperMetadata());
             } else if (!translated) {
                 logger.warn('[translateUnit] translateText returned null', { text: unit.text.substring(0, 50) });
