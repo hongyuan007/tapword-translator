@@ -463,7 +463,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     networkRegion: "auto",
     enableAutoTranslate: false,
     userLanguageProficiency: "Intermediate",
-    fullTranslateLightColor: "#065f46",
+    fullTranslateLightColor: "#064e3b",
     fullTranslateDarkColor: "#6ee7b7",
 }
 

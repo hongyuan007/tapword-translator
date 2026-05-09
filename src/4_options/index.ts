@@ -601,7 +601,7 @@ async function updateAppearancePreview(): Promise<void> {
 
     const lightSelectEl = document.getElementById("fullTranslateLightColorSelect")
     const darkSelectEl = document.getElementById("fullTranslateDarkColorSelect")
-    const lightColor = lightSelectEl?.dataset.value || settings.fullTranslateLightColor || "#065f46"
+    const lightColor = lightSelectEl?.dataset.value || settings.fullTranslateLightColor || "#064e3b"
     const darkColor = darkSelectEl?.dataset.value || settings.fullTranslateDarkColor || "#6ee7b7"
 
     const wordSelectEl = document.getElementById("wordUnderlineColorSelect")
