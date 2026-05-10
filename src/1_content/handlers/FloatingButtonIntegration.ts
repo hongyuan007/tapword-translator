@@ -53,9 +53,6 @@ export async function setup(): Promise<void> {
         floatingButtonManager.setTranslationState('active');
     }
 
-    // Hide immediately if quota is already exhausted on page load
-    await checkInitialQuotaState(floatingButtonManager);
-
     logger.info('Floating button integration initialized');
 }
 
@@ -82,28 +79,6 @@ function handleTranslateEvent(event: FullTranslateEvent): void {
         case 'quota_exhausted':
             floatingButtonManager.setTranslationState('quota_exhausted');
             break;
-    }
-}
-
-/**
- * Check if quota is exhausted on init and hide button immediately.
- * Prevents the button from appearing briefly on page refresh when quota is gone.
- */
-async function checkInitialQuotaState(manager: FloatingButtonManager): Promise<void> {
-    const config = manager.getCurrentConfig();
-    if (!config.autoHideOnQuotaExhausted) return;
-
-    try {
-        const response = await chrome.runtime.sendMessage({ type: 'QUOTA_USAGE_REQUEST' });
-        if (response?.success && response.data?.fullTextTranslation) {
-            const quota = response.data.fullTextTranslation;
-            if (quota.remaining <= 0) {
-                manager.hideImmediately();
-                logger.info('Button hidden on init: quota exhausted');
-            }
-        }
-    } catch (error) {
-        logger.warn('Initial quota check failed, button remains visible', error);
     }
 }
 

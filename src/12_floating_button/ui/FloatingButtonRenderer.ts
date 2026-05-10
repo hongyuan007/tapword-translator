@@ -166,16 +166,6 @@ export class FloatingButtonRenderer {
         return this.container;
     }
 
-    /** Slide the button to the right out of viewport, then hide */
-    slideOutAndHide(): void {
-        if (!this.container) return;
-        this.container.classList.add(constants.CLASS_SLIDING_OUT);
-        setTimeout(() => {
-            this.hide();
-            this.container?.classList.remove(constants.CLASS_SLIDING_OUT);
-        }, constants.SLIDE_OUT_DURATION_MS);
-    }
-
     /** Set dragging visual state */
     setDragging(isDragging: boolean): void {
         const draggingClass = `${constants.CSS_PREFIX}-dragging`;

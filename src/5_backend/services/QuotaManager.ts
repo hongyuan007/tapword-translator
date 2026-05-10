@@ -241,8 +241,14 @@ export class QuotaManager {
             return
         }
 
-        if (quotaCache.remaining <= 0) {
-            logger.warn("Full-text translation quota exhausted (client cache):", quotaCache)
+        // Always use the latest limit from ConfigService so server-side changes take effect immediately
+        const configService = getConfigService()
+        await configService.ensureCacheLoaded()
+        const currentLimit = configService.getDailyFreeFullTextTranslationChars()
+        const freshRemaining = Math.max(0, currentLimit - quotaCache.used)
+        if (freshRemaining <= 0) {
+            const updatedCache = { ...quotaCache, limit: currentLimit, remaining: freshRemaining }
+            logger.warn("Full-text translation quota exhausted (client cache):", updatedCache)
             throw new QuotaExceededError("fullTextTranslation", FULL_TEXT_TRANSLATION_ERROR_MSG)
         }
     }
@@ -269,17 +275,20 @@ export class QuotaManager {
 
     /**
      * Get current full-text translation quota usage from local cache.
+     * Always reads the limit from ConfigService to reflect server-side changes.
      */
     async getFullTextTranslationQuotaUsage(): Promise<{ used: number; limit: number; remaining: number }> {
-        const cache = await this.loadFullTextQuotaCache()
-        if (cache) {
-            return { used: cache.used, limit: cache.limit, remaining: cache.remaining }
-        }
-
-        // No cache — return defaults from config
         const configService = getConfigService()
         await configService.ensureCacheLoaded()
         const limit = configService.getDailyFreeFullTextTranslationChars()
+
+        const cache = await this.loadFullTextQuotaCache()
+        if (cache) {
+            const remaining = Math.max(0, limit - cache.used)
+            return { used: cache.used, limit, remaining }
+        }
+
+        // No cache — no usage yet today
         return { used: 0, limit, remaining: limit }
     }
 

@@ -19,7 +19,6 @@ export const DEFAULT_CONFIG: FloatingButtonConfig = {
     disabledSites: [],
     iconVariant: 'v5',
     iconColor: DEFAULT_ICON_COLOR,
-    autoHideOnQuotaExhausted: true,
 };
 
 // --- CSS ---
@@ -89,13 +88,4 @@ export const CLASS_EXHAUSTED_BADGE = `${CSS_PREFIX}-exhausted-badge`;
 /** CSS class applied to main button when translation is active or translating */
 export const CLASS_TRANSLATION_ACTIVE = `${CSS_PREFIX}-translation-active`;
 
-// --- Auto-Hide ---
 
-/** Delay before auto-hiding the button when quota is exhausted (ms) */
-export const AUTO_HIDE_DELAY_MS = 3000;
-
-/** Duration of the slide-out animation before hiding (ms) */
-export const SLIDE_OUT_DURATION_MS = 400;
-
-/** CSS class applied during slide-out animation */
-export const CLASS_SLIDING_OUT = `${CSS_PREFIX}-sliding-out`;

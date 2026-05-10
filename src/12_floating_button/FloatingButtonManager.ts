@@ -7,7 +7,7 @@ import * as loggerModule from '@/0_common/utils/logger';
 import type { FloatingButtonConfig, FloatingButtonState, IconVariant } from '@/12_floating_button/types';
 import { FloatingButtonRenderer } from '@/12_floating_button/ui/FloatingButtonRenderer';
 import { FloatingButtonConfigStore } from '@/12_floating_button/config/FloatingButtonConfigStore';
-import { DEFAULT_ICON_COLOR, AUTO_HIDE_DELAY_MS } from '@/12_floating_button/constants';
+import { DEFAULT_ICON_COLOR } from '@/12_floating_button/constants';
 import { DragHandler } from '@/12_floating_button/handlers/DragHandler';
 
 const logger = loggerModule.createLogger('FloatingButtonManager');
@@ -20,7 +20,6 @@ export class FloatingButtonManager {
     private currentIconVariant: IconVariant | null = null;
     private currentIconColor: string | null = null;
     private currentState: FloatingButtonState = 'idle';
-    private autoHideTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
     /** Callback invoked when the user clicks the button to toggle translation */
     private onToggleTranslation: (() => void) | null = null;
@@ -92,22 +91,12 @@ export class FloatingButtonManager {
 
     /** Update the visual state to reflect translation progress */
     setTranslationState(state: FloatingButtonState): void {
-        this.clearAutoHideTimeout();
         this.currentState = state;
         this.renderer.setTranslationState(state);
-
-        // Schedule auto-hide when quota is exhausted and user opted in
-        if (state === 'quota_exhausted' && this.configStore.getConfig().autoHideOnQuotaExhausted) {
-            this.autoHideTimeoutId = setTimeout(() => {
-                this.renderer.slideOutAndHide();
-                logger.info('Button auto-hidden due to quota exhaustion');
-            }, AUTO_HIDE_DELAY_MS);
-        }
     }
 
     /** Hide the button immediately without animation or delay */
     hideImmediately(): void {
-        this.clearAutoHideTimeout();
         this.currentState = 'quota_exhausted';
         this.renderer.hide();
         logger.info('Button hidden immediately');
@@ -115,7 +104,6 @@ export class FloatingButtonManager {
 
     /** Clean up all resources */
     destroy(): void {
-        this.clearAutoHideTimeout();
         this.dragHandler?.detach();
         this.configStore.destroy();
         this.renderer.destroy();
@@ -140,14 +128,6 @@ export class FloatingButtonManager {
     /** Get a snapshot of the current config */
     getCurrentConfig(): FloatingButtonConfig {
         return this.configStore.getConfig();
-    }
-
-    /** Clear the auto-hide timeout if one is pending */
-    private clearAutoHideTimeout(): void {
-        if (this.autoHideTimeoutId !== null) {
-            clearTimeout(this.autoHideTimeoutId);
-            this.autoHideTimeoutId = null;
-        }
     }
 
     /** Check if the page context allows rendering (ignores enabled flag) */

@@ -212,9 +212,4 @@ export const FLOATING_BUTTON_STYLES = `
     background: #f3f4f6;
 }
 
-/* Slide-out animation — slides the container off-screen to the right */
-.${constants.CLASS_CONTAINER}.${constants.CLASS_SLIDING_OUT} {
-    transform: translateX(100%) !important;
-    transition: transform ${constants.SLIDE_OUT_DURATION_MS}ms ease-in !important;
-}
 `;
