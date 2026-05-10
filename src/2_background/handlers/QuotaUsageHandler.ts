@@ -9,6 +9,7 @@ import type { QuotaUsageResponseMessage } from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
 import { getQuotaManager } from "@/5_backend/services/QuotaManager"
 import * as serviceInitializer from "../services/ServiceInitializer"
+import * as storageManagerModule from "@/0_common/utils/storageManager"
 
 const logger = loggerModule.createLogger("QuotaUsageHandler")
 
@@ -25,12 +26,16 @@ export async function handleQuotaUsageRequest(
         const quotaManager = getQuotaManager()
         const usage = await quotaManager.getFullTextTranslationQuotaUsage()
 
+        const settings = await storageManagerModule.getUserSettings()
+        const isOfficialProvider = settings.translationProvider === "official"
+
         logger.debug("Quota usage request handled:", usage)
 
         sendResponse({
             success: true,
             data: {
                 fullTextTranslation: usage,
+                isOfficialProvider,
             },
         })
     } catch (error) {

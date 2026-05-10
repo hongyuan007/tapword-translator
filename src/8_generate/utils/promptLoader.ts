@@ -154,12 +154,15 @@ export async function loadFewshot(
     }
 
     try {
-        const parsed = (await response.json()) as ChatMessage[]
+        const rawText = await response.text()
+        const parsed = JSON.parse(rawText) as ChatMessage[]
         logger.debug(`Loaded fewshot examples from ${url} (count: ${parsed.length})`)
         fewshotCache.set(cacheKey, parsed)
         return parsed
     } catch (error) {
-        logger.error(`Failed to parse fewshot JSON from ${url}`, error)
-        throw new Error(`Invalid fewshot JSON file: ${url}`)
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        const errorStack = error instanceof Error ? error.stack : undefined
+        logger.error(`Failed to parse fewshot JSON from ${url} — error: ${errorMsg}`, errorStack)
+        throw new Error(`Invalid fewshot JSON file: ${url} — ${errorMsg}`)
     }
 }

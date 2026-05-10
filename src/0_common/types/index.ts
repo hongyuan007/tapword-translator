@@ -542,6 +542,8 @@ export interface QuotaUsageResponseMessage {
     success: boolean
     data?: {
         fullTextTranslation: FullTextTranslationQuotaInfo
+        /** Whether the active translation provider is the official cloud service */
+        isOfficialProvider: boolean
     }
     error?: string
 }

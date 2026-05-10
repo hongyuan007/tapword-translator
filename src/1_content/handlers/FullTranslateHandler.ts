@@ -69,12 +69,13 @@ export function getIsRunning(): boolean {
 // --- Core start/stop logic (shared by message handler and direct toggle) ---
 
 async function startTranslation(): Promise<void> {
-    // Proactive quota check before starting translation
+    // Proactive quota check before starting translation (only for official provider)
     try {
         const response = await chrome.runtime.sendMessage({ type: 'QUOTA_USAGE_REQUEST' });
         if (response?.success && response.data?.fullTextTranslation) {
+            const isOfficialProvider = response.data.isOfficialProvider !== false;
             const quota = response.data.fullTextTranslation;
-            if (quota.remaining <= 0) {
+            if (isOfficialProvider && quota.remaining <= 0) {
                 const message = i18nModule.translate('fullTranslate.quotaExhausted.toast');
                 toastNotification.showViewportToast(message, 'info');
                 emitEvent('quota_exhausted');

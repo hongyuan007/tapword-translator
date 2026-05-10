@@ -74,18 +74,26 @@ function fetchQuotaUsage(): void {
         }
 
         const quota = response.data.fullTextTranslation
-        renderQuota(quota.used, quota.limit)
+        const isOfficialProvider = response.data.isOfficialProvider
+        renderQuota(quota.used, quota.limit, isOfficialProvider)
         saveCachedQuota(quota)
-        logger.debug(`Quota loaded: ${quota.used}/${quota.limit}`)
+        logger.debug(`Quota loaded: ${quota.used}/${quota.limit}, officialProvider: ${isOfficialProvider}`)
     })
 }
 
 /**
  * Render quota progress bar and percentage text.
  */
-function renderQuota(used: number, limit: number): void {
+function renderQuota(used: number, limit: number, isOfficialProvider: boolean = true): void {
     if (!progressBarFill || !progressPercentage || !quotaSection) return
 
+    // Hide quota section for non-official providers (quota only applies to official)
+    if (!isOfficialProvider) {
+        quotaSection.style.display = "none"
+        disableTranslateButton(false)
+        return
+    }
+    quotaSection.style.display = ""
     const percentage = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0
 
     // Update progress bar width

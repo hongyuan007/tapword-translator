@@ -1,0 +1,26 @@
+[
+    {
+        "role": "user",
+        "content": "# Source Language\nEnglish\n\n# Target Language\nChinese\n\n# Number of Segments\n3\n\n# Text to Translate\n<segment id=\"0\">Sustainable energy solutions are becoming increasingly important as the world transitions away from fossil fuels.</segment>\n<segment id=\"1\">Our team is dedicated to building innovative products that empower developers worldwide.</segment>\n<segment id=\"2\">By clicking \"Accept\", you agree to our Terms of Service and Privacy Policy.</segment>"
+    },
+    {
+        "role": "assistant",
+        "content": "<segment id=\"0\">随着全球逐步摆脱化石燃料，可持续能源解决方案变得越来越重要。</segment>\n<segment id=\"1\">我们的团队致力于打造创新产品，赋能全球开发者。</segment>\n<segment id=\"2\">点击“接受”即表示您同意我们的服务条款和隐私政策。</segment>"
+    },
+    {
+        "role": "user",
+        "content": "# Source Language\nEnglish\n\n# Target Language\nChinese\n\n# Number of Segments\n3\n\n# Text to Translate\n<segment id=\"0\">The server returned a 502 Bad Gateway error &amp; the response time was &gt;5000ms.</segment>\n<segment id=\"1\">Use the command `git push origin main` to deploy your changes to production.</segment>\n<segment id=\"2\">For more information, visit https://docs.example.com/api/v2 or contact support@example.com.</segment>"
+    },
+    {
+        "role": "assistant",
+        "content": "<segment id=\"0\">服务器返回了502 Bad Gateway错误，且响应时间超过5000毫秒。</segment>\n<segment id=\"1\">使用命令 `git push origin main` 将您的更改部署到生产环境。</segment>\n<segment id=\"2\">如需了解更多信息，请访问 https://docs.example.com/api/v2 或联系 support@example.com。</segment>"
+    },
+    {
+        "role": "user",
+        "content": "# Source Language\nEnglish\n\n# Target Language\nChinese\n\n# Number of Segments\n5\n\n# Text to Translate\n<segment id=\"0\">@elonmusk</segment>\n<segment id=\"1\">Elon Musk</segment>\n<segment id=\"2\">Follow @tapword_app for updates.</segment>\n<segment id=\"3\">OpenAI released a new model today.</segment>\n<segment id=\"4\">🚀</segment>"
+    },
+    {
+        "role": "assistant",
+        "content": "<segment id=\"0\">@elonmusk</segment>\n<segment id=\"1\">Elon Musk</segment>\n<segment id=\"2\">关注 @tapword_app 获取更新。</segment>\n<segment id=\"3\">OpenAI 今天发布了一个新模型。</segment>\n<segment id=\"4\">🚀</segment>"
+    }
+]

@@ -100,6 +100,60 @@ export class OpenAICompatibleClient {
             throw new Error("LLM generation failed. Please try again.")
         }
     }
+
+    /**
+     * Generate plain-text completion from LLM (no JSON response_format enforced)
+     *
+     * @param messages Array of chat messages (system, user, assistant)
+     * @returns Generated content as string (plain text / XML)
+     * @throws Error for various failure scenarios (timeout, rate limit, etc.)
+     */
+    async generateText(messages: ChatMessage[]): Promise<string> {
+        try {
+            logger.debug(`Sending text request to LLM (model: ${this.model}, messages: ${messages.length})`)
+
+            const completion = await this.client.chat.completions.create({
+                model: this.model,
+                messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+                temperature: this.temperature,
+                max_tokens: this.maxTokens,
+            })
+
+            const content = completion.choices[0]?.message?.content
+
+            if (!content) {
+                throw new Error("Invalid LLM response: empty content")
+            }
+
+            logger.debug(`Received text response from LLM (length: ${content.length})`)
+            return content
+        } catch (error) {
+            logger.error("LLM text generation error:", error)
+
+            if (error instanceof RateLimitError) {
+                throw new Error("Rate limit exceeded. Please try again later.")
+            }
+
+            if (error instanceof BadRequestError) {
+                if (error.code === "data_inspection_failed" || error.message.includes("inappropriate")) {
+                    throw new Error("Content moderation failed. The input may contain inappropriate content.")
+                }
+                throw new Error(`Bad request: ${error.message}`)
+            }
+
+            if (error instanceof APIConnectionTimeoutError) {
+                throw new Error("Request timeout. Please check your network connection and try again.")
+            }
+
+            // Re-throw if already an Error
+            if (error instanceof Error) {
+                throw error
+            }
+
+            // Generic error
+            throw new Error("LLM text generation failed. Please try again.")
+        }
+    }
 }
 
 /**
