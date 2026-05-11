@@ -27,6 +27,7 @@ vite.config.*.timestamp-*
 # Environment variables
 .env.development
 .env.production
+.env.test
 .env.firefox
 .env.firefox-development
 !.env.community

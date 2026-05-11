@@ -18,6 +18,7 @@
         "build:firefox": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode firefox",
         "build:firefox-dev": "npm run clean && npm run prebuild:dev && vite build -c vite.config.ts --mode firefox-development",
         "build:prod": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode production",
+        "build:test": "npm run clean && npm run prebuild:prod && cross-env NODE_ENV=production vite build -c vite.config.ts --mode test",
 
         "package": "npm run build:prod && npm run check:prod-logger-disabled && node scripts/package-with-version.mjs",
         "package:firefox": "npm run build:firefox && npm run check:firefox-logger-disabled && node scripts/package-with-version.mjs firefox",
