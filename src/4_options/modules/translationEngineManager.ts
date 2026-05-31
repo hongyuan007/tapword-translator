@@ -10,10 +10,14 @@ import * as i18nModule from "@/0_common/utils/i18n"
 const logger = loggerModule.createLogger("Options/TranslationEngineManager")
 
 const FIXED_PROVIDER_VALUES = ["official", "microsoftFree", "bingTranslate", "googleFree"]
-const TEST_BUTTON_LABEL = "Test"
-const TESTING_BUTTON_LABEL = "Testing..."
-const TEST_SUCCESS_MESSAGE = "✓ Connected"
-const TEST_FAILURE_PREFIX = "✗ Failed: "
+const PROVIDER_TEST_BUTTON_KEY = "options.translationEngine.aiProviders.form.test"
+const PROVIDER_TESTING_BUTTON_KEY = "options.translationEngine.aiProviders.form.testing"
+const PROVIDER_TEST_SUCCESS_KEY = "options.translationEngine.aiProviders.form.testSuccess"
+const PROVIDER_TEST_FAILURE_PREFIX_KEY = "options.translationEngine.aiProviders.form.testFailedPrefix"
+const DEFAULT_TEST_BUTTON_LABEL = "Test"
+const DEFAULT_TESTING_BUTTON_LABEL = "Testing..."
+const DEFAULT_TEST_SUCCESS_MESSAGE = "✓ Connected"
+const DEFAULT_TEST_FAILURE_PREFIX = "✗ Failed: "
 const TEST_SUCCESS_COLOR = "#22c55e"
 const TEST_FAILURE_COLOR = "#ef4444"
 
@@ -247,7 +251,7 @@ function buildFormElement(provider: CustomAiProvider): HTMLElement {
 
     const testBtn = document.createElement("button")
     testBtn.className = "secondary-button"
-    testBtn.textContent = TEST_BUTTON_LABEL
+    testBtn.textContent = getLocalizedText(PROVIDER_TEST_BUTTON_KEY, DEFAULT_TEST_BUTTON_LABEL)
     testBtn.style.cssText = "margin-right: auto;"
 
     const testResult = document.createElement("span")
@@ -424,7 +428,7 @@ async function runProviderConnectionTest(options: ProviderTestActionOptions): Pr
     const model = options.getModel().trim()
 
     options.button.disabled = true
-    options.button.textContent = TESTING_BUTTON_LABEL
+    options.button.textContent = getLocalizedText(PROVIDER_TESTING_BUTTON_KEY, DEFAULT_TESTING_BUTTON_LABEL)
     options.result.textContent = ""
 
     const url = endpoint.endsWith("/chat/completions") ? endpoint : endpoint.replace(/\/$/, "") + "/chat/completions"
@@ -438,7 +442,7 @@ async function runProviderConnectionTest(options: ProviderTestActionOptions): Pr
 
         if (response.ok) {
             options.result.style.color = TEST_SUCCESS_COLOR
-            options.result.textContent = TEST_SUCCESS_MESSAGE
+            options.result.textContent = getLocalizedText(PROVIDER_TEST_SUCCESS_KEY, DEFAULT_TEST_SUCCESS_MESSAGE)
             return
         }
 
@@ -449,23 +453,29 @@ async function runProviderConnectionTest(options: ProviderTestActionOptions): Pr
         setProviderTestFailure(options.result, message)
     } finally {
         options.button.disabled = false
-        options.button.textContent = TEST_BUTTON_LABEL
+        options.button.textContent = getLocalizedText(PROVIDER_TEST_BUTTON_KEY, DEFAULT_TEST_BUTTON_LABEL)
     }
 }
 
 function setProviderTestFailure(result: HTMLSpanElement, message: string): void {
     result.style.color = TEST_FAILURE_COLOR
-    result.textContent = `${TEST_FAILURE_PREFIX}${message.slice(0, 50)}`
+    const failurePrefix = getLocalizedText(PROVIDER_TEST_FAILURE_PREFIX_KEY, DEFAULT_TEST_FAILURE_PREFIX)
+    result.textContent = `${failurePrefix}${message.slice(0, 50)}`
 }
 
 function resetProviderTestUi(button: HTMLButtonElement | null, result: HTMLSpanElement | null): void {
     if (button) {
         button.disabled = false
-        button.textContent = TEST_BUTTON_LABEL
+        button.textContent = getLocalizedText(PROVIDER_TEST_BUTTON_KEY, DEFAULT_TEST_BUTTON_LABEL)
     }
 
     if (result) {
         result.textContent = ""
         result.style.color = ""
     }
+}
+
+function getLocalizedText(key: string, fallback: string): string {
+    const translated = i18nModule.translate(key)
+    return translated === key ? fallback : translated
 }
