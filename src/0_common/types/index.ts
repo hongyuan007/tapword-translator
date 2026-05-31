@@ -475,6 +475,12 @@ export interface FullTranslateBatchRequestMessage {
     data: FullTranslateBatchRequestData
 }
 
+export interface FullTranslateFallbackInfo {
+    sourceProvider: "official"
+    actualProvider: "microsoftFree"
+    reason: "quotaExceeded"
+}
+
 export interface FullTranslateBatchResponseMessage {
     success: boolean
     /** Array of translated texts, same order as input */
@@ -484,6 +490,8 @@ export interface FullTranslateBatchResponseMessage {
     errorType?: "QuotaExceeded" | "GenericError"
     /** Quota info returned from server on quota errors or successful responses */
     quotaInfo?: FullTextTranslationQuotaInfo
+    /** Runtime-only provider fallback metadata for user-visible notice flows */
+    fallbackInfo?: FullTranslateFallbackInfo
 }
 
 /**

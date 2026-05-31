@@ -5,7 +5,11 @@
  */
 
 import * as loggerModule from '@/0_common/utils/logger';
-import type { FullTranslateBatchRequestMessage, FullTranslateBatchResponseMessage } from '@/0_common/types';
+import type {
+    FullTranslateBatchRequestMessage,
+    FullTranslateBatchResponseMessage,
+    FullTranslateFallbackInfo,
+} from '@/0_common/types';
 import {
     DEFAULT_BATCH_DELAY_MS,
     DEFAULT_MAX_CHARS_PER_BATCH,
@@ -49,9 +53,12 @@ export class BatchQueue {
     private sourceLang: string;
     private targetLang: string;
     private isQuotaExhausted = false;
+    private hasReportedFallback = false;
 
     /** Callback invoked when a batch response indicates quota exhaustion */
     onQuotaExhausted?: () => void;
+    /** Callback invoked when a batch response indicates runtime provider fallback */
+    onProviderFallback?: (fallbackInfo: FullTranslateFallbackInfo) => void;
 
     constructor(config: {
         sourceLang: string;
@@ -192,6 +199,8 @@ export class BatchQueue {
                     throw new Error(errorMsg);
                 }
 
+                this.reportProviderFallback(response.fallbackInfo);
+
                 const translations = response.translations;
 
                 if (translations.length !== texts.length) {
@@ -254,11 +263,21 @@ export class BatchQueue {
                 }
 
                 if (response?.success && response.translations?.[0]) {
+                    this.reportProviderFallback(response.fallbackInfo);
                     resolve(response.translations[0]);
                 } else {
                     reject(new Error(response?.error ?? 'Translation failed'));
                 }
             });
         });
+    }
+
+    private reportProviderFallback(fallbackInfo?: FullTranslateFallbackInfo): void {
+        if (!fallbackInfo || this.hasReportedFallback) {
+            return;
+        }
+
+        this.hasReportedFallback = true;
+        this.onProviderFallback?.(fallbackInfo);
     }
 }

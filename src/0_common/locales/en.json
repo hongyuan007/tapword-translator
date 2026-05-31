@@ -207,10 +207,13 @@
   "popup.quota.title": "Today's Free Quota",
   "popup.quota.pageTranslation": "Page Translation",
   "popup.quota.exhausted": "Today's free quota is used up. Come back tomorrow!",
+  "popup.quota.fallbackHint": "TapWord full-page translation quota is used up. Switching to Microsoft Translate",
+  "popup.quota.fallbackBubble": "Quota used up · Using Microsoft Translate",
   "popup.quota.warning": "Quota running low",
   "popup.quota.loading": "Loading...",
   "popup.quota.error": "Failed to load quota",
-  "fullTranslate.quotaExhausted.toast": "Today's free translation quota has been used up. Already translated content will remain visible.",
+  "fullTranslate.quotaExhausted.toast": "Today's free translation quota has been used up. Already translated content will remain visible",
+  "fullTranslate.providerFallback.toast": "TapWord full-page translation quota is used up. Switching to Microsoft Translate",
   "options.fullTranslateLightColor.label": "Full Page Translation Color (Light Theme)",
   "options.fullTranslateDarkColor.label": "Full Page Translation Color (Dark Theme)",
   "options.color.black": "Black",
@@ -271,5 +274,6 @@
   "options.translationEngine.aiProviders.form.save": "Save",
   "options.translationEngine.aiProviders.form.edit": "Edit",
   "options.translationEngine.aiProviders.form.delete": "Delete",
+  "popup.translationProvider.officialExhausted": "TapWord Cloud Service quota exhausted",
   "popup.translationProvider.bingTranslate": "Bing Translate"
 }

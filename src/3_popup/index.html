@@ -54,7 +54,7 @@
               <div class="setting-info">
                 <label class="setting-label" for="fullPageTranslationProvider" data-i18n-key="popup.fullPageProvider.label">Translation Engine</label>
               </div>
-              <div class="setting-control">
+              <div class="setting-control setting-control-stack">
                 <select id="fullPageTranslationProvider" class="language-select">
                   <option value="official" data-i18n-key="popup.translationProvider.official">TapWord Cloud Service</option>
                   <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
@@ -64,12 +64,20 @@
               </div>
             </div>
             
-            <div id="quotaSection" class="setting-item setting-item-column quota-section is-loading" style="padding-top: 4px;">
-              <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                <span class="setting-label" style="font-size: 11px; color: rgba(30, 30, 30, 0.7);" data-i18n-key="popup.quota.title">Today's Free Quota</span>
+            <div id="quotaSection" class="setting-item setting-item-column quota-section is-loading">
+              <div
+                id="fullPageProviderFallbackBubble"
+                class="selector-fallback-bubble"
+                data-i18n-key="popup.quota.fallbackBubble"
+                hidden
+              >
+                Quota used up · Using Microsoft Translate
+              </div>
+              <div class="quota-header-row">
+                <span class="setting-label quota-title-label" data-i18n-key="popup.quota.title">Today's Free Quota</span>
                 <span id="quotaPercentage" class="quota-percentage" data-i18n-key="popup.quota.loading">Loading...</span>
               </div>
-              <div class="quota-bar-wrapper" style="width: 100%;">
+              <div class="quota-bar-wrapper">
                 <div class="quota-bar-track">
                   <div id="quotaProgressFill" class="quota-bar-fill"></div>
                 </div>

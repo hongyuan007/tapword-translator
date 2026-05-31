@@ -5,6 +5,7 @@
  */
 
 import * as loggerModule from '@/0_common/utils/logger';
+import type { FullTranslateFallbackInfo } from '@/0_common/types';
 import type { FullTranslateConfig, TranslationUnit } from './types';
 import { PARAGRAPH_ATTRIBUTE, WALKED_ATTRIBUTE } from './constants';
 import {
@@ -61,6 +62,8 @@ export class PageTranslationManager {
 
     /** Callback invoked when a batch response indicates quota exhaustion */
     onQuotaExhausted?: () => void;
+    /** Callback invoked when a batch response indicates runtime provider fallback */
+    onProviderFallback?: (fallbackInfo: FullTranslateFallbackInfo) => void;
 
     constructor(config: FullTranslateConfig) {
         this.config = config;
@@ -87,6 +90,7 @@ export class PageTranslationManager {
             targetLang: this.config.targetLang,
         });
         this.batchQueue.onQuotaExhausted = () => this.onQuotaExhausted?.();
+        this.batchQueue.onProviderFallback = (fallbackInfo) => this.onProviderFallback?.(fallbackInfo);
 
         this.viewportObserver = new ViewportObserver(
             (element) => this.onParagraphVisible(element),

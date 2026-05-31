@@ -15,6 +15,8 @@ const logger = loggerModule.createLogger("Popup/QuotaDisplay")
 const QUOTA_CACHE_KEY = "quotaDisplayCache"
 const PERCENTAGE_WARNING_THRESHOLD = 80
 const PERCENTAGE_EXHAUSTED_THRESHOLD = 100
+const OFFICIAL_PROVIDER_ID = "official"
+const PROVIDER_FALLBACK_EXHAUSTED_CLASS = "is-fallback-exhausted"
 
 interface QuotaDisplayCache {
     used: number
@@ -28,6 +30,7 @@ let progressBarFill: HTMLElement | null = null
 let progressPercentage: HTMLElement | null = null
 let quotaSection: HTMLElement | null = null
 let fullTranslateButton: HTMLButtonElement | null = null
+let isOfficialQuotaExhausted = false
 
 /**
  * Initialize the quota display.
@@ -49,6 +52,8 @@ export async function initQuotaDisplay(): Promise<void> {
     if (cached) {
         renderQuota(cached.used, cached.limit)
     }
+
+    syncProviderFallbackState()
 
     // Fetch fresh data from background
     fetchQuotaUsage()
@@ -87,14 +92,17 @@ function fetchQuotaUsage(): void {
 function renderQuota(used: number, limit: number, isOfficialProvider: boolean = true): void {
     if (!progressBarFill || !progressPercentage || !quotaSection) return
 
+    const percentage = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0
+    isOfficialQuotaExhausted = percentage >= PERCENTAGE_EXHAUSTED_THRESHOLD
+    syncProviderFallbackState()
+
     // Hide quota section for non-official providers (quota only applies to official)
     if (!isOfficialProvider) {
         quotaSection.style.display = "none"
-        disableTranslateButton(false)
+        updateTranslateButtonQuotaState()
         return
     }
     quotaSection.style.display = ""
-    const percentage = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0
 
     // Update progress bar width
     progressBarFill.style.width = `${percentage}%`
@@ -109,13 +117,13 @@ function renderQuota(used: number, limit: number, isOfficialProvider: boolean = 
     quotaSection.classList.remove("quota-normal", "quota-warning", "quota-exhausted")
     if (percentage >= PERCENTAGE_EXHAUSTED_THRESHOLD) {
         quotaSection.classList.add("quota-exhausted")
-        disableTranslateButton(true)
+        updateTranslateButtonQuotaState()
     } else if (percentage >= PERCENTAGE_WARNING_THRESHOLD) {
         quotaSection.classList.add("quota-warning")
-        disableTranslateButton(false)
+        updateTranslateButtonQuotaState()
     } else {
         quotaSection.classList.add("quota-normal")
-        disableTranslateButton(false)
+        updateTranslateButtonQuotaState()
     }
 }
 
@@ -130,20 +138,13 @@ function showError(): void {
 }
 
 /**
- * Disable/enable the full-translate button when quota is exhausted.
+ * Clear quota-specific button affordance without overriding master enable state.
  */
-function disableTranslateButton(disabled: boolean): void {
+function updateTranslateButtonQuotaState(): void {
     if (!fullTranslateButton) return
 
-    if (disabled) {
-        fullTranslateButton.disabled = true
-        fullTranslateButton.classList.add("is-quota-exhausted")
-        fullTranslateButton.title = i18nModule.translate("popup.quota.exhausted")
-    } else {
-        fullTranslateButton.disabled = false
-        fullTranslateButton.classList.remove("is-quota-exhausted")
-        fullTranslateButton.title = ""
-    }
+    fullTranslateButton.classList.remove("is-quota-exhausted")
+    fullTranslateButton.title = ""
 }
 
 /**
@@ -164,12 +165,14 @@ async function loadCachedQuota(): Promise<QuotaDisplayCache | null> {
 export function updateForProvider(provider: string): void {
     if (!quotaSection) return
 
-    if (provider === "official") {
+    syncProviderFallbackState(provider)
+
+    if (provider === OFFICIAL_PROVIDER_ID) {
         quotaSection.style.display = ""
         fetchQuotaUsage()
     } else {
         quotaSection.style.display = "none"
-        disableTranslateButton(false)
+        updateTranslateButtonQuotaState()
     }
 }
 
@@ -186,4 +189,33 @@ function saveCachedQuota(quota: FullTextTranslationQuotaInfo): void {
     chrome.storage.local.set({ [QUOTA_CACHE_KEY]: cache }).catch((error) => {
         logger.warn("Failed to cache quota data:", error)
     })
+}
+
+function syncProviderFallbackState(providerOverride?: string): void {
+    const providerSelect = document.getElementById("fullPageTranslationProvider") as HTMLSelectElement | null
+    const fallbackBubble = document.getElementById("fullPageProviderFallbackBubble")
+    if (!providerSelect) {
+        return
+    }
+
+    const selectedProvider = providerOverride ?? providerSelect.value
+    const isFallbackActive = selectedProvider === OFFICIAL_PROVIDER_ID && isOfficialQuotaExhausted
+
+    providerSelect.classList.toggle(PROVIDER_FALLBACK_EXHAUSTED_CLASS, isFallbackActive)
+    providerSelect.title = ""
+
+    const officialOption = Array.from(providerSelect.options).find((option) => option.value === OFFICIAL_PROVIDER_ID)
+    if (officialOption) {
+        officialOption.title = isFallbackActive ? i18nModule.translate("popup.translationProvider.officialExhausted") : ""
+        officialOption.style.color = isFallbackActive ? "rgba(30, 30, 30, 0.42)" : ""
+    }
+
+    if (isFallbackActive) {
+        providerSelect.title = i18nModule.translate("popup.translationProvider.officialExhausted")
+    }
+
+    if (fallbackBubble) {
+        fallbackBubble.hidden = !isFallbackActive
+        fallbackBubble.title = isFallbackActive ? i18nModule.translate("popup.quota.fallbackHint") : ""
+    }
 }

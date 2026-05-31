@@ -54,12 +54,19 @@ function emitEvent(event: FullTranslateEvent): void {
 const DEFAULT_SOURCE_LANG = 'auto';
 const DEFAULT_TARGET_LANG = 'zh';
 const DEFAULT_MODE = 'bilingual' as const;
+const FALLBACK_NOTICE_STORAGE_KEY = 'fullTranslateOfficialFallbackNotice';
+const FALLBACK_NOTICE_SCENARIO = 'officialQuotaFallbackToMicrosoftFree';
 // Development-stage product decision:
 // keep the "main" path available in the module, but force the live entrypoint
 // to use true full-page coverage until range switching is exposed intentionally.
 const DEFAULT_RANGE = 'all' as const;
 
 let manager: PageTranslationManager | null = null;
+
+interface FallbackNoticeState {
+    date: string;
+    scenario: string;
+}
 
 /** Check if full-text translation is currently running */
 export function getIsRunning(): boolean {
@@ -76,10 +83,7 @@ async function startTranslation(): Promise<void> {
             const isOfficialProvider = response.data.isOfficialProvider !== false;
             const quota = response.data.fullTextTranslation;
             if (isOfficialProvider && quota.remaining <= 0) {
-                const message = i18nModule.translate('fullTranslate.quotaExhausted.toast');
-                toastNotification.showViewportToast(message, 'info');
-                emitEvent('quota_exhausted');
-                return;
+                await showOfficialFallbackNoticeIfNeeded();
             }
         }
     } catch (error) {
@@ -98,6 +102,9 @@ async function startTranslation(): Promise<void> {
         const message = i18nModule.translate('fullTranslate.quotaExhausted.toast');
         toastNotification.showViewportToast(message, 'info');
         emitEvent('quota_exhausted');
+    };
+    manager.onProviderFallback = () => {
+        void showOfficialFallbackNoticeIfNeeded();
     };
     await manager.start();
     logger.info('Full-page translation started');
@@ -195,4 +202,44 @@ async function buildConfig(): Promise<FullTranslateConfig> {
         targetLang: settings.targetLanguage || DEFAULT_TARGET_LANG,
         translationTextColor,
     };
+}
+
+async function showOfficialFallbackNoticeIfNeeded(): Promise<void> {
+    const today = getTodayDateString();
+    let shouldShow = true;
+
+    try {
+        const result = await chrome.storage.local.get(FALLBACK_NOTICE_STORAGE_KEY);
+        const currentState = result[FALLBACK_NOTICE_STORAGE_KEY] as FallbackNoticeState | undefined;
+
+        if (
+            currentState?.date === today
+            && currentState.scenario === FALLBACK_NOTICE_SCENARIO
+        ) {
+            shouldShow = false;
+        } else {
+            const nextState: FallbackNoticeState = {
+                date: today,
+                scenario: FALLBACK_NOTICE_SCENARIO,
+            };
+            await chrome.storage.local.set({ [FALLBACK_NOTICE_STORAGE_KEY]: nextState });
+        }
+    } catch (error) {
+        logger.warn('Failed to persist full-page fallback notice state', error);
+    }
+
+    if (!shouldShow) {
+        return;
+    }
+
+    const message = i18nModule.translate('fullTranslate.providerFallback.toast');
+    toastNotification.showViewportToast(message, 'info');
+}
+
+function getTodayDateString(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }

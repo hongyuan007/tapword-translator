@@ -8,7 +8,13 @@
  * - custom ID: User-defined OpenAI-compatible provider
  */
 
-import type { FullTranslateBatchRequestData, FullTranslateBatchResponseMessage, CustomAiProvider } from "@/0_common/types"
+import type {
+    CustomAiProvider,
+    FullTextTranslationQuotaInfo,
+    FullTranslateBatchRequestData,
+    FullTranslateBatchResponseMessage,
+    FullTranslateFallbackInfo,
+} from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as storageManagerModule from "@/0_common/utils/storageManager"
 import { CUSTOM_API_FIXED_PARAMS } from "@/0_common/constants/customApi"
@@ -23,6 +29,29 @@ import * as generateModule from "@/8_generate"
 import * as serviceInitializer from "../services/ServiceInitializer"
 
 const logger = loggerModule.createLogger("FullTranslateBatchHandler")
+const FIXED_PROVIDERS = ["official", "microsoftFree", "bingTranslate", "googleFree"]
+const OFFICIAL_QUOTA_FALLBACK_INFO: FullTranslateFallbackInfo = {
+    sourceProvider: "official",
+    actualProvider: "microsoftFree",
+    reason: "quotaExceeded",
+}
+
+async function markOfficialQuotaExhausted(): Promise<FullTextTranslationQuotaInfo> {
+    const quotaManager = getQuotaManager()
+    await quotaManager.updateFullTextTranslationQuota({ used: 0, limit: 0, remaining: 0 })
+    return await quotaManager.getFullTextTranslationQuotaUsage()
+}
+
+function withOfficialQuotaFallback(
+    result: FullTranslateBatchResponseMessage,
+    quotaInfo?: FullTextTranslationQuotaInfo,
+): FullTranslateBatchResponseMessage {
+    return {
+        ...result,
+        quotaInfo: result.quotaInfo ?? quotaInfo,
+        fallbackInfo: OFFICIAL_QUOTA_FALLBACK_INFO,
+    }
+}
 
 // ─── Provider implementations ────────────────────────────────────────────────
 
@@ -139,7 +168,6 @@ export async function handleFullTranslateBatchRequest(
         const settings = await storageManagerModule.getUserSettings()
         const provider = settings.fullPageTranslationProvider
         const networkRegion = settings.networkRegion ?? "auto"
-        const FIXED_PROVIDERS = ["official", "microsoftFree", "bingTranslate", "googleFree"]
 
         logger.debug("Full-text batch request", { provider, segments: data.texts.length })
 
@@ -157,15 +185,20 @@ export async function handleFullTranslateBatchRequest(
             case "official":
                 // cloud API with quota management, with fallback to microsoftFree on quota exceeded
                 try {
-                    result = await translateWithOfficialApi(data)
-                    if (!result.success && result.errorType === "QuotaExceeded") {
+                    const officialResult = await translateWithOfficialApi(data)
+                    if (!officialResult.success && officialResult.errorType === "QuotaExceeded") {
                         logger.warn("Official API quota exceeded, falling back to microsoftFree")
-                        result = await translateWithMicrosoftFreeProvider(data)
+                        const fallbackResult = await translateWithMicrosoftFreeProvider(data)
+                        result = withOfficialQuotaFallback(fallbackResult, officialResult.quotaInfo)
+                    } else {
+                        result = officialResult
                     }
                 } catch (officialError) {
                     if (officialError instanceof APIError && officialError.code === APIErrorCodes.QUOTA_EXCEEDED) {
                         logger.warn("Official API quota exceeded (exception), falling back to microsoftFree")
-                        result = await translateWithMicrosoftFreeProvider(data)
+                        const quotaInfo = await markOfficialQuotaExhausted()
+                        const fallbackResult = await translateWithMicrosoftFreeProvider(data)
+                        result = withOfficialQuotaFallback(fallbackResult, quotaInfo)
                     } else {
                         throw officialError
                     }

@@ -27,8 +27,9 @@ export type ToastType = "info" | "warning" | "error" | "success"
 // ============================================================================
 
 // Layout
-const CARD_MIN_WIDTH = "280px"
-const CARD_MAX_WIDTH = "420px"
+const CARD_MIN_WIDTH = "min(320px, calc(100vw - 32px))"
+const CARD_WIDTH = "min(460px, calc(100vw - 32px))"
+const CARD_MAX_WIDTH = "calc(100vw - 32px)"
 const CARD_PADDING = "12px 16px"
 const CARD_BORDER_RADIUS = "12px"
 
@@ -148,6 +149,7 @@ export function createToastElements(message: string, type: ToastType): ToastElem
         display: "flex",
         alignItems: "flex-start",
         padding: CARD_PADDING,
+        width: CARD_WIDTH,
         minWidth: CARD_MIN_WIDTH,
         maxWidth: CARD_MAX_WIDTH,
         boxSizing: "border-box",
