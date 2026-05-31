@@ -3,6 +3,7 @@ import * as i18nModule from "@/0_common/utils/i18n"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as colorUtils from "@/0_common/utils/colorUtils"
 import * as settingsManagerModule from "@/4_options/modules/settingsManager"
+import * as translationEngineManagerModule from "@/4_options/modules/translationEngineManager"
 import type * as types from "@/0_common/types"
 import * as storageManagerModule from "@/0_common/utils/storageManager"
 import * as translationFontSizeModule from "@/0_common/constants/translationFontSize"
@@ -615,9 +616,7 @@ async function initializeOptions(): Promise<void> {
 
         await settingsManagerModule.loadSettings()
         settingsManagerModule.setupSettingChangeListeners()
-        settingsManagerModule.setupCustomApiValidation()
-        settingsManagerModule.setupMTranServerTest()
-        settingsManagerModule.setupBingTranslateTest()
+        await translationEngineManagerModule.initTranslationEngineSection()
         const fabColor = await loadFloatingButtonColor()
         initIconVariantPicker(fabColor)
         initFloatingButtonColorPicker(fabColor)

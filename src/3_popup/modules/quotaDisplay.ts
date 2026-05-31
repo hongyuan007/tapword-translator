@@ -159,6 +159,21 @@ async function loadCachedQuota(): Promise<QuotaDisplayCache | null> {
 }
 
 /**
+ * Update quota section visibility based on the selected translation provider.
+ */
+export function updateForProvider(provider: string): void {
+    if (!quotaSection) return
+
+    if (provider === "official") {
+        quotaSection.style.display = ""
+        fetchQuotaUsage()
+    } else {
+        quotaSection.style.display = "none"
+        disableTranslateButton(false)
+    }
+}
+
+/**
  * Save quota data to chrome.storage.local for instant rendering on next popup open.
  */
 function saveCachedQuota(quota: FullTextTranslationQuotaInfo): void {

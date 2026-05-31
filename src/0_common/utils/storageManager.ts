@@ -12,7 +12,6 @@
  * 8. Ensure data security for sensitive information
  */
 
-import { APP_EDITION } from "@/0_common/constants"
 import type * as types from "@/0_common/types"
 import { DEFAULT_USER_SETTINGS } from "@/0_common/types"
 import * as translationFontSizeModule from "@/0_common/constants/translationFontSize"
@@ -22,7 +21,6 @@ import { getPlatformOS, PLATFORMS } from "@/0_common/utils/platformDetector"
 import type { PlatformOS } from "@/0_common/utils/platformDetector"
 
 const logger = loggerModule.createLogger("0_common/utils/storageManager")
-const isCommunityEdition = APP_EDITION === "community"
 
 const STORAGE_KEYS = {
     USER_SETTINGS: "userSettings",
@@ -81,43 +79,33 @@ function normalizeUserSettings(
     settings: Partial<types.UserSettings>,
     platformDefaults?: PlatformDefaultContext
 ): types.UserSettings {
-    const normalizeString = (value: string | undefined): string => (value ?? "").trim()
+    const normalizedWordTranslationProvider =
+        typeof settings.wordTranslationProvider === "string" && settings.wordTranslationProvider.trim() !== ""
+            ? settings.wordTranslationProvider.trim()
+            : DEFAULT_USER_SETTINGS.wordTranslationProvider
 
-    const mergedCustomApi = {
-        ...DEFAULT_USER_SETTINGS.customApi,
-        ...(settings.customApi ?? {}),
+    const normalizedFullPageTranslationProvider =
+        typeof settings.fullPageTranslationProvider === "string" && settings.fullPageTranslationProvider.trim() !== ""
+            ? settings.fullPageTranslationProvider.trim()
+            : DEFAULT_USER_SETTINGS.fullPageTranslationProvider
+
+    const normalizeCustomProvider = (entry: unknown): types.CustomAiProvider | null => {
+        if (!entry || typeof entry !== "object") return null
+        const p = entry as Record<string, unknown>
+        const id = typeof p.id === "string" ? p.id.trim() : ""
+        if (!id) return null
+        return {
+            id,
+            name: typeof p.name === "string" ? p.name.trim() : "",
+            endpoint: typeof p.endpoint === "string" ? p.endpoint.trim() : "",
+            apiKey: typeof p.apiKey === "string" ? p.apiKey.trim() : "",
+            model: typeof p.model === "string" ? p.model.trim() : "",
+        }
     }
 
-    const mergedMTranserver = {
-        ...DEFAULT_USER_SETTINGS.mtranserver,
-        ...(settings.mtranserver ?? {}),
-    }
-
-    const mergedBingTranslate = {
-        ...DEFAULT_USER_SETTINGS.bingTranslate,
-        ...(settings.bingTranslate ?? {}),
-    }
-
-    const normalizedCustomApi: types.CustomApiSettings = {
-        baseUrl: normalizeString(mergedCustomApi.baseUrl),
-        apiKey: normalizeString(mergedCustomApi.apiKey),
-        model: normalizeString(mergedCustomApi.model),
-    }
-
-    const normalizedMTranserver: types.MTranserverSettings = {
-        url: normalizeString(mergedMTranserver.url),
-        key: normalizeString(mergedMTranserver.key),
-        enabled: mergedMTranserver.enabled ?? DEFAULT_USER_SETTINGS.mtranserver.enabled,
-    }
-
-    // Community edition: Default to customApi since official cloud API is not available
-    let normalizedTranslationProvider: types.TranslationProvider = "official"
-    if (isCommunityEdition && settings.translationProvider === undefined) {
-        normalizedTranslationProvider = "customApi"
-    }
-    
-    // Note: We don't auto-switch to mtranserver based on URL configuration
-    // User must explicitly select mtranserver from the provider dropdown
+    const normalizedCustomProviders: types.CustomAiProvider[] = Array.isArray(settings.customProviders)
+        ? (settings.customProviders.map(normalizeCustomProvider).filter(Boolean) as types.CustomAiProvider[])
+        : []
 
     const platformDefaultTriggerKey = platformDefaults?.defaultTriggerKey ?? DEFAULT_USER_SETTINGS.doubleClickSentenceTriggerKey
     const platformOS = platformDefaults?.os ?? "unknown"
@@ -130,8 +118,9 @@ function normalizeUserSettings(
         ...DEFAULT_USER_SETTINGS,
         ...platformAwareDefaults,
         ...settings,
-        customApi: normalizedCustomApi,
-        translationProvider: settings.translationProvider ?? normalizedTranslationProvider,
+        wordTranslationProvider: normalizedWordTranslationProvider,
+        fullPageTranslationProvider: normalizedFullPageTranslationProvider,
+        customProviders: normalizedCustomProviders,
     }
 
     const triggerKey = normalizeTriggerKey(mergedSettings.doubleClickSentenceTriggerKey, platformOS)
@@ -167,9 +156,6 @@ function normalizeUserSettings(
         tooltipUnderlineOffsetPxV3: mergedSettings.tooltipUnderlineOffsetPxV3 ?? DEFAULT_USER_SETTINGS.tooltipUnderlineOffsetPxV3,
         tooltipTextOffsetPxV3: mergedSettings.tooltipTextOffsetPxV3 ?? DEFAULT_USER_SETTINGS.tooltipTextOffsetPxV3,
         tooltipBottomSpacingPxV3: mergedSettings.tooltipBottomSpacingPxV3 ?? DEFAULT_USER_SETTINGS.tooltipBottomSpacingPxV3,
-        customApi: normalizedCustomApi,
-        mtranserver: normalizedMTranserver,
-        bingTranslate: mergedBingTranslate,
         doubleClickSentenceTriggerKey: validatedTriggerKey,
         // Ensure V2 key is always populated for internal usage
         doubleClickTranslateV2: mergedSettings.doubleClickTranslateV2 ?? DEFAULT_USER_SETTINGS.doubleClickTranslateV2,

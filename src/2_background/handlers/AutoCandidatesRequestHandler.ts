@@ -30,11 +30,12 @@ export async function handleAutoCandidatesRequest(
         serviceInitializer.startBackgroundWarmUp()
 
         const settings = await storageManagerModule.getUserSettings()
-        const provider = settings.translationProvider
+        const provider = settings.wordTranslationProvider
+        const FIXED_PROVIDERS = ["official", "microsoftFree", "googleFree"]
 
         logger.info("Auto-candidates request, provider:", provider, "sourceLang:", message.data.sourceLang)
 
-        if (provider === "mtranserver" || provider === "bingTranslate") {
+        if (provider === "microsoftFree" || provider === "googleFree") {
             sendResponse({
                 type: "AUTO_CANDIDATES_RESPONSE",
                 success: false,
@@ -43,17 +44,26 @@ export async function handleAutoCandidatesRequest(
             return
         }
 
-        if (provider === "customApi") {
-            const customApi = settings.customApi
-            const apiKey = customApi.apiKey.trim()
-            const baseUrl = customApi.baseUrl.trim()
-            const model = customApi.model.trim()
+        if (!FIXED_PROVIDERS.includes(provider)) {
+            const customProvider = settings.customProviders.find(p => p.id === provider)
+            if (!customProvider) {
+                sendResponse({
+                    type: "AUTO_CANDIDATES_RESPONSE",
+                    success: false,
+                    error: `Custom provider not found: ${provider}`,
+                })
+                return
+            }
+
+            const apiKey = customProvider.apiKey.trim()
+            const baseUrl = customProvider.endpoint.trim()
+            const model = customProvider.model.trim()
 
             if (!apiKey || !baseUrl || !model) {
                 sendResponse({
                     type: "AUTO_CANDIDATES_RESPONSE",
                     success: false,
-                    error: "Custom API configuration is incomplete (missing apiKey, baseUrl, or model)",
+                    error: "Custom API configuration is incomplete (missing apiKey, endpoint, or model)",
                 })
                 return
             }

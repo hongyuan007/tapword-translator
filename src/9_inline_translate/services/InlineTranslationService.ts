@@ -68,7 +68,7 @@ const MAX_TRANSLATIONS_PER_BLOCK = 30
 const RENDER_STAGGER_MS = 50
 
 /** Providers that do not support auto-candidate selection */
-const UNSUPPORTED_PROVIDERS = new Set(["mtranserver", "bingTranslate"])
+const UNSUPPORTED_PROVIDERS = new Set(["microsoftFree", "googleFree", "bingTranslate"])
 
 // ============================================================================
 // State
@@ -90,7 +90,7 @@ async function executeAutoTranslation(params: AutoTriggerParams): Promise<void> 
     if (!settings?.enableAutoTranslate) return
 
     // Check provider support
-    const provider = settings.translationProvider
+    const provider = settings.wordTranslationProvider
     if (UNSUPPORTED_PROVIDERS.has(provider)) {
         logger.info("Auto-translation not supported for provider:", provider)
         return

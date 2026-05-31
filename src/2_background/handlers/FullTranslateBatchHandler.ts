@@ -3,12 +3,12 @@
  *
  * Routes full-page translation requests to the appropriate provider:
  * - official: Cloud API with quota management
- * - customApi: Local LLM (OpenAI-compatible)
- * - mtranserver: Self-hosted MTranServer (parallel MT)
- * - bingTranslate: Bing Translate (parallel MT)
+ * - microsoftFree: Microsoft free translation
+ * - googleFree: Google free translation
+ * - custom ID: User-defined OpenAI-compatible provider
  */
 
-import type { FullTranslateBatchRequestData, FullTranslateBatchResponseMessage } from "@/0_common/types"
+import type { FullTranslateBatchRequestData, FullTranslateBatchResponseMessage, CustomAiProvider } from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as storageManagerModule from "@/0_common/utils/storageManager"
 import { CUSTOM_API_FIXED_PARAMS } from "@/0_common/constants/customApi"
@@ -16,9 +16,9 @@ import { APIError, APIErrorCodes, post } from "@/5_backend"
 import { getQuotaManager } from "@/5_backend/services/QuotaManager"
 import { TRANSLATION_API_ENDPOINTS } from "@/6_translate/constants/TranslationConstants"
 import type { FullTextBatchApiRequest, FullTextBatchApiResponse } from "@/6_translate/types/TranslationApiTypes"
-import * as mtranServerServiceModule from "@/6_translate/services/MTranServerService"
+import * as microsoftFreeServiceModule from "@/6_translate/services/MicrosoftFreeService"
+import * as googleFreeServiceModule from "@/6_translate/services/GoogleFreeService"
 import * as bingTranslateServiceModule from "@/6_translate/services/BingTranslateService"
-import type { MTranserverSettings, BingTranslateSettings, CustomApiSettings } from "@/0_common/types"
 import * as generateModule from "@/8_generate"
 import * as serviceInitializer from "../services/ServiceInitializer"
 
@@ -67,11 +67,11 @@ async function translateWithOfficialApi(data: FullTranslateBatchRequestData): Pr
 
 async function translateWithCustomApi(
     data: FullTranslateBatchRequestData,
-    customApi: CustomApiSettings,
+    customProvider: CustomAiProvider,
 ): Promise<FullTranslateBatchResponseMessage> {
-    const apiKey = customApi.apiKey.trim()
-    const baseUrl = customApi.baseUrl.trim()
-    const model = customApi.model.trim()
+    const apiKey = customProvider.apiKey.trim()
+    const baseUrl = customProvider.endpoint.trim()
+    const model = customProvider.model.trim()
 
     if (!apiKey || !baseUrl || !model) {
         return { success: false, error: "Custom API configuration is incomplete (missing apiKey, baseUrl, or model)" }
@@ -91,24 +91,33 @@ async function translateWithCustomApi(
     return { success: true, translations }
 }
 
-async function translateWithMTranServerProvider(
+async function translateWithMicrosoftFreeProvider(
     data: FullTranslateBatchRequestData,
-    settings: MTranserverSettings,
 ): Promise<FullTranslateBatchResponseMessage> {
-    logger.debug("MTranServer batch translation", { segments: data.texts.length })
+    logger.debug("MicrosoftFree batch translation", { segments: data.texts.length })
     const translations = await Promise.all(
-        data.texts.map((text) => mtranServerServiceModule.translateWithMTranServer(text, data.targetLang, settings)),
+        data.texts.map((text) => microsoftFreeServiceModule.translateWithMicrosoftFree(text, data.targetLang)),
+    )
+    return { success: true, translations }
+}
+
+async function translateWithGoogleFreeProvider(
+    data: FullTranslateBatchRequestData,
+): Promise<FullTranslateBatchResponseMessage> {
+    logger.debug("GoogleFree batch translation", { segments: data.texts.length })
+    const translations = await Promise.all(
+        data.texts.map((text) => googleFreeServiceModule.translateWithGoogleFree(text, data.targetLang)),
     )
     return { success: true, translations }
 }
 
 async function translateWithBingTranslateProvider(
     data: FullTranslateBatchRequestData,
-    settings: BingTranslateSettings,
+    networkRegion: string,
 ): Promise<FullTranslateBatchResponseMessage> {
-    logger.debug("BingTranslate batch translation", { segments: data.texts.length })
+    logger.debug("BingTranslate batch translation", { segments: data.texts.length, networkRegion })
     const translations = await Promise.all(
-        data.texts.map((text) => bingTranslateServiceModule.translateWithBingTranslate(text, data.targetLang, settings)),
+        data.texts.map((text) => bingTranslateServiceModule.translateWithBingTranslate(text, data.targetLang, networkRegion)),
     )
     return { success: true, translations }
 }
@@ -128,24 +137,53 @@ export async function handleFullTranslateBatchRequest(
         serviceInitializer.startBackgroundWarmUp()
 
         const settings = await storageManagerModule.getUserSettings()
-        const provider = settings.translationProvider
+        const provider = settings.fullPageTranslationProvider
+        const networkRegion = settings.networkRegion ?? "auto"
+        const FIXED_PROVIDERS = ["official", "microsoftFree", "bingTranslate", "googleFree"]
 
         logger.debug("Full-text batch request", { provider, segments: data.texts.length })
 
         let result: FullTranslateBatchResponseMessage
         switch (provider) {
-            case "customApi":
-                result = await translateWithCustomApi(data, settings.customApi)
-                break
-            case "mtranserver":
-                result = await translateWithMTranServerProvider(data, settings.mtranserver)
+            case "microsoftFree":
+                result = await translateWithMicrosoftFreeProvider(data)
                 break
             case "bingTranslate":
-                result = await translateWithBingTranslateProvider(data, settings.bingTranslate)
+                result = await translateWithBingTranslateProvider(data, networkRegion)
+                break
+            case "googleFree":
+                result = await translateWithGoogleFreeProvider(data)
+                break
+            case "official":
+                // cloud API with quota management, with fallback to microsoftFree on quota exceeded
+                try {
+                    result = await translateWithOfficialApi(data)
+                    if (!result.success && result.errorType === "QuotaExceeded") {
+                        logger.warn("Official API quota exceeded, falling back to microsoftFree")
+                        result = await translateWithMicrosoftFreeProvider(data)
+                    }
+                } catch (officialError) {
+                    if (officialError instanceof APIError && officialError.code === APIErrorCodes.QUOTA_EXCEEDED) {
+                        logger.warn("Official API quota exceeded (exception), falling back to microsoftFree")
+                        result = await translateWithMicrosoftFreeProvider(data)
+                    } else {
+                        throw officialError
+                    }
+                }
                 break
             default:
-                // "official" — cloud API with quota management
-                result = await translateWithOfficialApi(data)
+                // Custom provider — resolve by ID
+                if (!FIXED_PROVIDERS.includes(provider)) {
+                    const customProvider = settings.customProviders.find(p => p.id === provider)
+                    if (!customProvider) {
+                        result = { success: false, error: `Custom provider not found: ${provider}` }
+                    } else {
+                        result = await translateWithCustomApi(data, customProvider)
+                    }
+                } else {
+                    // Unrecognised fixed name — fall back to official
+                    result = await translateWithOfficialApi(data)
+                }
         }
 
         sendResponse(result)

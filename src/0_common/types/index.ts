@@ -298,35 +298,14 @@ export type NetworkRegion = "auto" | "china" | "global"
 export type LanguageProficiency = "Beginner" | "Intermediate" | "Advanced"
 
 /**
- * Translation provider type
- * - official: Official cloud API (default)
- * - customApi: User-provided LLM API
- * - mtranserver: Self-hosted MTranServer
- * - bingTranslate: Bing Translate API (free, no key required)
+ * Custom AI provider configuration (user-defined, 0–N entries)
  */
-export type TranslationProvider = "official" | "customApi" | "mtranserver" | "bingTranslate"
-
-export interface CustomApiSettings {
-    /** Custom API base URL */
-    baseUrl: string
-    /** Custom API key/token */
+export interface CustomAiProvider {
+    id: string
+    name: string
+    endpoint: string
     apiKey: string
-    /** Custom API model name */
     model: string
-}
-
-export interface MTranserverSettings {
-    /** MTranserver URL */
-    url: string
-    /** MTranserver API key */
-    key: string
-    /** Whether to enable MTranserver */
-    enabled: boolean
-}
-
-export interface BingTranslateSettings {
-    /** Whether to enable Bing Translate */
-    enabled: boolean
 }
 
 export interface UserSettings {
@@ -385,15 +364,14 @@ export interface UserSettings {
     sentenceUnderlineColor: string
     /** Icon background color */
     iconColor: IconColor
-    /** Translation provider selection */
-    translationProvider: TranslationProvider
-    /** Custom API settings */
-    customApi: CustomApiSettings
-    /** MTranserver settings */
-    mtranserver: MTranserverSettings
-    /** Bing Translate settings */
-    bingTranslate: BingTranslateSettings
+    /** Translation provider for word/fragment translation (fixed name or custom provider ID) */
+    wordTranslationProvider: string
+    /** Translation provider for full-page batch translation (fixed name or custom provider ID) */
+    fullPageTranslationProvider: string
+    /** User-defined custom AI providers (0–N entries) */
+    customProviders: CustomAiProvider[]
     /** Whether to suppress translation when the detected source language matches the target language */
+
     suppressNativeLanguage: boolean
     /** Network region preference for API calls (auto, china, global) */
     networkRegion: NetworkRegion
@@ -445,20 +423,9 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     wordUnderlineColorV2: "#1F7FDB",
     sentenceUnderlineColor: "#E9C46A",
     iconColor: "pink",
-    translationProvider: "official",
-    customApi: {
-        baseUrl: "",
-        apiKey: "",
-        model: "",
-    },
-    mtranserver: {
-        url: "http://127.0.0.1:8989",
-        key: "",
-        enabled: false,
-    },
-    bingTranslate: {
-        enabled: true,
-    },
+    wordTranslationProvider: "official",
+    fullPageTranslationProvider: "official",
+    customProviders: [],
     suppressNativeLanguage: false,
     networkRegion: "auto",
     enableAutoTranslate: false,

@@ -34,7 +34,7 @@
         <nav class="nav-menu">
           <a href="#general-settings" class="nav-item active" data-section="general-settings" data-i18n-key="popup.section.general">General</a>
           <a href="#appearance-settings" class="nav-item" data-section="appearance-settings" data-i18n-key="popup.section.appearance">Appearance</a>
-          <a href="#translation-settings" class="nav-item" data-section="translation-settings" data-i18n-key="popup.section.translate">Translation</a>
+          <a href="#translation-engine-settings" class="nav-item" data-section="translation-engine-settings" data-i18n-key="options.translationEngine.title">Translation Engine</a>
           <a href="#display-settings" class="nav-item" data-section="display-settings" data-i18n-key="popup.section.text">Text</a>
           <a href="#audio-settings" class="nav-item" data-section="audio-settings" data-i18n-key="popup.section.audio">Audio</a>
           <a href="#advanced-settings" class="nav-item" data-section="advanced-settings" data-i18n-key="popup.section.advanced">Advanced</a>
@@ -45,7 +45,7 @@
           <div class="section-header">
             <h2 data-i18n-key="popup.section.general">General</h2>
           </div>
-          <div class="card settings-card">
+          <div class="card settings-card" style="margin-bottom: 32px;">
             <div class="setting-item setting-item-master">
               <div class="setting-info">
                 <label class="setting-label master-label" for="enableTapWord">
@@ -58,6 +58,8 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+          </div>
+          <div class="card settings-card">
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="targetLanguage" data-i18n-key="popup.targetLanguage.label">Target Language</label>
@@ -119,6 +121,18 @@
               </div>
               <label class="toggle-switch">
                 <input type="checkbox" id="doubleClickSentenceTranslate" data-setting="doubleClickSentenceTranslate">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="suppressNativeLanguage">
+                  <span id="suppressNativeLanguageLabel"></span>
+                </label>
+                <p class="setting-helper" data-i18n-key="popup.suppressNativeLanguage.tooltip">Don't show translation icon when text language matches target language.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="suppressNativeLanguage" data-setting="suppressNativeLanguage">
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -591,22 +605,87 @@
           </div>
         </div>
 
-        <div id="translation-settings" class="settings-section">
+        <div id="translation-engine-settings" class="settings-section">
           <div class="section-header">
-            <h2 data-i18n-key="popup.section.translate">Translation Settings</h2>
+            <h2 data-i18n-key="options.translationEngine.title">Translation Engine</h2>
           </div>
-          <div class="card settings-card">
+
+          <!-- Sub-section 1: Engine Selectors -->
+          <h3 class="card-title" style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: var(--text-primary); padding-left: 2px;" data-i18n-key="options.translationEngine.engineSelect.title">Engine Selection</h3>
+          <div class="card settings-card" style="margin-bottom: 32px;">
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="suppressNativeLanguage">
-                  <span id="suppressNativeLanguageLabel"></span>
-                </label>
-                <p class="setting-helper" data-i18n-key="popup.suppressNativeLanguage.tooltip">Don't show translation icon when text language matches target language.</p>
+                <label class="setting-label" for="fullPageTranslationProviderSelect" data-i18n-key="options.translationEngine.fullPage.label">Full Page Translation</label>
+                <p class="setting-helper" data-i18n-key="options.translationEngine.fullPage.description">Engine for translating entire pages</p>
               </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="suppressNativeLanguage" data-setting="suppressNativeLanguage">
-                <span class="toggle-slider"></span>
-              </label>
+              <div class="setting-control">
+                <select id="fullPageTranslationProviderSelect" class="select-input">
+                  <option value="official" data-i18n-key="popup.translationProvider.official">TapWord Cloud Service</option>
+                  <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
+                  <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
+                  <!-- Custom providers injected by JS -->
+                </select>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="wordTranslationProviderSelect" data-i18n-key="options.translationEngine.word.label">Word &amp; Phrase Translation</label>
+                <p class="setting-helper" data-i18n-key="options.translationEngine.word.description">Engine for translating selected words and phrases</p>
+              </div>
+              <div class="setting-control">
+                <select id="wordTranslationProviderSelect" class="select-input">
+                  <option value="official" data-i18n-key="popup.translationProvider.official">TapWord Cloud Service</option>
+                  <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
+                  <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
+                  <!-- Custom providers injected by JS -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-section 2: AI Providers -->
+          <div style="margin-bottom: 12px; padding-left: 2px;">
+            <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;" data-i18n-key="options.translationEngine.aiProviders.label">AI Translation Providers</h3>
+            <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);" data-i18n-key="options.translationEngine.aiProviders.description">Add custom OpenAI-compatible API providers</p>
+          </div>
+          <div class="card settings-card">
+            <!-- Provider list: populated by JS -->
+            <div id="aiProviderList"></div>
+
+            <!-- Add/edit form (hidden by default) -->
+            <div id="aiProviderForm" style="display:none; padding: 16px; border-top: 1px solid rgba(0,0,0,0.06); background: #f9faff;">
+              <input type="hidden" id="aiProviderFormId">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.name">Name</label>
+                  <input type="text" id="aiProviderName" class="text-input" placeholder="e.g. My GPT-4o">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.model">Model</label>
+                  <input type="text" id="aiProviderModel" class="text-input" placeholder="gpt-4o-mini">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px; grid-column: 1 / -1;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.endpoint">API Endpoint</label>
+                  <input type="text" id="aiProviderEndpoint" class="text-input" placeholder="https://api.openai.com/v1">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px; grid-column: 1 / -1;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.apiKey">API Key</label>
+                  <input type="password" id="aiProviderApiKey" class="text-input" placeholder="sk-...">
+                </div>
+              </div>
+              <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button id="aiProviderFormTest" class="secondary-button" style="margin-right: auto;">Test</button>
+                <span id="aiProviderFormTestResult" style="font-size: 12px; margin-right: 4px;"></span>
+                <button id="aiProviderFormCancel" class="secondary-button" data-i18n-key="options.translationEngine.aiProviders.form.cancel">Cancel</button>
+                <button id="aiProviderFormSave" class="primary-button" data-i18n-key="options.translationEngine.aiProviders.form.save">Save</button>
+              </div>
+            </div>
+
+            <!-- Card footer: Add button -->
+            <div style="padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); background: #fafafa;">
+              <button id="addAiProviderBtn" class="secondary-button" data-i18n-key="options.translationEngine.aiProviders.addBtn">+ Add AI Provider</button>
             </div>
           </div>
         </div>
@@ -766,146 +845,6 @@
                   <span class="radio-desc" data-i18n-key="popup.networkRegion.global.desc">Force connection via Cloudflare.</span>
                 </div>
               </label>
-            </div>
-          </div>
-
-          <div id="providerTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-            <h3 class="card-title" data-i18n-key="popup.section.customApi" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Translation Provider</h3>
-            <p class="section-subtitle" data-i18n-key="popup.section.translationProvider.helper" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Select which translation service to use.</p>
-          </div>
-
-          <div class="card settings-card" id="providerSelectionCard">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="customApiProvider" data-i18n-key="popup.translationProvider.label">Translation Provider</label>
-                <p class="setting-helper" data-i18n-key="popup.translationProvider.helper">Choose between official cloud API, custom LLM API, or self-hosted MTranServer.</p>
-              </div>
-              <div class="setting-control">
-                <select id="customApiProvider" data-setting="translationProvider" class="select-input">
-                  <option value="official" data-i18n-key="popup.translationProvider.official">Official Cloud API</option>
-                  <option value="customApi" data-i18n-key="popup.translationProvider.customApi">Custom LLM API</option>
-                  <option value="mtranserver" data-i18n-key="popup.translationProvider.mtranserver">MTranServer (Self-hosted)</option>
-                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate (Free)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div id="providerPanelsContainer" class="provider-panels-container">
-            <!-- Custom LLM API panel -->
-            <div class="provider-panel" data-provider="customApi">
-              <div id="customApiTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-                <h3 class="card-title" data-i18n-key="popup.customApi.title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Custom LLM API</h3>
-                <p class="section-subtitle" data-i18n-key="popup.customApi.description" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Use your own LLM API provider for translations.</p>
-              </div>
-              <div class="card settings-card" id="customApiCard">
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="customApiBaseUrl" data-i18n-key="popup.customApi.baseUrl.label">API Base URL</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.baseUrl.helper">Example: https://api.openai.com/v1</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="url" id="customApiBaseUrl" data-setting="customApiBaseUrl" data-custom-api-control="true" class="select-input" placeholder="https://api.example.com/v1" />
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="customApiKey" data-i18n-key="popup.customApi.apiKey.label">API Key</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.apiKey.helper">Your provider token (stored locally in browser storage).</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="password" id="customApiKey" data-setting="customApiKey" data-custom-api-control="true" class="select-input" placeholder="sk-..." autocomplete="new-password" />
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="customApiModel" data-i18n-key="popup.customApi.model.label">Model</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.model.helper">Example: gpt-4o-mini, qwen-plus</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="text" id="customApiModel" data-setting="customApiModel" data-custom-api-control="true" class="select-input" placeholder="model-name" />
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="validateCustomApiButton" data-i18n-key="popup.customApi.validate.label">Validate Settings</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.validate.helper">Run a quick test translation using your custom API.</p>
-                  </div>
-                  <div class="setting-control validation-control">
-                    <button class="secondary-button" id="validateCustomApiButton" data-custom-api-control="true" data-i18n-key="popup.customApi.validate.button">Validate</button>
-                    <p class="validation-status" id="validateCustomApiStatus"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- MTranServer panel -->
-            <div class="provider-panel" data-provider="mtranserver">
-              <div id="mtranserverTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-                <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">MTranServer</h3>
-                <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
-                  <span data-i18n-key="popup.mtranserver.description">A lightweight, self-hosted translation service with low resource consumption.</span>
-                  <a href="https://github.com/xxnuo/MTranServer" target="_blank" rel="noopener noreferrer" class="link" data-i18n-key="popup.mtranserver.learnMore">Learn more →</a>
-                </p>
-              </div>
-              <div class="card settings-card" id="mtranserverCard">
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="mtranserverUrl" data-i18n-key="popup.mtranserver.url.label">MTranServer URL</label>
-                    <p class="setting-helper" data-i18n-key="popup.mtranserver.url.helper">Your self-hosted MTranServer endpoint (e.g., http://127.0.0.1:8989).</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="url" id="mtranserverUrl" data-setting="mtranserverUrl" class="select-input" placeholder="http://127.0.0.1:8989" value="http://127.0.0.1:8989"/>
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="mtranserverKey" data-i18n-key="popup.mtranserver.key.label">API Key (Optional)</label>
-                    <p class="setting-helper" data-i18n-key="popup.mtranserver.key.helper">If your MTranServer requires authentication.</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="password" id="mtranserverKey" data-setting="mtranserverKey" class="select-input" placeholder="" value=""/>
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" data-i18n-key="popup.mtranserver.test.label">Test Connection</label>
-                    <p class="setting-helper" data-i18n-key="popup.mtranserver.test.helper">Test your MTranServer connection with a sample translation.</p>
-                  </div>
-                  <div class="setting-control validation-control">
-                    <button class="secondary-button" id="testMtranserverButton" data-i18n-key="popup.mtranserver.test.button">Test Translation</button>
-                    <p class="validation-status" id="testMtranserverStatus"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bing Translate panel -->
-            <div class="provider-panel" data-provider="bingTranslate">
-              <div id="bingTranslateTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-                <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Bing Translate</h3>
-                <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
-                  <span data-i18n-key="popup.bingTranslate.description">Free translation service powered by Bing Translator. No API key required.</span>
-                  <a href="https://github.com/plainheart/bing-translate-api" target="_blank" rel="noopener noreferrer" class="link" data-i18n-key="popup.bingTranslate.learnMore">Learn more →</a>
-                </p>
-              </div>
-              <div class="card settings-card" id="bingTranslateCard">
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" data-i18n-key="popup.bingTranslate.note.label">Note</label>
-                    <p class="setting-helper" data-i18n-key="popup.bingTranslate.note.helper">Send a test request to verify Bing Translate is reachable.</p>
-                  </div>
-                  <div class="setting-control">
-                    <button class="secondary-button" id="testBingTranslateButton" data-i18n-key="popup.bingTranslate.test.button">Test Translation</button>
-                    <p class="validation-status" id="testBingTranslateStatus"></p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

@@ -99,9 +99,60 @@ async function initialize(): Promise<void> {
     // Initialize quota display
     await quotaDisplayModule.initQuotaDisplay()
 
+    // Initialize and manage fullPageTranslationProvider select
+    await setupFullPageProviderSelect()
+
     // Remove loading state to reveal content
     document.documentElement.classList.remove("loading")
     logger.info("Popup initialized")
+}
+
+/**
+ * Setup fullPageTranslationProvider select — dynamically injects custom provider options
+ * and wires save / quota-display logic.
+ */
+async function setupFullPageProviderSelect(): Promise<void> {
+    const select = document.getElementById("fullPageTranslationProvider") as HTMLSelectElement | null
+    if (!select) {
+        logger.warn("fullPageTranslationProvider select not found")
+        return
+    }
+
+    const result = await chrome.storage.sync.get("userSettings")
+    const settings = result.userSettings ?? {}
+    const customProviders: Array<{ id: string; name: string }> = settings.customProviders ?? []
+    const currentProvider: string = settings.fullPageTranslationProvider ?? "official"
+
+    // Inject custom provider options or sentinel option
+    if (customProviders.length === 0) {
+        const sentinel = document.createElement("option")
+        sentinel.value = "__add_provider__"
+        sentinel.setAttribute("data-i18n-key", "popup.translationProvider.addProvider")
+        sentinel.textContent = i18nModule.translate("popup.translationProvider.addProvider")
+        select.appendChild(sentinel)
+    } else {
+        for (const cp of customProviders) {
+            const opt = document.createElement("option")
+            opt.value = cp.id
+            opt.textContent = cp.name
+            select.appendChild(opt)
+        }
+    }
+
+    select.value = currentProvider
+    quotaDisplayModule.updateForProvider(currentProvider)
+
+    select.addEventListener("change", async () => {
+        const newValue = select.value
+        if (newValue === "__add_provider__") {
+            select.value = currentProvider
+            chrome.runtime.openOptionsPage()
+            return
+        }
+        await chrome.storage.sync.set({ userSettings: { ...settings, fullPageTranslationProvider: newValue } })
+        quotaDisplayModule.updateForProvider(newValue)
+        logger.info(`fullPageTranslationProvider changed to ${newValue}`)
+    })
 }
 
 /**

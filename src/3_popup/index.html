@@ -49,6 +49,21 @@
               </label>
             </div>
             
+            <div class="setting-item">
+              <div class="setting-gutter"></div>
+              <div class="setting-info">
+                <label class="setting-label" for="fullPageTranslationProvider" data-i18n-key="popup.fullPageProvider.label">Translation Engine</label>
+              </div>
+              <div class="setting-control">
+                <select id="fullPageTranslationProvider" class="language-select">
+                  <option value="official" data-i18n-key="popup.translationProvider.official">TapWord Cloud Service</option>
+                  <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
+                  <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
+                </select>
+              </div>
+            </div>
+            
             <div id="quotaSection" class="setting-item setting-item-column quota-section is-loading" style="padding-top: 4px;">
               <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
                 <span class="setting-label" style="font-size: 11px; color: rgba(30, 30, 30, 0.7);" data-i18n-key="popup.quota.title">Today's Free Quota</span>

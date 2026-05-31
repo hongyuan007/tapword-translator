@@ -93,19 +93,60 @@ body {
 }
 
 .secondary-button {
-  padding: 10px 16px;
+  padding: 8px 16px;
   border-radius: 8px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   border: 1px solid var(--border-color);
   background-color: #f8fafc;
   color: var(--text-color);
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-family);
 }
 
 .secondary-button:hover {
   background-color: #eef2ff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.primary-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background-color: var(--primary-color);
+  color: #fff;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.primary-button:hover {
+  background-color: #1a72cc;
+  box-shadow: 0 4px 12px rgba(36, 132, 224, 0.3);
+}
+
+.ghost-button {
+  background: transparent;
+  color: #888;
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.ghost-button:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-color);
+}
+.ghost-button-danger:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
 }
 
 .github-button {
@@ -512,6 +553,30 @@ body {
 .select-input:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(36, 132, 224, 0.15);
+  outline: none;
+}
+
+.text-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d7dce3;
+  background: #ffffff;
+  font-size: 13px;
+  color: var(--text-color);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.text-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 132, 224, 0.15);
+}
+
+.text-input::placeholder {
+  color: #bbb;
 }
 
 .toggle-switch {

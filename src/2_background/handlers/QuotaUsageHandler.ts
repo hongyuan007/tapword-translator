@@ -27,7 +27,7 @@ export async function handleQuotaUsageRequest(
         const usage = await quotaManager.getFullTextTranslationQuotaUsage()
 
         const settings = await storageManagerModule.getUserSettings()
-        const isOfficialProvider = settings.translationProvider === "official"
+        const isOfficialProvider = settings.fullPageTranslationProvider === "official"
 
         logger.debug("Quota usage request handled:", usage)
 
