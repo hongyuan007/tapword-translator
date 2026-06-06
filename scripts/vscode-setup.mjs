@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
 // Helper to create symlinks
-function createSymlink(targetPath, linkDir, linkName) {
+function createSymlink(targetPath, linkDir, linkName, type = 'dir') {
   const fullLinkDir = path.join(projectRoot, linkDir);
   const fullLinkPath = path.join(fullLinkDir, linkName);
   
@@ -48,7 +48,7 @@ function createSymlink(targetPath, linkDir, linkName) {
     } else {
       // macOS/Linux: Use relative symlink
       console.log(`  - Creating Symlink -> ${relativeTarget}`);
-      fs.symlinkSync(relativeTarget, fullLinkPath, 'dir'); // 'dir' hint for Windows if not junction, ignored on POSIX
+      fs.symlinkSync(relativeTarget, fullLinkPath, type); // 'dir' or 'file' hint for Windows
     }
     console.log(`  - Success.`);
   } catch (err) {
@@ -65,6 +65,9 @@ createSymlink("docs/skills", ".agents", "skills");
 
 // Task 2: .github/instructions -> docs/instructions
 createSymlink("docs/instructions", ".github", "instructions");
+
+// Task 3: CLAUDE.md -> AGENTS.md (file symlink)
+createSymlink("AGENTS.md", "", "CLAUDE.md", "file");
 
 console.log("");
 console.log("=== Setup Complete ===");

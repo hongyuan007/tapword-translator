@@ -1,6 +1,6 @@
 ---
 name: github-operations
-description: Comprehensive guide for all common GitHub operations via gh CLI: fetching issues and PRs, creating PRs, pushing branches, listing and filtering, and managing PR lifecycle. Use this when performing any GitHub task beyond basic git commands.
+description: "Comprehensive guide for all common GitHub operations via gh CLI: fetching issues and PRs, creating PRs, pushing branches, listing and filtering, and managing PR lifecycle. Use this when performing any GitHub task beyond basic git commands."
 ---
 
 # GitHub Operations Guide

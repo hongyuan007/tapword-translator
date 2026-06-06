@@ -30,6 +30,9 @@ class Logger {
         enabled: true,
     }
     private readonly startMonotonicMs: number
+    private activeToasts: HTMLElement[] = []
+    private static readonly MAX_TOASTS = 5
+    private static readonly TOAST_DURATION_MS = 5000
 
     constructor() {
         this.startMonotonicMs = this.getMonotonicNow()
@@ -123,6 +126,49 @@ class Logger {
         } catch (error) {
             this.fallbackLog(method, prefix, error)
         }
+
+        // Dev alert for warn/error
+        try {
+            const message = args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" ")
+            this.showDevAlert(level, prefix, message)
+        } catch {}
+    }
+
+    /**
+     * Show a non-blocking floating toast in the browser for warn/error logs.
+     * Only active in dev mode (VITE_LOGGER_ENABLED === "true") and DOM-capable contexts.
+     */
+    private showDevAlert(level: LogLevel, prefix: string, message: string): void {
+        if (!this.config.enabled) return
+        if (typeof document === "undefined") return
+        if (level !== "warn" && level !== "error") return
+        if (this.activeToasts.length >= Logger.MAX_TOASTS) return
+
+        try {
+            const bgColor = level === "error" ? "#dc3545" : "#fd7e14"
+            const bottomOffset = 16 + this.activeToasts.length * 64
+
+            const toast = document.createElement("div")
+            toast.style.cssText = `position:fixed;bottom:${bottomOffset}px;right:16px;z-index:2147483647;max-width:500px;padding:12px 16px;border-radius:8px;font:13px/1.4 system-ui,sans-serif;color:#fff;background:${bgColor};opacity:0.95;pointer-events:auto;box-shadow:0 4px 12px rgba(0,0,0,0.3);word-break:break-all;transition:opacity 0.3s ease;`
+
+            const truncMsg = message.length > 200 ? message.substring(0, 200) + "..." : message
+            toast.innerHTML = `<strong>[${level.toUpperCase()}]</strong> [${this.escapeHtml(prefix)}] ${this.escapeHtml(truncMsg)}`
+
+            document.body.appendChild(toast)
+            this.activeToasts.push(toast)
+
+            setTimeout(() => {
+                toast.style.opacity = "0"
+                setTimeout(() => {
+                    toast.remove()
+                    this.activeToasts = this.activeToasts.filter((t) => t !== toast)
+                }, 300)
+            }, Logger.TOAST_DURATION_MS)
+        } catch {}
+    }
+
+    private escapeHtml(str: string): string {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     }
 
     /**

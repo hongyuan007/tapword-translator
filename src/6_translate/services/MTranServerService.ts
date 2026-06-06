@@ -6,7 +6,13 @@
  */
 
 import * as loggerModule from "@/0_common/utils/logger"
-import type { MTranserverSettings } from "@/0_common/types"
+
+/** Settings for self-hosted MTranServer */
+interface MTranserverSettings {
+    url: string
+    key: string
+    enabled: boolean
+}
 
 const logger = loggerModule.createLogger("MTranServerService")
 

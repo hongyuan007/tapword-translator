@@ -26,6 +26,7 @@ const DEFAULT_CONFIG: CloudConfig = {
     quota: {
         dailyFreeTranslations: 100, // Conservative default
         dailyFreeSpeech: 300, // Conservative default
+        dailyFreeFullTextTranslationChars: 20000, // ~2–6 pages per day
     },
     websiteUrl: "www.tapword.cc", // Default official website
     chromeExtensionVersion: CLIENT_VERSION, // Default version
@@ -165,6 +166,13 @@ export class ConfigService {
      */
     getDailyFreeSpeech(): number {
         return this.getConfig().quota.dailyFreeSpeech
+    }
+
+    /**
+     * Get daily free full-text translation character quota
+     */
+    getDailyFreeFullTextTranslationChars(): number {
+        return this.getConfig().quota.dailyFreeFullTextTranslationChars
     }
 
     /**

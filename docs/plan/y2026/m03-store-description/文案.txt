@@ -1,0 +1,86 @@
+像做笔记一样翻译网页 —— 触词翻译（TapWord）是一款智能浏览器翻译插件，支持AI划词翻译和单词翻译。不同于传统翻译工具的弹窗打断，触词翻译将翻译结果直接展示在原文下方，就像阅读一本带笔记的外文书籍，在沉浸式阅读中自然掌握外语。
+
+核心功能包括：
+
+① 划词翻译：选中文本展示翻译图标，点击图标触发翻译。
+② 单击翻译单词：单击网页单词快速翻译。
+③ 详细翻译弹窗：点击翻译文本，显示详细的句子翻译，发音和词典释义，帮助理解语境。
+
+触词翻译官方网站：https://www.tapword.cc
+
+---
+Discover a new way to master foreign languages with TapWord. Unlike traditional translation tools that break your focus, TapWord displays precise, context-aware translations directly beneath the original text—just like subtitles for the web. Enjoy a seamless, immersive reading experience without ever losing your place.
+
+Key Features:
+
+① Highlight to Translate: Simply select any text and click the icon to see the translation instantly inline.
+② Smart Tap Translate: Click any word for a quick definition without leaving the flow of the sentence.
+③ Deep Dive Mode: Click on the translated text to open a detailed pop-up complete with full sentence structure, pronunciation, and dictionary definitions to master the context.
+
+Official Website: https://www.tapword.cc
+
+--- french
+Lisez le web sans frontières avec TapWord. Cette extension intelligente est conçue pour fluidifier votre lecture en affichant la traduction directement sous le texte original. Finis les allers-retours visuels : profitez d'une expérience de lecture immersive et contextuelle, idéale pour comprendre les subtilités d'une langue étrangère.
+
+Fonctionnalités principales :
+
+① Traduction au surlignage : Sélectionnez le texte et cliquez sur l'icône pour afficher la traduction en interligne.
+② Traduction instantanée de mots : Cliquez simplement sur un mot pour en obtenir le sens rapidement.
+③ Détails contextuels : Cliquez sur le texte traduit pour ouvrir une fenêtre détaillée incluant la traduction complète de la phrase, la prononciation et les définitions du dictionnaire.
+
+Site officiel : https://www.tapword.cc
+
+--- german
+Erleben Sie fremdsprachige Webseiten neu mit TapWord. Diese intelligente Browser-Erweiterung zeigt Übersetzungen direkt unter dem Originaltext an – ähnlich wie Untertitel. Das ermöglicht ein flüssiges, immersives Leseerlebnis, ohne dass Sie Ihren Blick abwenden müssen, und hilft Ihnen, den Kontext intuitiv zu erfassen.
+
+Hauptfunktionen:
+
+① Markieren & Übersetzen: Text markieren, Icon klicken und die Übersetzung erscheint sofort unter der Zeile.
+② Wort-Schnellübersetzung: Ein Klick auf ein Wort genügt für eine schnelle Übersetzung.
+③ Detailansicht: Ein Klick auf den übersetzten Text öffnet ein Fenster mit detaillierter Satzübersetzung, Aussprache und Wörterbuchdefinitionen für ein tieferes Sprachverständnis.
+
+Offizielle Website: https://www.tapword.cc
+
+-- jarpanese
+TapWordは、外国語記事をスムーズに読みたい方のためのインテリジェントな翻訳拡張機能です。翻訳結果を原文のすぐ「下」に表示することで、まるで映画の字幕を見るように、視線を動かさずにウェブサイトを読むことができます。学習のリズムを崩さない、没入型の読書体験を提供します。
+
+主な機能:
+
+① 選択して翻訳: テキストをドラッグしてアイコンをクリックするだけで、その場に翻訳が表示されます。
+② ワンクリック辞書: 単語をクリックするだけで、瞬時に意味を確認できます。
+③ 詳細ポップアップ: 表示された翻訳文をクリックすると、詳細ウィンドウが開きます。文全体の翻訳、発音、辞書の定義など、文脈を深く理解するための情報にアクセスできます。
+
+公式サイト：https://www.tapword.cc
+
+--- korean
+TapWord는 외국어 웹 서핑을 위한 최고의 파트너입니다. 번역 결과를 원문 바로 아래에 자막처럼 표시하여, 시선의 이동 없이 자연스럽게 내용을 이해할 수 있습니다. TapWord와 함께 흐름이 끊기지 않는 몰입형 독서를 경험해 보세요.
+
+핵심 기능:
+
+① 드래그 번역: 텍스트를 선택하고 아이콘을 클릭하면 번역이 원문 하단에 즉시 표시됩니다.
+② 원클릭 단어 검색: 모르는 단어를 클릭하면 빠르게 뜻을 확인할 수 있습니다.
+③ 상세 학습 모드: 번역된 텍스트를 클릭하면 문장 번역, 발음, 사전 정의가 포함된 상세 팝업이 나타나 문맥을 완벽하게 파악할 수 있습니다.
+
+공식 웹사이트: https://www.tapword.cc
+
+-- russian
+TapWord — это умное расширение для тех, кто читает на иностранных языках. В отличие от обычных переводчиков, TapWord показывает перевод прямо под оригинальным текстом (подстрочный перевод), создавая эффект субтитров. Это позволяет вам полностью погрузиться в чтение, не отвлекаясь на переключение между вкладками.
+
+Ключевые особенности:
+
+① Перевод выделенного: Выделите текст и нажмите на иконку, чтобы увидеть перевод прямо в строке.
+② Быстрый перевод слов: Кликните по любому слову для мгновенного перевода.
+③ Детальный разбор: Нажмите на переведенный текст, чтобы открыть всплывающее окно с полным переводом предложения, транскрипцией и словарными значениями для глубокого понимания контекста.
+
+Официальный сайт: https://www.tapword.cc
+
+-- spanish
+Transforma tu navegación web con TapWord, la extensión inteligente diseñada para lectores de idiomas extranjeros. Al mostrar la traducción directamente debajo del texto original, TapWord funciona como subtítulos para tus páginas web favoritas, permitiéndote una lectura fluida e inmersiva sin interrupciones.
+
+Características principales:
+
+① Traducir al seleccionar: Selecciona cualquier fragmento de texto y pulsa el icono para ver la traducción integrada al instante.
+② Clic inteligente: Haz clic en cualquier palabra para obtener una traducción rápida.
+③ Profundiza en el contexto: Haz clic en el texto traducido para desplegar una ventana con la traducción detallada de la frase, pronunciación y definiciones de diccionario para entender mejor el contexto.
+
+Sitio web oficial: https://www.tapword.cc

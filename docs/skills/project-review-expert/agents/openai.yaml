@@ -1,0 +1,4 @@
+interface:
+  display_name: "TapWord Review Expert"
+  short_description: "Project-specific review for TapWord changes"
+  default_prompt: "Use $tapword-review-expert to review the current TapWord Translator changes and report only concrete findings first."

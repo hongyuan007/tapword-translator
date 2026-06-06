@@ -1,6 +1,6 @@
 ---
 name: review-manifest-generator
-description: Generate a factual code change handoff manifest for reviewers. Use when asked to create a review checklist, review manifest, handoff manifest, or reviewer-oriented change audit. Keywords: review checklist, review manifest, handoff manifest, code change audit, reviewer context, risk checklist.
+description: "Generate a factual code change handoff manifest for reviewers. Use when asked to create a review checklist, review manifest, handoff manifest, or reviewer-oriented change audit. Keywords: review checklist, review manifest, handoff manifest, code change audit, reviewer context, risk checklist."
 ---
 
 # Review Manifest Generator

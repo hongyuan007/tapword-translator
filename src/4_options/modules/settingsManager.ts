@@ -5,17 +5,12 @@
  */
 
 import { APP_EDITION } from "@/0_common/constants"
-import { CUSTOM_API_FIXED_PARAMS } from "@/0_common/constants/customApi"
 import type * as types from "@/0_common/types"
 import * as i18nModule from "@/0_common/utils/i18n"
 import * as languageDisplayModule from "@/0_common/utils/languageDisplay"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as storageManagerModule from "@/0_common/utils/storageManager"
 import { getPlatformOS, PLATFORMS } from "@/0_common/utils/platformDetector"
-import { translateWord as translateWordWithLLM } from "@/8_generate"
-import type { LLMConfig } from "@/8_generate"
-import * as mtranServerServiceModule from "@/6_translate/services/MTranServerService"
-import * as bingTranslateServiceModule from "@/6_translate/services/BingTranslateService"
 
 const logger = loggerModule.createLogger("Options/Settings")
 const isCommunityEdition = APP_EDITION === "community"
@@ -218,33 +213,6 @@ export async function loadSettings(): Promise<void> {
             }
         })
 
-        const customApi = settings.customApi
-        const setValue = (id: string, value: string | number | boolean) => {
-            const element = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null
-            if (!element) {
-                return
-            }
-            if (element instanceof HTMLInputElement && element.type === "checkbox") {
-                element.checked = Boolean(value)
-            } else {
-                element.value = String(value)
-            }
-        }
-
-        // Load translation provider selection
-        setValue("customApiProvider", settings.translationProvider)
-
-        // Load Custom API settings
-        setValue("customApiBaseUrl", customApi.baseUrl)
-        setValue("customApiKey", customApi.apiKey)
-        setValue("customApiModel", customApi.model)
-
-        // Load MTranserver settings
-        if (settings.mtranserver) {
-            setValue("mtranserverUrl", settings.mtranserver.url || "http://127.0.0.1:8989")
-            setValue("mtranserverKey", settings.mtranserver.key || "")
-        }
-
         // Initialize Custom Selects with loaded values
         const customSelects = document.querySelectorAll(".custom-select-wrapper[data-setting]")
         customSelects.forEach((wrapper) => {
@@ -256,7 +224,7 @@ export async function loadSettings(): Promise<void> {
         })
 
         setTranslationControlsEnabled(settings.enableTapWord)
-        updateProviderDependentUI(settings.translationProvider, false)
+        updateProviderDependentUI(settings.wordTranslationProvider, false)
         lockAutoPlayAudioToggle()
         syncSingleClickFeatureDotState(settings.singleClickTranslate)
     } catch (error) {
@@ -337,10 +305,6 @@ export function setupSettingChangeListeners(): void {
                 updateSuppressNativeLanguageLabel(value)
             }
 
-            if (settingKey === "translationProvider") {
-                updateProviderDependentUI(value as types.TranslationProvider)
-            }
-
             await saveSetting(settingKey as keyof types.UserSettings, value)
         })
     })
@@ -396,92 +360,9 @@ export function setupSettingChangeListeners(): void {
 
             const value = inputElement.value.trim()
 
-            if (settingKey === "customApiBaseUrl" || settingKey === "customApiKey" || settingKey === "customApiModel") {
-                const current = await storageManagerModule.getUserSettings()
-                const partial: Partial<types.CustomApiSettings> = {}
-
-                if (settingKey === "customApiBaseUrl") {
-                    partial.baseUrl = value
-                }
-                if (settingKey === "customApiKey") {
-                    partial.apiKey = value
-                }
-                if (settingKey === "customApiModel") {
-                    partial.model = value
-                }
-
-                await storageManagerModule.updateUserSettings({
-                    customApi: {
-                        ...current.customApi,
-                        ...partial,
-                    },
-                })
-                return
-            }
-            
-            if (settingKey === "mtranserverUrl" || settingKey === "mtranserverKey") {
-                const current = await storageManagerModule.getUserSettings()
-                
-                if (settingKey === "mtranserverUrl") {
-                    await storageManagerModule.updateUserSettings({
-                        mtranserver: {
-                            ...current.mtranserver,
-                            url: value
-                        }
-                    })
-                } else if (settingKey === "mtranserverKey") {
-                    await storageManagerModule.updateUserSettings({
-                        mtranserver: {
-                            ...current.mtranserver,
-                            key: value
-                        }
-                    })
-                }
-                return
-            }
-
             await saveSetting(settingKey as keyof types.UserSettings, value)
         })
     })
-}
-
-function buildCustomApiConfigFromInputs(): LLMConfig | null {
-    const baseUrlInput = document.getElementById("customApiBaseUrl") as HTMLInputElement | null
-    const apiKeyInput = document.getElementById("customApiKey") as HTMLInputElement | null
-    const modelInput = document.getElementById("customApiModel") as HTMLInputElement | null
-    if (!baseUrlInput || !apiKeyInput || !modelInput) {
-        return null
-    }
-
-    const apiKey = apiKeyInput.value.trim()
-    const baseUrl = baseUrlInput.value.trim()
-    const model = modelInput.value.trim()
-
-    if (!apiKey || !baseUrl || !model) {
-        return null
-    }
-
-    return {
-        apiKey,
-        baseUrl,
-        model,
-        temperature: CUSTOM_API_FIXED_PARAMS.temperature,
-        maxTokens: CUSTOM_API_FIXED_PARAMS.maxTokens,
-        timeout: CUSTOM_API_FIXED_PARAMS.timeout,
-    }
-}
-
-function setValidationStatus(element: HTMLElement | null, status: "idle" | "success" | "error" | "loading", message?: string): void {
-    if (!element) {
-        return
-    }
-
-    element.textContent = message ?? ""
-    element.classList.remove("success", "error", "loading")
-
-    if (status !== "idle") {
-        element.classList.add(status)
-    }
 }
 
 /**
@@ -582,53 +463,6 @@ function updateCustomSelectUI(wrapper: HTMLElement, value: string): void {
     selectedOption.classList.add("selected")
 }
 
-export function setupCustomApiValidation(): void {
-    const validateButton = document.getElementById("validateCustomApiButton") as HTMLButtonElement | null
-    const statusElement = document.getElementById("validateCustomApiStatus")
-    const translationProviderSelect = document.getElementById("customApiProvider") as HTMLSelectElement | null
-    const targetLanguageSelect = document.getElementById("targetLanguage") as HTMLSelectElement | null
-
-    if (!validateButton) {
-        return
-    }
-
-    validateButton.addEventListener("click", async () => {
-        const provider = translationProviderSelect?.value || "official"
-
-        if (provider !== "customApi") {
-            setValidationStatus(statusElement, "error", "Select 'Custom LLM API' as translation provider before validating.")
-            return
-        }
-
-        const config = buildCustomApiConfigFromInputs()
-        if (!config) {
-            setValidationStatus(statusElement, "error", "Base URL, API key, and model are required.")
-            return
-        }
-
-        setValidationStatus(statusElement, "loading", "Validating...")
-        validateButton.disabled = true
-
-        try {
-            const targetLanguage = targetLanguageSelect?.value || "zh"
-            await translateWordWithLLM(
-                {
-                    word: "hello",
-                    sourceLanguage: "en",
-                    targetLanguage,
-                },
-                config
-            )
-
-            setValidationStatus(statusElement, "success", "Validation succeeded.")
-        } catch (error) {
-            const message = error instanceof Error ? error.message : "Validation failed"
-            setValidationStatus(statusElement, "error", message)
-        } finally {
-            validateButton.disabled = false
-        }
-    })
-}
 
 /**
  * Animate the provider-panels container to a target height, then clear inline style.
@@ -654,7 +488,7 @@ function animateContainerHeight(container: HTMLElement, targetHeight: number): v
  * Switch the visible provider sub-panel with a height-animated container + opacity crossfade.
  * Pass animate=false for initial render (no animation).
  */
-function updateProviderDependentUI(provider: types.TranslationProvider, animate = true): void {
+function updateProviderDependentUI(provider: string, animate = true): void {
     const container = document.getElementById("providerPanelsContainer") as HTMLElement | null
     if (!container) {
         return
@@ -725,75 +559,4 @@ function updateProviderDependentUI(provider: types.TranslationProvider, animate 
     }
 }
 
-/**
- * Setup MTranServer connection test
- */
-export function setupMTranServerTest(): void {
-    const testButton = document.getElementById("testMtranserverButton") as HTMLButtonElement | null
-    const statusElement = document.getElementById("testMtranserverStatus")
 
-    if (!testButton) {
-        return
-    }
-
-    testButton.addEventListener("click", async () => {
-        const settings = await storageManagerModule.getUserSettings()
-        const mtranserverSettings = settings.mtranserver
-
-        if (!mtranserverSettings.url || !mtranserverSettings.url.trim()) {
-            setValidationStatus(statusElement, "error", "MTranServer URL is required.")
-            return
-        }
-
-        setValidationStatus(statusElement, "loading", "Testing connection...")
-        testButton.disabled = true
-
-        try {
-            const result = await mtranServerServiceModule.testMTranServerConnection(mtranserverSettings)
-            if (result) {
-                setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
-            } else {
-                setValidationStatus(statusElement, "error", "Connection failed.")
-            }
-        } catch (error) {
-            const message = error instanceof Error ? error.message : "Connection failed"
-            setValidationStatus(statusElement, "error", message)
-        } finally {
-            testButton.disabled = false
-        }
-    })
-}
-
-/**
- * Setup Bing Translate connection test
- */
-export function setupBingTranslateTest(): void {
-    const testButton = document.getElementById("testBingTranslateButton") as HTMLButtonElement | null
-    const statusElement = document.getElementById("testBingTranslateStatus")
-
-    if (!testButton) {
-        return
-    }
-
-    testButton.addEventListener("click", async () => {
-        const settings = await storageManagerModule.getUserSettings()
-        const bingTranslateSettings = settings.bingTranslate
-
-        setValidationStatus(statusElement, "loading", "Testing connection...")
-        testButton.disabled = true
-
-        try {
-            const result = await bingTranslateServiceModule.testBingTranslateConnection(bingTranslateSettings)
-            if (result) {
-                setValidationStatus(statusElement, "success", "Connection successful! 'hello' translated successfully.")
-            } else {
-                setValidationStatus(statusElement, "error", "Connection failed.")
-            }
-        } catch (error) {
-            const message = error instanceof Error ? error.message : "Connection failed"
-            setValidationStatus(statusElement, "error", message)
-        } finally {
-            testButton.disabled = false
-        }
-    })
-}

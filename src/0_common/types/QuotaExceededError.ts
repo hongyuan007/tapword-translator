@@ -6,9 +6,9 @@
  */
 
 export class QuotaExceededError extends Error {
-    public readonly quotaType: "translation" | "speech"
+    public readonly quotaType: "translation" | "speech" | "fullTextTranslation"
 
-    constructor(quotaType: "translation" | "speech", message: string) {
+    constructor(quotaType: "translation" | "speech" | "fullTextTranslation", message: string) {
         super(message)
         this.name = "QuotaExceededError"
         this.quotaType = quotaType

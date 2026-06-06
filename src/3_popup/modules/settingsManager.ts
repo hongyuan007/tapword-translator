@@ -9,7 +9,6 @@ import * as i18nModule from "@/0_common/utils/i18n"
 import * as languageDisplayModule from "@/0_common/utils/languageDisplay"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as storageManagerModule from "@/0_common/utils/storageManager"
-import { getPlatformOS, PLATFORMS } from "@/0_common/utils/platformDetector"
 import * as toastManagerModule from "./toastManager"
 
 const logger = loggerModule.createLogger("Popup/Settings")
@@ -32,7 +31,7 @@ function updateSuppressNativeLanguageLabel(targetLanguage: string): void {
 }
 
 function setTranslationControlsEnabled(enabled: boolean): void {
-    const dependentIds = ["showIcon", "singleClickTranslate", "doubleClickSentenceTranslate", "doubleClickSentenceTriggerKey"]
+    const dependentIds = ["showIcon", "singleClickTranslate"]
 
     dependentIds.forEach((id) => {
         const input = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null
@@ -48,92 +47,40 @@ function setTranslationControlsEnabled(enabled: boolean): void {
             settingItem.classList.toggle("is-disabled", !enabled)
         }
     })
+
+    // Also disable/enable the full translate button
+    const fullTranslateButton = document.getElementById("fullTranslateButton") as HTMLButtonElement | null
+    if (fullTranslateButton) {
+        fullTranslateButton.disabled = !enabled
+        fullTranslateButton.closest(".setting-item")?.classList.toggle("is-disabled", !enabled)
+    }
 }
 
 async function restoreDependentTogglesIfAllOff(): Promise<void> {
     const showIconInput = document.getElementById("showIcon") as HTMLInputElement | null
     const singleClickInput = document.getElementById("singleClickTranslate") as HTMLInputElement | null
-    const sentenceTranslateInput = document.getElementById("doubleClickSentenceTranslate") as HTMLInputElement | null
 
-    if (!showIconInput || !singleClickInput || !sentenceTranslateInput) {
+    if (!showIconInput || !singleClickInput) {
         return
     }
 
     const currentSettings = await storageManagerModule.getUserSettings()
     const isDoubleClickEnabled = currentSettings.doubleClickTranslateV2
 
-    const allDisabled = !showIconInput.checked && !singleClickInput.checked && !sentenceTranslateInput.checked && !isDoubleClickEnabled
+    const allDisabled = !showIconInput.checked && !singleClickInput.checked && !isDoubleClickEnabled
     if (!allDisabled) {
         return
     }
 
     showIconInput.checked = true
     singleClickInput.checked = true
-    // V2 default: Double Click OFF, Single Click ON
-    // doubleClickInput.checked = false // already false if allDisabled
-    sentenceTranslateInput.checked = true
 
     // Atomic update to avoid concurrent overwrite
     await storageManagerModule.updateUserSettings({
         showIcon: true,
         singleClickTranslate: true,
         doubleClickTranslateV2: false,
-        doubleClickSentenceTranslate: true,
     })
-}
-
-/**
- * Detect OS and populate trigger key options
- */
-async function populateTriggerKeyOptions(): Promise<void> {
-    const select = document.getElementById("doubleClickSentenceTriggerKey") as HTMLSelectElement | null
-    if (!select) return
-
-    const os = await getPlatformOS()
-    select.innerHTML = ""
-
-    if (os === PLATFORMS.MAC) {
-        // Mac Options: Command (Default), Option
-        const cmdOption = document.createElement("option")
-        cmdOption.value = "meta"
-        cmdOption.textContent = "Command"
-        select.appendChild(cmdOption)
-
-        const optOption = document.createElement("option")
-        optOption.value = "option"
-        optOption.textContent = "Option"
-        select.appendChild(optOption)
-    } else {
-        // Windows/Linux/Other Options: Alt (Default), Ctrl
-        const altOption = document.createElement("option")
-        altOption.value = "alt"
-        altOption.textContent = "Alt"
-        select.appendChild(altOption)
-
-        const ctrlOption = document.createElement("option")
-        ctrlOption.value = "ctrl"
-        ctrlOption.textContent = "Ctrl"
-        select.appendChild(ctrlOption)
-    }
-}
-
-/**
- * Apply visibility rules based on current locale
- * Some settings may be hidden in certain languages to avoid layout issues or clutter
- */
-function applyLocaleSpecificVisibility(): void {
-    const locale = i18nModule.getCurrentLocale()
-    const settingItem = document.getElementById("settingItem-doubleClickSentence")
-
-    if (settingItem) {
-        // Only show for 'zh' (Chinese), hide for all others because UI space is limited in popup
-        // Users can still configure this via the full options page if needed
-        if (locale !== "zh") {
-            settingItem.style.display = "none"
-        } else {
-            settingItem.style.display = ""
-        }
-    }
 }
 
 /**
@@ -141,12 +88,6 @@ function applyLocaleSpecificVisibility(): void {
  */
 export async function loadSettings(): Promise<void> {
     try {
-        // Initialize dynamic options before loading values
-        await populateTriggerKeyOptions()
-
-        // Apply locale-specific visibility rules
-        applyLocaleSpecificVisibility()
-
         const settings = await storageManagerModule.getUserSettings()
         logger.info("Loaded settings:", settings)
 
@@ -177,6 +118,7 @@ export async function loadSettings(): Promise<void> {
         // Apply master toggle effect to dependent controls
         setTranslationControlsEnabled(settings.enableTapWord)
         syncMasterSectionVisualState(settings.enableTapWord)
+
     } catch (error) {
         logger.error("Failed to load settings:", error)
     }
@@ -199,7 +141,7 @@ export async function saveSetting(settingKey: keyof types.UserSettings, value: b
 /**
  * Set up change listeners for all setting controls (checkboxes and selects)
  */
-export function setupSettingChangeListeners(): void {
+export function setupSettingChangeListeners(options?: { onTapWordDisabled?: () => void }): void {
     // Add change listeners to all checkboxes
     const checkboxes = document.querySelectorAll('input[type="checkbox"][data-setting]')
     checkboxes.forEach((checkbox) => {
@@ -219,8 +161,25 @@ export function setupSettingChangeListeners(): void {
                     syncMasterSectionVisualState(input.checked)
                     if (input.checked) {
                         await restoreDependentTogglesIfAllOff()
+                    } else {
+                        // Stop any running full-page translation when TapWord is disabled
+                        const stopMsg: types.FullTranslateToggleMessage = { type: "FULL_TRANSLATE_TOGGLE", data: { enabled: false } }
+                        chrome.runtime.sendMessage(stopMsg)
+
+                        // Reset full translate button to idle visual state
+                        const fullTranslateButton = document.getElementById("fullTranslateButton") as HTMLButtonElement | null
+                        const fullTranslateLabel = document.getElementById("fullTranslateLabel")
+                        if (fullTranslateButton) {
+                            fullTranslateButton.classList.remove("is-active", "is-loading", "is-quota-exhausted")
+                        }
+                        if (fullTranslateLabel) {
+                            fullTranslateLabel.textContent = i18nModule.translate("popup.translatePage.label")
+                        }
+                        // Sync the isRunning state tracked in the button handler
+                        options?.onTapWordDisabled?.()
                     }
                 }
+
             }
         })
     })
@@ -241,7 +200,7 @@ export function setupSettingChangeListeners(): void {
                 await saveSetting(settingKey, value)
 
                 // Show refresh reminder toast for translation font size preset change
-                if (settingKey === "translationFontSizePreset") {
+                if (settingKey === "translationFontSizePresetV2") {
                     const message = i18nModule.translate("popup.refreshReminder")
                     toastManagerModule.showToast(message, "info")
                 }

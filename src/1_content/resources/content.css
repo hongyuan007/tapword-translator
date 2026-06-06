@@ -114,6 +114,22 @@
     border-top-color: var(--modal-accent-color);
 }
 
+/* Auto-translation underline: teal color, lower visual weight than manual */
+.ai-translator-tooltip--auto {
+    border-top-color: #2A9D8F;
+    border-top-width: 1px;
+    animation: ai-translator-auto-fade-in 0.4s ease forwards;
+}
+
+.ai-translator-tooltip--auto.visible {
+    opacity: 0.6;
+}
+
+@keyframes ai-translator-auto-fade-in {
+    from { opacity: 0; transform: translateY(-1px); }
+    to   { opacity: 0.6; transform: translateY(0); }
+}
+
 /* Error state for tooltip - orange-red color */
 .ai-translator-tooltip.error {
     color: #FF6B35;

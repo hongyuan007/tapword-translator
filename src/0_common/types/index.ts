@@ -70,7 +70,7 @@ export interface SpeechSynthesisRequestData {
 /**
  * Message types for content-background communication
  */
-export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED"
+export type MessageType = "TRANSLATE_REQUEST" | "FRAGMENT_TRANSLATE_REQUEST" | "SPEECH_SYNTHESIS_REQUEST" | "SPEECH_STOP_REQUEST" | "POPUP_BOOTSTRAP_REQUEST" | "PAGE_ACTIVATED" | "AUTO_CANDIDATES_REQUEST" | "FULL_TRANSLATE_BATCH_REQUEST" | "FULL_TRANSLATE_TOGGLE" | "FULL_TRANSLATE_STATUS_REQUEST" | "QUOTA_USAGE_REQUEST"
 
 /**
  * Page activated message (sent by content script on injection for token pre-warming)
@@ -179,6 +179,68 @@ export interface FragmentTranslateResponseErrorMessage {
  */
 export type FragmentTranslateResponseMessage = FragmentTranslateResponseSuccessMessage | FragmentTranslateResponseErrorMessage
 
+// --- Auto-Candidates Message Types ---
+
+export interface AutoCandidatesRequestData {
+    sourceLang: string
+    targetLang: string
+    blockText: string
+    /** Used by backend pipeline for filtering. Not passed to LLM prompt. */
+    manualTrigger: {
+        text: string
+        type?: "word" | "phrase"
+        translation?: string
+    }
+    userLevel: LanguageProficiency
+    /** Used by backend pipeline for filtering. Not passed to LLM prompt. */
+    excludedTexts: string[]
+}
+
+export interface AutoCandidatesRequestMessage {
+    type: "AUTO_CANDIDATES_REQUEST"
+    data: AutoCandidatesRequestData
+}
+
+export interface AutoCandidate {
+    text: string
+    type: "word" | "phrase"
+    /** Computed by backend, not LLM. 0-based inclusive. */
+    start: number
+    /** Computed by backend, not LLM. 0-based exclusive. */
+    end: number
+    translation: string
+    source: "llm" | "rule" | "hybrid"
+}
+
+export interface AutoCandidatesResponseData {
+    traceId: string
+    candidates: AutoCandidate[]
+    meta: {
+        sourceLang: string
+        targetLang: string
+        limitApplied: number
+        degraded: boolean
+        model?: string
+    }
+    warnings?: string[]
+}
+
+export interface AutoCandidatesResponseSuccessMessage {
+    type: "AUTO_CANDIDATES_RESPONSE"
+    success: true
+    data: AutoCandidatesResponseData
+}
+
+export interface AutoCandidatesResponseErrorMessage {
+    type: "AUTO_CANDIDATES_RESPONSE"
+    success: false
+    error: string
+}
+
+export type AutoCandidatesResponseMessage =
+    | AutoCandidatesResponseSuccessMessage
+    | AutoCandidatesResponseErrorMessage
+
 /**
  * Speech synthesis request message
  */
@@ -233,36 +295,17 @@ export type TriggerKey = "meta" | "option" | "alt" | "ctrl"
 
 export type NetworkRegion = "auto" | "china" | "global"
 
+export type LanguageProficiency = "Beginner" | "Intermediate" | "Advanced"
+
 /**
- * Translation provider type
- * - official: Official cloud API (default)
- * - customApi: User-provided LLM API
- * - mtranserver: Self-hosted MTranServer
- * - bingTranslate: Bing Translate API (free, no key required)
+ * Custom AI provider configuration (user-defined, 0–N entries)
  */
-export type TranslationProvider = "official" | "customApi" | "mtranserver" | "bingTranslate"
-
-export interface CustomApiSettings {
-    /** Custom API base URL */
-    baseUrl: string
-    /** Custom API key/token */
+export interface CustomAiProvider {
+    id: string
+    name: string
+    endpoint: string
     apiKey: string
-    /** Custom API model name */
     model: string
-}
-
-export interface MTranserverSettings {
-    /** MTranserver URL */
-    url: string
-    /** MTranserver API key */
-    key: string
-    /** Whether to enable MTranserver */
-    enabled: boolean
-}
-
-export interface BingTranslateSettings {
-    /** Whether to enable Bing Translate */
-    enabled: boolean
 }
 
 export interface UserSettings {
@@ -321,18 +364,30 @@ export interface UserSettings {
     sentenceUnderlineColor: string
     /** Icon background color */
     iconColor: IconColor
-    /** Translation provider selection */
-    translationProvider: TranslationProvider
-    /** Custom API settings */
-    customApi: CustomApiSettings
-    /** MTranserver settings */
-    mtranserver: MTranserverSettings
-    /** Bing Translate settings */
-    bingTranslate: BingTranslateSettings
+    /** Translation provider for word/fragment translation (fixed name or custom provider ID) */
+    wordTranslationProvider: string
+    /** Translation provider for full-page batch translation (fixed name or custom provider ID) */
+    fullPageTranslationProvider: string
+    /** User-defined custom AI providers (0–N entries) */
+    customProviders: CustomAiProvider[]
     /** Whether to suppress translation when the detected source language matches the target language */
+
     suppressNativeLanguage: boolean
     /** Network region preference for API calls (auto, china, global) */
     networkRegion: NetworkRegion
+    /** Enable automatic supplementary translation after manual translation */
+    enableAutoTranslate: boolean
+    /** User language proficiency level for auto-translation candidate selection */
+    userLanguageProficiency: LanguageProficiency
+    /**
+     * Font size preset (v2 key). Optional so old stored data without it defaults to "large" automatically.
+     * New users and migrated users all use this key. UI reads/writes this field.
+     */
+    translationFontSizePresetV2?: TranslationFontSizePreset
+    /** Text color for full-page translated text on light-mode websites (hex) */
+    fullTranslateLightColor?: string
+    /** Text color for full-page translated text on dark-mode websites (hex) */
+    fullTranslateDarkColor?: string
 }
 
 /**
@@ -352,8 +407,9 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     restoreLineHeightOnClear: false,
     autoPlayAudio: true,
     targetLanguage: "en",
-    translationFontSizePreset: "medium",
-    translationFontSize: 10,
+    translationFontSizePreset: "large",
+    translationFontSize: 14,
+    translationFontSizePresetV2: "large",
     tooltipNextLineGapPx: 4,
     tooltipNextLineGapPxV2: 6,
     tooltipVerticalOffsetPx: 2,
@@ -362,27 +418,107 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     textUnderlineOffsetPxV2: 4,
     tooltipUnderlineOffsetPxV3: 1.5,
     tooltipTextOffsetPxV3: 1,
-    tooltipBottomSpacingPxV3: 6,
+    tooltipBottomSpacingPxV3: 6.5,
     wordUnderlineColor: "#2A9D8F",
     wordUnderlineColorV2: "#1F7FDB",
     sentenceUnderlineColor: "#E9C46A",
     iconColor: "pink",
-    translationProvider: "official",
-    customApi: {
-        baseUrl: "",
-        apiKey: "",
-        model: "",
-    },
-    mtranserver: {
-        url: "http://127.0.0.1:8989",
-        key: "",
-        enabled: false,
-    },
-    bingTranslate: {
-        enabled: true,
-    },
+    wordTranslationProvider: "official",
+    fullPageTranslationProvider: "official",
+    customProviders: [],
     suppressNativeLanguage: false,
     networkRegion: "auto",
+    enableAutoTranslate: false,
+    userLanguageProficiency: "Intermediate",
+    fullTranslateLightColor: "#059669",
+    fullTranslateDarkColor: "#6ee7b7",
 }
 
 export const DEFAULT_SUPPRESS_NATIVE_LANGUAGE = DEFAULT_USER_SETTINGS.suppressNativeLanguage
+
+// --- Full-Page Translation Types ---
+
+export interface FullTranslateToggleMessage {
+    type: "FULL_TRANSLATE_TOGGLE"
+    data: {
+        enabled: boolean
+    }
+}
+
+export interface FullTranslateToggleResponseMessage {
+    success: boolean
+    isRunning: boolean
+    error?: string
+}
+
+export interface FullTranslateStatusRequestMessage {
+    type: "FULL_TRANSLATE_STATUS_REQUEST"
+}
+
+export interface FullTranslateStatusResponseMessage {
+    success: boolean
+    isRunning: boolean
+    error?: string
+}
+
+export interface FullTranslateBatchRequestData {
+    /** Array of text segments to translate */
+    texts: string[]
+    /** Source language code */
+    sourceLang: string
+    /** Target language code */
+    targetLang: string
+}
+
+export interface FullTranslateBatchRequestMessage {
+    type: "FULL_TRANSLATE_BATCH_REQUEST"
+    data: FullTranslateBatchRequestData
+}
+
+export interface FullTranslateFallbackInfo {
+    sourceProvider: "official"
+    actualProvider: "microsoftFree"
+    reason: "quotaExceeded"
+}
+
+export interface FullTranslateBatchResponseMessage {
+    success: boolean
+    /** Array of translated texts, same order as input */
+    translations?: string[]
+    error?: string
+    /** Error type to distinguish quota exceeded from generic errors */
+    errorType?: "QuotaExceeded" | "GenericError"
+    /** Quota info returned from server on quota errors or successful responses */
+    quotaInfo?: FullTextTranslationQuotaInfo
+    /** Runtime-only provider fallback metadata for user-visible notice flows */
+    fallbackInfo?: FullTranslateFallbackInfo
+}
+
+/**
+ * Full-text translation quota info (from server response)
+ */
+export interface FullTextTranslationQuotaInfo {
+    used: number
+    limit: number
+    remaining: number
+}
+
+/**
+ * Quota usage request message (sent by popup to background)
+ */
+export interface QuotaUsageRequestMessage {
+    type: "QUOTA_USAGE_REQUEST"
+}
+
+/**
+ * Quota usage response message
+ */
+export interface QuotaUsageResponseMessage {
+    success: boolean
+    data?: {
+        fullTextTranslation: FullTextTranslationQuotaInfo
+        /** Whether the active translation provider is the official cloud service */
+        isOfficialProvider: boolean
+    }
+    error?: string
+}

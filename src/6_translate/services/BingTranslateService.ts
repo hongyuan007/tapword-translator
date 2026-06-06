@@ -7,15 +7,26 @@
  */
 
 import * as loggerModule from "@/0_common/utils/logger"
-import type { BingTranslateSettings } from "@/0_common/types"
 
 const logger = loggerModule.createLogger("BingTranslateService")
 
 const BING_TRANSLATE_TIMEOUT = 10000 // 10 seconds timeout
+const LOG_BODY_PREVIEW_LENGTH = 160
+const DEFAULT_BING_SUBDOMAIN = "www.bing.com"
 
-// Try different Bing subdomains based on region
-const BING_SUBDOMAINS = ["cn.bing.com", "www.bing.com", "bing.com"]
 let currentSubdomain: string | null = null
+
+/**
+ * Returns ordered list of Bing subdomains based on user network region.
+ * "global" → prefer international domain first; otherwise prefer CN domain.
+ */
+function getSubdomainsForRegion(networkRegion: string): string[] {
+    if (networkRegion === "global") {
+        return ["www.bing.com", "cn.bing.com", "bing.com"]
+    }
+    // "auto" or "china" — prefer CN domain
+    return ["cn.bing.com", "www.bing.com", "bing.com"]
+}
 
 /**
  * Bing Translate language code mapping
@@ -71,6 +82,51 @@ function mapToBingLanguage(langCode: string): string {
     return LANGUAGE_CODE_MAP[langCode] || langCode
 }
 
+function sanitizeLogText(value: string): string {
+    return value
+        .replace(/params_AbusePreventionHelper\s?=\s?\[[^\]]+\]/g, "params_AbusePreventionHelper=[REDACTED]")
+        .replace(/IG:"[^"]+"/g, 'IG:"[REDACTED]"')
+        .replace(/data-iid="[^"]+"/g, 'data-iid="[REDACTED]"')
+        .replace(/([?&](?:token|key|IG|IID|SFX)=)([^&\s]+)/g, "$1[REDACTED]")
+}
+
+function createBodyPreview(body: string): string {
+    const normalized = sanitizeLogText(body).replace(/\s+/g, " ").trim()
+    if (normalized.length <= LOG_BODY_PREVIEW_LENGTH) {
+        return normalized
+    }
+    return `${normalized.slice(0, LOG_BODY_PREVIEW_LENGTH)}...`
+}
+
+function getResponseLocation(response: Response): { finalHost: string | null; finalPath: string | null } {
+    try {
+        const finalUrl = new URL(response.url)
+        return {
+            finalHost: finalUrl.hostname,
+            finalPath: finalUrl.pathname,
+        }
+    } catch {
+        return {
+            finalHost: null,
+            finalPath: null,
+        }
+    }
+}
+
+function buildResponseSummary(response: Response, body: string): Record<string, string | number | boolean | null> {
+    const location = getResponseLocation(response)
+    return {
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get("content-type") || "unknown",
+        redirected: response.redirected,
+        finalHost: location.finalHost,
+        finalPath: location.finalPath,
+        responseSize: body.length,
+        bodyPreview: createBodyPreview(body),
+    }
+}
+
 /**
  * Error thrown when Bing Translate request fails
  */
@@ -104,18 +160,25 @@ let fetchConfigPromise: Promise<BingGlobalConfig> | null = null
 /**
  * Fetch global config from Bing Translator page
  */
-async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
+async function fetchGlobalConfig(networkRegion: string): Promise<BingGlobalConfig> {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), BING_TRANSLATE_TIMEOUT)
 
     // If we don't have a cached subdomain, try to find one that works
-    const subdomainsToTry = currentSubdomain ? [currentSubdomain, ...BING_SUBDOMAINS.filter(d => d !== currentSubdomain)] : BING_SUBDOMAINS
+    const regionSubdomains = getSubdomainsForRegion(networkRegion)
+    const subdomainsToTry = currentSubdomain ? [currentSubdomain, ...regionSubdomains.filter(d => d !== currentSubdomain)] : regionSubdomains
     
     let lastError: Error | null = null
 
-    for (const subdomain of subdomainsToTry) {
+    for (const [index, subdomain] of subdomainsToTry.entries()) {
+        const attemptStartedAt = Date.now()
         try {
-            logger.info("Trying Bing subdomain:", subdomain)
+            logger.debug("Bing config fetch start:", {
+                phase: "config-fetch",
+                networkRegion,
+                subdomain,
+                attempt: index + 1,
+            })
             
             const response = await fetch(`https://${subdomain}/translator`, {
                 method: "GET",
@@ -127,22 +190,31 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
                 signal: controller.signal,
             })
 
+            const body = await response.text()
+            const responseSummary = buildResponseSummary(response, body)
+            const logContext = {
+                phase: "config-fetch",
+                networkRegion,
+                subdomain,
+                attempt: index + 1,
+                durationMs: Date.now() - attemptStartedAt,
+                ...responseSummary,
+            }
+
             if (!response.ok) {
-                logger.warn(`Subdomain ${subdomain} returned status ${response.status}`)
+                logger.warn("Bing config fetch returned non-OK response:", logContext)
                 continue
             }
 
-            const body = await response.text()
-
             if (!body) {
-                logger.warn(`Bing returned empty response from ${subdomain} — likely blocked or host permission missing`)
+                logger.warn("Bing config fetch returned empty body:", logContext)
                 continue
             }
 
             // Extract IG
             const igMatch = body.match(/IG:"([^"]+)"/)
             if (!igMatch) {
-                logger.warn(`Failed to extract IG from ${subdomain}`)
+                logger.warn("Bing config fetch missing IG:", logContext)
                 continue
             }
             const IG = igMatch[1]!
@@ -150,7 +222,7 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
             // Extract IID
             const iidMatch = body.match(/data-iid="([^"]+)"/)
             if (!iidMatch) {
-                logger.warn(`Failed to extract IID from ${subdomain}`)
+                logger.warn("Bing config fetch missing IID:", logContext)
                 continue
             }
             const IID = iidMatch[1]!
@@ -158,7 +230,7 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
             // Extract key and token from params_AbusePreventionHelper
             const paramsMatch = body.match(/params_AbusePreventionHelper\s?=\s?(\[[^\]]+\])/)
             if (!paramsMatch) {
-                logger.warn(`Failed to extract AbusePreventionHelper params from ${subdomain}`)
+                logger.warn("Bing config fetch missing AbusePreventionHelper params:", logContext)
                 continue
             }
 
@@ -185,11 +257,30 @@ async function fetchGlobalConfig(): Promise<BingGlobalConfig> {
                 count: 0,
             }
 
-            logger.info("Fetched Bing global config from", actualSubdomain, "(attempted:", subdomain + ")", ":", { IG, IID, tokenExpiryInterval })
+            logger.debug("Bing config fetch success:", {
+                phase: "config-fetch",
+                networkRegion,
+                attemptedSubdomain: subdomain,
+                actualSubdomain,
+                attempt: index + 1,
+                redirected: response.redirected,
+                status: response.status,
+                contentType: response.headers.get("content-type") || "unknown",
+                responseSize: body.length,
+                tokenExpiryInterval,
+                durationMs: Date.now() - attemptStartedAt,
+            })
             clearTimeout(timeoutId)
             return globalConfig!
         } catch (error) {
-            logger.warn(`Failed to fetch config from ${subdomain}:`, error instanceof Error ? error.message : String(error))
+            logger.warn("Bing config fetch request failed:", {
+                phase: "config-fetch",
+                networkRegion,
+                subdomain,
+                attempt: index + 1,
+                durationMs: Date.now() - attemptStartedAt,
+                error: error instanceof Error ? error.message : String(error),
+            })
             lastError = error instanceof Error ? error : new Error(String(error))
         }
     }
@@ -210,12 +301,12 @@ function isConfigExpired(): boolean {
  * Get valid config (refresh if needed).
  * Deduplicates concurrent config fetches so only one in-flight request runs at a time.
  */
-async function getValidConfig(): Promise<BingGlobalConfig> {
+async function getValidConfig(networkRegion: string): Promise<BingGlobalConfig> {
     if (!isConfigExpired()) {
         return globalConfig!
     }
     if (!fetchConfigPromise) {
-        fetchConfigPromise = fetchGlobalConfig().finally(() => {
+        fetchConfigPromise = fetchGlobalConfig(networkRegion).finally(() => {
             fetchConfigPromise = null
         })
     }
@@ -226,29 +317,47 @@ async function getValidConfig(): Promise<BingGlobalConfig> {
  * Translate text using Bing Translate API
  * @param text Text to translate
  * @param targetLanguage Target language code
- * @param _settings Bing Translate settings (not used)
+ * @param networkRegion User network region setting ("auto" | "china" | "global")
  * @returns Translated text
  */
 export async function translateWithBingTranslate(
     text: string,
     targetLanguage: string,
-    _settings: BingTranslateSettings
+    networkRegion: string = "auto"
 ): Promise<string> {
     const toLang = mapToBingLanguage(targetLanguage)
     const fromLang = "auto-detect"
 
-    logger.info("Sending Bing Translate request:", { text, fromLang, toLang })
-
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), BING_TRANSLATE_TIMEOUT)
+    const translationStartedAt = Date.now()
+    let phase = "config-fetch"
+    let requestContext: Record<string, string | number | boolean | null> = {
+        fromLang,
+        toLang,
+        networkRegion,
+        textLength: text.length,
+        subdomain: null,
+    }
 
     try {
-        const config = await getValidConfig()
+        const config = await getValidConfig(networkRegion)
         config.count++
 
         // Use the cached working subdomain
-        const subdomain = currentSubdomain || BING_SUBDOMAINS[0]
+        const subdomains = getSubdomainsForRegion(networkRegion)
+        const subdomain = currentSubdomain || subdomains[0] || DEFAULT_BING_SUBDOMAIN
         const url = `https://${subdomain}/ttranslatev3?IG=${config.IG}&IID=${config.IID}&SFX=${config.count}`
+        phase = "translate-post"
+        requestContext = {
+            phase,
+            fromLang,
+            toLang,
+            networkRegion,
+            textLength: text.length,
+            subdomain,
+            requestSequence: config.count,
+        }
 
         const formData = new URLSearchParams()
         formData.append("fromLang", fromLang)
@@ -258,8 +367,7 @@ export async function translateWithBingTranslate(
         formData.append("key", config.key)
         formData.append("tryFetchingGenderDebiasedTranslations", "true")
 
-        logger.debug("Bing Translate URL:", url)
-        logger.debug("Bing Translate body:", Object.fromEntries(formData))
+        logger.debug("Sending Bing Translate request:", requestContext)
 
         const response = await fetch(url, {
             method: "POST",
@@ -281,22 +389,22 @@ export async function translateWithBingTranslate(
             signal: controller.signal,
         })
 
-        logger.debug("Bing Translate response status:", response.status, response.statusText)
-
         const responseText = await response.text()
+        const responseSummary = buildResponseSummary(response, responseText)
+        const responseContext = {
+            ...requestContext,
+            durationMs: Date.now() - translationStartedAt,
+            ...responseSummary,
+        }
 
-        // Log raw response for debugging
-        logger.debug("Bing raw response:", responseText.substring(0, 1000))
+        logger.debug("Bing Translate response summary:", responseContext)
 
         if (!responseText || responseText.trim() === "") {
-            const headersObj: Record<string, string> = {}
-            response.headers.forEach((value, key) => { headersObj[key] = value })
-            logger.warn("Bing ttranslatev3 returned empty body for subdomain:", subdomain,
-                "status:", response.status,
-                "headers:", headersObj)
+            logger.warn("Bing Translate returned empty body:", responseContext)
         }
 
         if (!response.ok) {
+            logger.warn("Bing Translate returned non-OK response:", responseContext)
             throw new BingTranslateError(
                 `Bing Translate responded with status ${response.status}: ${responseText.substring(0, 200)}`,
                 response.status,
@@ -309,7 +417,7 @@ export async function translateWithBingTranslate(
         try {
             data = JSON.parse(responseText)
         } catch (parseError) {
-            logger.error("Failed to parse Bing response as JSON:", responseText)
+            logger.error("Failed to parse Bing response as JSON:", responseContext)
             throw new BingTranslateError(
                 `Failed to parse Bing response: ${parseError instanceof Error ? parseError.message : String(parseError)}`,
                 response.status,
@@ -319,12 +427,22 @@ export async function translateWithBingTranslate(
 
         // Parse Bing's response format
         // Response: [{translations: [{text: "...", to: "..."}]}, {detectedLanguage: {...}}]
-        if (!Array.isArray(data) || !data[0]?.translations?.[0]?.text) {
-            logger.error("Invalid Bing Translate response structure:", data)
+        const firstResult = Array.isArray(data) ? data[0] : null
+        const translations = typeof firstResult === "object" && firstResult !== null && "translations" in firstResult
+            ? (firstResult as { translations?: Array<{ text?: unknown }> }).translations
+            : undefined
+        const translatedText = translations?.[0]?.text
+
+        if (typeof translatedText !== "string" || translatedText.length === 0) {
+            logger.error("Invalid Bing Translate response structure:", {
+                ...responseContext,
+                isArray: Array.isArray(data),
+                hasTranslations: Array.isArray(translations) && translations.length > 0,
+            })
             throw new BingTranslateError("Bing Translate returned invalid response format")
         }
 
-        const translation = data[0].translations[0].text
+        const translation = translatedText
         logger.info("Bing Translate result:", translation)
         return translation
     } catch (error) {
@@ -332,10 +450,19 @@ export async function translateWithBingTranslate(
             throw error
         }
         if (error instanceof Error && error.name === "AbortError") {
-            logger.error("Bing Translate translation timeout")
+            logger.error("Bing Translate translation timeout:", {
+                ...requestContext,
+                phase,
+                durationMs: Date.now() - translationStartedAt,
+            })
             throw new BingTranslateError(`Failed to translate: Connection timeout after ${BING_TRANSLATE_TIMEOUT / 1000}s`)
         }
-        logger.error("Bing Translate translation error:", error)
+        logger.error("Bing Translate translation error:", {
+            ...requestContext,
+            phase,
+            durationMs: Date.now() - translationStartedAt,
+            error: error instanceof Error ? error.message : String(error),
+        })
         throw new BingTranslateError(`Failed to translate: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
         clearTimeout(timeoutId)
@@ -344,12 +471,13 @@ export async function translateWithBingTranslate(
 
 /**
  * Test Bing Translate connection
+ * @param networkRegion User network region setting
  */
-export async function testBingTranslateConnection(_settings: BingTranslateSettings): Promise<boolean> {
+export async function testBingTranslateConnection(networkRegion: string = "auto"): Promise<boolean> {
     try {
         // Reset config to force refresh
         globalConfig = null
-        const result = await translateWithBingTranslate("hello", "zh", { enabled: true })
+        const result = await translateWithBingTranslate("hello", "zh", networkRegion)
         logger.info("Bing Translate connection test successful:", result)
         return true
     } catch (error) {

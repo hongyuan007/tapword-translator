@@ -1,0 +1,124 @@
+[requestLogger] --- New Request ---
+[requestLogger] [REQ] 2026-03-12T09:13:27.012Z POST /api/v1/translate/auto-candidates
+[requestLogger] [REQ] Headers: {
+  "host": "local.tapword.cc",
+  "x-real-ip": "127.0.0.1",
+  "x-forwarded-for": "127.0.0.1",
+  "x-forwarded-proto": "https",
+  "connection": "close",
+  "content-length": "421",
+  "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJleHRlbnNpb24tY2M3MGYyZTNkNzlkNjE5MSIsImNsaWVudFR5cGUiOiJleHRlbnNpb24iLCJqdGkiOiI3NDAzMjRmYy0zYWNlLTRiNjgtYWFmYS03MTdlNDBlYzc4YjEiLCJpYXQiOjE3NzMzMDY0MzcsImV4cCI6MTc3MzMwNzYzN30.Lo6WTVwpQmjK5OdG0IEHuJJk56fwNTO4PNNZNp5d7DQ",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+  "x-client-version": "0.1.0",
+  "dnt": "1",
+  "content-type": "application/json",
+  "accept": "*/*",
+  "origin": "chrome-extension://mblnafgdagbhnnmfeakekalbckpoimce",
+  "sec-fetch-site": "none",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "sec-fetch-storage-access": "active",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "zh,ru;q=0.9,ja;q=0.8,en-AU;q=0.7,en;q=0.6,fr-CA;q=0.5,fr;q=0.4,es-AR;q=0.3,es;q=0.2,sq;q=0.1,fr-FR;q=0.1"
+}
+[requestLogger] [REQ] Body: {"sourceLang":"en","targetLang":"zh","blockText":"Global scope: In your Codex home directory (defaults to ~/.codex, unless you set CODEX_HOME), Codex reads AGENTS.override.md if it exists. Otherwise, Codex reads AGENTS.md. Codex uses only the first non-empty file at this level.","manualTrigger":{"text":"Global scope","type":"phrase","translation":"全局范围"},"userLevel":"Beginner","excludedTexts":["global scope"]}
+[jwt.middleware] [DEV MODE] Bypassing JWT verification, using default user: dev-user-123 dev
+[generate.llm] [qwen3.5-122b-a10b] User Prompt:
+# Source Language
+en
+
+# Target Language
+zh
+
+# Reader Proficiency Level
+Beginner
+
+# Maximum Translation Results
+13
+
+# Block Text
+Global scope: In your Codex home directory (defaults to ~/.codex, unless you set CODEX_HOME), Codex reads AGENTS.override.md if it exists. Otherwise, Codex reads AGENTS.md. Codex uses only the first non-empty file at this level.
+
+[generate.llm] [qwen3.5-122b-a10b] LLM Response:
+{
+  "candidates": [
+    {
+      "reason": "Technical term for the main folder where a program stores its files",
+      "text": "home directory",
+      "type": "phrase",
+      "translation": "主目录"
+    },
+    {
+      "reason": "Common programming symbol representing the user's home folder path",
+      "text": "~/.codex",
+      "type": "phrase",
+      "translation": "~/.codex"
+    },
+    {
+      "reason": "Environment variable name used to customize the application's location",
+      "text": "CODEX_HOME",
+      "type": "phrase",
+      "translation": "CODEX_HOME"
+    },
+    {
+      "reason": "Verb meaning to assign a value or setting in a technical context",
+      "text": "set",
+      "type": "word",
+      "translation": "设置"
+    },
+    {
+      "reason": "File extension indicating a Markdown formatted text file",
+      "text": ".md",
+      "type": "phrase",
+      "translation": ".md"
+    },
+    {
+      "reason": "Adjective describing a file that contains no content or lines",
+      "text": "non-empty",
+      "type": "phrase",
+      "translation": "非空的"
+    },
+    {
+      "reason": "Prepositional phrase indicating a specific hierarchy level in a system",
+      "text": "at this level",
+      "type": "phrase",
+      "translation": "在此级别"
+    },
+    {
+      "reason": "Technical verb meaning to access and process data from a file",
+      "text": "reads",
+      "type": "word",
+      "translation": "读取"
+    },
+    {
+      "reason": "Conjunction introducing an alternative condition if the first fails",
+      "text": "Otherwise",
+      "type": "word",
+      "translation": "否则"
+    },
+    {
+      "reason": "Phrase indicating the default state before any changes are made",
+      "text": "defaults to",
+      "type": "phrase",
+      "translation": "默认为"
+    },
+    {
+      "reason": "Conditional phrase meaning 'if it is present'",
+      "text": "if it exists",
+      "type": "phrase",
+      "translation": "如果存在"
+    },
+    {
+      "reason": "Adverb emphasizing exclusivity of the action performed",
+      "text": "only",
+      "type": "word",
+      "translation": "仅"
+    },
+    {
+      "reason": "Noun referring to the specific software tool being discussed",
+      "text": "Codex",
+      "type": "word",
+      "translation": "Codex"
+    }
+  ]
+}

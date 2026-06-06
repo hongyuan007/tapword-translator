@@ -1,0 +1,1910 @@
+logger.ts:125 [16:04:17.267][+64261ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_TOGGLE",
+  "data": {
+    "enabled": true
+  }
+}
+logger.ts:125 [16:04:17.373][+64367ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "A Game of Thrones",
+      "Article",
+      "Talk",
+      "Read"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+ [16:04:17.375][+64368ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+ [16:04:17.375][+64369ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "A Game of Thrones"
+}
+ [16:04:17.378][+64371ms][TranslationService] Sending fragment translation request: {
+  "text": "A Game of Thrones",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.378][+64371ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+ [16:04:17.378][+64372ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+ [16:04:17.379][+64372ms][APIService] Request body: {
+  "text": "A Game of Thrones",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.379][+64372ms][AuthService] Using cached token
+ [16:04:17.379][+64372ms][APIService] Auth token length: 268
+ [16:04:17.379][+64373ms][APIService] Body: {"text":"A Game of Thrones","sourceLanguage":"auto","targetLanguage":"zh"}
+ [16:04:17.381][+64374ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Edit",
+      "View history",
+      "Appearance",
+      "hide"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+ [16:04:17.381][+64374ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+ [16:04:17.381][+64374ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Edit"
+}
+ [16:04:17.381][+64375ms][TranslationService] Sending fragment translation request: {
+  "text": "Edit",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.381][+64375ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+ [16:04:17.381][+64375ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+ [16:04:17.381][+64375ms][APIService] Request body: {
+  "text": "Edit",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.382][+64375ms][AuthService] Using cached token
+ [16:04:17.382][+64375ms][APIService] Auth token length: 268
+ [16:04:17.382][+64375ms][APIService] Body: {"text":"Edit","sourceLanguage":"auto","targetLanguage":"zh"}
+ [16:04:17.382][+64376ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Birthday mode (Baby Globe)",
+      "Learn more about Birthday mode",
+      "Disabled",
+      "Enabled"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+ [16:04:17.383][+64376ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+ [16:04:17.383][+64376ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Birthday mode (Baby Globe)"
+}
+ [16:04:17.383][+64376ms][TranslationService] Sending fragment translation request: {
+  "text": "Birthday mode (Baby Globe)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.383][+64376ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+ [16:04:17.383][+64376ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+ [16:04:17.383][+64376ms][APIService] Request body: {
+  "text": "Birthday mode (Baby Globe)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.383][+64376ms][AuthService] Using cached token
+ [16:04:17.383][+64376ms][APIService] Auth token length: 268
+ [16:04:17.383][+64376ms][APIService] Body: {"text":"Birthday mode (Baby Globe)","sourceLanguage":"auto","targetLanguage":"zh"}
+ [16:04:17.383][+64377ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Text",
+      "Small",
+      "Standard",
+      "Large"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+ [16:04:17.384][+64377ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+ [16:04:17.384][+64377ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Text"
+}
+ [16:04:17.384][+64377ms][TranslationService] Sending fragment translation request: {
+  "text": "Text",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.384][+64377ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+ [16:04:17.384][+64377ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+ [16:04:17.384][+64377ms][APIService] Request body: {
+  "text": "Text",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.384][+64378ms][AuthService] Using cached token
+ [16:04:17.384][+64378ms][APIService] Auth token length: 268
+ [16:04:17.384][+64378ms][APIService] Body: {"text":"Text","sourceLanguage":"auto","targetLanguage":"zh"}
+ [16:04:17.385][+64378ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Width",
+      "Standard",
+      "Wide",
+      "Color (beta)"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+ [16:04:17.385][+64378ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+ [16:04:17.385][+64379ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Width"
+}
+ [16:04:17.385][+64379ms][TranslationService] Sending fragment translation request: {
+  "text": "Width",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.385][+64379ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+ [16:04:17.385][+64379ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+ [16:04:17.385][+64379ms][APIService] Request body: {
+  "text": "Width",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+ [16:04:17.386][+64379ms][AuthService] Using cached token
+ [16:04:17.386][+64379ms][APIService] Auth token length: 268
+ [16:04:17.386][+64379ms][APIService] Body: {"text":"Width","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:17.386][+64379ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Automatic",
+      "Light",
+      "Dark",
+      "From Wikipedia, the free encyclopedia"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.386][+64380ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+logger.ts:125 [16:04:17.386][+64380ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Automatic"
+}
+logger.ts:125 [16:04:17.386][+64380ms][TranslationService] Sending fragment translation request: {
+  "text": "Automatic",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.386][+64380ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.387][+64380ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.387][+64380ms][APIService] Request body: {
+  "text": "Automatic",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.387][+64380ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.387][+64380ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.387][+64380ms][APIService] Body: {"text":"Automatic","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:17.387][+64381ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "This article is about the novel. For the TV series, see Game of Thrones. For derivative works of the same name, see A Game of Thrones (disambiguation).",
+      "A Game of Thrones",
+      "US first edition cover",
+      "Editor"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.387][+64381ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+logger.ts:125 [16:04:17.387][+64381ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "This article is about the novel. For the TV series"
+}
+logger.ts:125 [16:04:17.388][+64381ms][TranslationService] Sending fragment translation request: {
+  "text": "This article is about the novel. For the TV series, see Game of Thrones. For derivative works of the same name, see A Game of Thrones (disambiguation).",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.388][+64381ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.388][+64381ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.388][+64381ms][APIService] Request body: {
+  "text": "This article is about the novel. For the TV series, see Game of Thrones. For derivative works of the same name, see A Game of Thrones (disambiguation).",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.388][+64381ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.388][+64381ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.388][+64381ms][APIService] Body: {"text":"This article is about the novel. For the TV series, see Game of Thrones. For derivative works of the same name, see A Game of Thrones (disambiguation).","sourceLanguage":"auto","targetLanguag...
+logger.ts:125 [16:04:17.388][+64381ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Anne Groell[1][2]",
+      "Author",
+      "George R. R. Martin",
+      "Language"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.388][+64382ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+logger.ts:125 [16:04:17.388][+64382ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Anne Groell[1][2]"
+}
+logger.ts:125 [16:04:17.388][+64382ms][TranslationService] Sending fragment translation request: {
+  "text": "Anne Groell[1][2]",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.388][+64382ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.388][+64382ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.388][+64382ms][APIService] Request body: {
+  "text": "Anne Groell[1][2]",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.389][+64382ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.389][+64382ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.389][+64382ms][APIService] Body: {"text":"Anne Groell[1][2]","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:17.389][+64382ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "English",
+      "Series",
+      "A Song of Ice and Fire",
+      "Genre"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.389][+64382ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+logger.ts:125 [16:04:17.389][+64382ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "English"
+}
+logger.ts:125 [16:04:17.389][+64383ms][TranslationService] Sending fragment translation request: {
+  "text": "English",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.389][+64383ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.389][+64383ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.389][+64383ms][APIService] Request body: {
+  "text": "English",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.389][+64383ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.389][+64383ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.390][+64383ms][APIService] Body: {"text":"English","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:17.390][+64383ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Historical fantasy, epic fantasy",
+      "Published",
+      "August 1, 1996 [3]",
+      "Publisher"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.390][+64383ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+logger.ts:125 [16:04:17.390][+64383ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Historical fantasy, epic fantasy"
+}
+logger.ts:125 [16:04:17.390][+64383ms][TranslationService] Sending fragment translation request: {
+  "text": "Historical fantasy, epic fantasy",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.390][+64383ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.390][+64383ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.390][+64384ms][APIService] Request body: {
+  "text": "Historical fantasy, epic fantasy",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.390][+64384ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.390][+64384ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.390][+64384ms][APIService] Body: {"text":"Historical fantasy, epic fantasy","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:17.391][+64384ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Bantam Spectra (US)",
+      "HarperCollins Voyager (UK)",
+      "Pages",
+      "Followed by"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.391][+64384ms][FullTranslateBatchHandler] Batch translation request: 4 segments
+logger.ts:125 [16:04:17.391][+64384ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Bantam Spectra (US)"
+}
+logger.ts:125 [16:04:17.391][+64384ms][TranslationService] Sending fragment translation request: {
+  "text": "Bantam Spectra (US)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.391][+64384ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.391][+64384ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.391][+64384ms][APIService] Request body: {
+  "text": "Bantam Spectra (US)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.391][+64385ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.391][+64385ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.391][+64385ms][APIService] Body: {"text":"Bantam Spectra (US)","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:17.392][+64385ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "A Clash of Kings",
+      "A Game of Thrones is an epic fantasy novel by American author George R. R. Martin. It was published in August 1996 as the first entry in his series A Song of Ice and Fire. It was Martin's fourth novel and his return to writing prose fiction after a long period working in television. He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy."
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.392][+64385ms][FullTranslateBatchHandler] Batch translation request: 2 segments
+logger.ts:125 [16:04:17.392][+64385ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "A Clash of Kings"
+}
+logger.ts:125 [16:04:17.392][+64386ms][TranslationService] Sending fragment translation request: {
+  "text": "A Clash of Kings",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.392][+64386ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.392][+64386ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.392][+64386ms][APIService] Request body: {
+  "text": "A Clash of Kings",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.393][+64386ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.393][+64386ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.393][+64386ms][APIService] Body: {"text":"A Clash of Kings","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:17.393][+64387ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "A Game of Thrones is narrated in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts. In the Seven Kingdoms of Westeros, House Stark and House Lannister influence the political fate of the continent. In Westeros' far north, an illegitimate son of House Stark joins a group maintaining a giant wall of ice to protect Westeros from raiders and a group of mythical enemies. Across the sea in Essos, the last surviving members of Westeros' deposed royal house, House Targaryen, live in exile."
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.394][+64387ms][FullTranslateBatchHandler] Batch translation request: 1 segments
+logger.ts:125 [16:04:17.394][+64387ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "A Game of Thrones is narrated in third person, wit"
+}
+logger.ts:125 [16:04:17.394][+64387ms][TranslationService] Sending fragment translation request: {
+  "text": "A Game of Thrones is narrated in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts. In the Seven Kingdoms of Westeros, House Stark and House Lannister influence the political fate of the continent. In Westeros' far north, an illegitimate son of House Stark joins a group maintaining a giant wall of ice to protect Westeros from raiders and a group of mythical enemies. Across the sea in Essos, the last surviving members of Westeros' deposed royal house, House Targaryen, live in exile.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.394][+64387ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.394][+64388ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.394][+64388ms][APIService] Request body: {
+  "text": "A Game of Thrones is narrated in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts. In the Seven Kingdoms of Westeros, House Stark and House Lannister influence the political fate of the continent. In Westeros' far north, an illegitimate son of House Stark joins a group maintaining a giant wall of ice to protect Westeros from raiders and a group of mythical enemies. Across the sea in Essos, the last surviving members of Westeros' deposed royal house, House Targaryen, live in exile.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.394][+64388ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.395][+64388ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.395][+64388ms][APIService] Body: {"text":"A Game of Thrones is narrated in third person, with each chapter alternating between eight narrators who sometimes provide unreliable accounts. In the Seven Kingdoms of Westeros, House Stark ...
+logger.ts:125 [16:04:17.395][+64388ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Following the novel's publication, several reviewers commended the novel's focus on political intrigue and historical influences. It won the 1997 Locus Award for Best Fantasy Novel and was nominated for several others, and a novella comprising the Targaryen chapters won the 1997 Hugo Award for Best Short Story. It was only a modest commercial success, selling a few thousand copies. The HBO television adaptation Game of Thrones (2011–2019) reignited interest in the novel. It became a best-seller and the subject of academic and popular discourse."
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.395][+64389ms][FullTranslateBatchHandler] Batch translation request: 1 segments
+logger.ts:125 [16:04:17.395][+64389ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Following the novel's publication, several reviewe"
+}
+logger.ts:125 [16:04:17.395][+64389ms][TranslationService] Sending fragment translation request: {
+  "text": "Following the novel's publication, several reviewers commended the novel's focus on political intrigue and historical influences. It won the 1997 Locus Award for Best Fantasy Novel and was nominated for several others, and a novella comprising the Targaryen chapters won the 1997 Hugo Award for Best Short Story. It was only a modest commercial success, selling a few thousand copies. The HBO television adaptation Game of Thrones (2011–2019) reignited interest in the novel. It became a best-seller and the subject of academic and popular discourse.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.395][+64389ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.395][+64389ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.396][+64389ms][APIService] Request body: {
+  "text": "Following the novel's publication, several reviewers commended the novel's focus on political intrigue and historical influences. It won the 1997 Locus Award for Best Fantasy Novel and was nominated for several others, and a novella comprising the Targaryen chapters won the 1997 Hugo Award for Best Short Story. It was only a modest commercial success, selling a few thousand copies. The HBO television adaptation Game of Thrones (2011–2019) reignited interest in the novel. It became a best-seller and the subject of academic and popular discourse.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.396][+64389ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.396][+64389ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.396][+64389ms][APIService] Body: {"text":"Following the novel's publication, several reviewers commended the novel's focus on political intrigue and historical influences. It won the 1997 Locus Award for Best Fantasy Novel and was no...
+logger.ts:125 [16:04:17.396][+64389ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "An epic fantasy novel, it has been widely compared with the work of J. R. R. Tolkien and characterized as subverting the genre's major tropes; it is sometimes described as historical or medieval fantasy. There are few direct historical analogues, but there are clear echoes of real history, like Hadrian's Wall inspiring the novel's giant wall of ice. Scholars have explored whether the novel authentically represents the Middle Ages and discuss how it responds to medieval literary conventions or themes, like chivalry. Gender, motherhood, and sexual violence are other frequently explored topics, and the authority of rulers or kings is sometimes discussed with reference to feudalism. In 2019, the BBC named it among the 100 most inspiring novels."
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.396][+64389ms][FullTranslateBatchHandler] Batch translation request: 1 segments
+logger.ts:125 [16:04:17.396][+64390ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "An epic fantasy novel, it has been widely compared"
+}
+logger.ts:125 [16:04:17.396][+64390ms][TranslationService] Sending fragment translation request: {
+  "text": "An epic fantasy novel, it has been widely compared with the work of J. R. R. Tolkien and characterized as subverting the genre's major tropes; it is sometimes described as historical or medieval fantasy. There are few direct historical analogues, but there are clear echoes of real history, like Hadrian's Wall inspiring the novel's giant wall of ice. Scholars have explored whether the novel authentically represents the Middle Ages and discuss how it responds to medieval literary conventions or themes, like chivalry. Gender, motherhood, and sexual violence are other frequently explored topics, and the authority of rulers or kings is sometimes discussed with reference to feudalism. In 2019, the BBC named it among the 100 most inspiring novels.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.396][+64390ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.396][+64390ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.397][+64390ms][APIService] Request body: {
+  "text": "An epic fantasy novel, it has been widely compared with the work of J. R. R. Tolkien and characterized as subverting the genre's major tropes; it is sometimes described as historical or medieval fantasy. There are few direct historical analogues, but there are clear echoes of real history, like Hadrian's Wall inspiring the novel's giant wall of ice. Scholars have explored whether the novel authentically represents the Middle Ages and discuss how it responds to medieval literary conventions or themes, like chivalry. Gender, motherhood, and sexual violence are other frequently explored topics, and the authority of rulers or kings is sometimes discussed with reference to feudalism. In 2019, the BBC named it among the 100 most inspiring novels.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.397][+64390ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.397][+64390ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.397][+64390ms][APIService] Body: {"text":"An epic fantasy novel, it has been widely compared with the work of J. R. R. Tolkien and characterized as subverting the genre's major tropes; it is sometimes described as historical or medie...
+logger.ts:125 [16:04:17.482][+64476ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "叙述"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:17.483][+64476ms][FullTranslateBatchHandler] Batch translation request: 1 segments
+logger.ts:125 [16:04:17.483][+64476ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "叙述"
+}
+logger.ts:125 [16:04:17.483][+64476ms][TranslationService] Sending fragment translation request: {
+  "text": "叙述",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.483][+64476ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:17.483][+64476ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:17.483][+64476ms][APIService] Request body: {
+  "text": "叙述",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:17.483][+64476ms][AuthService] Using cached token
+logger.ts:125 [16:04:17.483][+64476ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:17.483][+64477ms][APIService] Body: {"text":"叙述","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.096][+65090ms][APIService] Response: 200 (714ms)
+logger.ts:125 [16:04:18.097][+65090ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.097][+65090ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.097][+65090ms][TranslationService] Fragment translation response data: {
+  "translation": "编辑"
+}
+logger.ts:125 [16:04:18.097][+65090ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "编辑"
+}
+logger.ts:125 [16:04:18.097][+65091ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "View history"
+}
+logger.ts:125 [16:04:18.097][+65091ms][TranslationService] Sending fragment translation request: {
+  "text": "View history",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.097][+65091ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.097][+65091ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.097][+65091ms][APIService] Request body: {
+  "text": "View history",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.097][+65091ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.098][+65091ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.098][+65091ms][APIService] Body: {"text":"View history","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.122][+65115ms][APIService] Response: 200 (738ms)
+logger.ts:125 [16:04:18.122][+65116ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.122][+65116ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.122][+65116ms][TranslationService] Fragment translation response data: {
+  "translation": "文本"
+}
+logger.ts:125 [16:04:18.122][+65116ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "文本"
+}
+logger.ts:125 [16:04:18.122][+65116ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Small"
+}
+logger.ts:125 [16:04:18.122][+65116ms][TranslationService] Sending fragment translation request: {
+  "text": "Small",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.123][+65116ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.123][+65116ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.123][+65116ms][APIService] Request body: {
+  "text": "Small",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.123][+65116ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.123][+65116ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.123][+65116ms][APIService] Body: {"text":"Small","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.132][+65125ms][APIService] Response: 200 (752ms)
+logger.ts:125 [16:04:18.132][+65125ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.132][+65125ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.132][+65125ms][TranslationService] Fragment translation response data: {
+  "translation": "权力的游戏"
+}
+logger.ts:125 [16:04:18.132][+65126ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "权力的游戏"
+}
+logger.ts:125 [16:04:18.132][+65126ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Article"
+}
+logger.ts:125 [16:04:18.132][+65126ms][TranslationService] Sending fragment translation request: {
+  "text": "Article",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.132][+65126ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.132][+65126ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.132][+65126ms][APIService] Request body: {
+  "text": "Article",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.132][+65126ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.132][+65126ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.132][+65126ms][APIService] Body: {"text":"Article","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.168][+65161ms][APIService] Response: 200 (781ms)
+logger.ts:125 [16:04:18.168][+65162ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.168][+65162ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.169][+65162ms][TranslationService] Fragment translation response data: {
+  "translation": "自动"
+}
+logger.ts:125 [16:04:18.169][+65162ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "自动"
+}
+logger.ts:125 [16:04:18.169][+65162ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Light"
+}
+logger.ts:125 [16:04:18.169][+65162ms][TranslationService] Sending fragment translation request: {
+  "text": "Light",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.169][+65162ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.169][+65163ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.169][+65163ms][APIService] Request body: {
+  "text": "Light",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.169][+65163ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.169][+65163ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.169][+65163ms][APIService] Body: {"text":"Light","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.170][+65163ms][MessageRouter] Message received in background: {
+  "type": "FULL_TRANSLATE_BATCH_REQUEST",
+  "data": {
+    "texts": [
+      "Jump to content"
+    ],
+    "sourceLang": "auto",
+    "targetLang": "zh"
+  }
+}
+logger.ts:125 [16:04:18.170][+65164ms][FullTranslateBatchHandler] Batch translation request: 1 segments
+logger.ts:125 [16:04:18.170][+65164ms][FullTranslateBatchHandler] [handleBatch] translating index=0 {
+  "text": "Jump to content"
+}
+logger.ts:125 [16:04:18.170][+65164ms][TranslationService] Sending fragment translation request: {
+  "text": "Jump to content",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.170][+65164ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.170][+65164ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.170][+65164ms][APIService] Request body: {
+  "text": "Jump to content",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.170][+65164ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.170][+65164ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.171][+65164ms][APIService] Body: {"text":"Jump to content","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.192][+65185ms][APIService] Response: 200 (806ms)
+logger.ts:125 [16:04:18.192][+65185ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.192][+65186ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.192][+65186ms][TranslationService] Fragment translation response data: {
+  "translation": "宽度"
+}
+logger.ts:125 [16:04:18.192][+65186ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "宽度"
+}
+logger.ts:125 [16:04:18.192][+65186ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Standard"
+}
+logger.ts:125 [16:04:18.193][+65186ms][TranslationService] Sending fragment translation request: {
+  "text": "Standard",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.193][+65186ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.193][+65186ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.193][+65186ms][APIService] Request body: {
+  "text": "Standard",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.193][+65186ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.193][+65186ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.193][+65186ms][APIService] Body: {"text":"Standard","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.241][+65235ms][APIService] Response: 200 (858ms)
+logger.ts:125 [16:04:18.242][+65235ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.242][+65236ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.242][+65236ms][TranslationService] Fragment translation response data: {
+  "translation": "生日模式（宝宝地球）"
+}
+logger.ts:125 [16:04:18.242][+65236ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "生日模式（宝宝地球）"
+}
+logger.ts:125 [16:04:18.242][+65236ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Learn more about Birthday mode"
+}
+logger.ts:125 [16:04:18.243][+65236ms][TranslationService] Sending fragment translation request: {
+  "text": "Learn more about Birthday mode",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.243][+65236ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.243][+65236ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.243][+65236ms][APIService] Request body: {
+  "text": "Learn more about Birthday mode",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.243][+65236ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.243][+65236ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.243][+65236ms][APIService] Body: {"text":"Learn more about Birthday mode","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.562][+65556ms][APIService] Response: 200 (1172ms)
+logger.ts:125 [16:04:18.563][+65556ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.563][+65556ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.563][+65556ms][TranslationService] Fragment translation response data: {
+  "translation": "历史幻想，史诗幻想"
+}
+logger.ts:125 [16:04:18.563][+65556ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "历史幻想，史诗幻想"
+}
+logger.ts:125 [16:04:18.563][+65556ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Published"
+}
+logger.ts:125 [16:04:18.563][+65556ms][TranslationService] Sending fragment translation request: {
+  "text": "Published",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.563][+65556ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.563][+65556ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.563][+65556ms][APIService] Request body: {
+  "text": "Published",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.563][+65556ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.563][+65556ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.563][+65556ms][APIService] Body: {"text":"Published","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.735][+65728ms][APIService] Response: 200 (1342ms)
+logger.ts:125 [16:04:18.735][+65728ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.735][+65728ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.735][+65728ms][TranslationService] Fragment translation response data: {
+  "translation": "王权的游戏"
+}
+logger.ts:125 [16:04:18.735][+65728ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "王权的游戏"
+}
+logger.ts:125 [16:04:18.735][+65729ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "A Game of Thrones is an epic fantasy novel by Amer"
+}
+logger.ts:125 [16:04:18.735][+65729ms][TranslationService] Sending fragment translation request: {
+  "text": "A Game of Thrones is an epic fantasy novel by American author George R. R. Martin. It was published in August 1996 as the first entry in his series A Song of Ice and Fire. It was Martin's fourth novel and his return to writing prose fiction after a long period working in television. He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.735][+65729ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.735][+65729ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.735][+65729ms][APIService] Request body: {
+  "text": "A Game of Thrones is an epic fantasy novel by American author George R. R. Martin. It was published in August 1996 as the first entry in his series A Song of Ice and Fire. It was Martin's fourth novel and his return to writing prose fiction after a long period working in television. He had the initial idea in 1991 while writing science fiction; he wrote a hundred pages and submitted them to his agent, originally planning the novel as a trilogy.",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.736][+65729ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.736][+65729ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.736][+65729ms][APIService] Body: {"text":"A Game of Thrones is an epic fantasy novel by American author George R. R. Martin. It was published in August 1996 as the first entry in his series A Song of Ice and Fire. It was Martin's fou...
+logger.ts:125 [16:04:18.841][+65835ms][APIService] Response: 200 (1450ms)
+logger.ts:125 [16:04:18.842][+65835ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.842][+65835ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.842][+65836ms][TranslationService] Fragment translation response data: {
+  "translation": "兰登书屋·斯佩克特拉（美国）"
+}
+logger.ts:125 [16:04:18.842][+65836ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "兰登书屋·斯佩克特拉（美国）"
+}
+logger.ts:125 [16:04:18.842][+65836ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "HarperCollins Voyager (UK)"
+}
+logger.ts:125 [16:04:18.843][+65836ms][TranslationService] Sending fragment translation request: {
+  "text": "HarperCollins Voyager (UK)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.843][+65836ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.843][+65836ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.843][+65836ms][APIService] Request body: {
+  "text": "HarperCollins Voyager (UK)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.843][+65837ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.843][+65837ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.843][+65837ms][APIService] Body: {"text":"HarperCollins Voyager (UK)","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:18.970][+65964ms][APIService] Response: 200 (1582ms)
+logger.ts:125 [16:04:18.971][+65964ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:18.971][+65964ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:18.971][+65964ms][TranslationService] Fragment translation response data: {
+  "translation": "本文介绍的是小说。关于电视剧，请参见《权力的游戏》。关于同名的衍生作品，请参见《冰与火之歌》（消歧义）。"
+}
+logger.ts:125 [16:04:18.971][+65965ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "本文介绍的是小说。关于电视剧，请参见《权力的游戏》。关于同名的衍生作品，请参见《冰与火之歌》（消歧义"
+}
+logger.ts:125 [16:04:18.971][+65965ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "A Game of Thrones"
+}
+logger.ts:125 [16:04:18.971][+65965ms][TranslationService] Sending fragment translation request: {
+  "text": "A Game of Thrones",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.971][+65965ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:18.972][+65965ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:18.972][+65965ms][APIService] Request body: {
+  "text": "A Game of Thrones",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:18.972][+65965ms][AuthService] Using cached token
+logger.ts:125 [16:04:18.972][+65965ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:18.972][+65965ms][APIService] Body: {"text":"A Game of Thrones","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:19.339][+66332ms][APIService] Response: 200 (1950ms)
+logger.ts:125 [16:04:19.339][+66333ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:19.339][+66333ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:19.340][+66333ms][TranslationService] Fragment translation response data: {
+  "translation": "安妮·格罗尔[1][2]"
+}
+logger.ts:125 [16:04:19.340][+66333ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "安妮·格罗尔[1][2]"
+}
+logger.ts:125 [16:04:19.340][+66333ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Author"
+}
+logger.ts:125 [16:04:19.340][+66334ms][TranslationService] Sending fragment translation request: {
+  "text": "Author",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.340][+66334ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:19.341][+66334ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:19.341][+66334ms][APIService] Request body: {
+  "text": "Author",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.341][+66334ms][AuthService] Using cached token
+logger.ts:125 [16:04:19.341][+66335ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:19.341][+66335ms][APIService] Body: {"text":"Author","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:19.347][+66340ms][APIService] Response: 200 (1864ms)
+logger.ts:125 [16:04:19.347][+66340ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:19.347][+66340ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:19.347][+66340ms][TranslationService] Fragment translation response data: {
+  "translation": "叙述"
+}
+logger.ts:125 [16:04:19.347][+66341ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "叙述"
+}
+logger.ts:125 [16:04:19.348][+66341ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 1,
+  "successCount": 1,
+  "elapsedMs": 1865
+}
+logger.ts:125 [16:04:19.348][+66341ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 1
+}
+logger.ts:125 [16:04:19.772][+66766ms][APIService] Response: 200 (1649ms)
+logger.ts:125 [16:04:19.773][+66766ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:19.773][+66766ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:19.773][+66766ms][TranslationService] Fragment translation response data: {
+  "translation": "小"
+}
+logger.ts:125 [16:04:19.773][+66766ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "小"
+}
+logger.ts:125 [16:04:19.773][+66767ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "Standard"
+}
+logger.ts:125 [16:04:19.773][+66767ms][TranslationService] Sending fragment translation request: {
+  "text": "Standard",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.773][+66767ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:19.774][+66767ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:19.774][+66767ms][APIService] Request body: {
+  "text": "Standard",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.774][+66767ms][AuthService] Using cached token
+logger.ts:125 [16:04:19.774][+66767ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:19.774][+66768ms][APIService] Body: {"text":"Standard","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:19.857][+66851ms][APIService] Response: 200 (1759ms)
+logger.ts:125 [16:04:19.858][+66851ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:19.858][+66851ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:19.858][+66851ms][TranslationService] Fragment translation response data: {
+  "translation": "查看历史"
+}
+logger.ts:125 [16:04:19.858][+66852ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "查看历史"
+}
+logger.ts:125 [16:04:19.858][+66852ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "Appearance"
+}
+logger.ts:125 [16:04:19.858][+66852ms][TranslationService] Sending fragment translation request: {
+  "text": "Appearance",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.858][+66852ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:19.859][+66852ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:19.859][+66852ms][APIService] Request body: {
+  "text": "Appearance",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.859][+66852ms][AuthService] Using cached token
+logger.ts:125 [16:04:19.859][+66852ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:19.859][+66852ms][APIService] Body: {"text":"Appearance","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:19.925][+66918ms][APIService] Response: 200 (2535ms)
+logger.ts:125 [16:04:19.925][+66919ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:19.925][+66919ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:19.926][+66919ms][TranslationService] Fragment translation response data: {
+  "translation": "英语"
+}
+logger.ts:125 [16:04:19.926][+66919ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "英语"
+}
+logger.ts:125 [16:04:19.926][+66919ms][FullTranslateBatchHandler] [handleBatch] translating index=1 {
+  "text": "Series"
+}
+logger.ts:125 [16:04:19.926][+66919ms][TranslationService] Sending fragment translation request: {
+  "text": "Series",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.926][+66919ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:19.926][+66919ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:19.926][+66920ms][APIService] Request body: {
+  "text": "Series",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:19.926][+66920ms][AuthService] Using cached token
+logger.ts:125 [16:04:19.926][+66920ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:19.926][+66920ms][APIService] Body: {"text":"Series","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:20.116][+67109ms][APIService] Response: 200 (2721ms)
+logger.ts:125 [16:04:20.116][+67110ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.117][+67110ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.117][+67110ms][TranslationService] Fragment translation response data: {
+  "translation": "《权力的游戏》以第三人称叙述，每章在八位叙述者之间交替，有时提供不可靠的描述。在维斯特洛的七大王国，史塔克家族和兰尼斯特家族影响着大陆的政治命运。在维斯特洛极北之地，史塔克家族的一名私生子加入了一个维护巨大冰墙的团体，以保护维斯特洛免受掠夺者和一群神话敌人的侵袭。在海外的厄索斯，维斯特洛被推翻的王室家族——坦格利安家族最后幸存的成员流亡在外。"
+}
+logger.ts:125 [16:04:20.117][+67110ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "《权力的游戏》以第三人称叙述，每章在八位叙述者之间交替，有时提供不可靠的描述。在维斯特洛的七大王国，"
+}
+logger.ts:125 [16:04:20.117][+67110ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 1,
+  "successCount": 1,
+  "elapsedMs": 2723
+}
+logger.ts:125 [16:04:20.117][+67110ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 1
+}
+logger.ts:125 [16:04:20.177][+67171ms][APIService] Response: 200 (2045ms)
+logger.ts:125 [16:04:20.178][+67171ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.178][+67171ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.178][+67171ms][TranslationService] Fragment translation response data: {
+  "translation": "文章"
+}
+logger.ts:125 [16:04:20.178][+67171ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "文章"
+}
+logger.ts:125 [16:04:20.178][+67171ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "Talk"
+}
+logger.ts:125 [16:04:20.178][+67171ms][TranslationService] Sending fragment translation request: {
+  "text": "Talk",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.178][+67171ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:20.178][+67171ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:20.178][+67171ms][APIService] Request body: {
+  "text": "Talk",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.178][+67172ms][AuthService] Using cached token
+logger.ts:125 [16:04:20.178][+67172ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:20.178][+67172ms][APIService] Body: {"text":"Talk","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:20.396][+67389ms][APIService] Response: 200 (2226ms)
+logger.ts:125 [16:04:20.396][+67389ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.396][+67389ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.396][+67390ms][TranslationService] Fragment translation response data: {
+  "translation": "光"
+}
+logger.ts:125 [16:04:20.396][+67390ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "光"
+}
+logger.ts:125 [16:04:20.396][+67390ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "Dark"
+}
+logger.ts:125 [16:04:20.397][+67390ms][TranslationService] Sending fragment translation request: {
+  "text": "Dark",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.397][+67390ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:20.397][+67390ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:20.397][+67390ms][APIService] Request body: {
+  "text": "Dark",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.397][+67390ms][AuthService] Using cached token
+logger.ts:125 [16:04:20.397][+67390ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:20.397][+67390ms][APIService] Body: {"text":"Dark","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:20.530][+67523ms][APIService] Response: 200 (2359ms)
+logger.ts:125 [16:04:20.530][+67523ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.530][+67523ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.530][+67524ms][TranslationService] Fragment translation response data: {
+  "translation": "跳转到内容"
+}
+logger.ts:125 [16:04:20.530][+67524ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "跳转到内容"
+}
+logger.ts:125 [16:04:20.530][+67524ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 1,
+  "successCount": 1,
+  "elapsedMs": 2360
+}
+logger.ts:125 [16:04:20.530][+67524ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 1
+}
+logger.ts:125 [16:04:20.626][+67620ms][APIService] Response: 200 (2433ms)
+logger.ts:125 [16:04:20.627][+67620ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.627][+67621ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.627][+67621ms][TranslationService] Fragment translation response data: {
+  "translation": "标准"
+}
+logger.ts:125 [16:04:20.627][+67621ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "标准"
+}
+logger.ts:125 [16:04:20.628][+67621ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "Wide"
+}
+logger.ts:125 [16:04:20.628][+67621ms][TranslationService] Sending fragment translation request: {
+  "text": "Wide",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.628][+67621ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:20.628][+67621ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:20.628][+67622ms][APIService] Request body: {
+  "text": "Wide",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.628][+67622ms][AuthService] Using cached token
+logger.ts:125 [16:04:20.628][+67622ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:20.628][+67622ms][APIService] Body: {"text":"Wide","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:20.629][+67622ms][APIService] Response: 200 (2386ms)
+logger.ts:125 [16:04:20.629][+67622ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.629][+67622ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.629][+67623ms][TranslationService] Fragment translation response data: {
+  "translation": "了解生日模式的更多信息"
+}
+logger.ts:125 [16:04:20.629][+67623ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "了解生日模式的更多信息"
+}
+logger.ts:125 [16:04:20.629][+67623ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "Disabled"
+}
+logger.ts:125 [16:04:20.629][+67623ms][TranslationService] Sending fragment translation request: {
+  "text": "Disabled",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.630][+67623ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:20.630][+67623ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:20.630][+67623ms][APIService] Request body: {
+  "text": "Disabled",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.630][+67623ms][AuthService] Using cached token
+logger.ts:125 [16:04:20.630][+67623ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:20.630][+67623ms][APIService] Body: {"text":"Disabled","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:20.660][+67653ms][APIService] Response: 200 (3264ms)
+logger.ts:125 [16:04:20.660][+67653ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.660][+67653ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.660][+67653ms][TranslationService] Fragment translation response data: {
+  "translation": "小说出版后，多位评论家称赞其对政治权谋和历史影响的关注。它获得了1997年最佳奇幻小说洛厄尔奖，并获得多项其他奖项提名，而包含坦格利安章节的中篇小说则赢得了1997年雨果奖最佳短篇故事奖。尽管最初商业上仅取得 modest 成功，售出数千册，但HBO电视剧《权力的游戏》（2011–2019年）的改编重新激发了人们对这部小说的兴趣。它迅速成为畅销书，并成为学术界和大众讨论的焦点。"
+}
+logger.ts:125 [16:04:20.660][+67654ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "小说出版后，多位评论家称赞其对政治权谋和历史影响的关注。它获得了1997年最佳奇幻小说洛厄尔奖，并获"
+}
+logger.ts:125 [16:04:20.660][+67654ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 1,
+  "successCount": 1,
+  "elapsedMs": 3265
+}
+logger.ts:125 [16:04:20.660][+67654ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 1
+}
+logger.ts:125 [16:04:20.906][+67899ms][APIService] Response: 200 (2343ms)
+logger.ts:125 [16:04:20.906][+67900ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:20.907][+67900ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:20.907][+67900ms][TranslationService] Fragment translation response data: {
+  "translation": "已发布"
+}
+logger.ts:125 [16:04:20.907][+67900ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "已发布"
+}
+logger.ts:125 [16:04:20.907][+67901ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "August 1, 1996 [3]"
+}
+logger.ts:125 [16:04:20.907][+67901ms][TranslationService] Sending fragment translation request: {
+  "text": "August 1, 1996 [3]",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.907][+67901ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:20.908][+67901ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:20.908][+67901ms][APIService] Request body: {
+  "text": "August 1, 1996 [3]",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:20.908][+67901ms][AuthService] Using cached token
+logger.ts:125 [16:04:20.908][+67901ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:20.908][+67901ms][APIService] Body: {"text":"August 1, 1996 [3]","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.066][+68059ms][APIService] Response: 200 (3669ms)
+logger.ts:125 [16:04:21.066][+68059ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.066][+68059ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.066][+68059ms][TranslationService] Fragment translation response data: {
+  "translation": "一部史诗奇幻小说，它广泛地与J.R.R.托尔金的作品相比较，并被描述为颠覆了该类型的主要套路；有时也被归类为历史或中世纪奇幻。虽然几乎没有直接的历史对应物，但明显回响着真实历史的痕迹，比如哈德良长城启发了小说中那道巨大的冰墙。学者们探讨了这部小说是否真实再现了中世纪，以及它如何回应中世纪的文学惯例或主题，如骑士精神。性别、母性以及性暴力是其他经常探讨的主题，统治者或国王的权威有时也通过封建制度来讨论。2019年，英国广播公司将其列为最具启发性的百部小说之一。"
+}
+logger.ts:125 [16:04:21.066][+68060ms][FullTranslateBatchHandler] [handleBatch] index=0 success {
+  "translation": "一部史诗奇幻小说，它广泛地与J.R.R.托尔金的作品相比较，并被描述为颠覆了该类型的主要套路；有时也"
+}
+logger.ts:125 [16:04:21.066][+68060ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 1,
+  "successCount": 1,
+  "elapsedMs": 3670
+}
+logger.ts:125 [16:04:21.066][+68060ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 1
+}
+logger.ts:125 [16:04:21.095][+68089ms][APIService] Response: 200 (2123ms)
+logger.ts:125 [16:04:21.096][+68089ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.096][+68090ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.096][+68090ms][TranslationService] Fragment translation response data: {
+  "translation": "权力的游戏"
+}
+logger.ts:125 [16:04:21.096][+68090ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "权力的游戏"
+}
+logger.ts:125 [16:04:21.096][+68090ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "US first edition cover"
+}
+logger.ts:125 [16:04:21.096][+68090ms][TranslationService] Sending fragment translation request: {
+  "text": "US first edition cover",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.096][+68090ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.096][+68090ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.097][+68090ms][APIService] Request body: {
+  "text": "US first edition cover",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.097][+68090ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.097][+68090ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.097][+68090ms][APIService] Body: {"text":"US first edition cover","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.127][+68121ms][APIService] Response: 200 (1786ms)
+logger.ts:125 [16:04:21.128][+68121ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.128][+68121ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.128][+68121ms][TranslationService] Fragment translation response data: {
+  "translation": "作者"
+}
+logger.ts:125 [16:04:21.128][+68121ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "作者"
+}
+logger.ts:125 [16:04:21.128][+68121ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "George R. R. Martin"
+}
+logger.ts:125 [16:04:21.128][+68121ms][TranslationService] Sending fragment translation request: {
+  "text": "George R. R. Martin",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.128][+68122ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.128][+68122ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.128][+68122ms][APIService] Request body: {
+  "text": "George R. R. Martin",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.128][+68122ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.129][+68122ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.129][+68122ms][APIService] Body: {"text":"George R. R. Martin","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.352][+68346ms][APIService] Response: 200 (2508ms)
+logger.ts:125 [16:04:21.353][+68346ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.353][+68346ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.353][+68346ms][TranslationService] Fragment translation response data: {
+  "translation": "哈珀柯林斯维京出版社（英国）"
+}
+logger.ts:125 [16:04:21.353][+68346ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "哈珀柯林斯维京出版社（英国）"
+}
+logger.ts:125 [16:04:21.353][+68346ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "Pages"
+}
+logger.ts:125 [16:04:21.353][+68347ms][TranslationService] Sending fragment translation request: {
+  "text": "Pages",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.353][+68347ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.353][+68347ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.353][+68347ms][APIService] Request body: {
+  "text": "Pages",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.354][+68347ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.354][+68347ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.354][+68347ms][APIService] Body: {"text":"Pages","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.426][+68419ms][APIService] Response: 200 (1652ms)
+logger.ts:125 [16:04:21.426][+68420ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.426][+68420ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.426][+68420ms][TranslationService] Fragment translation response data: {
+  "translation": "标准"
+}
+logger.ts:125 [16:04:21.426][+68420ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "标准"
+}
+logger.ts:125 [16:04:21.427][+68420ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Large"
+}
+logger.ts:125 [16:04:21.427][+68420ms][TranslationService] Sending fragment translation request: {
+  "text": "Large",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.427][+68420ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.427][+68420ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.427][+68420ms][APIService] Request body: {
+  "text": "Large",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.427][+68420ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.427][+68420ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.427][+68420ms][APIService] Body: {"text":"Large","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.461][+68454ms][APIService] Response: 200 (1602ms)
+logger.ts:125 [16:04:21.461][+68455ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.462][+68455ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.462][+68455ms][TranslationService] Fragment translation response data: {
+  "translation": "外观"
+}
+logger.ts:125 [16:04:21.462][+68455ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "外观"
+}
+logger.ts:125 [16:04:21.462][+68455ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "hide"
+}
+logger.ts:125 [16:04:21.462][+68455ms][TranslationService] Sending fragment translation request: {
+  "text": "hide",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.462][+68455ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.462][+68455ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.462][+68455ms][APIService] Request body: {
+  "text": "hide",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.462][+68456ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.462][+68456ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.462][+68456ms][APIService] Body: {"text":"hide","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.506][+68499ms][APIService] Response: 200 (1328ms)
+logger.ts:125 [16:04:21.507][+68500ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.507][+68500ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.507][+68500ms][TranslationService] Fragment translation response data: {
+  "translation": "谈话"
+}
+logger.ts:125 [16:04:21.507][+68500ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "谈话"
+}
+logger.ts:125 [16:04:21.507][+68500ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Read"
+}
+logger.ts:125 [16:04:21.507][+68500ms][TranslationService] Sending fragment translation request: {
+  "text": "Read",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.507][+68500ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.507][+68500ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.507][+68501ms][APIService] Request body: {
+  "text": "Read",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.507][+68501ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.507][+68501ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.507][+68501ms][APIService] Body: {"text":"Read","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.508][+68501ms][APIService] Response: 200 (1582ms)
+logger.ts:125 [16:04:21.508][+68502ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.508][+68502ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.508][+68502ms][TranslationService] Fragment translation response data: {
+  "translation": "系列"
+}
+logger.ts:125 [16:04:21.508][+68502ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "系列"
+}
+logger.ts:125 [16:04:21.508][+68502ms][FullTranslateBatchHandler] [handleBatch] translating index=2 {
+  "text": "A Song of Ice and Fire"
+}
+logger.ts:125 [16:04:21.509][+68502ms][TranslationService] Sending fragment translation request: {
+  "text": "A Song of Ice and Fire",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.509][+68502ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.509][+68502ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.509][+68502ms][APIService] Request body: {
+  "text": "A Song of Ice and Fire",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.509][+68502ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.509][+68502ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.509][+68502ms][APIService] Body: {"text":"A Song of Ice and Fire","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.857][+68851ms][APIService] Response: 200 (1460ms)
+logger.ts:125 [16:04:21.858][+68851ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.858][+68852ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.858][+68852ms][TranslationService] Fragment translation response data: {
+  "translation": "黑暗"
+}
+logger.ts:125 [16:04:21.859][+68852ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "黑暗"
+}
+logger.ts:125 [16:04:21.859][+68852ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "From Wikipedia, the free encyclopedia"
+}
+logger.ts:125 [16:04:21.859][+68853ms][TranslationService] Sending fragment translation request: {
+  "text": "From Wikipedia, the free encyclopedia",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.860][+68853ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.860][+68853ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.860][+68853ms][APIService] Request body: {
+  "text": "From Wikipedia, the free encyclopedia",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.860][+68854ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.860][+68854ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.860][+68854ms][APIService] Body: {"text":"From Wikipedia, the free encyclopedia","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.874][+68868ms][APIService] Response: 200 (1246ms)
+logger.ts:125 [16:04:21.875][+68868ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.875][+68868ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.875][+68868ms][TranslationService] Fragment translation response data: {
+  "translation": "宽的"
+}
+logger.ts:125 [16:04:21.875][+68868ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "宽的"
+}
+logger.ts:125 [16:04:21.875][+68869ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Color (beta)"
+}
+logger.ts:125 [16:04:21.875][+68869ms][TranslationService] Sending fragment translation request: {
+  "text": "Color (beta)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.875][+68869ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.876][+68869ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.876][+68869ms][APIService] Request body: {
+  "text": "Color (beta)",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.876][+68869ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.876][+68869ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.876][+68870ms][APIService] Body: {"text":"Color (beta)","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:21.942][+68935ms][APIService] Response: 200 (1312ms)
+logger.ts:125 [16:04:21.942][+68935ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:21.942][+68935ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:21.942][+68936ms][TranslationService] Fragment translation response data: {
+  "translation": "已禁用"
+}
+logger.ts:125 [16:04:21.942][+68936ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "已禁用"
+}
+logger.ts:125 [16:04:21.942][+68936ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Enabled"
+}
+logger.ts:125 [16:04:21.943][+68936ms][TranslationService] Sending fragment translation request: {
+  "text": "Enabled",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.943][+68936ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:21.943][+68936ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:21.943][+68936ms][APIService] Request body: {
+  "text": "Enabled",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:21.943][+68936ms][AuthService] Using cached token
+logger.ts:125 [16:04:21.943][+68936ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:21.943][+68936ms][APIService] Body: {"text":"Enabled","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:22.061][+69055ms][APIService] Response: 200 (1153ms)
+logger.ts:125 [16:04:22.062][+69055ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.062][+69055ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.062][+69055ms][TranslationService] Fragment translation response data: {
+  "translation": "1996年8月1日 [3]"
+}
+logger.ts:125 [16:04:22.062][+69055ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "1996年8月1日 [3]"
+}
+logger.ts:125 [16:04:22.062][+69055ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Publisher"
+}
+logger.ts:125 [16:04:22.062][+69055ms][TranslationService] Sending fragment translation request: {
+  "text": "Publisher",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.062][+69055ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:22.062][+69055ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:22.062][+69056ms][APIService] Request body: {
+  "text": "Publisher",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.062][+69056ms][AuthService] Using cached token
+logger.ts:125 [16:04:22.062][+69056ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:22.062][+69056ms][APIService] Body: {"text":"Publisher","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:22.098][+69091ms][APIService] Response: 200 (1001ms)
+logger.ts:125 [16:04:22.098][+69091ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.098][+69091ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.098][+69091ms][TranslationService] Fragment translation response data: {
+  "translation": "美国首版封面"
+}
+logger.ts:125 [16:04:22.098][+69091ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "美国首版封面"
+}
+logger.ts:125 [16:04:22.098][+69092ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Editor"
+}
+logger.ts:125 [16:04:22.098][+69092ms][TranslationService] Sending fragment translation request: {
+  "text": "Editor",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.098][+69092ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:22.098][+69092ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:22.098][+69092ms][APIService] Request body: {
+  "text": "Editor",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.098][+69092ms][AuthService] Using cached token
+logger.ts:125 [16:04:22.098][+69092ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:22.099][+69092ms][APIService] Body: {"text":"Editor","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:22.261][+69254ms][APIService] Response: 200 (907ms)
+logger.ts:125 [16:04:22.261][+69254ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.261][+69254ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.261][+69254ms][TranslationService] Fragment translation response data: {
+  "translation": "页面"
+}
+logger.ts:125 [16:04:22.261][+69254ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "页面"
+}
+logger.ts:125 [16:04:22.261][+69254ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Followed by"
+}
+logger.ts:125 [16:04:22.261][+69254ms][TranslationService] Sending fragment translation request: {
+  "text": "Followed by",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.261][+69254ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:22.261][+69255ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:22.261][+69255ms][APIService] Request body: {
+  "text": "Followed by",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.261][+69255ms][AuthService] Using cached token
+logger.ts:125 [16:04:22.261][+69255ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:22.261][+69255ms][APIService] Body: {"text":"Followed by","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:22.326][+69320ms][APIService] Response: 200 (1197ms)
+logger.ts:125 [16:04:22.327][+69320ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.327][+69320ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.327][+69320ms][TranslationService] Fragment translation response data: {
+  "translation": "乔治·R·R·马丁"
+}
+logger.ts:125 [16:04:22.327][+69320ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "乔治·R·R·马丁"
+}
+logger.ts:125 [16:04:22.327][+69320ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Language"
+}
+logger.ts:125 [16:04:22.327][+69320ms][TranslationService] Sending fragment translation request: {
+  "text": "Language",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.327][+69320ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:22.327][+69320ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:22.327][+69320ms][APIService] Request body: {
+  "text": "Language",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.327][+69320ms][AuthService] Using cached token
+logger.ts:125 [16:04:22.327][+69320ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:22.327][+69320ms][APIService] Body: {"text":"Language","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:22.331][+69324ms][APIService] Response: 200 (3595ms)
+logger.ts:125 [16:04:22.331][+69324ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.331][+69324ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.331][+69324ms][TranslationService] Fragment translation response data: {
+  "translation": "《权力的游戏》是美国作家乔治·R·R·马丁创作的一部史诗奇幻小说。它于1996年8月出版，是其系列作品《冰与火之歌》的第一部。这是马丁的第四部小说，也是他长期从事电视工作后重返小说创作的代表作。他在1991年撰写科幻作品时萌生了最初的构思；当时他写了上百页，并提交给代理人，最初计划将这部小说作为三部曲。"
+}
+logger.ts:125 [16:04:22.331][+69324ms][FullTranslateBatchHandler] [handleBatch] index=1 success {
+  "translation": "《权力的游戏》是美国作家乔治·R·R·马丁创作的一部史诗奇幻小说。它于1996年8月出版，是其系列作"
+}
+logger.ts:125 [16:04:22.331][+69324ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 2,
+  "successCount": 2,
+  "elapsedMs": 4939
+}
+logger.ts:125 [16:04:22.331][+69325ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 2
+}
+logger.ts:125 [16:04:22.412][+69406ms][APIService] Response: 200 (985ms)
+logger.ts:125 [16:04:22.413][+69406ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.413][+69406ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.413][+69406ms][TranslationService] Fragment translation response data: {
+  "translation": "大"
+}
+logger.ts:125 [16:04:22.413][+69406ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "大"
+}
+logger.ts:125 [16:04:22.413][+69406ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5030
+}
+logger.ts:125 [16:04:22.413][+69406ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:22.458][+69452ms][APIService] Response: 200 (996ms)
+logger.ts:125 [16:04:22.459][+69452ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.459][+69452ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.459][+69453ms][TranslationService] Fragment translation response data: {
+  "translation": "隐藏"
+}
+logger.ts:125 [16:04:22.459][+69453ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "隐藏"
+}
+logger.ts:125 [16:04:22.459][+69453ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5078
+}
+logger.ts:125 [16:04:22.459][+69453ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:22.596][+69589ms][APIService] Response: 200 (1089ms)
+logger.ts:125 [16:04:22.596][+69589ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.596][+69589ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.596][+69589ms][TranslationService] Fragment translation response data: {
+  "translation": "阅读"
+}
+logger.ts:125 [16:04:22.596][+69590ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "阅读"
+}
+logger.ts:125 [16:04:22.596][+69590ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5221
+}
+logger.ts:125 [16:04:22.596][+69590ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:22.727][+69720ms][APIService] Response: 200 (1218ms)
+logger.ts:125 [16:04:22.727][+69721ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.727][+69721ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.728][+69721ms][TranslationService] Fragment translation response data: {
+  "translation": "冰与火之歌"
+}
+logger.ts:125 [16:04:22.728][+69721ms][FullTranslateBatchHandler] [handleBatch] index=2 success {
+  "translation": "冰与火之歌"
+}
+logger.ts:125 [16:04:22.728][+69721ms][FullTranslateBatchHandler] [handleBatch] translating index=3 {
+  "text": "Genre"
+}
+logger.ts:125 [16:04:22.728][+69721ms][TranslationService] Sending fragment translation request: {
+  "text": "Genre",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.728][+69721ms][APIService] post called with: {
+  "endpoint": "/api/v1/translate/fragment",
+  "hasBody": true
+}
+logger.ts:125 [16:04:22.728][+69721ms][APIService] ⟶ POST https://local.tapword.cc/api/v1/translate/fragment
+logger.ts:125 [16:04:22.728][+69721ms][APIService] Request body: {
+  "text": "Genre",
+  "sourceLanguage": "auto",
+  "targetLanguage": "zh"
+}
+logger.ts:125 [16:04:22.728][+69721ms][AuthService] Using cached token
+logger.ts:125 [16:04:22.728][+69722ms][APIService] Auth token length: 268
+logger.ts:125 [16:04:22.728][+69722ms][APIService] Body: {"text":"Genre","sourceLanguage":"auto","targetLanguage":"zh"}
+logger.ts:125 [16:04:22.779][+69772ms][APIService] Response: 200 (903ms)
+logger.ts:125 [16:04:22.779][+69773ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.779][+69773ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.779][+69773ms][TranslationService] Fragment translation response data: {
+  "translation": "颜色（测试版）"
+}
+logger.ts:125 [16:04:22.779][+69773ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "颜色（测试版）"
+}
+logger.ts:125 [16:04:22.780][+69773ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5394
+}
+logger.ts:125 [16:04:22.780][+69773ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:22.802][+69795ms][APIService] Response: 200 (859ms)
+logger.ts:125 [16:04:22.802][+69796ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.802][+69796ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.802][+69796ms][TranslationService] Fragment translation response data: {
+  "translation": "已启用"
+}
+logger.ts:125 [16:04:22.802][+69796ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "已启用"
+}
+logger.ts:125 [16:04:22.802][+69796ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5420
+}
+logger.ts:125 [16:04:22.803][+69796ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:22.808][+69801ms][APIService] Response: 200 (947ms)
+logger.ts:125 [16:04:22.808][+69802ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.808][+69802ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.808][+69802ms][TranslationService] Fragment translation response data: {
+  "translation": "来自维基百科，自由的百科全书"
+}
+logger.ts:125 [16:04:22.808][+69802ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "来自维基百科，自由的百科全书"
+}
+logger.ts:125 [16:04:22.808][+69802ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5422
+}
+logger.ts:125 [16:04:22.808][+69802ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:22.968][+69962ms][APIService] Response: 200 (869ms)
+logger.ts:125 [16:04:22.968][+69962ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:22.968][+69962ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:22.968][+69962ms][TranslationService] Fragment translation response data: {
+  "translation": "编辑"
+}
+logger.ts:125 [16:04:22.969][+69962ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "编辑"
+}
+logger.ts:125 [16:04:22.969][+69962ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5581
+}
+logger.ts:125 [16:04:22.969][+69962ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:23.016][+70009ms][APIService] Response: 200 (954ms)
+logger.ts:125 [16:04:23.016][+70009ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:23.016][+70009ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:23.016][+70010ms][TranslationService] Fragment translation response data: {
+  "translation": "出版商"
+}
+logger.ts:125 [16:04:23.016][+70010ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "出版商"
+}
+logger.ts:125 [16:04:23.016][+70010ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5626
+}
+logger.ts:125 [16:04:23.016][+70010ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:23.239][+70233ms][APIService] Response: 200 (978ms)
+logger.ts:125 [16:04:23.240][+70233ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:23.240][+70233ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:23.240][+70233ms][TranslationService] Fragment translation response data: {
+  "translation": "接下来是"
+}
+logger.ts:125 [16:04:23.240][+70234ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "接下来是"
+}
+logger.ts:125 [16:04:23.241][+70234ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5850
+}
+logger.ts:125 [16:04:23.241][+70234ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:23.267][+70260ms][APIService] Response: 200 (539ms)
+logger.ts:125 [16:04:23.267][+70260ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:23.267][+70260ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:23.267][+70260ms][TranslationService] Fragment translation response data: {
+  "translation": "类型"
+}
+logger.ts:125 [16:04:23.267][+70261ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "类型"
+}
+logger.ts:125 [16:04:23.267][+70261ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5878
+}
+logger.ts:125 [16:04:23.267][+70261ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}
+logger.ts:125 [16:04:23.276][+70269ms][APIService] Response: 200 (949ms)
+logger.ts:125 [16:04:23.276][+70270ms][APIService] Request completed successfully, returning data
+logger.ts:125 [16:04:23.276][+70270ms][APIService] ✓ POST /api/v1/translate/fragment
+logger.ts:125 [16:04:23.276][+70270ms][TranslationService] Fragment translation response data: {
+  "translation": "语言"
+}
+logger.ts:125 [16:04:23.277][+70270ms][FullTranslateBatchHandler] [handleBatch] index=3 success {
+  "translation": "语言"
+}
+logger.ts:125 [16:04:23.277][+70270ms][FullTranslateBatchHandler] [handleBatch] all translations complete {
+  "total": 4,
+  "successCount": 4,
+  "elapsedMs": 5889
+}
+logger.ts:125 [16:04:23.277][+70270ms][FullTranslateBatchHandler] [handleBatch] sending response {
+  "success": true,
+  "count": 4
+}

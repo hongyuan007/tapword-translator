@@ -11,9 +11,18 @@
 
 import * as i18nModule from "@/0_common/utils/i18n"
 import { APP_EDITION } from "@/0_common/constants"
+import type {
+    FullTranslateStatusRequestMessage,
+    FullTranslateStatusResponseMessage,
+    FullTranslateToggleMessage,
+    FullTranslateToggleResponseMessage,
+} from "@/0_common/types"
 import * as loggerModule from "@/0_common/utils/logger"
+import { FLOATING_BUTTON_STORAGE_KEY, DEFAULT_CONFIG } from "@/12_floating_button/constants"
+import type { FloatingButtonConfig } from "@/12_floating_button/types"
 import * as settingsManagerModule from "./modules/settingsManager"
 import * as tooltipManagerModule from "./modules/tooltipManager"
+import * as quotaDisplayModule from "./modules/quotaDisplay"
 import "./styles/popup.css"
 
 const logger = loggerModule.createLogger("Popup")
@@ -36,7 +45,8 @@ async function initialize(): Promise<void> {
     await settingsManagerModule.loadSettings()
 
     // Set up setting change listeners
-    settingsManagerModule.setupSettingChangeListeners()
+    const resetFullTranslateState = await setupFullTranslateButton()
+    settingsManagerModule.setupSettingChangeListeners({ onTapWordDisabled: resetFullTranslateState })
 
     // Set up tooltip interactions
     const helpIcons = document.querySelectorAll<HTMLElement>(".help-icon")
@@ -83,9 +93,194 @@ async function initialize(): Promise<void> {
         }
     }
 
+    // Setup floating button toggle
+    await setupFloatingButtonToggle()
+
+    // Initialize quota display
+    await quotaDisplayModule.initQuotaDisplay()
+
+    // Initialize and manage fullPageTranslationProvider select
+    await setupFullPageProviderSelect()
+
     // Remove loading state to reveal content
     document.documentElement.classList.remove("loading")
     logger.info("Popup initialized")
+}
+
+/**
+ * Setup fullPageTranslationProvider select — dynamically injects custom provider options
+ * and wires save / quota-display logic.
+ */
+async function setupFullPageProviderSelect(): Promise<void> {
+    const select = document.getElementById("fullPageTranslationProvider") as HTMLSelectElement | null
+    if (!select) {
+        logger.warn("fullPageTranslationProvider select not found")
+        return
+    }
+
+    const result = await chrome.storage.sync.get("userSettings")
+    const settings = result.userSettings ?? {}
+    const customProviders: Array<{ id: string; name: string }> = settings.customProviders ?? []
+    const currentProvider: string = settings.fullPageTranslationProvider ?? "official"
+
+    // Inject custom provider options or sentinel option
+    if (customProviders.length === 0) {
+        const sentinel = document.createElement("option")
+        sentinel.value = "__add_provider__"
+        sentinel.setAttribute("data-i18n-key", "popup.translationProvider.addProvider")
+        sentinel.textContent = i18nModule.translate("popup.translationProvider.addProvider")
+        select.appendChild(sentinel)
+    } else {
+        for (const cp of customProviders) {
+            const opt = document.createElement("option")
+            opt.value = cp.id
+            opt.textContent = cp.name
+            select.appendChild(opt)
+        }
+    }
+
+    select.value = currentProvider
+    quotaDisplayModule.updateForProvider(currentProvider)
+
+    select.addEventListener("change", async () => {
+        const newValue = select.value
+        if (newValue === "__add_provider__") {
+            select.value = currentProvider
+            chrome.tabs.create({ url: chrome.runtime.getURL("src/4_options/index.html") + "#translation-engine-settings" })
+            return
+        }
+        await chrome.storage.sync.set({ userSettings: { ...settings, fullPageTranslationProvider: newValue } })
+        quotaDisplayModule.updateForProvider(newValue)
+        logger.info(`fullPageTranslationProvider changed to ${newValue}`)
+    })
+}
+
+/**
+ * Setup floating button toggle — reads/writes directly to chrome.storage.local
+ */
+async function setupFloatingButtonToggle(): Promise<void> {
+    const checkbox = document.getElementById("floatingButtonEnabled") as HTMLInputElement | null
+    if (!checkbox) {
+        logger.warn("Floating button toggle not found")
+        return
+    }
+
+    // Load current state
+    try {
+        const result = await chrome.storage.local.get(FLOATING_BUTTON_STORAGE_KEY)
+        const stored = result[FLOATING_BUTTON_STORAGE_KEY] as Partial<FloatingButtonConfig> | undefined
+        const config = { ...DEFAULT_CONFIG, ...stored }
+        checkbox.checked = config.enabled
+    } catch (error) {
+        logger.error("Failed to load floating button config:", error)
+        checkbox.checked = DEFAULT_CONFIG.enabled
+    }
+
+    // Save on toggle
+    checkbox.addEventListener("change", async () => {
+        try {
+            const result = await chrome.storage.local.get(FLOATING_BUTTON_STORAGE_KEY)
+            const stored = result[FLOATING_BUTTON_STORAGE_KEY] as Partial<FloatingButtonConfig> | undefined
+            const config = { ...DEFAULT_CONFIG, ...stored, enabled: checkbox.checked }
+            await chrome.storage.local.set({ [FLOATING_BUTTON_STORAGE_KEY]: config })
+            logger.info(`Floating button enabled set to ${checkbox.checked}`)
+        } catch (error) {
+            logger.error("Failed to save floating button config:", error)
+        }
+    })
+}
+
+/**
+ * Setup full-page translate button with toggle behavior
+ */
+async function setupFullTranslateButton(): Promise<() => void> {
+    const button = document.getElementById("fullTranslateButton") as HTMLButtonElement | null
+    const label = document.getElementById("fullTranslateLabel")
+    if (!button || !label) {
+        logger.warn("Full translate button not found")
+        return () => { /* no-op: button not found */ }
+    }
+
+    let isRunning = await getFullTranslateStatus()
+    updateButtonState(button, label, isRunning)
+
+    button.addEventListener("click", () => {
+        const enabling = !isRunning
+
+        // Set loading state
+        button.classList.add("is-loading")
+        button.classList.remove("is-active")
+        label.textContent = i18nModule.translate("popup.translatePage.loading")
+
+        const message: FullTranslateToggleMessage = {
+            type: "FULL_TRANSLATE_TOGGLE",
+            data: { enabled: enabling },
+        }
+
+        chrome.runtime.sendMessage(message, (response: FullTranslateToggleResponseMessage) => {
+            button.classList.remove("is-loading")
+
+            if (chrome.runtime.lastError) {
+                logger.error("Full translate toggle failed:", chrome.runtime.lastError.message)
+                updateButtonState(button, label, isRunning)
+                return
+            }
+
+            // Guard against undefined/error responses (e.g., no content script on restricted pages)
+            if (!response || response.error) {
+                logger.warn("Full translate unavailable on this page:", response?.error ?? "no response")
+                updateButtonState(button, label, isRunning)
+                return
+            }
+
+            isRunning = response.isRunning
+            updateButtonState(button, label, isRunning)
+            logger.info(`Full translate toggled: isRunning=${isRunning}`)
+
+            // Close popup after toggling full translation (start or stop)
+            window.close()
+        })
+    })
+
+    // Return a callback to reset the running state when TapWord is disabled externally
+    return () => {
+        isRunning = false
+    }
+}
+
+function getFullTranslateStatus(): Promise<boolean> {
+    const message: FullTranslateStatusRequestMessage = {
+        type: "FULL_TRANSLATE_STATUS_REQUEST",
+    }
+
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage(message, (response: FullTranslateStatusResponseMessage) => {
+            if (chrome.runtime.lastError) {
+                logger.warn("Failed to load full translate status:", chrome.runtime.lastError.message)
+                resolve(false)
+                return
+            }
+
+            if (!response || response.error) {
+                logger.info("Full translate status unavailable:", response?.error ?? "no response")
+                resolve(false)
+                return
+            }
+
+            resolve(response.isRunning)
+        })
+    })
+}
+
+/** Update button visual state based on running status */
+function updateButtonState(button: HTMLButtonElement, label: HTMLElement, isRunning: boolean): void {
+    if (isRunning) {
+        button.classList.add("is-active")
+        label.textContent = i18nModule.translate("popup.translatePage.stop")
+    } else {
+        button.classList.remove("is-active")
+        label.textContent = i18nModule.translate("popup.translatePage.label")
+    }
 }
 
 // Initialize when DOM is ready

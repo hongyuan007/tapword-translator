@@ -9,7 +9,13 @@
 
 // Export types
 export type { FragmentTranslationResult, TranslateFragmentParams, TranslateParams, TranslationResult } from "./types/TranslationModels"
+export type { AutoCandidatesApiRequest, AutoCandidatesApiResponse } from "./types/AutoCandidatesTypes"
+export type { FullTextBatchApiRequest, FullTextBatchApiResponse } from "./types/TranslationApiTypes"
 export { TranslationError } from "./types/TranslationError"
+
+// Export constants
+export { TRANSLATION_API_ENDPOINTS } from "./constants/TranslationConstants"
 
 // Export services
 export { translateFragment, translateWord } from "./services/TranslationService"
+export { requestAutoTranslateCandidates } from "./services/AutoCandidatesService"

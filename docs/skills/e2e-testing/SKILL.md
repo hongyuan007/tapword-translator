@@ -1,6 +1,6 @@
 ---
 name: e2e-testing
-description: Guide for writing, running, and debugging Playwright E2E tests for the TapWord Translator Chrome extension. Use this skill when creating new E2E tests or fixing failing tests.
+description: "Guide for writing, running, and debugging Playwright E2E tests for the TapWord Translator Chrome extension. Use this skill when creating new E2E tests or fixing failing tests."
 ---
 
 # E2E Testing Guide for TapWord Translator

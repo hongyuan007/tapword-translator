@@ -1,0 +1,11 @@
+# Source Language
+${sourceLanguage}
+
+# Target Language
+${targetLanguage}
+
+# Number of Segments
+${count}
+
+# Text to Translate
+${text}

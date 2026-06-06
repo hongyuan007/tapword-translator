@@ -4,8 +4,8 @@
 
 This document analyzes why the first translation after page activation feels slower than subsequent translations, based on:
 
-- `docs/plan/y2026/m03-pre-activate/日志/content脚本日志.txt`
-- `docs/plan/y2026/m03-pre-activate/日志/后台脚本日志.txt`
+- `docs/plan/y2026/m03-pre-activate/logs/content脚本日志.txt`
+- `docs/plan/y2026/m03-pre-activate/logs/后台脚本日志.txt`
 - current implementation in `src/1_content`, `src/2_background`, `src/5_backend`, and `src/6_translate`
 
 The goal is to reduce both:

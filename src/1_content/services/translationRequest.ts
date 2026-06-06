@@ -5,6 +5,9 @@
  */
 
 import type {
+    AutoCandidatesRequestData,
+    AutoCandidatesRequestMessage,
+    AutoCandidatesResponseMessage,
     FragmentTranslateRequestMessage,
     FragmentTranslateResponseMessage,
     FragmentTranslationContextData,
@@ -77,6 +80,23 @@ export async function requestFragmentTranslation(data: FragmentTranslationContex
     return sendMessageWithRetry<FragmentTranslateRequestMessage, FragmentTranslateResponseMessage>(
         {
             type: "FRAGMENT_TRANSLATE_REQUEST",
+            data,
+        },
+        2,
+        150
+    )
+}
+
+/**
+ * Request auto-translation candidates from background script
+ *
+ * @param data - Auto-candidates request data
+ * @returns Promise resolving to auto-candidates result or error
+ */
+export async function requestAutoCandidates(data: AutoCandidatesRequestData): Promise<AutoCandidatesResponseMessage> {
+    return sendMessageWithRetry<AutoCandidatesRequestMessage, AutoCandidatesResponseMessage>(
+        {
+            type: "AUTO_CANDIDATES_REQUEST",
             data,
         },
         2,

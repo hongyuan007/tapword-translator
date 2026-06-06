@@ -11,7 +11,7 @@ export const TRANSLATION_FONT_SIZE_MAP: Record<TranslationFontSizePreset, number
     extraLarge: 16,
 }
 
-export const DEFAULT_TRANSLATION_FONT_SIZE_PRESET: TranslationFontSizePreset = "medium"
+export const DEFAULT_TRANSLATION_FONT_SIZE_PRESET: TranslationFontSizePreset = "large"
 
 /**
  * Resolve preset to pixel size with fallback to default preset.

@@ -8,6 +8,8 @@
 export const TRANSLATION_API_ENDPOINTS = {
     TRANSLATE: "/api/v1/translate",
     TRANSLATE_FRAGMENT: "/api/v1/translate/fragment",
+    TRANSLATE_FULL_TEXT_BATCH: "/api/v1/translate/full-text-batch",
+    AUTO_CANDIDATES: "/api/v1/translate/auto-candidates",
 } as const
 
 /**

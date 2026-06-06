@@ -69,6 +69,8 @@ export interface TranslationEntry {
     translationType: "word" | "fragment"
     /** Date.now() at creation — used for interaction grace period. */
     creationTime: number
+    /** Whether this entry was created by auto-translation (not manual). */
+    isAutoTranslation?: boolean
 }
 
 // ============================================================================

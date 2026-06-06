@@ -93,18 +93,22 @@ export async function loadUserPromptTemplate(taskName: string): Promise<string> 
  * @param language Target language code (e.g., 'zh', 'ja', 'en')
  * @returns Array of chat messages for few-shot examples
  */
-export async function loadFewshot(taskName: string, language?: string): Promise<ChatMessage[]> {
+export async function loadFewshot(
+    taskName: string,
+    language?: string,
+    fileName: string = constants.PROMPT_FILE_FEWSHOT
+): Promise<ChatMessage[]> {
     // Normalize language code (remove region variants like zh-CN -> zh)
     const normalizedLang = (language?.split("-")[0] || constants.DEFAULT_FEWSHOT_LANGUAGE).toLowerCase()
-    const cacheKey = `${taskName}:${normalizedLang}`
+    const cacheKey = `${taskName}:${normalizedLang}:${fileName}`
 
     if (fewshotCache.has(cacheKey)) {
         return fewshotCache.get(cacheKey)!
     }
 
     // Try language-specific fewshot first, then fall back to English
-    const candidateUrl = getResourceUrl(taskName, `${normalizedLang}/${constants.PROMPT_FILE_FEWSHOT}`)
-    const fallbackUrl = getResourceUrl(taskName, `${constants.DEFAULT_FEWSHOT_LANGUAGE}/${constants.PROMPT_FILE_FEWSHOT}`)
+    const candidateUrl = getResourceUrl(taskName, `${normalizedLang}/${fileName}`)
+    const fallbackUrl = getResourceUrl(taskName, `${constants.DEFAULT_FEWSHOT_LANGUAGE}/${fileName}`)
 
     logger.debug(`Attempting to load fewshot from: ${candidateUrl}`)
 
@@ -150,12 +154,15 @@ export async function loadFewshot(taskName: string, language?: string): Promise<
     }
 
     try {
-        const parsed = (await response.json()) as ChatMessage[]
+        const rawText = await response.text()
+        const parsed = JSON.parse(rawText) as ChatMessage[]
         logger.debug(`Loaded fewshot examples from ${url} (count: ${parsed.length})`)
         fewshotCache.set(cacheKey, parsed)
         return parsed
     } catch (error) {
-        logger.error(`Failed to parse fewshot JSON from ${url}`, error)
-        throw new Error(`Invalid fewshot JSON file: ${url}`)
+        const errorMsg = error instanceof Error ? error.message : String(error)
+        const errorStack = error instanceof Error ? error.stack : undefined
+        logger.error(`Failed to parse fewshot JSON from ${url} — error: ${errorMsg}`, errorStack)
+        throw new Error(`Invalid fewshot JSON file: ${url} — ${errorMsg}`)
     }
 }

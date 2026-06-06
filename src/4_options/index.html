@@ -34,7 +34,7 @@
         <nav class="nav-menu">
           <a href="#general-settings" class="nav-item active" data-section="general-settings" data-i18n-key="popup.section.general">General</a>
           <a href="#appearance-settings" class="nav-item" data-section="appearance-settings" data-i18n-key="popup.section.appearance">Appearance</a>
-          <a href="#translation-settings" class="nav-item" data-section="translation-settings" data-i18n-key="popup.section.translate">Translation</a>
+          <a href="#translation-engine-settings" class="nav-item" data-section="translation-engine-settings" data-i18n-key="options.translationEngine.title">Translation Engine</a>
           <a href="#display-settings" class="nav-item" data-section="display-settings" data-i18n-key="popup.section.text">Text</a>
           <a href="#audio-settings" class="nav-item" data-section="audio-settings" data-i18n-key="popup.section.audio">Audio</a>
           <a href="#advanced-settings" class="nav-item" data-section="advanced-settings" data-i18n-key="popup.section.advanced">Advanced</a>
@@ -45,7 +45,7 @@
           <div class="section-header">
             <h2 data-i18n-key="popup.section.general">General</h2>
           </div>
-          <div class="card settings-card">
+          <div class="card settings-card" style="margin-bottom: 32px;">
             <div class="setting-item setting-item-master">
               <div class="setting-info">
                 <label class="setting-label master-label" for="enableTapWord">
@@ -58,6 +58,8 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+          </div>
+          <div class="card settings-card">
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="targetLanguage" data-i18n-key="popup.targetLanguage.label">Target Language</label>
@@ -122,14 +124,6 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
-          </div>
-        </div>
-
-        <div id="translation-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.translate">Translation Settings</h2>
-          </div>
-          <div class="card settings-card">
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="suppressNativeLanguage">
@@ -142,128 +136,14 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
-          </div>
-        </div>
-
-        <div id="display-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.text">Text Settings</h2>
-          </div>
-          <div class="card settings-card">
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="translationFontSizePreset" data-i18n-key="popup.translationFontSize.label">Translation Font Size</label>
-              </div>
-              <div class="setting-control">
-                <select id="translationFontSizePreset" data-setting="translationFontSizePreset" class="select-input">
-                  <option value="small" data-i18n-key="popup.translationFontSize.small">Small</option>
-                  <option value="medium" data-i18n-key="popup.translationFontSize.medium">Medium</option>
-                  <option value="large" data-i18n-key="popup.translationFontSize.large">Large</option>
-                  <option value="extraLarge" data-i18n-key="popup.translationFontSize.extraLarge">Extra Large</option>
-                </select>
-              </div>
-            </div>
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="autoAdjustHeight">
-                  <span data-i18n-key="popup.autoAdjustHeight.label">Auto-adjust Line Height</span>
+                <label class="setting-label" for="floatingButtonEnabledOptions">
+                  <span data-i18n-key="popup.floatingButton.label">Show floating ball</span>
                 </label>
-                <p class="setting-helper" data-i18n-key="popup.autoAdjustHeight.tooltip">Improve readability by gently increasing line height for translated text.</p>
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" id="autoAdjustHeight" data-setting="autoAdjustHeight">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="restoreLineHeightOnClear">
-                  <span data-i18n-key="popup.restoreLineHeightOnClear.label">Restore line height on clear</span>
-                </label>
-                <p class="setting-helper" data-i18n-key="popup.restoreLineHeightOnClear.tooltip">Restore original line height when all translations in a block are removed.</p>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="restoreLineHeightOnClear" data-setting="restoreLineHeightOnClear">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="tooltipBottomSpacingPxV3" data-i18n-key="popup.tooltipBottomSpacingPxV3.label">Tooltip Bottom Spacing (px)</label>
-                <p class="setting-helper" data-i18n-key="popup.tooltipBottomSpacingPxV3.helper">Extra spacing reserved below the translation text.</p>
-              </div>
-              <div class="setting-control">
-                <div class="range-setting">
-                  <div class="range-setting-header">
-                    <span class="range-setting-value" id="tooltipBottomSpacingPxV3Value">6.0</span>
-                  </div>
-                  <input type="range" id="tooltipBottomSpacingPxV3" data-setting="tooltipBottomSpacingPxV3" class="range-input" step="0.5" min="0" max="20" value="6" />
-                </div>
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="tooltipTextOffsetPxV3" data-i18n-key="popup.tooltipTextOffsetPxV3.label">Translation Vertical Position (px)</label>
-                <p class="setting-helper" data-i18n-key="popup.tooltipTextOffsetPxV3.helper">Adjust the distance between the translation text and the underline.</p>
-              </div>
-              <div class="setting-control">
-                <div class="range-setting">
-                  <div class="range-setting-header">
-                    <span class="range-setting-value" id="tooltipTextOffsetPxV3Value">1.0</span>
-                  </div>
-                  <input type="range" id="tooltipTextOffsetPxV3" data-setting="tooltipTextOffsetPxV3" class="range-input" step="0.5" min="0" max="20" value="1" />
-                </div>
-              </div>
-            </div>
-
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="tooltipUnderlineOffsetPxV3" data-i18n-key="popup.tooltipUnderlineOffsetPxV3.label">Underline Offset (px)</label>
-                <p class="setting-helper" data-i18n-key="popup.tooltipUnderlineOffsetPxV3.helper">Adjust the distance between the original text and the underline.</p>
-              </div>
-              <div class="setting-control">
-                <div class="range-setting">
-                  <div class="range-setting-header">
-                    <span class="range-setting-value" id="tooltipUnderlineOffsetPxV3Value">1.5</span>
-                  </div>
-                  <input type="range" id="tooltipUnderlineOffsetPxV3" data-setting="tooltipUnderlineOffsetPxV3" class="range-input" step="0.5" min="0" max="20" value="1.5" />
-                </div>
-              </div>
-            </div>
-
-            <div class="tooltip-preview" id="tooltipPreview">
-              <div class="tooltip-preview-stage" id="tooltipPreviewStage">
-                <p class="tooltip-preview-paragraph" id="tooltipPreviewParagraph">
-                  <span data-i18n-key="popup.preview.text1">The new AI model can</span> <span class="tooltip-preview-anchor tooltip-preview-anchor--word" id="tooltipPreviewAnchor1" data-i18n-key="popup.preview.word">comprehend</span> <span class="tooltip-preview-anchor tooltip-preview-anchor--phrase" id="tooltipPreviewAnchor" data-i18n-key="popup.preview.phrase">complex instructions</span><span data-i18n-key="popup.preview.text2">.</span>
-                  <br />
-                  <span data-i18n-key="popup.preview.nextLine">Users have reported significant improvements in accuracy.</span>
-                </p>
-                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip1">
-                  <div class="tooltip-preview-tooltip-content" data-i18n-key="popup.preview.wordTranslation">理解</div>
-                </div>
-                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip">
-                  <div class="tooltip-preview-tooltip-content" data-i18n-key="popup.preview.phraseTranslation">复杂的指令</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="audio-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.audio">Audio Settings</h2>
-          </div>
-          <div class="card settings-card">
-            <div class="setting-item" id="autoPlayAudioSettingItem">
-              <div class="setting-info">
-                <label class="setting-label" for="autoPlayAudio" data-i18n-key="popup.autoPlayAudio.label">Auto-play Word Pronunciation</label>
-                <p class="setting-helper community-note" id="autoPlayAudioCommunityNote"></p>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="autoPlayAudio" data-setting="autoPlayAudio">
+                <input type="checkbox" id="floatingButtonEnabledOptions">
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -353,6 +233,66 @@
                   </svg>
                 </span>
               </label>
+            </div>
+
+            <!-- Floating Button Icon Style -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="popup.floatingButtonIcon.label">Floating Button Style</label>
+              </div>
+            </div>
+            <div class="icon-picker-container" id="icon-variant-picker">
+              <!-- Dynamically populated by JS -->
+            </div>
+
+            <!-- Floating Button Color -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="popup.floatingButtonColor.label">Floating Button Color</label>
+              </div>
+              <div class="setting-control">
+                <div class="custom-select-wrapper" id="floatingButtonColorSelect">
+                  <div class="custom-select-trigger">
+                    <span class="color-dot" id="floatingButtonColorPreview"></span>
+                    <span class="color-name" id="floatingButtonColorLabel">Select Color</span>
+                    <span class="custom-select-arrow"></span>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="#F472B6">
+                      <span class="color-dot" style="background-color: #F472B6;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.pink">Pink</span>
+                    </div>
+                    <div class="custom-option" data-value="#60A5FA">
+                      <span class="color-dot" style="background-color: #60A5FA;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.blue">Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#A78BFA">
+                      <span class="color-dot" style="background-color: #A78BFA;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.purple">Purple</span>
+                    </div>
+                    <div class="custom-option" data-value="#4ADE80">
+                      <span class="color-dot" style="background-color: #4ADE80;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.green">Green</span>
+                    </div>
+                    <div class="custom-option" data-value="#FB923C">
+                      <span class="color-dot" style="background-color: #FB923C;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.orange">Orange</span>
+                    </div>
+                    <div class="custom-option" data-value="#F87171">
+                      <span class="color-dot" style="background-color: #F87171;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.red">Red</span>
+                    </div>
+                    <div class="custom-option" data-value="#2DD4BF">
+                      <span class="color-dot" style="background-color: #2DD4BF;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.teal">Teal</span>
+                    </div>
+                    <div class="custom-option" data-value="#818CF8">
+                      <span class="color-dot" style="background-color: #818CF8;"></span>
+                      <span data-i18n-key="popup.floatingButtonColor.indigo">Indigo</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="setting-item">
@@ -484,6 +424,392 @@
                 </div>
               </div>
             </div>
+            <!-- Full Page Translation Text Color (Light) -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="options.fullTranslateLightColor.label">Full Translate Text Color (Light)</label>
+              </div>
+              <div class="setting-control">
+                <div class="custom-select-wrapper" id="fullTranslateLightColorSelect" data-setting="fullTranslateLightColor">
+                  <div class="custom-select-trigger">
+                    <span class="color-dot" id="fullTranslateLightColorPreview"></span>
+                    <span class="color-name" id="fullTranslateLightColorLabel">Select Color</span>
+                    <span class="custom-select-arrow"></span>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="#000000">
+                      <span class="color-dot" style="background-color: #000000;"></span>
+                      <span data-i18n-key="options.color.black">Black</span>
+                    </div>
+                    <div class="custom-option" data-value="#1e3a5f">
+                      <span class="color-dot" style="background-color: #1e3a5f;"></span>
+                      <span data-i18n-key="options.color.darkBlue">Dark Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#064e3b">
+                      <span class="color-dot" style="background-color: #064e3b;"></span>
+                      <span data-i18n-key="options.color.darkGreen">Dark Green</span>
+                    </div>
+                    <div class="custom-option" data-value="#0f766e">
+                      <span class="color-dot" style="background-color: #0f766e;"></span>
+                      <span data-i18n-key="options.color.deepTeal">Deep Teal</span>
+                    </div>
+                    <div class="custom-option" data-value="#1d4ed8">
+                      <span class="color-dot" style="background-color: #1d4ed8;"></span>
+                      <span data-i18n-key="options.color.cobaltBlue">Cobalt Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#1e40af">
+                      <span class="color-dot" style="background-color: #1e40af;"></span>
+                      <span data-i18n-key="options.color.royalBlue">Royal Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#166534">
+                      <span class="color-dot" style="background-color: #166534;"></span>
+                      <span data-i18n-key="options.color.forestGreen">Forest Green</span>
+                    </div>
+                    <div class="custom-option" data-value="#6d28d9">
+                      <span class="color-dot" style="background-color: #6d28d9;"></span>
+                      <span data-i18n-key="options.color.purple">Purple</span>
+                    </div>
+                    <div class="custom-option" data-value="#7c2d12">
+                      <span class="color-dot" style="background-color: #7c2d12;"></span>
+                      <span data-i18n-key="options.color.burntSienna">Burnt Sienna</span>
+                    </div>
+                    <div class="custom-option" data-value="#3b0764">
+                      <span class="color-dot" style="background-color: #3b0764;"></span>
+                      <span data-i18n-key="options.color.eggplant">Eggplant</span>
+                    </div>
+                    <div class="custom-option" data-value="#0c4a6e">
+                      <span class="color-dot" style="background-color: #0c4a6e;"></span>
+                      <span data-i18n-key="options.color.deepSkyBlue">Deep Sky Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#059669">
+                      <span class="color-dot" style="background-color: #059669;"></span>
+                      <span data-i18n-key="options.color.emeraldGreen">Emerald Green</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Full Page Translation Text Color (Dark) -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" data-i18n-key="options.fullTranslateDarkColor.label">Full Translate Text Color (Dark)</label>
+              </div>
+              <div class="setting-control">
+                <div class="custom-select-wrapper" id="fullTranslateDarkColorSelect" data-setting="fullTranslateDarkColor">
+                  <div class="custom-select-trigger">
+                    <span class="color-dot" id="fullTranslateDarkColorPreview"></span>
+                    <span class="color-name" id="fullTranslateDarkColorLabel">Select Color</span>
+                    <span class="custom-select-arrow"></span>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-option" data-value="#ffffff">
+                      <span class="color-dot" style="background-color: #ffffff;"></span>
+                      <span data-i18n-key="options.color.white">White</span>
+                    </div>
+                    <div class="custom-option" data-value="#6ee7b7">
+                      <span class="color-dot" style="background-color: #6ee7b7;"></span>
+                      <span data-i18n-key="options.color.lightGreen">Light Green</span>
+                    </div>
+                    <div class="custom-option" data-value="#93c5fd">
+                      <span class="color-dot" style="background-color: #93c5fd;"></span>
+                      <span data-i18n-key="options.color.lightBlue">Light Blue</span>
+                    </div>
+                    <div class="custom-option" data-value="#5eead4">
+                      <span class="color-dot" style="background-color: #5eead4;"></span>
+                      <span data-i18n-key="options.color.mint">Mint</span>
+                    </div>
+                    <div class="custom-option" data-value="#fde68a">
+                      <span class="color-dot" style="background-color: #fde68a;"></span>
+                      <span data-i18n-key="options.color.lightYellow">Light Yellow</span>
+                    </div>
+                    <div class="custom-option" data-value="#f0abfc">
+                      <span class="color-dot" style="background-color: #f0abfc;"></span>
+                      <span data-i18n-key="options.color.lightPurple">Light Purple</span>
+                    </div>
+                    <div class="custom-option" data-value="#fdba74">
+                      <span class="color-dot" style="background-color: #fdba74;"></span>
+                      <span data-i18n-key="options.color.lightOrange">Light Orange</span>
+                    </div>
+                    <div class="custom-option" data-value="#fca5a5">
+                      <span class="color-dot" style="background-color: #fca5a5;"></span>
+                      <span data-i18n-key="options.color.lightRed">Light Red</span>
+                    </div>
+                    <div class="custom-option" data-value="#e2e8f0">
+                      <span class="color-dot" style="background-color: #e2e8f0;"></span>
+                      <span data-i18n-key="options.color.lightGray">Light Gray</span>
+                    </div>
+                    <div class="custom-option" data-value="#a5f3fc">
+                      <span class="color-dot" style="background-color: #a5f3fc;"></span>
+                      <span data-i18n-key="options.color.lightCyan">Light Cyan</span>
+                    </div>
+                    <div class="custom-option" data-value="#bef264">
+                      <span class="color-dot" style="background-color: #bef264;"></span>
+                      <span data-i18n-key="options.color.yellowGreen">Yellow Green</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Appearance Preview -->
+            <div class="appearance-preview">
+
+              <!-- Light Panel -->
+              <div class="ap-panel ap-panel--light">
+                <p class="ap-label" data-i18n-key="options.appearancePreview.lightLabel">Light</p>
+                <div class="ap-stage">
+                  <p class="ap-para">Machine learning models are transforming how
+                    we process information. These systems can recognize patterns
+                    in vast datasets with remarkable accuracy.</p>
+                  <!-- Underline preview rows -->
+                  <div class="ap-underline-demo">
+                    <div class="ap-underline-row">
+                      <span class="ap-underline-text">learning</span>
+                      <div class="ap-word-tooltip" id="ap-word-tooltip-light">学习</div>
+                    </div>
+                    <div class="ap-underline-row">
+                      <span class="ap-underline-text">recognize patterns</span>
+                      <div class="ap-sent-tooltip" id="ap-sent-tooltip-light">识别模式</div>
+                    </div>
+                  </div>
+                  <p class="ap-full-trans" id="ap-full-trans-light">机器学习模型正在改变我们处理信息的方式。这些系统能以惊人的准确率识别大量数据集中的模式。</p>
+                </div>
+              </div>
+
+              <!-- Dark Panel -->
+              <div class="ap-panel ap-panel--dark">
+                <p class="ap-label" data-i18n-key="options.appearancePreview.darkLabel">Dark</p>
+                <div class="ap-stage">
+                  <p class="ap-para">Machine learning models are transforming how
+                    we process information. These systems can recognize patterns
+                    in vast datasets with remarkable accuracy.</p>
+                  <!-- Underline preview rows -->
+                  <div class="ap-underline-demo">
+                    <div class="ap-underline-row">
+                      <span class="ap-underline-text">learning</span>
+                      <div class="ap-word-tooltip" id="ap-word-tooltip-dark">学习</div>
+                    </div>
+                    <div class="ap-underline-row">
+                      <span class="ap-underline-text">recognize patterns</span>
+                      <div class="ap-sent-tooltip" id="ap-sent-tooltip-dark">识别模式</div>
+                    </div>
+                  </div>
+                  <p class="ap-full-trans" id="ap-full-trans-dark">机器学习模型正在改变我们处理信息的方式。这些系统能以惊人的准确率识别大量数据集中的模式。</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div id="translation-engine-settings" class="settings-section">
+          <div class="section-header">
+            <h2 data-i18n-key="options.translationEngine.title">Translation Engine</h2>
+          </div>
+
+          <!-- Sub-section 1: Engine Selectors -->
+          <h3 class="card-title" style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: var(--text-primary); padding-left: 2px;" data-i18n-key="options.translationEngine.engineSelect.title">Engine Selection</h3>
+          <div class="card settings-card" style="margin-bottom: 32px;">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="fullPageTranslationProviderSelect" data-i18n-key="options.translationEngine.fullPage.label">Full Page Translation</label>
+                <p class="setting-helper" data-i18n-key="options.translationEngine.fullPage.description">Engine for translating entire pages</p>
+              </div>
+              <div class="setting-control">
+                <select id="fullPageTranslationProviderSelect" class="select-input">
+                  <option value="official" data-i18n-key="popup.translationProvider.official">TapWord Cloud Service</option>
+                  <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
+                  <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
+                  <!-- Custom providers injected by JS -->
+                </select>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="wordTranslationProviderSelect" data-i18n-key="options.translationEngine.word.label">Word &amp; Phrase Translation</label>
+                <p class="setting-helper" data-i18n-key="options.translationEngine.word.description">Engine for translating selected words and phrases</p>
+              </div>
+              <div class="setting-control">
+                <select id="wordTranslationProviderSelect" class="select-input">
+                  <option value="official" data-i18n-key="popup.translationProvider.official">TapWord Cloud Service</option>
+                  <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
+                  <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
+                  <!-- Custom providers injected by JS -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-section 2: AI Providers -->
+          <div style="margin-bottom: 12px; padding-left: 2px;">
+            <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;" data-i18n-key="options.translationEngine.aiProviders.label">AI Translation Providers</h3>
+            <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);" data-i18n-key="options.translationEngine.aiProviders.description">Add custom OpenAI-compatible API providers</p>
+          </div>
+          <div class="card settings-card">
+            <!-- Provider list: populated by JS -->
+            <div id="aiProviderList"></div>
+
+            <!-- Add/edit form (hidden by default) -->
+            <div id="aiProviderForm" style="display:none; padding: 16px; border-top: 1px solid rgba(0,0,0,0.06); background: #f9faff;">
+              <input type="hidden" id="aiProviderFormId">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.name">Name</label>
+                  <input type="text" id="aiProviderName" class="text-input" placeholder="e.g. My GPT-4o">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.model">Model</label>
+                  <input type="text" id="aiProviderModel" class="text-input" placeholder="gpt-4o-mini">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px; grid-column: 1 / -1;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.endpoint">API Endpoint</label>
+                  <input type="text" id="aiProviderEndpoint" class="text-input" placeholder="https://api.openai.com/v1">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 5px; grid-column: 1 / -1;">
+                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.apiKey">API Key</label>
+                  <input type="password" id="aiProviderApiKey" class="text-input" placeholder="sk-...">
+                </div>
+              </div>
+              <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button id="aiProviderFormTest" class="secondary-button" style="margin-right: auto;" data-i18n-key="options.translationEngine.aiProviders.form.test">Test</button>
+                <span id="aiProviderFormTestResult" style="font-size: 12px; margin-right: 4px;"></span>
+                <button id="aiProviderFormCancel" class="secondary-button" data-i18n-key="options.translationEngine.aiProviders.form.cancel">Cancel</button>
+                <button id="aiProviderFormSave" class="primary-button" data-i18n-key="options.translationEngine.aiProviders.form.save">Save</button>
+              </div>
+            </div>
+
+            <!-- Card footer: Add button -->
+            <div style="padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); background: #fafafa;">
+              <button id="addAiProviderBtn" class="secondary-button" data-i18n-key="options.translationEngine.aiProviders.addBtn">+ Add AI Provider</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="display-settings" class="settings-section">
+          <div class="section-header">
+            <h2 data-i18n-key="popup.section.text">Text Settings</h2>
+          </div>
+          <div class="card settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="translationFontSizePreset" data-i18n-key="popup.translationFontSize.label">Translation Font Size</label>
+              </div>
+              <div class="setting-control">
+                <select id="translationFontSizePresetV2" data-setting="translationFontSizePresetV2" class="select-input">
+                  <option value="small" data-i18n-key="popup.translationFontSize.small">Small</option>
+                  <option value="medium" data-i18n-key="popup.translationFontSize.medium">Medium</option>
+                  <option value="large" data-i18n-key="popup.translationFontSize.large">Large</option>
+                  <option value="extraLarge" data-i18n-key="popup.translationFontSize.extraLarge">Extra Large</option>
+                </select>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="autoAdjustHeight">
+                  <span data-i18n-key="popup.autoAdjustHeight.label">Auto-adjust Line Height</span>
+                </label>
+                <p class="setting-helper" data-i18n-key="popup.autoAdjustHeight.tooltip">Improve readability by gently increasing line height for translated text.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="autoAdjustHeight" data-setting="autoAdjustHeight">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="restoreLineHeightOnClear">
+                  <span data-i18n-key="popup.restoreLineHeightOnClear.label">Restore line height on clear</span>
+                </label>
+                <p class="setting-helper" data-i18n-key="popup.restoreLineHeightOnClear.tooltip">Restore original line height when all translations in a block are removed.</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="restoreLineHeightOnClear" data-setting="restoreLineHeightOnClear">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="tooltipBottomSpacingPxV3" data-i18n-key="popup.tooltipBottomSpacingPxV3.label">Tooltip Bottom Spacing (px)</label>
+                <p class="setting-helper" data-i18n-key="popup.tooltipBottomSpacingPxV3.helper">Extra spacing reserved below the translation text.</p>
+              </div>
+              <div class="setting-control">
+                <div class="range-setting">
+                  <div class="range-setting-header">
+                    <span class="range-setting-value" id="tooltipBottomSpacingPxV3Value">6.5</span>
+                  </div>
+                  <input type="range" id="tooltipBottomSpacingPxV3" data-setting="tooltipBottomSpacingPxV3" class="range-input" step="0.5" min="0" max="20" value="6.5" />
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="tooltipTextOffsetPxV3" data-i18n-key="popup.tooltipTextOffsetPxV3.label">Translation Vertical Position (px)</label>
+                <p class="setting-helper" data-i18n-key="popup.tooltipTextOffsetPxV3.helper">Adjust the distance between the translation text and the underline.</p>
+              </div>
+              <div class="setting-control">
+                <div class="range-setting">
+                  <div class="range-setting-header">
+                    <span class="range-setting-value" id="tooltipTextOffsetPxV3Value">1.0</span>
+                  </div>
+                  <input type="range" id="tooltipTextOffsetPxV3" data-setting="tooltipTextOffsetPxV3" class="range-input" step="0.5" min="0" max="20" value="1" />
+                </div>
+              </div>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-info">
+                <label class="setting-label" for="tooltipUnderlineOffsetPxV3" data-i18n-key="popup.tooltipUnderlineOffsetPxV3.label">Underline Offset (px)</label>
+                <p class="setting-helper" data-i18n-key="popup.tooltipUnderlineOffsetPxV3.helper">Adjust the distance between the original text and the underline.</p>
+              </div>
+              <div class="setting-control">
+                <div class="range-setting">
+                  <div class="range-setting-header">
+                    <span class="range-setting-value" id="tooltipUnderlineOffsetPxV3Value">1.5</span>
+                  </div>
+                  <input type="range" id="tooltipUnderlineOffsetPxV3" data-setting="tooltipUnderlineOffsetPxV3" class="range-input" step="0.5" min="0" max="20" value="1.5" />
+                </div>
+              </div>
+            </div>
+
+            <div class="tooltip-preview" id="tooltipPreview">
+              <div class="tooltip-preview-stage" id="tooltipPreviewStage">
+                <p class="tooltip-preview-paragraph" id="tooltipPreviewParagraph">
+                  <span data-i18n-key="popup.preview.text1">The new AI model can</span> <span class="tooltip-preview-anchor tooltip-preview-anchor--word" id="tooltipPreviewAnchor1" data-i18n-key="popup.preview.word">comprehend</span> <span class="tooltip-preview-anchor tooltip-preview-anchor--phrase" id="tooltipPreviewAnchor" data-i18n-key="popup.preview.phrase">complex instructions</span><span data-i18n-key="popup.preview.text2">.</span>
+                  <br />
+                  <span data-i18n-key="popup.preview.nextLine">Users have reported significant improvements in accuracy.</span>
+                </p>
+                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip1">
+                  <div class="tooltip-preview-tooltip-content" data-i18n-key="popup.preview.wordTranslation">理解</div>
+                </div>
+                <div class="tooltip-preview-tooltip" id="tooltipPreviewTooltip">
+                  <div class="tooltip-preview-tooltip-content" data-i18n-key="popup.preview.phraseTranslation">复杂的指令</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="audio-settings" class="settings-section">
+          <div class="section-header">
+            <h2 data-i18n-key="popup.section.audio">Audio Settings</h2>
+          </div>
+          <div class="card settings-card">
+            <div class="setting-item" id="autoPlayAudioSettingItem">
+              <div class="setting-info">
+                <label class="setting-label" for="autoPlayAudio" data-i18n-key="popup.autoPlayAudio.label">Auto-play Word Pronunciation</label>
+                <p class="setting-helper community-note" id="autoPlayAudioCommunityNote"></p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="autoPlayAudio" data-setting="autoPlayAudio">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -517,146 +843,6 @@
                   <span class="radio-desc" data-i18n-key="popup.networkRegion.global.desc">Force connection via Cloudflare.</span>
                 </div>
               </label>
-            </div>
-          </div>
-
-          <div id="providerTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-            <h3 class="card-title" data-i18n-key="popup.section.customApi" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Translation Provider</h3>
-            <p class="section-subtitle" data-i18n-key="popup.section.translationProvider.helper" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Select which translation service to use.</p>
-          </div>
-
-          <div class="card settings-card" id="providerSelectionCard">
-            <div class="setting-item">
-              <div class="setting-info">
-                <label class="setting-label" for="customApiProvider" data-i18n-key="popup.translationProvider.label">Translation Provider</label>
-                <p class="setting-helper" data-i18n-key="popup.translationProvider.helper">Choose between official cloud API, custom LLM API, or self-hosted MTranServer.</p>
-              </div>
-              <div class="setting-control">
-                <select id="customApiProvider" data-setting="translationProvider" class="select-input">
-                  <option value="official" data-i18n-key="popup.translationProvider.official">Official Cloud API</option>
-                  <option value="customApi" data-i18n-key="popup.translationProvider.customApi">Custom LLM API</option>
-                  <option value="mtranserver" data-i18n-key="popup.translationProvider.mtranserver">MTranServer (Self-hosted)</option>
-                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate (Free)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div id="providerPanelsContainer" class="provider-panels-container">
-            <!-- Custom LLM API panel -->
-            <div class="provider-panel" data-provider="customApi">
-              <div id="customApiTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-                <h3 class="card-title" data-i18n-key="popup.customApi.title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Custom LLM API</h3>
-                <p class="section-subtitle" data-i18n-key="popup.customApi.description" style="margin: 0; font-size: 13px; color: var(--text-secondary);">Use your own LLM API provider for translations.</p>
-              </div>
-              <div class="card settings-card" id="customApiCard">
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="customApiBaseUrl" data-i18n-key="popup.customApi.baseUrl.label">API Base URL</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.baseUrl.helper">Example: https://api.openai.com/v1</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="url" id="customApiBaseUrl" data-setting="customApiBaseUrl" data-custom-api-control="true" class="select-input" placeholder="https://api.example.com/v1" />
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="customApiKey" data-i18n-key="popup.customApi.apiKey.label">API Key</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.apiKey.helper">Your provider token (stored locally in browser storage).</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="password" id="customApiKey" data-setting="customApiKey" data-custom-api-control="true" class="select-input" placeholder="sk-..." autocomplete="new-password" />
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="customApiModel" data-i18n-key="popup.customApi.model.label">Model</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.model.helper">Example: gpt-4o-mini, qwen-plus</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="text" id="customApiModel" data-setting="customApiModel" data-custom-api-control="true" class="select-input" placeholder="model-name" />
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="validateCustomApiButton" data-i18n-key="popup.customApi.validate.label">Validate Settings</label>
-                    <p class="setting-helper" data-i18n-key="popup.customApi.validate.helper">Run a quick test translation using your custom API.</p>
-                  </div>
-                  <div class="setting-control validation-control">
-                    <button class="secondary-button" id="validateCustomApiButton" data-custom-api-control="true" data-i18n-key="popup.customApi.validate.button">Validate</button>
-                    <p class="validation-status" id="validateCustomApiStatus"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- MTranServer panel -->
-            <div class="provider-panel" data-provider="mtranserver">
-              <div id="mtranserverTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-                <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">MTranServer</h3>
-                <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
-                  <span data-i18n-key="popup.mtranserver.description">A lightweight, self-hosted translation service with low resource consumption.</span>
-                  <a href="https://github.com/xxnuo/MTranServer" target="_blank" rel="noopener noreferrer" class="link" data-i18n-key="popup.mtranserver.learnMore">Learn more →</a>
-                </p>
-              </div>
-              <div class="card settings-card" id="mtranserverCard">
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="mtranserverUrl" data-i18n-key="popup.mtranserver.url.label">MTranServer URL</label>
-                    <p class="setting-helper" data-i18n-key="popup.mtranserver.url.helper">Your self-hosted MTranServer endpoint (e.g., http://127.0.0.1:8989).</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="url" id="mtranserverUrl" data-setting="mtranserverUrl" class="select-input" placeholder="http://127.0.0.1:8989" value="http://127.0.0.1:8989"/>
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" for="mtranserverKey" data-i18n-key="popup.mtranserver.key.label">API Key (Optional)</label>
-                    <p class="setting-helper" data-i18n-key="popup.mtranserver.key.helper">If your MTranServer requires authentication.</p>
-                  </div>
-                  <div class="setting-control">
-                    <input type="password" id="mtranserverKey" data-setting="mtranserverKey" class="select-input" placeholder="" value=""/>
-                  </div>
-                </div>
-
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" data-i18n-key="popup.mtranserver.test.label">Test Connection</label>
-                    <p class="setting-helper" data-i18n-key="popup.mtranserver.test.helper">Test your MTranServer connection with a sample translation.</p>
-                  </div>
-                  <div class="setting-control validation-control">
-                    <button class="secondary-button" id="testMtranserverButton" data-i18n-key="popup.mtranserver.test.button">Test Translation</button>
-                    <p class="validation-status" id="testMtranserverStatus"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bing Translate panel -->
-            <div class="provider-panel" data-provider="bingTranslate">
-              <div id="bingTranslateTitleSection" style="margin-bottom: 12px; padding-left: 2px;">
-                <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Bing Translate</h3>
-                <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);">
-                  <span data-i18n-key="popup.bingTranslate.description">Free translation service powered by Bing Translator. No API key required.</span>
-                  <a href="https://github.com/plainheart/bing-translate-api" target="_blank" rel="noopener noreferrer" class="link" data-i18n-key="popup.bingTranslate.learnMore">Learn more →</a>
-                </p>
-              </div>
-              <div class="card settings-card" id="bingTranslateCard">
-                <div class="setting-item">
-                  <div class="setting-info">
-                    <label class="setting-label" data-i18n-key="popup.bingTranslate.note.label">Note</label>
-                    <p class="setting-helper" data-i18n-key="popup.bingTranslate.note.helper">Send a test request to verify Bing Translate is reachable.</p>
-                  </div>
-                  <div class="setting-control">
-                    <button class="secondary-button" id="testBingTranslateButton" data-i18n-key="popup.bingTranslate.test.button">Test Translation</button>
-                    <p class="validation-status" id="testBingTranslateStatus"></p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

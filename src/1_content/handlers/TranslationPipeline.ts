@@ -256,6 +256,7 @@ async function translateWordPath(
                     },
                     displaySettings
                 )
+
             } else {
                 // Check errorType to determine error handling
                 // QuotaExceeded: use short message for tooltip, keep detailed message for modal
@@ -416,6 +417,7 @@ async function translateFragmentPath(
                     },
                     displaySettings
                 )
+
             } else {
                 // Check errorType to determine error handling
                 // QuotaExceeded: use short message for tooltip, keep detailed message for modal

@@ -19,12 +19,14 @@ body {
   color: var(--text-color);
   margin: 0;
   font-size: 14px;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .header {
@@ -91,19 +93,60 @@ body {
 }
 
 .secondary-button {
-  padding: 10px 16px;
+  padding: 8px 16px;
   border-radius: 8px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   border: 1px solid var(--border-color);
   background-color: #f8fafc;
   color: var(--text-color);
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-family);
 }
 
 .secondary-button:hover {
   background-color: #eef2ff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.primary-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background-color: var(--primary-color);
+  color: #fff;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.primary-button:hover {
+  background-color: #1a72cc;
+  box-shadow: 0 4px 12px rgba(36, 132, 224, 0.3);
+}
+
+.ghost-button {
+  background: transparent;
+  color: #888;
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.ghost-button:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-color);
+}
+.ghost-button-danger:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
 }
 
 .github-button {
@@ -124,6 +167,7 @@ body {
   flex-grow: 1;
   overflow: hidden;
   background: linear-gradient(180deg, #f7f9fb 0%, #f0f4f8 100%);
+  min-height: 0;
 }
 
 .sidebar {
@@ -207,6 +251,94 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Appearance Preview - Dual Panel */
+.appearance-preview {
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 12px;
+  padding-top: 16px;
+}
+
+.ap-panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.ap-label {
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+  margin: 0 0 5px 0;
+}
+
+.ap-stage {
+  position: relative;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.ap-panel--light .ap-stage {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
+.ap-panel--dark .ap-stage {
+  background-color: #1a1a2e;
+  border: 1px solid #2d2d4e;
+  color: #e2e8f0;
+}
+
+.ap-para {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.ap-underline-demo {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 4px 0 10px;
+}
+
+.ap-underline-row {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ap-underline-text {
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+/* Replicates .ai-translator-tooltip border-top underline effect from content script */
+.ap-word-tooltip,
+.ap-sent-tooltip {
+  border-top: 1.5px solid currentColor; /* overridden by JS via borderTopColor */
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.3;
+  padding-top: 2px;
+  width: 100%;
+  text-align: center;
+}
+
+.ap-full-trans {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  font-weight: 400;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
+  padding-top: 8px;
+}
+
 
 .tooltip-preview {
   border-top: 1px solid var(--border-color);
@@ -426,6 +558,30 @@ body {
 .select-input:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(36, 132, 224, 0.15);
+  outline: none;
+}
+
+.text-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d7dce3;
+  background: #ffffff;
+  font-size: 13px;
+  color: var(--text-color);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: var(--font-family);
+}
+
+.text-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 132, 224, 0.15);
+}
+
+.text-input::placeholder {
+  color: #bbb;
 }
 
 .toggle-switch {
@@ -681,6 +837,37 @@ body {
   height: 100%;
 }
 
+/* Icon Variant Preview (pill shape matching floating button) */
+.icon-option:has(.icon-preview--variant) {
+  padding-left: 8px;
+  padding-right: 0;
+}
+
+.icon-preview--variant {
+  width: 100%;
+  height: 40px;
+  background: #ffffff;
+  border-radius: 9999px 0 0 9999px;
+  border: 1px solid #e5e7eb;
+  border-right: none;
+  justify-content: flex-start;
+  padding-left: 8px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  filter: none;
+}
+
+.icon-preview--variant svg {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.icon-option input[type="radio"]:checked ~ .icon-preview--variant {
+  transform: none;
+}
+
 .highlight-language {
   display: inline-block;
   padding: 2px 6px;
@@ -810,7 +997,15 @@ body {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-sizing: border-box;
   min-width: 180px;
+}
+
+/* Wider variant for floating ball / underline color pickers */
+#floatingButtonColorSelect .custom-select-trigger,
+#wordUnderlineColorSelect .custom-select-trigger,
+#sentenceUnderlineColorSelect .custom-select-trigger {
+  min-width: 230px;
 }
 
 .custom-select-wrapper-wide {

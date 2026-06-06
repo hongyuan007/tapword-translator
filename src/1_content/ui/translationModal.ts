@@ -6,12 +6,13 @@
  */
 
 import type { SpeechSynthesisResponseMessage } from "@/0_common/types"
-import { APP_EDITION } from "@/0_common/constants"
+import * as commonConstants from "@/0_common/constants"
 import * as loggerModule from "@/0_common/utils/logger"
+import * as storageManagerModule from "@/0_common/utils/storageManager"
 import * as constants from "@/1_content/constants"
 import * as contentIndex from "@/1_content/index"
 import * as modalTemplates from "@/1_content/ui/modalTemplates"
-import * as toastNotification from "@/1_content/ui/toastNotification"
+import * as toastNotification from "@/1_content/ui/toast/toastNotification"
 import * as languageDetector from "@/1_content/utils/languageDetector"
 import { ModalPositionerV2 } from "@/1_content/utils/modalPositionerV2"
 import * as hitTesting from "@/1_content/ui/translationDisplayV2/hitTesting"
@@ -440,6 +441,7 @@ function attachActionButtonListeners(modalContainer: HTMLElement, data: Translat
     const speakOriginalBtn = modalContainer.querySelector(".ai-translator-speak-original-btn")
     const speakSentenceBtn = modalContainer.querySelector(".ai-translator-speak-sentence-btn")
     const speakLemmaBtn = modalContainer.querySelector(".ai-translator-speak-lemma-btn")
+    const autoPlayCheckbox = modalContainer.querySelector<HTMLInputElement>(".ai-translator-auto-play-checkbox")
     const deleteBtn = modalContainer.querySelector(".ai-translator-delete-btn")
     const refreshBtn = modalContainer.querySelector(".ai-translator-refresh-btn")
     const closeButton = modalContainer.querySelector(".ai-translator-modal-close")
@@ -471,6 +473,16 @@ function attachActionButtonListeners(modalContainer: HTMLElement, data: Translat
         refreshBtn.addEventListener("click", (e) => handleRefreshClick(e, data))
     }
 
+    // Auto-play toggle
+    if (autoPlayCheckbox) {
+        const cachedSettings = contentIndex.getCachedUserSettings()
+        autoPlayCheckbox.checked = cachedSettings?.autoPlayAudio ?? true
+        autoPlayCheckbox.addEventListener("change", async () => {
+            await storageManagerModule.updateUserSettings({ autoPlayAudio: autoPlayCheckbox.checked })
+            logger.info("Auto-play audio toggled", { autoPlayAudio: autoPlayCheckbox.checked })
+        })
+    }
+
     logger.info("Action button listeners attached")
 }
 
@@ -481,7 +493,7 @@ function createModalElement(data: TranslationDetailData, showUpdateLabel: boolea
     // Create modal container
     const modalContainer = document.createElement("div")
     modalContainer.className = constants.CSS_CLASSES.MODAL
-    modalContainer.setAttribute("data-app-edition", APP_EDITION)
+    modalContainer.setAttribute("data-app-edition", commonConstants.APP_EDITION)
 
     // Add a class based on the translation type for specific styling
     if (data.translationType === "word") {
@@ -616,6 +628,7 @@ function positionModal(modalContainer: HTMLElement, anchorSource: Range): void {
 
 function createShadowHost(): { host: HTMLElement; shadowRoot: ShadowRoot } {
     const host = document.createElement("div")
+    host.setAttribute(commonConstants.EXTENSION_OWNED_ATTRIBUTE, "")
     // Keep host inert and style-neutral; child modal uses fixed positioning and its own z-index
     host.style.all = "initial"
     const shadowRoot = host.attachShadow({ mode: "open" })

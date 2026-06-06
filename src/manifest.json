@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "__MSG_extName__",
-    "version": "0.4.5",
-    "version_name": "0.4.5",
+    "version": "0.5.0",
+    "version_name": "0.5.0",
     "description": "__MSG_extDescription__",
     "default_locale": "en",
     "icons": {

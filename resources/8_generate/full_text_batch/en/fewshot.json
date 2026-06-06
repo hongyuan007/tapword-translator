@@ -1,0 +1,26 @@
+[
+    {
+        "role": "user",
+        "content": "# Source Language\nEnglish\n\n# Target Language\nChinese\n\n# Number of Segments\n3\n\n# Text to Translate\n<segment id=\"0\">The quick brown fox jumps over the lazy dog.</segment>\n<segment id=\"1\">Machine learning is transforming the tech industry.</segment>\n<segment id=\"2\">Please refer to the documentation for more details.</segment>"
+    },
+    {
+        "role": "assistant",
+        "content": "<segment id=\"0\">敏捷的棕色狐狸跳过了懒惰的狗。</segment>\n<segment id=\"1\">机器学习正在改变科技行业。</segment>\n<segment id=\"2\">请参阅文档以获取更多详细信息。</segment>"
+    },
+    {
+        "role": "user",
+        "content": "# Source Language\nEnglish\n\n# Target Language\nJapanese\n\n# Number of Segments\n2\n\n# Text to Translate\n<segment id=\"0\">Click the \"Submit\" button to proceed.</segment>\n<segment id=\"1\">The API response code was 200 &amp; the latency was &lt;50ms.</segment>"
+    },
+    {
+        "role": "assistant",
+        "content": "<segment id=\"0\">「Submit」ボタンをクリックして続行してください。</segment>\n<segment id=\"1\">APIのレスポンスコードは200で、レイテンシは50ms未満でした。</segment>"
+    },
+    {
+        "role": "user",
+        "content": "# Source Language\nEnglish\n\n# Target Language\nChinese\n\n# Number of Segments\n5\n\n# Text to Translate\n<segment id=\"0\">@elonmusk</segment>\n<segment id=\"1\">Elon Musk</segment>\n<segment id=\"2\">Follow @tapword_app for updates.</segment>\n<segment id=\"3\">OpenAI released a new model today.</segment>\n<segment id=\"4\">🚀</segment>"
+    },
+    {
+        "role": "assistant",
+        "content": "<segment id=\"0\">@elonmusk</segment>\n<segment id=\"1\">Elon Musk</segment>\n<segment id=\"2\">关注 @tapword_app 获取更新。</segment>\n<segment id=\"3\">OpenAI 今天发布了一个新模型。</segment>\n<segment id=\"4\">🚀</segment>"
+    }
+]

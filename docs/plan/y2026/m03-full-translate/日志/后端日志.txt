@@ -1,0 +1,313 @@
+[requestLogger] --- New Request ---
+[requestLogger] [REQ] 2026-03-15T10:30:03.617Z POST /api/v1/translate/full-text-batch
+[requestLogger] [REQ] Headers: {
+  "host": "local.tapword.cc",
+  "x-real-ip": "127.0.0.1",
+  "x-forwarded-for": "127.0.0.1",
+  "x-forwarded-proto": "https",
+  "connection": "close",
+  "content-length": "106",
+  "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJleHRlbnNpb24tZTNiMGExNDIyMDM5MDIzNCIsImNsaWVudFR5cGUiOiJleHRlbnNpb24iLCJqdGkiOiJhMDVlODQ1Ny0zZjZhLTRkMzUtODJkZi04ODc1ZjMzZGMzMTQiLCJpYXQiOjE3NzM1NzA1NTYsImV4cCI6MTc3MzU3MTc1Nn0.Tj23gNa-zF6YzAlasfXSfPT5vQM57uDCLDd3CygMvyw",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+  "x-client-version": "0.1.0",
+  "content-type": "application/json",
+  "accept": "*/*",
+  "origin": "chrome-extension://mblnafgdagbhnnmfeakekalbckpoimce",
+  "sec-fetch-site": "none",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "sec-fetch-storage-access": "active",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "zh-CN,zh;q=0.9"
+}
+[requestLogger] [REQ] Body: {"texts":["[edit]","Plot","[edit]","In the Seven Kingdoms"],"sourceLanguage":"auto","targetLanguage":"zh"}
+[jwt.middleware] [DEV MODE] Bypassing JWT verification, using default user: dev-user-123 dev
+[translation.service] [FullTextBatch] Starting: 4 texts, 37 chars, auto -> zh
+[generate.llm] [qwen3-30b-a3b-instruct-2507] User Prompt:
+# Source Language
+Auto-Detect
+
+# Target Language
+Chinese
+
+# Number of Segments
+4
+
+# Text to Translate
+[edit] %% Plot %% [edit] %% In the Seven Kingdoms
+
+[generate.tokenTracker] Recorded usage: prompt=301, completion=55, total=356
+[generate.llm] [qwen3-30b-a3b-instruct-2507] LLM Response:
+{"translations": "本文介绍的是小说。关于电视剧，请参见《权力的游戏》。关于同名的衍生作品，请参见《权力的游戏》（消歧义）。 %% 权力的游戏 %% 美国首版封面 %% 编辑"}
+[translation.service] [FullTextBatch] Completed in 955ms
+[translation.service] [FullTextBatch] Token usage: { promptTokens: 301, completionTokens: 55, totalTokens: 356 }
+[requestLogger] [RES] 2026-03-15T10:30:03.632Z Status: 200 (took 957ms)
+[requestLogger] [RES] Body: {
+  "data": {
+    "translations": [
+      "本文介绍的是小说。关于电视剧，请参见《权力的游戏》。关于同名的衍生作品，请参见《权力的游戏》（消歧义）。",
+      "权力的游戏",
+      "美国首版封面",
+      "编辑"
+    ],
+    "sourceLanguage": "auto",
+    "targetLanguage": "zh",
+    "usage": {
+      "promptTokens": 301,
+      "completionTokens": 55,
+      "totalTokens": 356
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+[requestLogger] --- End Request ---
+{"level":"info","module":"requestLogger","timestamp":"2026-03-15T10:30:03.632Z","method":"POST","url":"/api/v1/translate/full-text-batch","status":200,"duration":957,"ip":"127.0.0.1"}
+[requestLogger] --- New Request ---
+[requestLogger] [REQ] 2026-03-15T10:30:03.633Z POST /api/v1/translate/full-text-batch
+[requestLogger] [REQ] Headers: {
+  "host": "local.tapword.cc",
+  "x-real-ip": "127.0.0.1",
+  "x-forwarded-for": "127.0.0.1",
+  "x-forwarded-proto": "https",
+  "connection": "close",
+  "content-length": "499",
+  "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJleHRlbnNpb24tZTNiMGExNDIyMDM5MDIzNCIsImNsaWVudFR5cGUiOiJleHRlbnNpb24iLCJqdGkiOiJhMDVlODQ1Ny0zZjZhLTRkMzUtODJkZi04ODc1ZjMzZGMzMTQiLCJpYXQiOjE3NzM1NzA1NTYsImV4cCI6MTc3MzU3MTc1Nn0.Tj23gNa-zF6YzAlasfXSfPT5vQM57uDCLDd3CygMvyw",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+  "x-client-version": "0.1.0",
+  "content-type": "application/json",
+  "accept": "*/*",
+  "origin": "chrome-extension://mblnafgdagbhnnmfeakekalbckpoimce",
+  "sec-fetch-site": "none",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "sec-fetch-storage-access": "active",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "zh-CN,zh;q=0.9"
+}
+[requestLogger] [REQ] Body: {"texts":["After the death of Lord Jon Arryn, King Robert Baratheon recruits his childhood friend Eddard \"Ned\" Stark, the lord of the northern castle of Winterfell, to replace Arryn as Hand of the King and betroths his son Joffrey to Ned's daughter Sansa. Shortly thereafter, Ned's son Bran discovers Robert's wife, Queen Cersei Lannister, having sex with her twin brother Jaime. Jaime throws Bran from a tower, leaving Bran comatose and paralyzed."],"sourceLanguage":"auto","targetLanguage":"zh"}
+[jwt.middleware] [DEV MODE] Bypassing JWT verification, using default user: dev-user-123 dev
+[translation.service] [FullTextBatch] Starting: 1 texts, 437 chars, auto -> zh
+[generate.llm] [qwen3-30b-a3b-instruct-2507] User Prompt:
+# Source Language
+Auto-Detect
+
+# Target Language
+Chinese
+
+# Number of Segments
+1
+
+# Text to Translate
+After the death of Lord Jon Arryn, King Robert Baratheon recruits his childhood friend Eddard "Ned" Stark, the lord of the northern castle of Winterfell, to replace Arryn as Hand of the King and betroths his son Joffrey to Ned's daughter Sansa. Shortly thereafter, Ned's son Bran discovers Robert's wife, Queen Cersei Lannister, having sex with her twin brother Jaime. Jaime throws Bran from a tower, leaving Bran comatose and paralyzed.
+
+[generate.llm] Generation provider error: BadRequestError: 400 Input data may contain inappropriate content. For details, see: https://help.aliyun.com/zh/model-studio/error-code#inappropriate-content
+    at APIError.generate (/Users/hongyuan/project/translate-api/node_modules/openai/src/core/error.ts:72:14)
+    at OpenAI.makeStatusError (/Users/hongyuan/project/translate-api/node_modules/openai/src/client.ts:463:28)
+    at OpenAI.makeRequest (/Users/hongyuan/project/translate-api/node_modules/openai/src/client.ts:713:24)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async GenerationLLMService.generateWithUsage (/Users/hongyuan/project/translate-api/src/7_generate/services/llm/generationLLM.service.ts:69:32)
+    at async FullTextBatchTranslationService.callAndParse (/Users/hongyuan/project/translate-api/src/7_generate/services/FullTextBatchTranslation.service.ts:113:45)
+    at async FullTextBatchTranslationService.translateBatch (/Users/hongyuan/project/translate-api/src/7_generate/services/FullTextBatchTranslation.service.ts:86:22)
+    at async Object.translateFullTextBatch (/Users/hongyuan/project/translate-api/src/1_translate/services/translation.service.ts:821:24)
+    at async translateFullTextBatchHandler (/Users/hongyuan/project/translate-api/src/1_translate/controllers/translation.controller.ts:220:24) {
+  status: 400,
+  headers: Headers {
+    vary: 'Origin,Access-Control-Request-Method,Access-Control-Request-Headers, Accept-Encoding',
+    'x-request-id': 'ded6cad5-5619-93e7-906d-e22b572e5e90',
+    'x-dashscope-call-gateway': 'true',
+    'content-type': 'application/json',
+    'req-cost-time': '261',
+    'req-arrive-time': '1773570603869',
+    'resp-start-time': '1773570604130',
+    'x-envoy-upstream-service-time': '261',
+    'content-encoding': 'gzip',
+    date: 'Sun, 15 Mar 2026 10:30:03 GMT',
+    server: 'istio-envoy',
+    'transfer-encoding': 'chunked'
+  },
+  requestID: 'ded6cad5-5619-93e7-906d-e22b572e5e90',
+  error: {
+    message: 'Input data may contain inappropriate content. For details, see: https://help.aliyun.com/zh/model-studio/error-code#inappropriate-content',
+    type: 'data_inspection_failed',
+    param: null,
+    code: 'data_inspection_failed'
+  },
+  code: 'data_inspection_failed',
+  param: null,
+  type: 'data_inspection_failed'
+}
+[translation.service] [FullTextBatch] Batch failed, falling back to individual translations: BusinessError: Translation content was blocked by moderation.
+    at GenerationLLMService.generateWithUsage (/Users/hongyuan/project/translate-api/src/7_generate/services/llm/generationLLM.service.ts:115:27)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async FullTextBatchTranslationService.callAndParse (/Users/hongyuan/project/translate-api/src/7_generate/services/FullTextBatchTranslation.service.ts:113:45)
+    at async FullTextBatchTranslationService.translateBatch (/Users/hongyuan/project/translate-api/src/7_generate/services/FullTextBatchTranslation.service.ts:86:22)
+    at async Object.translateFullTextBatch (/Users/hongyuan/project/translate-api/src/1_translate/services/translation.service.ts:821:24)
+    at async translateFullTextBatchHandler (/Users/hongyuan/project/translate-api/src/1_translate/controllers/translation.controller.ts:220:24) {
+  code: 20001
+}
+[translation.service] [FullTextBatch:Fallback] Starting individual translations for 1 texts
+[LanguageDetector] [detectFromAuto] "After the death of L" → "en" (score: 0.31)
+[generate.promptLoader] Loaded fewshot examples from /Users/hongyuan/project/translate-api/resources/generate/fragment_translation_only/zh/fewshot.json (count: 4)
+[generate.llm] [qwen3-30b-a3b-instruct-2507] User Prompt:
+# Source Language
+English
+
+# Target Language
+Chinese
+
+# Target Fragment
+After the death of Lord Jon Arryn, King Robert Baratheon recruits his childhood friend Eddard "Ned" Stark, the lord of the northern castle of Winterfell, to replace Arryn as Hand of the King and betroths his son Joffrey to Ned's daughter Sansa. Shortly thereafter, Ned's son Bran discovers Robert's wife, Queen Cersei Lannister, having sex with her twin brother Jaime. Jaime throws Bran from a tower, leaving Bran comatose and paralyzed.
+
+# Context
+<fragment>After the death of Lord Jon Arryn, King Robert Baratheon recruits his childhood friend Eddard "Ned" Stark, the lord of the northern castle of Winterfell, to replace Arryn as Hand of the King and betroths his son Joffrey to Ned's daughter Sansa. Shortly thereafter, Ned's son Bran discovers Robert's wife, Queen Cersei Lannister, having sex with her twin brother Jaime. Jaime throws Bran from a tower, leaving Bran comatose and paralyzed.</fragment>
+
+[generate.tokenTracker] Recorded usage: prompt=268, completion=20, total=288
+[generate.llm] [qwen3-30b-a3b-instruct-2507] LLM Response:
+{"translations": "[编辑] %% 剧情 %% [编辑] %% 在七大王国"}
+[translation.service] [FullTextBatch] Completed in 603ms
+[translation.service] [FullTextBatch] Token usage: { promptTokens: 268, completionTokens: 20, totalTokens: 288 }
+[requestLogger] [RES] 2026-03-15T10:30:04.221Z Status: 200 (took 604ms)
+[requestLogger] [RES] Body: {
+  "data": {
+    "translations": [
+      "[编辑]",
+      "剧情",
+      "[编辑]",
+      "在七大王国"
+    ],
+    "sourceLanguage": "auto",
+    "targetLanguage": "zh",
+    "usage": {
+      "promptTokens": 268,
+      "completionTokens": 20,
+      "totalTokens": 288
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+[requestLogger] --- End Request ---
+{"level":"info","module":"requestLogger","timestamp":"2026-03-15T10:30:04.221Z","method":"POST","url":"/api/v1/translate/full-text-batch","status":200,"duration":604,"ip":"127.0.0.1"}
+[generate.tokenTracker] Recorded usage: prompt=368, completion=125, total=493
+[generate.llm] [qwen3-30b-a3b-instruct-2507] LLM Response:
+{"translations": "《权力的游戏》以第三人称叙述，每一章在八位叙述者之间交替，有时提供不可靠的描述。在维斯特洛的七大王国中，史塔克家族和兰尼斯特家族影响着大陆的政治命运。在维斯特洛极北之地，史塔克家族一位私生子加入了守护一道巨大冰墙的团体，以抵御掠夺者和一群神话般的敌人。在海外的厄索斯大陆，维斯特洛被推翻的王室家族——坦格利安家族的最后幸存者们流亡在外。"}
+[translation.service] [FullTextBatch] Completed in 1602ms
+[translation.service] [FullTextBatch] Token usage: { promptTokens: 368, completionTokens: 125, totalTokens: 493 }
+[requestLogger] [RES] 2026-03-15T10:30:04.993Z Status: 200 (took 1604ms)
+[requestLogger] [RES] Body: {
+  "data": {
+    "translations": [
+      "《权力的游戏》以第三人称叙述，每一章在八位叙述者之间交替，有时提供不可靠的描述。在维斯特洛的七大王国中，史塔克家族和兰尼斯特家族影响着大陆的政治命运。在维斯特洛极北之地，史塔克家族一位私生子加入了守护一道巨大冰墙的团体，以抵御掠夺者和一群神话般的敌人。在海外的厄索斯大陆，维斯特洛被推翻的王室家族——坦格利安家族的最后幸存者们流亡在外。"
+    ],
+    "sourceLanguage": "auto",
+    "targetLanguage": "zh",
+    "usage": {
+      "promptTokens": 368,
+      "completionTokens": 125,
+      "totalTokens": 493
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+[requestLogger] --- End Request ---
+{"level":"info","module":"requestLogger","timestamp":"2026-03-15T10:30:04.994Z","method":"POST","url":"/api/v1/translate/full-text-batch","status":200,"duration":1605,"ip":"127.0.0.1"}
+[generate.tokenTracker] Recorded usage: prompt=374, completion=130, total=504
+[generate.llm] [qwen3-30b-a3b-instruct-2507] LLM Response:
+{"translations": "小说出版后，多位评论家称赞该小说对政治权谋和历史影响的关注。它获得了1997年洛厄斯奖最佳奇幻小说奖，并被提名多项其他奖项，其中包含坦格利安家族章节的中篇小说还赢得了1997年雨果奖最佳短篇故事奖。尽管其商业成功有限，仅售出数千册，但HBO电视剧《权力的游戏》（2011–2019）的改编重新点燃了人们对这部小说的兴趣。小说因此成为畅销书，并引发了学术界和大众的广泛讨论。"}
+[translation.service] [FullTextBatch] Completed in 1744ms
+[translation.service] [FullTextBatch] Token usage: { promptTokens: 374, completionTokens: 130, totalTokens: 504 }
+[requestLogger] [RES] 2026-03-15T10:30:05.161Z Status: 200 (took 1745ms)
+[requestLogger] [RES] Body: {
+  "data": {
+    "translations": [
+      "小说出版后，多位评论家称赞该小说对政治权谋和历史影响的关注。它获得了1997年洛厄斯奖最佳奇幻小说奖，并被提名多项其他奖项，其中包含坦格利安家族章节的中篇小说还赢得了1997年雨果奖最佳短篇故事奖。尽管其商业成功有限，仅售出数千册，但HBO电视剧《权力的游戏》（2011–2019）的改编重新点燃了人们对这部小说的兴趣。小说因此成为畅销书，并引发了学术界和大众的广泛讨论。"
+    ],
+    "sourceLanguage": "auto",
+    "targetLanguage": "zh",
+    "usage": {
+      "promptTokens": 374,
+      "completionTokens": 130,
+      "totalTokens": 504
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+[requestLogger] --- End Request ---
+{"level":"info","module":"requestLogger","timestamp":"2026-03-15T10:30:05.161Z","method":"POST","url":"/api/v1/translate/full-text-batch","status":200,"duration":1745,"ip":"127.0.0.1"}
+[generate.tokenTracker] Recorded usage: prompt=619, completion=123, total=742
+[generate.llm] [qwen3-30b-a3b-instruct-2507] LLM Response:
+{"translation": "琼恩·艾林公爵去世后，国王罗伯特·拜拉席恩招募了他儿时的朋友艾德·“奈德”·史塔克——临冬城的领主，接替艾林担任国王之手，并将他的儿子乔佛里许配给奈德的女儿珊莎。不久之后，奈德的儿子布兰发现了国王的妻子、兰尼斯特家族的王后瑟曦与她的双胞胎兄弟詹姆私会。詹姆将布兰从高塔上推下，导致布兰昏迷且瘫痪。"}
+[generate.fragmentTranslationService] Fragment translated via qwen from en to zh
+[translation.service] [qwen] Fragment translation API call took 1686ms
+[translation.service] [FullTextBatch:Fallback] Completed in 1702ms
+[requestLogger] [RES] 2026-03-15T10:30:05.696Z Status: 200 (took 2063ms)
+[requestLogger] [RES] Body: {
+  "data": {
+    "translations": [
+      "琼恩·艾林公爵去世后，国王罗伯特·拜拉席恩招募了他儿时的朋友艾德·“奈德”·史塔克——临冬城的领主，接替艾林担任国王之手，并将他的儿子乔佛里许配给奈德的女儿珊莎。不久之后，奈德的儿子布兰发现了国王的妻子、兰尼斯特家族的王后瑟曦与她的双胞胎兄弟詹姆私会。詹姆将布兰从高塔上推下，导致布兰昏迷且瘫痪。"
+    ],
+    "sourceLanguage": "auto",
+    "targetLanguage": "zh",
+    "usage": {
+      "promptTokens": 619,
+      "completionTokens": 123,
+      "totalTokens": 742
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+[requestLogger] --- End Request ---
+{"level":"info","module":"requestLogger","timestamp":"2026-03-15T10:30:05.696Z","method":"POST","url":"/api/v1/translate/full-text-batch","status":200,"duration":2063,"ip":"127.0.0.1"}
+[generate.tokenTracker] Recorded usage: prompt=407, completion=158, total=565
+[generate.llm] [qwen3-30b-a3b-instruct-2507] LLM Response:
+{"translations": "一部史诗奇幻小说，它常被与J. R. R. 托尔金的作品相比较，并被认为颠覆了该类型的主要套路；有时也被描述为历史或中世纪奇幻。虽然几乎没有直接的历史类比，但明显能听到真实历史的回响，例如哈德良长城启发了小说中那堵巨大的冰墙。学者们探讨过这部小说是否真实再现了中世纪，以及它如何回应中世纪文学传统或主题，如骑士精神。性别、母性以及性暴力是其他经常被探讨的主题，统治者或国王的权威有时也参照封建制度进行讨论。2019年，英国广播公司（BBC）将其列为最具启发性的100部小说之一。"}
+[translation.service] [FullTextBatch] Completed in 2306ms
+[translation.service] [FullTextBatch] Token usage: { promptTokens: 407, completionTokens: 158, totalTokens: 565 }
+[requestLogger] [RES] 2026-03-15T10:30:05.725Z Status: 200 (took 2307ms)
+[requestLogger] [RES] Body: {
+  "data": {
+    "translations": [
+      "一部史诗奇幻小说，它常被与J. R. R. 托尔金的作品相比较，并被认为颠覆了该类型的主要套路；有时也被描述为历史或中世纪奇幻。虽然几乎没有直接的历史类比，但明显能听到真实历史的回响，例如哈德良长城启发了小说中那堵巨大的冰墙。学者们探讨过这部小说是否真实再现了中世纪，以及它如何回应中世纪文学传统或主题，如骑士精神。性别、母性以及性暴力是其他经常被探讨的主题，统治者或国王的权威有时也参照封建制度进行讨论。2019年，英国广播公司（BBC）将其列为最具启发性的100部小说之一。"
+    ],
+    "sourceLanguage": "auto",
+    "targetLanguage": "zh",
+    "usage": {
+      "promptTokens": 407,
+      "completionTokens": 158,
+      "totalTokens": 565
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+[requestLogger] --- End Request ---
+{"level":"info","module":"requestLogger","timestamp":"2026-03-15T10:30:05.725Z","method":"POST","url":"/api/v1/translate/full-text-batch","status":200,"duration":2307,"ip":"127.0.0.1"}
+[generate.tokenTracker] Recorded usage: prompt=357, completion=122, total=479
+[generate.llm] [qwen3-30b-a3b-instruct-2507] LLM Response:
+{"translations": "王权的游戏 %% 《冰与火之歌》是美国作家乔治·R·R·马丁创作的一部史诗奇幻小说。该书于1996年8月出版，是其《冰与火之歌》系列的第一部作品。这是马丁的第四部小说，也是他长期从事电视工作后重返小说创作的代表作。他最初在1991年撰写科幻小说时萌生了这个构思，随后写下了百页内容，并提交给经纪人，最初计划将这部小说作为三部曲来创作。"}
+[translation.service] [FullTextBatch] Completed in 3351ms
+[translation.service] [FullTextBatch] Token usage: { promptTokens: 357, completionTokens: 122, totalTokens: 479 }
+[requestLogger] [RES] 2026-03-15T10:30:06.138Z Status: 200 (took 3351ms)
+[requestLogger] [RES] Body: {
+  "data": {
+    "translations": [
+      "王权的游戏",
+      "《冰与火之歌》是美国作家乔治·R·R·马丁创作的一部史诗奇幻小说。该书于1996年8月出版，是其《冰与火之歌》系列的第一部作品。这是马丁的第四部小说，也是他长期从事电视工作后重返小说创作的代表作。他最初在1991年撰写科幻小说时萌生了这个构思，随后写下了百页内容，并提交给经纪人，最初计划将这部小说作为三部曲来创作。"
+    ],
+    "sourceLanguage": "auto",
+    "targetLanguage": "zh",
+    "usage": {
+      "promptTokens": 357,
+      "completionTokens": 122,
+      "totalTokens": 479
+    }
+  },
+  "code": 0,
+  "message": "success"
+}
+[requestLogger] --- End Request ---
+{"level":"info","module":"requestLogger","timestamp":"2026-03-15T10:30:06.141Z","method":"POST","url":"/api/v1/translate/full-text-batch","status":200,"duration":3354,"ip":"127.0.0.1"}

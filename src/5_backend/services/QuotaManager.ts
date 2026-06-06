@@ -22,11 +22,17 @@ const logger = createLogger("QuotaManager")
 
 const TRANSLATE_ERROR_MSG = "翻译额度用光了, 明天再来吧"
 const SPEECH_ERROR_MSG = "语音额度用光了, 明天再来吧"
+const FULL_TEXT_TRANSLATION_ERROR_MSG = "今日免费额度已用完，明天再来吧"
 
 /**
  * Storage key for quota tracking data
  */
 const QUOTA_STORAGE_KEY = "quotaUsage"
+
+/**
+ * Storage key for full-text translation quota cache (from server)
+ */
+const FULL_TEXT_QUOTA_STORAGE_KEY = "fullTextQuotaUsage"
 
 /**
  * Quota usage data structure
@@ -38,6 +44,20 @@ interface QuotaUsageData {
     translationCount: number
     /** Number of successful speech synthesis requests today */
     speechCount: number
+}
+
+/**
+ * Full-text translation quota cache from server
+ */
+interface FullTextQuotaCache {
+    /** Date string in YYYY-MM-DD format */
+    date: string
+    /** Characters used today */
+    used: number
+    /** Daily character limit */
+    limit: number
+    /** Remaining characters */
+    remaining: number
 }
 
 /**
@@ -197,6 +217,98 @@ export class QuotaManager {
         return {
             translation: this.currentData?.translationCount || 0,
             speech: this.currentData?.speechCount || 0,
+        }
+    }
+
+    // ============================================================
+    // Full-Text Translation Quota (Server-Side Primary, Client Cache)
+    // ============================================================
+
+    /**
+     * Check if full-text translation quota is available (client-side cache check).
+     * @throws QuotaExceededError if local cache indicates quota is exhausted.
+     * Note: Server is the source of truth; this is a fast pre-check only.
+     */
+    async checkFullTextTranslationQuota(): Promise<void> {
+        if (APP_EDITION === "community") {
+            logger.debug("Community edition: skipping full-text translation quota check")
+            return
+        }
+
+        const quotaCache = await this.loadFullTextQuotaCache()
+        if (!quotaCache) {
+            // No cache — let server decide
+            return
+        }
+
+        // Always use the latest limit from ConfigService so server-side changes take effect immediately
+        const configService = getConfigService()
+        await configService.ensureCacheLoaded()
+        const currentLimit = configService.getDailyFreeFullTextTranslationChars()
+        const freshRemaining = Math.max(0, currentLimit - quotaCache.used)
+        if (freshRemaining <= 0) {
+            const updatedCache = { ...quotaCache, limit: currentLimit, remaining: freshRemaining }
+            logger.warn("Full-text translation quota exhausted (client cache):", updatedCache)
+            throw new QuotaExceededError("fullTextTranslation", FULL_TEXT_TRANSLATION_ERROR_MSG)
+        }
+    }
+
+    /**
+     * Update local full-text translation quota cache from server response.
+     */
+    async updateFullTextTranslationQuota(quota: { used: number; limit: number; remaining: number }): Promise<void> {
+        const today = getTodayDateString()
+        const cache: FullTextQuotaCache = {
+            date: today,
+            used: quota.used,
+            limit: quota.limit,
+            remaining: quota.remaining,
+        }
+
+        try {
+            await chrome.storage.local.set({ [FULL_TEXT_QUOTA_STORAGE_KEY]: cache })
+            logger.debug("Full-text quota cache updated:", cache)
+        } catch (error) {
+            logger.error("Failed to save full-text quota cache:", error)
+        }
+    }
+
+    /**
+     * Get current full-text translation quota usage from local cache.
+     * Always reads the limit from ConfigService to reflect server-side changes.
+     */
+    async getFullTextTranslationQuotaUsage(): Promise<{ used: number; limit: number; remaining: number }> {
+        const configService = getConfigService()
+        await configService.ensureCacheLoaded()
+        const limit = configService.getDailyFreeFullTextTranslationChars()
+
+        const cache = await this.loadFullTextQuotaCache()
+        if (cache) {
+            const remaining = Math.max(0, limit - cache.used)
+            return { used: cache.used, limit, remaining }
+        }
+
+        // No cache — no usage yet today
+        return { used: 0, limit, remaining: limit }
+    }
+
+    /**
+     * Load full-text quota cache from chrome.storage.local.
+     * Returns null if no cache or cache is stale (different date).
+     */
+    private async loadFullTextQuotaCache(): Promise<FullTextQuotaCache | null> {
+        try {
+            const result = await chrome.storage.local.get(FULL_TEXT_QUOTA_STORAGE_KEY)
+            const stored = result[FULL_TEXT_QUOTA_STORAGE_KEY] as FullTextQuotaCache | undefined
+            const today = getTodayDateString()
+
+            if (stored && stored.date === today) {
+                return stored
+            }
+            return null
+        } catch (error) {
+            logger.error("Failed to load full-text quota cache:", error)
+            return null
         }
     }
 

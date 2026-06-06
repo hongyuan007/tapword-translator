@@ -11,6 +11,7 @@
 
 import * as contentIndex from "@/1_content/index"
 import * as constants from "@/1_content/constants"
+import * as commonConstants from "@/0_common/constants"
 import * as translationFontSizeModule from "@/0_common/constants/translationFontSize"
 import * as styleCalculator from "@/1_content/utils/styleCalculator"
 import * as loggerModule from "@/0_common/utils/logger"
@@ -67,6 +68,7 @@ export function resolveMinFontSizePx(userSettings?: DisplayUserSettings): number
 export function createTooltipElement(): HTMLElement {
     const tooltip = document.createElement("div")
     tooltip.className = constants.CSS_CLASSES.TOOLTIP
+    tooltip.setAttribute(commonConstants.EXTENSION_OWNED_ATTRIBUTE, "")
 
     const content = document.createElement("div")
     content.className = "ai-translator-tooltip-content"

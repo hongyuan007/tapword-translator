@@ -27,6 +27,7 @@ vite.config.*.timestamp-*
 # Environment variables
 .env.development
 .env.production
+.env.test
 .env.firefox
 .env.firefox-development
 !.env.community
@@ -72,6 +73,7 @@ other/
 #other
 GEMINI.md
 CLAUDE.md
+.claude/
 # Playwright
 playwright-report/
 test-results/

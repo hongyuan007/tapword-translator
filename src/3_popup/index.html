@@ -21,20 +21,67 @@
       </div>
 
       <div class="settings-list">
-        <section class="section-card section-master">
+        <!-- Redesigned Full Translate & Quota Section -->
+        <section class="section-card section-full-translate">
+          <div class="section-floating-title" data-title="Page Translation" data-i18n-key="popup.quota.pageTranslation" data-i18n-attr="data-title"></div>
           <div class="section-body">
-            <div class="setting-item setting-item-master">
+            <div class="setting-item setting-item-column" style="border-bottom: none; padding-bottom: 4px;">
+              <button id="fullTranslateButton" class="full-translate-button">
+                <svg class="full-translate-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M2 12h20"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                <span id="fullTranslateLabel" data-i18n-key="popup.translatePage.label">Translate Page</span>
+              </button>
+            </div>
+            
+            <div class="setting-item">
               <div class="setting-gutter"></div>
               <div class="setting-info">
-                <label class="setting-label master-label" for="enableTapWord">
-                  <span class="master-label-text" data-i18n-key="popup.enableTapWord.label">Enable TapWord</span>
-                  <span class="help-icon" data-i18n-key="popup.enableTapWord.helper" data-i18n-attr="data-tooltip">?</span>
+                <label class="setting-label" for="floatingButtonEnabled">
+                  <span data-i18n-key="popup.floatingButton.label">Show floating button</span>
                 </label>
               </div>
-              <label class="toggle-switch toggle-switch-master">
-                <input type="checkbox" id="enableTapWord" data-setting="enableTapWord">
+              <label class="toggle-switch">
+                <input type="checkbox" id="floatingButtonEnabled">
                 <span class="toggle-slider"></span>
               </label>
+            </div>
+            
+            <div class="setting-item">
+              <div class="setting-gutter"></div>
+              <div class="setting-info">
+                <label class="setting-label" for="fullPageTranslationProvider" data-i18n-key="popup.fullPageProvider.label">Translation Engine</label>
+              </div>
+              <div class="setting-control setting-control-stack">
+                <select id="fullPageTranslationProvider" class="language-select">
+                  <option value="official" data-i18n-key="popup.translationProvider.official">TapWord Cloud Service</option>
+                  <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
+                  <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
+                  <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="quotaSection" class="setting-item setting-item-column quota-section is-loading">
+              <div class="quota-header-row">
+                <span class="setting-label quota-title-label" data-i18n-key="popup.quota.title">Today's Free Quota</span>
+                <span id="quotaPercentage" class="quota-percentage" data-i18n-key="popup.quota.loading">Loading...</span>
+              </div>
+              <div class="quota-bar-wrapper">
+                <div class="quota-bar-track">
+                  <div id="quotaProgressFill" class="quota-bar-fill"></div>
+                </div>
+              </div>
+              <div
+                id="fullPageProviderFallbackBubble"
+                class="selector-fallback-bubble"
+                data-i18n-key="popup.quota.fallbackBubble"
+                hidden
+              >
+                Quota used up · Using Microsoft Translate
+              </div>
             </div>
           </div>
         </section>
@@ -43,6 +90,19 @@
           <div class="section-floating-title" data-title="Translation Settings" data-i18n-key="popup.section.translate"
             data-i18n-attr="data-title"></div>
           <div class="section-body">
+            <div class="setting-item">
+              <div class="setting-gutter"></div>
+              <div class="setting-info">
+                <label class="setting-label" for="enableTapWord">
+                  <span data-i18n-key="popup.enableTapWord.label">Enable TapWord</span>
+                  <span class="help-icon" data-i18n-key="popup.enableTapWord.helper" data-i18n-attr="data-tooltip">?</span>
+                </label>
+              </div>
+              <label class="toggle-switch toggle-switch-pink">
+                <input type="checkbox" id="enableTapWord" data-setting="enableTapWord">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
             <div class="setting-item">
               <div class="setting-gutter"></div>
               <div class="setting-info">
@@ -71,7 +131,7 @@
                   <span data-i18n-key="popup.singleClickTranslate.label">Single-click to translate word</span>
                 </label>
               </div>
-              <label class="toggle-switch toggle-switch-pink">
+              <label class="toggle-switch">
                 <input type="checkbox" id="singleClickTranslate" data-setting="singleClickTranslate">
                 <span class="toggle-slider"></span>
               </label>
@@ -90,26 +150,6 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
-            <div class="setting-item" id="settingItem-doubleClickSentence">
-              <div class="setting-gutter"></div>
-              <div class="setting-info">
-                <div class="trigger-key-container" style="display: flex; align-items: center;">
-                  <select id="doubleClickSentenceTriggerKey" data-setting="doubleClickSentenceTriggerKey" class="language-select trigger-key-select">
-                    <!-- Options populated by JS -->
-                    <option value="alt">Alt</option>
-                  </select>
-                  <span class="plus-separator">+</span>
-                  <label class="setting-label" for="doubleClickSentenceTranslate">
-                    <span data-i18n-key="popup.doubleClickSentenceTranslate.label">Double-click Sentence</span>
-                    <span class="help-icon" data-i18n-key="popup.doubleClickSentenceTranslate.tooltip" data-i18n-attr="data-tooltip">?</span>
-                  </label>
-                </div>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="doubleClickSentenceTranslate" data-setting="doubleClickSentenceTranslate">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
             <div class="setting-item">
               <div class="setting-gutter"></div>
               <div class="setting-info">
@@ -124,13 +164,6 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
-          </div>
-        </section>
-
-        <section class="section-card section-display">
-          <div class="section-floating-title" data-title="Display Settings" data-i18n-key="popup.section.text"
-            data-i18n-attr="data-title"></div>
-          <div class="section-body">
             <div class="setting-item">
               <div class="setting-gutter"></div>
               <div class="setting-info">
@@ -138,7 +171,7 @@
                   data-i18n-key="popup.translationFontSize.label">Translation Font Size</label>
               </div>
               <div class="setting-control">
-                <select id="translationFontSizePreset" data-setting="translationFontSizePreset" class="language-select">
+                <select id="translationFontSizePresetV2" data-setting="translationFontSizePresetV2" class="language-select">
                   <option value="small" data-i18n-key="popup.translationFontSize.small">Small</option>
                   <option value="medium" data-i18n-key="popup.translationFontSize.medium">Medium</option>
                   <option value="large" data-i18n-key="popup.translationFontSize.large">Large</option>
@@ -149,23 +182,6 @@
           </div>
         </section>
 
-        <section class="section-card section-audio">
-          <div class="section-floating-title" data-title="Audio Settings" data-i18n-key="popup.section.audio"
-            data-i18n-attr="data-title"></div>
-          <div class="section-body">
-            <div class="setting-item">
-              <div class="setting-gutter"></div>
-              <div class="setting-info">
-                <label class="setting-label" for="autoPlayAudio" data-i18n-key="popup.autoPlayAudio.label">Auto-play Word
-                  Pronunciation</label>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="autoPlayAudio" data-setting="autoPlayAudio">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
 

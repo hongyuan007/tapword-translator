@@ -3,9 +3,13 @@ import * as i18nModule from "@/0_common/utils/i18n"
 import * as loggerModule from "@/0_common/utils/logger"
 import * as colorUtils from "@/0_common/utils/colorUtils"
 import * as settingsManagerModule from "@/4_options/modules/settingsManager"
+import * as translationEngineManagerModule from "@/4_options/modules/translationEngineManager"
 import type * as types from "@/0_common/types"
 import * as storageManagerModule from "@/0_common/utils/storageManager"
 import * as translationFontSizeModule from "@/0_common/constants/translationFontSize"
+import * as iconVariantsModule from "@/12_floating_button/ui/iconVariants"
+import * as floatingButtonConstants from "@/12_floating_button/constants"
+import type { IconVariant } from "@/12_floating_button/types"
 
 const logger = loggerModule.createLogger("Options")
 const DEFAULT_DOCUMENTATION_URL = "https://tapword.ai"
@@ -157,7 +161,7 @@ async function setupTooltipSpacingPreview(): Promise<void> {
     const textOffsetInput = document.getElementById("tooltipTextOffsetPxV3") as HTMLInputElement | null
     const bottomSpacingInput = document.getElementById("tooltipBottomSpacingPxV3") as HTMLInputElement | null
 
-    const fontPresetSelect = document.getElementById("translationFontSizePreset") as HTMLSelectElement | null
+    const fontPresetSelect = document.getElementById("translationFontSizePresetV2") as HTMLSelectElement | null
     const autoAdjustHeightInput = document.getElementById("autoAdjustHeight") as HTMLInputElement | null
 
     if (
@@ -354,6 +358,13 @@ function setupNavigation(): void {
     })
 }
 
+function navigateToHashSection(): void {
+    const hash = location.hash.replace("#", "")
+    if (!hash) return
+    const target = document.querySelector<HTMLElement>(`.nav-item[data-section="${hash}"]`)
+    if (target) target.click()
+}
+
 function setupDocumentationButton(websiteUrl: string | null): void {
     const docsButton = document.getElementById("documentationButton") as HTMLButtonElement | null
 
@@ -390,6 +401,139 @@ function setupGithubButton(): void {
     })
 }
 
+// --- Icon Variant Picker ---
+
+const ICON_VARIANT_KEYS: IconVariant[] = ["v1", "v2", "v3", "v4", "v5", "v6"]
+
+function highlightSelectedVariant(variant: string): void {
+    const container = document.getElementById("icon-variant-picker")
+    if (!container) return
+    const radio = container.querySelector<HTMLInputElement>(`input[name="iconVariant"][value="${variant}"]`)
+    if (radio) radio.checked = true
+}
+
+async function loadCurrentIconVariant(): Promise<void> {
+    const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || floatingButtonConstants.DEFAULT_CONFIG
+    const currentVariant = config.iconVariant || "v1"
+    highlightSelectedVariant(currentVariant)
+}
+
+async function selectIconVariant(variant: IconVariant): Promise<void> {
+    const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || { ...floatingButtonConstants.DEFAULT_CONFIG }
+    config.iconVariant = variant
+    await chrome.storage.local.set({ [floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY]: config })
+    highlightSelectedVariant(variant)
+    updateAppearancePreview().catch((err) => logger.warn("Failed to update appearance preview", err))
+}
+
+function initIconVariantPicker(color: string): void {
+    const container = document.getElementById("icon-variant-picker")
+    if (!container) return
+
+    for (const key of ICON_VARIANT_KEYS) {
+        const label = document.createElement("label")
+        label.className = "icon-option"
+        label.title = i18nModule.translate(`popup.floatingButtonIcon.${key}`)
+        label.innerHTML = `
+            <input type="radio" name="iconVariant" value="${key}">
+            <span class="icon-preview icon-preview--variant">${iconVariantsModule.ICON_VARIANTS[key](color)}</span>
+        `
+        const radio = label.querySelector("input")!
+        radio.addEventListener("change", () => selectIconVariant(key))
+        container.appendChild(label)
+    }
+
+    loadCurrentIconVariant()
+}
+
+function refreshIconVariantPreviews(color: string): void {
+    const container = document.getElementById("icon-variant-picker")
+    if (!container) return
+    const previews = container.querySelectorAll<HTMLElement>(".icon-preview--variant")
+    const keys = ICON_VARIANT_KEYS
+    previews.forEach((preview, index) => {
+        const key = keys[index]
+        if (key) {
+            preview.innerHTML = iconVariantsModule.ICON_VARIANTS[key](color)
+        }
+    })
+}
+
+// --- Floating Button Color Picker ---
+
+async function loadFloatingButtonColor(): Promise<string> {
+    const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || floatingButtonConstants.DEFAULT_CONFIG
+    return config.iconColor || floatingButtonConstants.DEFAULT_ICON_COLOR
+}
+
+function updateFloatingButtonColorDisplay(wrapper: HTMLElement, color: string): void {
+    const preview = wrapper.querySelector<HTMLElement>("#floatingButtonColorPreview")
+    const label = wrapper.querySelector<HTMLElement>("#floatingButtonColorLabel")
+    if (preview) preview.style.backgroundColor = color
+
+    const matchOption = wrapper.querySelector<HTMLElement>(`.custom-option[data-value="${color}"]`)
+    if (label && matchOption) {
+        const nameSpan = matchOption.querySelector<HTMLElement>("span[data-i18n-key]")
+        if (nameSpan) {
+            const key = nameSpan.getAttribute("data-i18n-key")
+            if (key) {
+                label.textContent = i18nModule.translate(key)
+                label.setAttribute("data-i18n-key", key)
+            } else {
+                label.textContent = nameSpan.textContent || color
+            }
+        }
+    }
+
+    wrapper.querySelectorAll(".custom-option").forEach((opt) => {
+        opt.classList.toggle("selected", (opt as HTMLElement).dataset.value === color)
+    })
+}
+
+async function saveFloatingButtonColor(color: string): Promise<void> {
+    const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || { ...floatingButtonConstants.DEFAULT_CONFIG }
+    config.iconColor = color
+    await chrome.storage.local.set({ [floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY]: config })
+}
+
+function initFloatingButtonColorPicker(currentColor: string): void {
+    const wrapper = document.getElementById("floatingButtonColorSelect")
+    if (!wrapper) return
+
+    updateFloatingButtonColorDisplay(wrapper, currentColor)
+
+    // Toggle dropdown open/close
+    const trigger = wrapper.querySelector(".custom-select-trigger")
+    if (trigger) {
+        trigger.addEventListener("click", (e) => {
+            e.stopPropagation()
+            document.querySelectorAll(".custom-select-wrapper.open").forEach((other) => {
+                if (other !== wrapper) other.classList.remove("open")
+            })
+            wrapper.classList.toggle("open")
+        })
+    }
+
+    // Option click handlers
+    const options = wrapper.querySelectorAll<HTMLElement>(".custom-option")
+    options.forEach((option) => {
+        option.addEventListener("click", async (e) => {
+            e.stopPropagation()
+            const color = option.dataset.value
+            if (!color) return
+            await saveFloatingButtonColor(color)
+            updateFloatingButtonColorDisplay(wrapper, color)
+            refreshIconVariantPreviews(color)
+            wrapper.classList.remove("open")
+            updateAppearancePreview().catch((err) => logger.warn("Failed to update appearance preview", err))
+        })
+    })
+}
+
 function setVersion(): void {
     const versionDisplay = document.getElementById("versionDisplay")
     if (!versionDisplay) {
@@ -398,6 +542,75 @@ function setVersion(): void {
 
     const version = chrome.runtime.getManifest().version
     versionDisplay.textContent = version
+}
+
+async function loadFloatingButtonEnabledSetting(): Promise<void> {
+    const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || floatingButtonConstants.DEFAULT_CONFIG
+    const checkbox = document.getElementById("floatingButtonEnabledOptions") as HTMLInputElement | null
+    if (checkbox) {
+        checkbox.checked = config.enabled ?? floatingButtonConstants.DEFAULT_CONFIG.enabled
+    }
+}
+
+function setupFloatingButtonEnabledListener(): void {
+    const checkbox = document.getElementById("floatingButtonEnabledOptions") as HTMLInputElement | null
+    if (!checkbox) return
+
+    checkbox.addEventListener("change", async () => {
+        const result = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+        const config = result[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || { ...floatingButtonConstants.DEFAULT_CONFIG }
+        config.enabled = checkbox.checked
+        await chrome.storage.local.set({ [floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY]: config })
+        logger.info(`Floating ball enabled: ${checkbox.checked}`)
+    })
+}
+
+async function updateAppearancePreview(): Promise<void> {
+    const fabLightEl = document.getElementById("preview-fab-light")
+    const fabDarkEl = document.getElementById("preview-fab-dark")
+    const fullTransLightEl = document.getElementById("ap-full-trans-light")
+    const fullTransDarkEl = document.getElementById("ap-full-trans-dark")
+    const wordTooltipLightEl = document.getElementById("ap-word-tooltip-light")
+    const wordTooltipDarkEl = document.getElementById("ap-word-tooltip-dark")
+    const sentTooltipLightEl = document.getElementById("ap-sent-tooltip-light")
+    const sentTooltipDarkEl = document.getElementById("ap-sent-tooltip-dark")
+
+    const storageResult = await chrome.storage.local.get(floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY)
+    const fabConfig = storageResult[floatingButtonConstants.FLOATING_BUTTON_STORAGE_KEY] || floatingButtonConstants.DEFAULT_CONFIG
+    const iconColor: string = fabConfig.iconColor || floatingButtonConstants.DEFAULT_ICON_COLOR
+    const iconVariant: IconVariant = fabConfig.iconVariant || "v1"
+
+    const settings = await storageManagerModule.getUserSettings()
+
+    const lightSelectEl = document.getElementById("fullTranslateLightColorSelect")
+    const darkSelectEl = document.getElementById("fullTranslateDarkColorSelect")
+    const lightColor = lightSelectEl?.dataset.value || settings.fullTranslateLightColor || "#059669"
+    const darkColor = darkSelectEl?.dataset.value || settings.fullTranslateDarkColor || "#6ee7b7"
+
+    const wordSelectEl = document.getElementById("wordUnderlineColorSelect")
+    const wordUnderlineColor = wordSelectEl?.dataset.value || settings.wordUnderlineColorV2
+    const sentenceSelectEl = document.getElementById("sentenceUnderlineColorSelect")
+    const sentenceUnderlineColor = sentenceSelectEl?.dataset.value || settings.sentenceUnderlineColor
+
+    // Floating ball SVG
+    if (fabLightEl || fabDarkEl) {
+        const fabSvg = iconVariantsModule.ICON_VARIANTS[iconVariant](iconColor)
+        if (fabLightEl) fabLightEl.innerHTML = fabSvg
+        if (fabDarkEl) fabDarkEl.innerHTML = fabSvg
+    }
+
+    // Full-translate text color
+    if (fullTransLightEl) fullTransLightEl.style.color = lightColor
+    if (fullTransDarkEl) fullTransDarkEl.style.color = darkColor
+
+    // Underline preview colors — replicates content script: border-top with opacity
+    const wordBorderColor = colorUtils.addOpacityToHex(wordUnderlineColor, UNDERLINE_OPACITY)
+    const sentBorderColor = colorUtils.addOpacityToHex(sentenceUnderlineColor, UNDERLINE_OPACITY)
+    if (wordTooltipLightEl) wordTooltipLightEl.style.borderTopColor = wordBorderColor
+    if (wordTooltipDarkEl) wordTooltipDarkEl.style.borderTopColor = wordBorderColor
+    if (sentTooltipLightEl) sentTooltipLightEl.style.borderTopColor = sentBorderColor
+    if (sentTooltipDarkEl) sentTooltipDarkEl.style.borderTopColor = sentBorderColor
 }
 
 async function initializeOptions(): Promise<void> {
@@ -410,15 +623,28 @@ async function initializeOptions(): Promise<void> {
 
         await settingsManagerModule.loadSettings()
         settingsManagerModule.setupSettingChangeListeners()
-        settingsManagerModule.setupCustomApiValidation()
-        settingsManagerModule.setupMTranServerTest()
-        settingsManagerModule.setupBingTranslateTest()
+        await translationEngineManagerModule.initTranslationEngineSection()
+        const fabColor = await loadFloatingButtonColor()
+        initIconVariantPicker(fabColor)
+        initFloatingButtonColorPicker(fabColor)
+        await loadFloatingButtonEnabledSetting()
+        setupFloatingButtonEnabledListener()
         await setupTooltipSpacingPreview()
+        await updateAppearancePreview()
+
+        document.addEventListener("settingChange", (event: Event) => {
+            const customEvent = event as CustomEvent
+            const relevantKeys = ["wordUnderlineColorV2", "sentenceUnderlineColor", "fullTranslateLightColor", "fullTranslateDarkColor"]
+            if (relevantKeys.includes(customEvent.detail?.key)) {
+                updateAppearancePreview().catch((err) => logger.warn("Failed to update appearance preview", err))
+            }
+        })
 
         const websiteUrl = await fetchWebsiteUrl()
 
         setVersion()
         setupNavigation()
+        navigateToHashSection()
         setupDocumentationButton(websiteUrl)
         setupGithubButton()
 

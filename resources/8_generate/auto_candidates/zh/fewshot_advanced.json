@@ -1,0 +1,10 @@
+[
+    {
+        "role": "user",
+        "content": "# Source Language\nen\n\n# Target Language\nzh\n\n# Reader Proficiency Level\nAdvanced\n\n# Maximum Translation Results\n5\n\n# Block Text\nClimate change refers to long-term shifts in global temperatures and weather patterns. While natural forces have historically driven these shifts, since the 1800s, human activities have been the main driver, primarily due to the burning of fossil fuels like coal, oil, and natural gas. These combustion processes release greenhouse gases, with carbon dioxide and methane being the most significant contributors. The resulting greenhouse effect traps heat in Earth's atmosphere, leading to widespread consequences including rising sea levels, more frequent and severe weather events, loss of biodiversity, and disruptions to agricultural systems. Scientists have reached a near-universal consensus that urgent action is needed to mitigate these effects through reducing emissions, transitioning to renewable energy sources, and implementing carbon capture technologies.\n"
+    },
+    {
+        "role": "assistant",
+        "content": "{\"candidates\": [{\"reason\": \"Technical chemistry term for the burning process — domain-specific vocabulary\", \"text\": \"combustion\", \"type\": \"word\", \"translation\": \"燃烧\"}, {\"reason\": \"Formal verb meaning to reduce severity — common in policy and academic texts but less so in general reading\", \"text\": \"mitigate\", \"type\": \"word\", \"translation\": \"缓解\"}, {\"reason\": \"Specialized environmental engineering term for CO2 removal technology — highly domain-specific\", \"text\": \"carbon capture technologies\", \"type\": \"phrase\", \"translation\": \"碳捕获技术\"}]}"
+    }
+]

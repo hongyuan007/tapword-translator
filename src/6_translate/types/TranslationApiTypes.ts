@@ -105,3 +105,39 @@ export interface FragmentTranslationApiResponse {
     /** 完整句子翻译 (可选: 当提供 leadingText 和 trailingText 时返回) */
     sentenceTranslation?: string
 }
+
+/**
+ * Full-text batch translation API request
+ */
+export interface FullTextBatchApiRequest {
+    /** Array of text segments to translate */
+    texts: string[]
+    /** Source language code (e.g. "en") */
+    sourceLanguage: string
+    /** Target language code (e.g. "zh") */
+    targetLanguage: string
+}
+
+/**
+ * Full-text batch translation API response data
+ */
+export interface FullTextBatchApiResponse {
+    /** Array of translated texts, same order and length as input texts */
+    translations: string[]
+    /** Source language code */
+    sourceLanguage: string
+    /** Target language code */
+    targetLanguage: string
+    /** Aggregate token usage for the single LLM call */
+    usage?: {
+        promptTokens: number
+        completionTokens: number
+        totalTokens: number
+    }
+    /** Quota info returned by server after successful translation */
+    quota?: {
+        used: number
+        limit: number
+        remaining: number
+    }
+}
