@@ -997,6 +997,7 @@ body {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-sizing: border-box;
   min-width: 180px;
 }
 
