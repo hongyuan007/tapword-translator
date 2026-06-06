@@ -358,6 +358,13 @@ function setupNavigation(): void {
     })
 }
 
+function navigateToHashSection(): void {
+    const hash = location.hash.replace("#", "")
+    if (!hash) return
+    const target = document.querySelector<HTMLElement>(`.nav-item[data-section="${hash}"]`)
+    if (target) target.click()
+}
+
 function setupDocumentationButton(websiteUrl: string | null): void {
     const docsButton = document.getElementById("documentationButton") as HTMLButtonElement | null
 
@@ -637,6 +644,7 @@ async function initializeOptions(): Promise<void> {
 
         setVersion()
         setupNavigation()
+        navigateToHashSection()
         setupDocumentationButton(websiteUrl)
         setupGithubButton()
 

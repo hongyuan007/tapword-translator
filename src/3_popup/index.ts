@@ -146,7 +146,7 @@ async function setupFullPageProviderSelect(): Promise<void> {
         const newValue = select.value
         if (newValue === "__add_provider__") {
             select.value = currentProvider
-            chrome.runtime.openOptionsPage()
+            chrome.tabs.create({ url: chrome.runtime.getURL("src/4_options/index.html") + "#translation-engine-settings" })
             return
         }
         await chrome.storage.sync.set({ userSettings: { ...settings, fullPageTranslationProvider: newValue } })
