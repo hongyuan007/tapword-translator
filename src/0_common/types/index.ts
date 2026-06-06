@@ -418,7 +418,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     textUnderlineOffsetPxV2: 4,
     tooltipUnderlineOffsetPxV3: 1.5,
     tooltipTextOffsetPxV3: 1,
-    tooltipBottomSpacingPxV3: 6,
+    tooltipBottomSpacingPxV3: 6.5,
     wordUnderlineColor: "#2A9D8F",
     wordUnderlineColorV2: "#1F7FDB",
     sentenceUnderlineColor: "#E9C46A",
