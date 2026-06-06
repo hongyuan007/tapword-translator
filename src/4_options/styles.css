@@ -500,6 +500,11 @@ body {
   gap: 4px;
 }
 
+.color-setting-control {
+  width: 252px;
+  max-width: 100%;
+}
+
 .validation-control {
   align-items: flex-end;
 }
@@ -982,7 +987,8 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  gap: 10px;
+  padding: 8px 40px 8px 12px;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-color);
@@ -999,6 +1005,23 @@ body {
 #wordUnderlineColorSelect .custom-select-trigger,
 #sentenceUnderlineColorSelect .custom-select-trigger {
   min-width: 230px;
+}
+
+.custom-select-wrapper-wide {
+  width: 100%;
+  min-width: 0;
+}
+
+.custom-select-trigger .color-dot {
+  margin-right: 0;
+}
+
+.color-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .custom-select-trigger:hover {

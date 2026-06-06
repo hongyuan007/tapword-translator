@@ -29,7 +29,7 @@ const DEFAULT_CONFIG: CloudConfig = {
         dailyFreeFullTextTranslationChars: 20000, // ~2–6 pages per day
     },
     websiteUrl: "www.tapword.cc", // Default official website
-    chromeExtensionVersion: "0.1.0", // Default version
+    chromeExtensionVersion: CLIENT_VERSION, // Default version
 }
 
 /**
