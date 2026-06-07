@@ -10,22 +10,28 @@ A smart AI-powered translation browser extension that provides context-aware tra
 - **Floating Notes Display**: Translations are displayed in an unobtrusive floating card directly below the highlighted text.
 - **Persistent Annotations**: All translations remain on the page as you scroll, creating a temporary "annotated" version of the site for easy reference.
 
-##  Folder Structure
+## Folder Structure
 
 ```
 .
 ├── dist/                   # Build output (loaded into Chrome)
 ├── resources/              # Static assets (icons, etc.)
 ├── src/                    # Source code
-│   ├── 0_common/           # Shared utilities, types, and constants
-│   ├── 1_content/          # Content scripts injected into web pages
-│   ├── 2_background/       # Background service worker
-│   ├── 3_popup/            # Extension popup UI
-│   ├── 5_backend/          # Generic API infrastructure (service, types)
-│   ├── 6_translate/        # Translation business logic
+│   ├── 0_common/           # Shared utilities, types, constants, i18n
+│   ├── 1_content/          # Content script: interaction detection, translation pipeline, UI rendering
+│   ├── 2_background/       # Background service worker: message routing, service init
+│   ├── 3_popup/            # Extension popup UI: settings and quota status
+│   ├── 4_options/          # Full-page options/settings UI
+│   ├── 5_backend/          # Generic API infrastructure (HTTP client, auth, quota)
+│   ├── 6_translate/        # Translation business logic and provider adapters
 │   ├── 7_speech/           # Speech synthesis module
-│   └── 8_generate/         # Text generation module
-├── test/                   # Unit and integration tests
+│   ├── 8_generate/         # Text generation module (auto-candidates, etc.)
+│   ├── 9_inline_translate/ # Inline translation overlay feature
+│   ├── 9_offscreen/        # Offscreen document for audio playback (Chrome MV3)
+│   ├── 10_welcome/         # Welcome/onboarding page
+│   ├── 11_full_translate/  # Full-page translation pipeline (Walk → Observe → Batch → Render)
+│   └── 12_floating_button/ # Floating ball button for triggering full-page translation
+├── tests/                  # Unit and integration tests
 ├── package.json            # NPM package configuration
 ├── tsconfig.json           # TypeScript configuration
 └── vite.config.ts          # Vite build configuration
@@ -38,10 +44,14 @@ A smart AI-powered translation browser extension that provides context-aware tra
 - `src/1_content/README.md`
 - `src/2_background/README.md`
 - `src/3_popup/README.md`
+- `src/4_options/README.md`
 - `src/5_backend/README.md`
 - `src/6_translate/README.md`
 - `src/7_speech/README.md`
 - `src/8_generate/README.md`
+- `src/9_inline_translate/README.md`
+- `src/11_full_translate/README.md`
+- `src/12_floating_button/README.md`
 
 ## Technical Stack
 
