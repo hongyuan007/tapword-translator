@@ -1,192 +1,81 @@
-Last updated on: 2026-03-20
+Last updated on: 2026-06-07
 
-# 12_floating_button: Floating Ball Button Module
+# 12_floating_button
 
-## Module Overview
+Floating ball button fixed to the right edge of web pages that provides a one-click trigger for full-text translation, with draggable position, visual state feedback, and per-site or global disable options.
 
-This module implements a floating ball button that hovers on the right edge of web pages, providing a one-click trigger for full-text translation without opening the extension popup. It displays visual state feedback (idle, translating, active), supports vertical dragging with position persistence, and offers quick disable options via a dropdown menu.
+## Entry Points
 
-## File Structure
+| File | Kind | Role |
+|------|------|------|
+| `FloatingButtonManager.ts` | **Core class** | Top-level orchestrator — the only class the content script instantiates; call `initialize()` then `setTranslationState()` |
+| `index.ts` | **Barrel** | Re-exports all public types, constants, and classes; external callers must import exclusively from here |
 
+## Files
+
+**root/**
+- `FloatingButtonManager.ts` — lifecycle orchestrator: loads config, creates DOM, wires up drag/close handlers, handles cross-context config changes and button recreation
+- `types.ts` — `FloatingButtonConfig`, `FloatingButtonState` (`idle | translating | active | quota_exhausted`), `IconVariant` (`v1`–`v6`), `ConfigChangeCallback`
+- `constants.ts` — storage key, `DEFAULT_CONFIG`, `CSS_PREFIX` (`tw-fab`), `Z_INDEX` (max int), drag thresholds, and all CSS class name constants
+- `index.ts` — public barrel; explicitly exports types, constants, `FloatingButtonManager`, and `FloatingButtonConfigStore`
+
+**config/**
+- `FloatingButtonConfigStore.ts` — reads/writes `FloatingButtonConfig` in `chrome.storage.local`; provides `addDisabledSite()`, `setEnabled()`, `setPosition()`, hostname match check, and `onChanged()` cross-context listener
+
+**handlers/**
+- `DragHandler.ts` — vertical drag with 5 px click-vs-drag threshold; fires `onClick` on tap, `onDragEnd` with viewport ratio on release; suppresses text selection during drag
+- `CloseMenuHandler.ts` — X button toggle that opens a dropdown with "Disable on this site" / "Disable globally"; persists via `FloatingButtonConfigStore`; `mousedown` on X is stopped to prevent parent drag
+
+**ui/**
+- `FloatingButtonRenderer.ts` — builds the DOM tree (container → main button → active/exhausted badges + spinner + close button + dropdown), injects the `<style>` tag, manages visual state and position
+- `styles.ts` — CSS string constant injected as a `<style>` tag; all classes use `tw-fab-*` prefix; includes print hide, hover transition, and spinner keyframe
+- `iconVariants.ts` — `ICON_VARIANTS` map: six inline-SVG functions keyed by `IconVariant`; v2 uses `colorUtils` for gradient generation; v5 has a hardcoded gold star accent
+- `colorUtils.ts` — HSL-based `lightenHex` / `darkenHex` helpers used exclusively by `iconVariants.ts` for v2 gradient
+
+## Key Flows
+
+### Initialization
 ```
-12_floating_button/
-├── README.md                               # This document
-├── index.ts                                # Public API barrel — re-exports types, constants, core classes
-├── types.ts                                # FloatingButtonConfig, FloatingButtonState type definitions
-├── constants.ts                            # Storage keys, CSS prefixes, dimensions, thresholds
-├── FloatingButtonManager.ts                # Top-level orchestrator (lifecycle, coordination)
-├── config/
-│   └── FloatingButtonConfigStore.ts        # chrome.storage.local read/write with cross-context sync
-├── handlers/
-│   ├── DragHandler.ts                      # Vertical drag with click-vs-drag threshold
-│   └── CloseMenuHandler.ts                 # X button + dropdown menu (disable site/globally)
-└── ui/
-    ├── FloatingButtonRenderer.ts           # DOM creation, style injection, visual state management
-    └── styles.ts                           # CSS string constant (injected via <style> tag)
-```
-
-## Architecture Overview
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                     FloatingButtonManager                        │
-│  (Orchestrator — lifecycle, config, handler coordination)        │
-├──────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌── Config ──────────────────────────────────────────────┐     │
-│  │  FloatingButtonConfigStore                              │     │
-│  │  • load/save from chrome.storage.local                  │     │
-│  │  • cross-context change listener                        │     │
-│  │  • disabled-site hostname matching                      │     │
-│  └─────────────────────────────────────────────────────────┘     │
-│                                                                  │
-│  ┌── UI ──────────────────────────────────────────────────┐     │
-│  │  FloatingButtonRenderer                                 │     │
-│  │  • DOM tree creation (container > main button > badges) │     │
-│  │  • <style> tag injection (tw-fab-* classes)             │     │
-│  │  • Visual state: idle / translating / active            │     │
-│  │  • Position management (viewport ratio)                 │     │
-│  └─────────────────────────────────────────────────────────┘     │
-│                                                                  │
-│  ┌── Handlers ────────────────────────────────────────────┐     │
-│  │  DragHandler                                            │     │
-│  │  • mousedown → mousemove → mouseup on document          │     │
-│  │  • 5px threshold to distinguish click from drag         │     │
-│  │  • Position clamped to [30px, innerHeight - 100px]      │     │
-│  │                                                         │     │
-│  │  CloseMenuHandler                                       │     │
-│  │  • X button click → dropdown toggle                     │     │
-│  │  • "Disable on this site" / "Disable globally"          │     │
-│  │  • Click-outside to dismiss                             │     │
-│  └─────────────────────────────────────────────────────────┘     │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
+FloatingButtonManager.initialize(onToggleTranslation)
+  → FloatingButtonConfigStore.load()              # merge stored config with DEFAULT_CONFIG
+  → isRenderableContext()                         # abort if non-HTTP or site disabled
+  → FloatingButtonRenderer.create(variant, color) # build DOM, inject styles
+  → renderer.hide() then setPosition()            # prevent flash-of-content
+  → document.body.appendChild(container)
+  → renderer.show()                               # only if config.enabled === true
+  → DragHandler.attach()                          # listen on main button mousedown
+  → CloseMenuHandler.attach()                     # listen on close button click
+  → FloatingButtonConfigStore.onChanged()         # register cross-context sync listener
 ```
 
-## Core Components
-
-### 1. Entry Point (`index.ts`)
-
-Barrel file providing the module's public API. External consumers (e.g., content script) import from `@/12_floating_button` and never reach into sub-files directly.
-
-### 2. FloatingButtonManager (`FloatingButtonManager.ts`)
-
-The top-level orchestrator. Manages the full lifecycle:
-
-- **`initialize(onToggleTranslation)`**: Loads config, checks visibility (enabled, not disabled for site, HTTP/HTTPS page), creates DOM, attaches handlers, listens for cross-context changes.
-- **`setTranslationState(state)`**: Updates visual indicators (idle → translating → active).
-- **`destroy()`**: Tears down all listeners, removes DOM elements.
-
-### 3. Config Store (`config/FloatingButtonConfigStore.ts`)
-
-Manages persistent configuration via `chrome.storage.local`:
-
-| Method | Purpose |
-|--------|---------|
-| `load()` | Read config from storage, merge with defaults |
-| `save(partial)` | Write partial config update |
-| `addDisabledSite(hostname)` | Append hostname to disabled list |
-| `setEnabled(enabled)` | Toggle global visibility |
-| `setPosition(position)` | Persist drag position |
-| `isDisabledForSite(hostname)` | Check hostname match (exact or subdomain) |
-| `onChanged(callback)` | Listen for cross-context changes |
-
-### 4. UI Renderer (`ui/FloatingButtonRenderer.ts`)
-
-Creates and manages the DOM tree:
-
+### Cross-context config update (popup / options page)
 ```
-.tw-fab-container (fixed, right: 0)
-  └── .tw-fab-main (pill button, left-rounded)
-       ├── SVG translate icon
-       ├── .tw-fab-close (X button, top-left corner)
-       ├── .tw-fab-badge (green checkmark, bottom-right)
-       ├── .tw-fab-spinner (loading indicator, bottom-right)
-       └── .tw-fab-dropdown (menu, positioned left of button)
-            ├── .tw-fab-dropdown-item ("Disable on this site")
-            └── .tw-fab-dropdown-item ("Disable globally")
+chrome.storage.onChanged fires
+  → FloatingButtonConfigStore notifies Manager via handleConfigChanged(updatedConfig)
+      → if !enabled: renderer.hide()
+      → if variant/color changed: recreateButton()  # full DOM rebuild + re-attach DragHandler
+      → else: renderer.setPosition() + renderer.show()
 ```
 
-### 5. Styles (`ui/styles.ts`)
-
-CSS injected via a `<style>` tag. All classes prefixed with `tw-fab-`. Includes:
-- Print media query (hidden when printing)
-- Hover transitions (opacity 0.6 → 1.0, translateX slide-in)
-- Drag visual state (cursor: move, no transition)
-- Spinner keyframe animation
-
-### 6. DragHandler (`handlers/DragHandler.ts`)
-
-Handles vertical dragging along the right edge:
-1. `mousedown` on main button → record start position
-2. `mousemove` on document → if moved > 5px, enter drag mode
-3. `mouseup` → if dragged: persist position; if not: fire click callback
-4. During drag: `document.body.style.userSelect = 'none'`
-
-### 7. CloseMenuHandler (`handlers/CloseMenuHandler.ts`)
-
-Manages the X button and its dropdown:
-- Click X → toggle dropdown visibility
-- "Disable on this site" → `configStore.addDisabledSite(hostname)`
-- "Disable globally" → `configStore.setEnabled(false)`
-- Click outside → close dropdown
-- `mousedown` on X button is stopped to prevent parent drag
-
-## State Machine
-
+### User drag → position persisted
 ```
-┌─────────────────────────────────────┐
-│ Global/Per-site disabled → HIDDEN   │
-└──────────────┬──────────────────────┘
-               │ enabled && !disabled
-               ▼
-┌──────────────────────┐
-│       IDLE           │  60% opacity, partially hidden (translateX 8px)
-└──────────┬───────────┘
-           │ click
-           ▼
-┌──────────────────────┐
-│     TRANSLATING      │  Spinner badge visible
-└──────────┬───────────┘
-           │ translation complete
-           ▼
-┌──────────────────────┐
-│   BILINGUAL ACTIVE   │  Green checkmark badge visible
-└──────────┬───────────┘
-           │ click (stop)
-           ▼
-           IDLE
+DragHandler mousedown → mousemove > 5px → onDragStart (renderer.setDragging(true))
+  → mousemove: onDragMove(ratio) → renderer.setPosition(ratio)   # live update
+  → mouseup: onDragEnd(ratio)
+      → renderer.setDragging(false)
+      → FloatingButtonConfigStore.setPosition(ratio)              # persisted to storage
 ```
 
-## Integration Points
+## Key Contracts
 
-### Content Script (`1_content`)
-The `FloatingButtonManager` is instantiated and initialized from the content script. The content script provides the `onToggleTranslation` callback that triggers the same flow as the popup's "Translate Page" button.
+- **Position is stored as a 0–1 viewport-height ratio**, not pixels. Converting to `px` happens only in `FloatingButtonRenderer.setPosition()`.
+- **`DEFAULT_CONFIG.enabled` is `false`**. The button is opt-in; newly installed users see nothing until they toggle it on.
+- **`isRenderableContext()` is checked before DOM creation**, not before `show()`. The DOM is never created for non-HTTP pages or disabled sites, so `destroy()` can be safely called even if `initialize()` returned early.
+- **Icon variant changes require a full DOM rebuild** (`recreateButton()`). The SVG is baked into `innerHTML` at creation time; there is no live re-render path.
+- **`CloseMenuHandler` calls `e.stopPropagation()` on `mousedown` of the X button** to prevent `DragHandler` from triggering. Any new clickable child added to the container must do the same.
+- **All CSS classes use the `tw-fab-*` prefix** (from `CSS_PREFIX`). Never introduce bare class names or IDs to avoid collisions with host-page styles.
 
-### Full-Text Translation (`11_full_translate`)
-The button reflects translation state by receiving `setTranslationState()` calls from the content script when translation starts, completes, or stops.
+## Module Boundaries
 
-### Cross-Context Sync
-Config changes from the popup or options page are detected via `chrome.storage.onChanged` and automatically update the button's visibility and position.
-
-## Usage Example
-
-```typescript
-import { FloatingButtonManager } from '@/12_floating_button';
-
-const manager = new FloatingButtonManager();
-
-await manager.initialize(() => {
-    // Toggle full-text translation
-    toggleFullTranslation();
-});
-
-// Update state when translation starts
-manager.setTranslationState('translating');
-
-// Update state when translation completes
-manager.setTranslationState('active');
-
-// Clean up
-manager.destroy();
-```
+- ✅ May be imported by: `1_content`, `3_popup`, `4_options`
+- ❌ Must NOT import from: `1_content`, `2_background`, `6_translate`, `7_speech`, `8_generate` — this is a pure UI/config component with no knowledge of translation business logic

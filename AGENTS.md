@@ -10,22 +10,28 @@ A smart AI-powered translation browser extension that provides context-aware tra
 - **Floating Notes Display**: Translations are displayed in an unobtrusive floating card directly below the highlighted text.
 - **Persistent Annotations**: All translations remain on the page as you scroll, creating a temporary "annotated" version of the site for easy reference.
 
-##  Folder Structure
+## Folder Structure
 
 ```
 .
 ├── dist/                   # Build output (loaded into Chrome)
 ├── resources/              # Static assets (icons, etc.)
 ├── src/                    # Source code
-│   ├── 0_common/           # Shared utilities, types, and constants
-│   ├── 1_content/          # Content scripts injected into web pages
-│   ├── 2_background/       # Background service worker
-│   ├── 3_popup/            # Extension popup UI
-│   ├── 5_backend/          # Generic API infrastructure (service, types)
-│   ├── 6_translate/        # Translation business logic
+│   ├── 0_common/           # Shared utilities, types, constants, i18n
+│   ├── 1_content/          # Content script: interaction detection, translation pipeline, UI rendering
+│   ├── 2_background/       # Background service worker: message routing, service init
+│   ├── 3_popup/            # Extension popup UI: settings and quota status
+│   ├── 4_options/          # Full-page options/settings UI
+│   ├── 5_backend/          # Generic API infrastructure (HTTP client, auth, quota)
+│   ├── 6_translate/        # Translation business logic and provider adapters
 │   ├── 7_speech/           # Speech synthesis module
-│   └── 8_generate/         # Text generation module
-├── test/                   # Unit and integration tests
+│   ├── 8_generate/         # Text generation module (auto-candidates, etc.)
+│   ├── 9_inline_translate/ # Inline translation overlay feature
+│   ├── 9_offscreen/        # Offscreen document for audio playback (Chrome MV3)
+│   ├── 10_welcome/         # Welcome/onboarding page
+│   ├── 11_full_translate/  # Full-page translation pipeline (Walk → Observe → Batch → Render)
+│   └── 12_floating_button/ # Floating ball button for triggering full-page translation
+├── tests/                  # Unit and integration tests
 ├── package.json            # NPM package configuration
 ├── tsconfig.json           # TypeScript configuration
 └── vite.config.ts          # Vite build configuration
@@ -38,10 +44,14 @@ A smart AI-powered translation browser extension that provides context-aware tra
 - `src/1_content/README.md`
 - `src/2_background/README.md`
 - `src/3_popup/README.md`
+- `src/4_options/README.md`
 - `src/5_backend/README.md`
 - `src/6_translate/README.md`
 - `src/7_speech/README.md`
 - `src/8_generate/README.md`
+- `src/9_inline_translate/README.md`
+- `src/11_full_translate/README.md`
+- `src/12_floating_button/README.md`
 
 ## Technical Stack
 
@@ -67,61 +77,8 @@ A smart AI-powered translation browser extension that provides context-aware tra
 
 ## Project Coding Conventions
 
-### Import Style
-- **Absolute Paths**: Always use the `@/` prefix (maps to `src/`) for imports instead of relative paths (`../`).
-- **Namespace Imports**: Use namespace imports (`import * as name from '...'`) for functions and variables to make their origin explicit. This is preferred over named imports for clarity.
-
-```typescript
-// ✅ Correct
-import * as loggerModule from '@/0_common/utils/logger';
-const logger = loggerModule.createLogger('my-module');
-
-// ❌ Avoid (Relative Path and Named Import)
-import { createLogger } from '../../0_common/utils/logger';
-const logger = createLogger('my-module');
-```
-
-### Module Index Files
-- **Explicit exports only**: Module `index.ts` files must explicitly list all exported members, never use `export *`
-- **Categorized exports**: Group exports by type (classes, functions, types) with clear comments
-- **Type annotations**: Use `export type` for type-only exports to enable proper tree-shaking
-```typescript
-// ✅ Correct - Explicit exports with categories
-export type { TranslationApiData, TranslateParams } from './models/TranslationModels';
-export { translate, translateWord } from './services/TranslationService';
-
-// ❌ Avoid - Wildcard exports
-export * from './models/TranslationModels';
-```
-
-### Logging
-- **Use logger utility**: Replace `console.log/error` with `createLogger()` for consistent prefixes
-```typescript
-// ✅ Correct
-import { createLogger } from '@/0_common/utils/logger';
-const logger = createLogger('className/ModuleName/functionName');
-logger.info('Message');
-
-// ❌ Avoid
-console.log('[ModuleName] Message');
-```
-
-### Code Organization
-- Export functions/variables at file top, internal functions below
-
-### In-App UI Localization
-The project uses a custom utility at `src/0_common/utils/i18n.ts` for in-app UI translations.
-
-- **HTML**: Add `data-i18n-key="key.name"` to elements. `applyTranslations()` will handle the rest.
-- **TypeScript**: Import with `import * as i18nModule from "@/0_common/utils/i18n"`, then use `i18nModule.translate('key.name')` for dynamic strings.
-
-### Architecture Principles
-- **Infrastructure Purity**: Infrastructure code MUST be agnostic of business logic and environment state.
-- **Inject, Don't Fetch**: Pass configuration via arguments (Dependency Injection). NEVER import business logic or state managers into infrastructure layers.
+For coding rules specific to this project type (Chrome Extension / TypeScript / Vite), load the **`coding-conventions`** skill and refer to `chrome-extension.md`.
 
 ## Automated E2E Testing (Playwright)
 
-Use Playwright to verify extension functionality in a real browser environment. 
-
-**For detailed instructions on running, writing, and debugging E2E tests, AI agents MUST refer to the dedicated skill document:**
-`docs/skills/e2e-testing/SKILL.md`
+Use Playwright to verify extension functionality in a real browser environment.
