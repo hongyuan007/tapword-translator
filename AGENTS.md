@@ -77,61 +77,8 @@ A smart AI-powered translation browser extension that provides context-aware tra
 
 ## Project Coding Conventions
 
-### Import Style
-- **Absolute Paths**: Always use the `@/` prefix (maps to `src/`) for imports instead of relative paths (`../`).
-- **Namespace Imports**: Use namespace imports (`import * as name from '...'`) for functions and variables to make their origin explicit. This is preferred over named imports for clarity.
-
-```typescript
-// ✅ Correct
-import * as loggerModule from '@/0_common/utils/logger';
-const logger = loggerModule.createLogger('my-module');
-
-// ❌ Avoid (Relative Path and Named Import)
-import { createLogger } from '../../0_common/utils/logger';
-const logger = createLogger('my-module');
-```
-
-### Module Index Files
-- **Explicit exports only**: Module `index.ts` files must explicitly list all exported members, never use `export *`
-- **Categorized exports**: Group exports by type (classes, functions, types) with clear comments
-- **Type annotations**: Use `export type` for type-only exports to enable proper tree-shaking
-```typescript
-// ✅ Correct - Explicit exports with categories
-export type { TranslationApiData, TranslateParams } from './models/TranslationModels';
-export { translate, translateWord } from './services/TranslationService';
-
-// ❌ Avoid - Wildcard exports
-export * from './models/TranslationModels';
-```
-
-### Logging
-- **Use logger utility**: Replace `console.log/error` with `createLogger()` for consistent prefixes
-```typescript
-// ✅ Correct
-import { createLogger } from '@/0_common/utils/logger';
-const logger = createLogger('className/ModuleName/functionName');
-logger.info('Message');
-
-// ❌ Avoid
-console.log('[ModuleName] Message');
-```
-
-### Code Organization
-- Export functions/variables at file top, internal functions below
-
-### In-App UI Localization
-The project uses a custom utility at `src/0_common/utils/i18n.ts` for in-app UI translations.
-
-- **HTML**: Add `data-i18n-key="key.name"` to elements. `applyTranslations()` will handle the rest.
-- **TypeScript**: Import with `import * as i18nModule from "@/0_common/utils/i18n"`, then use `i18nModule.translate('key.name')` for dynamic strings.
-
-### Architecture Principles
-- **Infrastructure Purity**: Infrastructure code MUST be agnostic of business logic and environment state.
-- **Inject, Don't Fetch**: Pass configuration via arguments (Dependency Injection). NEVER import business logic or state managers into infrastructure layers.
+For coding rules specific to this project type (Chrome Extension / TypeScript / Vite), load the **`coding-conventions`** skill and refer to `chrome-extension.md`.
 
 ## Automated E2E Testing (Playwright)
 
-Use Playwright to verify extension functionality in a real browser environment. 
-
-**For detailed instructions on running, writing, and debugging E2E tests, AI agents MUST refer to the dedicated skill document:**
-`docs/skills/e2e-testing/SKILL.md`
+Use Playwright to verify extension functionality in a real browser environment.
