@@ -120,7 +120,9 @@ describe("shouldTriggerTranslationAsync", () => {
         })
 
         it("uses xml:lang when html lang is missing", async () => {
-            stubDocumentLanguageSignals({ xmlLang: "zh-TW" })
+            // Use zh-CN (simplified) so that isSameLanguage("zh-cn", "zh") → true → suppress.
+            // With zh-TW, the new logic correctly differentiates traditional ≠ simplified → trigger.
+            stubDocumentLanguageSignals({ xmlLang: "zh-CN" })
 
             expect(await shouldTriggerTranslationAsync("Release", "zh")).toBe(false)
             vi.unstubAllGlobals()

@@ -241,11 +241,18 @@ export async function getUserSettings(): Promise<types.UserSettings> {
  * @returns Language code for target language
  */
 function detectBrowserLanguage(): string {
-    const SUPPORTED_LANGUAGES = ["en", "zh", "es", "ja", "fr", "de", "ko", "ru"]
+    const SUPPORTED_LANGUAGES = ["en", "zh", "zh-Hant", "es", "ja", "fr", "de", "ko", "ru"]
 
     // Get browser language (e.g., "zh-CN", "en-US", "ja")
     // Use optional chaining and nullish coalescing for safe access
     const browserLang = navigator.language || navigator.languages?.[0] || "en"
+
+    // Precise match for Traditional Chinese browser languages before split fallback
+    const lowerBrowserLang = browserLang.toLowerCase()
+    if (lowerBrowserLang === "zh-tw" || lowerBrowserLang === "zh-hk" || lowerBrowserLang === "zh-hant") {
+        logger.info("Browser language matched Traditional Chinese:", browserLang)
+        return "zh-Hant"
+    }
 
     // Extract primary language code (before hyphen)
     const parts = browserLang.split("-")

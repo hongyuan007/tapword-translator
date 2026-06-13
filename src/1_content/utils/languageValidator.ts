@@ -6,6 +6,12 @@
  */
 import * as loggerModule from "@/0_common/utils/logger"
 import { detectSourceLanguageAsync } from "@/1_content/utils/languageDetector"
+import {
+    normalizeLanguageTagFull,
+    normalizeLocaleMeta,
+    getMainSubtag,
+    isSameLanguage,
+} from "@/0_common/utils/languageTagUtils"
 
 const logger = loggerModule.createLogger("languageValidator")
 
@@ -15,12 +21,12 @@ const CONTEXT_CHINESE_RATIO_THRESHOLD = 0.10
 function getPageDeclaredLanguage(): string {
     if (typeof document === "undefined") return ""
 
-    const htmlLang = normalizeLanguageTag(document.documentElement.lang)
+    const htmlLang = normalizeLanguageTagFull(document.documentElement.lang)
     if (htmlLang) {
         return htmlLang
     }
 
-    const xmlLang = normalizeLanguageTag(document.documentElement.getAttribute("xml:lang"))
+    const xmlLang = normalizeLanguageTagFull(document.documentElement.getAttribute("xml:lang"))
     if (xmlLang) {
         return xmlLang
     }
@@ -28,8 +34,9 @@ function getPageDeclaredLanguage(): string {
     const ogLocale = normalizeLocaleMeta(document.querySelector('meta[property="og:locale"]')?.getAttribute("content"))
     const contentLanguage = normalizeLocaleMeta(document.querySelector('meta[http-equiv="content-language"]')?.getAttribute("content"))
 
-    if (ogLocale && contentLanguage && ogLocale === contentLanguage) {
-        return ogLocale
+    if (ogLocale && contentLanguage) {
+        // Only trust meta tags when they agree; conflicting signals are unreliable
+        return ogLocale === contentLanguage ? ogLocale : ""
     }
 
     return ogLocale || contentLanguage || ""
@@ -49,6 +56,7 @@ const REGEX_LATIN = /\p{Script=Latin}/gu
  * - If text matches the target language's native script, we assume the user is a native speaker reading their own language
  *   and does not need translation.
  * - For Chinese ('zh'), we use a ratio check because Han characters are shared with Japanese.
+ *   For zh-Hant (Traditional Chinese), we differentiate between Simplified and Traditional script.
  * - For Japanese ('ja'), we check for Kana (Hiragana/Katakana) which are unique to Japanese.
  * - For Korean ('ko') and Russian ('ru'), we check for their specific scripts.
  * - For all languages, we also check the page's `<html lang="...">` metadata as a fast, reliable signal.
@@ -61,17 +69,31 @@ const REGEX_LATIN = /\p{Script=Latin}/gu
  * @returns true if translation should be triggered, false if it should be suppressed
  */
 export async function shouldTriggerTranslationAsync(text: string, targetLanguage: string, contextText?: string): Promise<boolean> {
-    const tgtLang = (targetLanguage || "").toLowerCase().split("-")[0] // Normalize 'zh-CN' -> 'zh'
+    const tgtLang = (targetLanguage || "").toLowerCase() // Only lowercase, do NOT split
     const pageDeclaredLanguage = getPageDeclaredLanguage()
 
-    switch (tgtLang) {
+    // Determine the primary language subtag for switch dispatch
+    const tgtMain = getMainSubtag(tgtLang)
+
+    switch (tgtMain) {
         case "zh": {
-            // 1. Check if the selection ITSELF is Chinese
-            // Check for Han characters ratio, but allow if Japanese Kana is present
+            // 1. Check for Japanese Kana first
             if (REGEX_KANA.test(text)) {
                 return true // It's likely Japanese, so show translation for Chinese user
             }
-            // Count Han characters
+
+            // 2. Check page's declared language FIRST (before text analysis)
+            // This handles the case where the page declares zh-TW/zh-Hant and target is zh-Hant,
+            // even if the selected text itself is script-neutral (e.g., "你好世界").
+            if (pageDeclaredLanguage && isSameLanguage(pageDeclaredLanguage, tgtLang)) {
+                logger.debug("Suppressing translation: page metadata declares same Chinese variant", {
+                    pageDeclaredLanguage,
+                    tgtLang,
+                })
+                return false
+            }
+
+            // 3. Check if the selection ITSELF is Chinese
             const chineseMatches = text.match(REGEX_HAN)
             const chineseCount = chineseMatches ? chineseMatches.length : 0
             const totalLength = text.length
@@ -84,23 +106,28 @@ export async function shouldTriggerTranslationAsync(text: string, targetLanguage
                     logger.debug("Allowing translation: Han ratio high but context has Kana → Japanese page")
                     return true
                 }
-                logger.debug("Suppressing translation: Target is Chinese and text is identified as Chinese", {
+                // Detect the script variant of the selected text to differentiate Simplified vs Traditional
+                const textScript = detectChineseScript(text)
+                const textLang = textScript === "traditional" ? "zh-Hant" : "zh"
+                if (isSameLanguage(textLang, tgtLang)) {
+                    logger.debug("Suppressing translation: Target matches text language (same Chinese variant)", {
+                        text: text.substring(0, 20) + "...",
+                        ratio: chineseCount / totalLength,
+                        textScript,
+                        tgtLang,
+                    })
+                    return false
+                }
+                // Text is Chinese but different script variant from target
+                logger.debug("Allowing translation: Chinese text but different script variant", {
                     text: text.substring(0, 20) + "...",
-                    ratio: chineseCount / totalLength,
+                    textScript,
+                    tgtLang,
                 })
-                return false
+                return true
             }
 
-            // 2. Check page's declared language (fast, synchronous, reliable when set)
-            // Covers cases where the selected text is pure Latin but the page is Chinese.
-            if (pageDeclaredLanguage === "zh") {
-                logger.debug("Suppressing translation: Target is Chinese and page metadata declares Chinese", {
-                    pageDeclaredLanguage,
-                })
-                return false
-            }
-
-            // 3. Check whether the surrounding context is Chinese-dominant.
+            // 4. Check whether the surrounding context is Chinese-dominant.
             // A few Chinese characters (e.g. a translated link title on an otherwise English page)
             // should not suppress translation. Require a meaningful Han ratio instead.
             // Guard: if context contains Japanese Kana, it is a Japanese page — don't suppress.
@@ -114,11 +141,17 @@ export async function shouldTriggerTranslationAsync(text: string, targetLanguage
                     threshold: CONTEXT_CHINESE_RATIO_THRESHOLD,
                 })
                 if (contextChineseRatio >= CONTEXT_CHINESE_RATIO_THRESHOLD) {
-                    logger.debug("Suppressing translation: Target is Chinese and context is Chinese-dominant", {
-                        contextSnippet: contextText.substring(0, 20) + "...",
-                        ratio: contextChineseRatio,
-                    })
-                    return false
+                    // Detect script of context text to differentiate Simplified vs Traditional
+                    const contextScript = detectChineseScript(contextText)
+                    const contextLang = contextScript === "traditional" ? "zh-Hant" : "zh"
+                    if (isSameLanguage(contextLang, tgtLang)) {
+                        logger.debug("Suppressing translation: Target is Chinese and context is Chinese-dominant (same variant)", {
+                            contextSnippet: contextText.substring(0, 20) + "...",
+                            ratio: contextChineseRatio,
+                            contextScript,
+                        })
+                        return false
+                    }
                 }
             }
 
@@ -159,15 +192,15 @@ export async function shouldTriggerTranslationAsync(text: string, targetLanguage
         default: {
             // Other languages (es, fr, de, etc.)
             // Fast-path: check page's declared language before async detection
-            if (getPageDeclaredLanguage() === tgtLang) {
-                logger.debug(`Suppressing translation: Target is ${tgtLang} and page declares it via lang attribute`)
+            if (pageDeclaredLanguage && isSameLanguage(pageDeclaredLanguage, tgtLang)) {
+                logger.debug(`Suppressing translation: Target is ${tgtMain} and page declares it via lang attribute`)
                 return false
             }
             // Fallback: rely on async language detection if context is provided
             if (contextText && contextText.length > 0) {
                 const { lang: detectedLang } = await detectSourceLanguageAsync(contextText)
-                if (detectedLang === tgtLang) {
-                    logger.debug(`Suppressing translation: Target is ${tgtLang} and context detected as ${detectedLang}`)
+                if (detectedLang === tgtMain) {
+                    logger.debug(`Suppressing translation: Target is ${tgtMain} and context detected as ${detectedLang}`)
                     return false
                 }
             }
@@ -187,16 +220,29 @@ function calculateHanRatioAgainstHanAndLatin(text: string): number {
     return hanCount / comparableCount
 }
 
-function normalizeLanguageTag(tag: string | null | undefined): string {
-    if (!tag) return ""
-    return tag.toLowerCase().split("-")[0]?.trim() ?? ""
-}
+/**
+ * A set of characters that only appear in Traditional Chinese (not in Simplified).
+ * Used as a heuristic to detect if Chinese text is traditional or simplified.
+ * Not exhaustive but covers the most common discriminating characters.
+ */
+const TRADITIONAL_ONLY_CHARS = new Set(
+    ("愛礙罷備筆畢邊變標佈測廠場暢車陳塵遲醜從達帶單當黨導敵電釣東動獨頓發罰煩訪費廢奮複負蓋幹剛綱個給宮貢構購穀顧僱掛廣歸龜貴國號轟鴻後護劃懷壞歡還匯會渾獲貨禍擊機積飢膚雞級幾計記際劑濟夾鉀價駕堅鉛儉劍漸礁膠腳較節莖驚經頸競舊劇據鋸覺決殼塊寬礦曠況虧來賴藍攔欄覽勞澇樂離禮歷勵隸連憐蓮聯鐮倆糧兩遼裂獵臨鄰靈領嶺劉陸錄慮論腦鬧釀鳥農盤龐賠噴騙貧評撲鋪樸氣遷僑橋竊欽親輕慶區權勸熱認灑傘喪掃澀殺曬閃陝賞燒設審聲勝聖詩時識實適釋壽書術樹雙誰絲鬆蘇雖隨歲損鎖態嘆討騰體塗團脫馱彎萬網衛穩務烏無膽鐘轉壯狀齊維穢濁興譽軒選學醫郵魚圓緣遠雲雜災髒戰張趙鎮爭鄭證織職執質滯種眾軸駐專莊裝髮準濟").split("")
+)
 
-function normalizeLocaleMeta(content: string | null | undefined): string {
-    if (!content) return ""
-
-    const firstToken = content.split(",")[0]?.trim().toLowerCase() ?? ""
-    if (!firstToken) return ""
-
-    return firstToken.split(/[-_]/)[0]?.trim() ?? ""
+/**
+ * Detect whether Chinese text uses Traditional or Simplified characters.
+ * Uses a heuristic: if any character in the text is a known Traditional-only character,
+ * the text is classified as Traditional.
+ *
+ * @param text - Chinese text to analyze
+ * @returns "traditional", "simplified", or "unknown" (empty/no Han chars)
+ */
+function detectChineseScript(text: string): "traditional" | "simplified" | "unknown" {
+    if (!text) return "unknown"
+    for (const char of text) {
+        if (TRADITIONAL_ONLY_CHARS.has(char)) {
+            return "traditional"
+        }
+    }
+    return "simplified"
 }
