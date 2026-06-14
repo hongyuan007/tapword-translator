@@ -57,11 +57,15 @@ export class OpenAICompatibleClient {
         try {
             logger.debug(`Sending request to LLM (model: ${this.model}, messages: ${messages.length})`)
 
+            const isNewModel = constants.NEW_MODEL_PATTERN.test(this.model)
+
             const completion = await this.client.chat.completions.create({
                 model: this.model,
                 messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
                 temperature: this.temperature,
-                max_tokens: this.maxTokens,
+                ...(isNewModel
+                    ? { max_completion_tokens: this.maxTokens }
+                    : { max_tokens: this.maxTokens }),
                 response_format: { type: "json_object" },
             })
 

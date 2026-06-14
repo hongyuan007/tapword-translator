@@ -3,6 +3,12 @@
  */
 
 /**
+ * Regex matching OpenAI new-generation models: gpt-5*, o1*, o3*, o4*
+ * These models use `max_completion_tokens` instead of `max_tokens`.
+ */
+export const NEW_MODEL_PATTERN = /^(gpt-5|o[134])/i
+
+/**
  * Default LLM generation parameters
  */
 export const DEFAULT_TEMPERATURE = 0.35
