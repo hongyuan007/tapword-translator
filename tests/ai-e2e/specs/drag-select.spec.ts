@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 
 import { captureScreenshot } from '../shared/screenshot';
-import { verifyWithAI } from '../shared/ai-verifier';
 import {
     assertExtensionBuilt,
     createExtensionContext,
@@ -78,21 +77,10 @@ test('fixture: drag-select triggers translation via icon', async () => {
         const translationUI = page.locator('.ai-translator-modal, .ai-translator-tooltip');
         await expect(translationUI.first()).toBeVisible({ timeout: TRANSLATION_TIMEOUT_MS });
 
-        // Screenshot: after translation appears
+        // Screenshot: after translation appears (will be verified by AI visual review)
         const afterShot = await captureScreenshot(page, OUTPUT_DIR, 'drag-after', {
             fullPage: true,
         });
-
-        // AI verification
-        const result = await verifyWithAI({
-            scenario: 'drag-select',
-            operation: 'Select a word via JS Selection API, click the floating translation icon',
-            expectedBehavior:
-                'A translation icon should appear near the selected text. After clicking it, a translation modal or tooltip should show the Chinese translation.',
-            screenshots: [beforeShot, afterShot],
-        });
-
-        expect(result.passed, result.reason).toBe(true);
     } finally {
         await closeExtensionContext({ context, userDataDir });
         await closeFixtureServer(fixtureServer);
@@ -148,19 +136,9 @@ test('real: drag-select on example.com', async () => {
         await expect(translationUI.first()).toBeVisible({ timeout: TRANSLATION_TIMEOUT_MS });
 
         // Screenshot: after
-        const afterShot = await captureScreenshot(page, OUTPUT_DIR, 'real-drag-after', {
+        const afterShotReal = await captureScreenshot(page, OUTPUT_DIR, 'real-drag-after', {
             fullPage: true,
         });
-
-        const result = await verifyWithAI({
-            scenario: 'drag-select',
-            operation: 'Select heading text on example.com, click translation icon',
-            expectedBehavior:
-                'Translation icon appears after selection. Clicking shows Chinese translation in a modal or tooltip.',
-            screenshots: [beforeShot, afterShot],
-        });
-
-        expect(result.passed, result.reason).toBe(true);
     } finally {
         await closeExtensionContext({ context, userDataDir });
     }

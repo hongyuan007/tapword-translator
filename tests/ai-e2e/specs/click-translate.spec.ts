@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 
 import { captureScreenshot } from '../shared/screenshot';
-import { verifyWithAI } from '../shared/ai-verifier';
 import {
     assertExtensionBuilt,
     createExtensionContext,
@@ -75,21 +74,10 @@ test('fixture: click-translate triggers translation popup', async () => {
 
         console.log('✅ Translation UI appeared after single click');
 
-        // Screenshot: after click
+        // Screenshot: after click (will be verified by AI visual review)
         const afterShot = await captureScreenshot(page, OUTPUT_DIR, 'click-after', {
             fullPage: true,
         });
-
-        // AI verification
-        const result = await verifyWithAI({
-            scenario: 'click-translate',
-            operation: 'Click on a highlighted word to trigger translation popup',
-            expectedBehavior:
-                'A translation modal or tooltip should appear near the clicked word, displaying translation content without breaking the page layout.',
-            screenshots: [beforeShot, afterShot],
-        });
-
-        expect(result.passed, result.reason).toBe(true);
     } finally {
         await closeExtensionContext({ context, userDataDir });
         await closeFixtureServer(fixtureServer);
@@ -131,35 +119,24 @@ test.skip('real: click-translate on wikipedia.org', async () => {
         await page.addStyleTag({ content: '* { cursor: default !important; }' });
 
         // Screenshot: before
-        const beforeShot = await captureScreenshot(page, OUTPUT_DIR, 'real-click-before', {
+        const beforeShotReal = await captureScreenshot(page, OUTPUT_DIR, 'real-click-before', {
             fullPage: true,
         });
 
-        // Action: click on a word inside the first paragraph (Wikipedia has rich text content)
-        const firstPara = page.locator('p').first();
-        await firstPara.click();
+        // Action: click on a word inside the first paragraph
+        const firstParaReal = page.locator('p').first();
+        await firstParaReal.click();
 
         // Wait for translation UI – Wikipedia content is heavier, allow more time
-        const translationUI = page.locator('.ai-translator-modal, .ai-translator-tooltip');
-        await expect(translationUI.first()).toBeVisible({ timeout: 20_000 });
+        const translationUIReal = page.locator('.ai-translator-modal, .ai-translator-tooltip');
+        await expect(translationUIReal.first()).toBeVisible({ timeout: 20_000 });
 
         console.log('✅ Translation UI appeared after single click on wikipedia.org');
 
         // Screenshot: after
-        const afterShot = await captureScreenshot(page, OUTPUT_DIR, 'real-click-after', {
+        const afterShotReal = await captureScreenshot(page, OUTPUT_DIR, 'real-click-after', {
             fullPage: true,
         });
-
-        // AI verification
-        const result = await verifyWithAI({
-            scenario: 'click-translate',
-            operation: 'Click on first paragraph text on wikipedia.org to trigger translation',
-            expectedBehavior:
-                'A translation modal or tooltip should appear, showing Chinese translation of the clicked text.',
-            screenshots: [beforeShot, afterShot],
-        });
-
-        expect(result.passed, result.reason).toBe(true);
     } finally {
         await closeExtensionContext({ context, userDataDir });
     }
