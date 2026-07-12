@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Translate Fixture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #0056b3;
+        }
+
+        p {
+            margin-bottom: 12px;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #darkModeToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            z-index: 10000;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ccc;
+        }
+
+        body.dark-mode h1 {
+            color: #5c9be0;
+        }
+
+        body.dark-mode .highlight {
+            background-color: #3a3a1a;
+            color: #ffd966;
+        }
+
+        body.dark-mode #darkModeToggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <div class="container">
+        <h1>Click Translate Test Page</h1>
+
+        <p>This is a test paragraph with <span class="highlight">important</span> words that can be clicked for translation.</p>
+
+        <p>The <span class="highlight">extraordinary</span> quality of the product impressed everyone at the meeting.</p>
+
+        <p>She demonstrated an <span class="highlight">unbelievable</span> talent for musical composition.</p>
+
+        <h2>Multilingual Content</h2>
+
+        <p><span lang="ja">こんにちは、今日はお元気ですか？人生は予測不可能な出来事に満ちた素晴らしい冒険です。</span> (Japanese)</p>
+
+        <p><span lang="fr">Bonjour, comment ça va? La vie est une aventure passionnante.</span> (French)</p>
+
+        <p><span lang="de">Guten Tag, wie geht es Ihnen heute? Das Leben ist eine Reise.</span> (German)</p>
+
+        <p><span lang="ko">안녕하세요, 오늘 기분 어때요? 인생은 흥미진진한 여정입니다.</span> (Korean)</p>
+
+        <h2>Technical Terms</h2>
+        <p>The <span class="highlight">antidisestablishmentarianism</span> of the political movement was quite remarkable.</p>
+        <p>Modern <span class="highlight">infrastructure</span> must be agnostic of business logic.</p>
+    </div>
+
+    <script>
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+
+</html>
