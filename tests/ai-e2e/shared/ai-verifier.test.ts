@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { verifyWithAI } from './ai-verifier';
 import type { VerificationContext, VerificationResult } from './types';
 
