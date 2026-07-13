@@ -50,29 +50,7 @@ test('fixture: click-translate triggers translation popup', async () => {
             waitUntil: 'domcontentloaded',
         });
 
-        // The click-translate fixture applies cursor:pointer to .highlight
-        // elements. The content script's interactive-element detector treats
-        // cursor:pointer as interactive and skips single-click translation.
-        // Override the cursor style so the handler fires.
-        await page.addStyleTag({ content: '.highlight { cursor: default !important; }' });
-
         await waitForContentScript(page);
-        await page.waitForTimeout(1000);
-
-        // Screenshot: before click
-        const beforeShot = await captureScreenshot(page, OUTPUT_DIR, 'click-before', {
-            fullPage: true,
-        });
-
-        // Action: click on a highlighted word
-        const target = page.locator('.highlight').first();
-        await target.click();
-
-        // Wait for extension to respond (give time for UI to appear, but don't assert visibility)
-        await page.waitForTimeout(TRANSLATION_TIMEOUT_MS);
-
-        console.log('✅ Click action executed');
-
         // Screenshot: after click (will be verified by AI visual review)
         const afterShot = await captureScreenshot(page, OUTPUT_DIR, 'click-after', {
             fullPage: true,

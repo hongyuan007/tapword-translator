@@ -143,6 +143,35 @@ export async function closeExtensionContext(extCtx: ExtensionContext): Promise<v
     }
 }
 
+// -------------------------------------------------------------------------
+// Extension Settings
+// -------------------------------------------------------------------------
+
+/**
+ * Enable single-click and drag-select translation features via chrome.storage.
+ */
+export async function enableTranslationFeatures(page: import('@playwright/test').Page): Promise<void> {
+    try {
+        await page.evaluate(async () => {
+            // @ts-ignore
+            const csp = (window as any).chrome?.storage?.sync;
+            if (csp) {
+                await csp.set({
+                    enableTapWord: true,
+                    singleClickTranslate: true,
+                    dragSelectTranslate: true,
+                    singleClickTranslateMode: 'auto',
+                });
+                console.log('[E2E] Translation features enabled via content script');
+            } else {
+                console.warn('[E2E] chrome.storage.sync not available in page context');
+            }
+        });
+    } catch (e) {
+        console.warn('[E2E] enableTranslationFeatures failed:', e);
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Re-exports
 // ---------------------------------------------------------------------------

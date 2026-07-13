@@ -46,7 +46,7 @@ test('fixture: drag-select triggers translation via icon', async () => {
         });
 
         await waitForContentScript(page);
-        await page.waitForTimeout(500); // Background services init
+        await page.waitForTimeout(1000);
 
         // Screenshot: before selection
         const beforeShot = await captureScreenshot(page, OUTPUT_DIR, 'drag-before', {

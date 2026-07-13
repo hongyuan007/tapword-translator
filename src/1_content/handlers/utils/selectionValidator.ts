@@ -173,7 +173,7 @@ export async function validateSingleClickAsync(
     if (!enableTapWord) {
         return { isValid: false, text: "", reason: "Extension disabled via enableTapWord", shouldCleanup: false }
     }
-    if (!settings?.singleClickTranslate) {
+    if (settings?.singleClickTranslate === false) {
         return { isValid: false, text: "", reason: "Feature disabled", shouldCleanup: false }
     }
 
