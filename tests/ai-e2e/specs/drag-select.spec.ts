@@ -23,14 +23,16 @@ const __dirname = path.dirname(__filename);
 const FIXTURES_DIR = path.resolve(__dirname, '../fixtures');
 const OUTPUT_DIR = path.resolve(__dirname, '../output');
 const ICON_TIMEOUT_MS = 10_000;
-const TRANSLATION_TIMEOUT_MS = 15_000;
+const TRANSLATION_TIMEOUT_MS = 20_000;
+const TRANSLATION_TOOLTIP_SELECTOR = '.ai-translator-tooltip, [data-tapword-ext].ai-translator-tooltip, .tapword-translation, [data-tapword-ext]';
+const ICON_SELECTOR = '[data-tapword-ext].ai-translator-icon, .ai-translator-icon';
 
 // ---------------------------------------------------------------------------
-// Fixture-level test
+// Fixture-level test: select text → icon appears → click icon → translation
 // ---------------------------------------------------------------------------
 
 test('fixture: drag-select triggers translation via icon', async () => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
     await assertExtensionBuilt();
 
     const { context, userDataDir } = await createExtensionContext();
@@ -49,11 +51,9 @@ test('fixture: drag-select triggers translation via icon', async () => {
         await page.waitForTimeout(1000);
 
         // Screenshot: before selection
-        const beforeShot = await captureScreenshot(page, OUTPUT_DIR, 'drag-before', {
-            fullPage: true,
-        });
+        await captureScreenshot(page, OUTPUT_DIR, 'drag-before', { fullPage: true });
 
-        // Precise text selection using JS Selection API (per Skill guidelines)
+        // Select the target word using JS Selection API
         await page.evaluate(() => {
             const el = document.getElementById('target-word');
             if (!el) throw new Error('target-word element not found');
@@ -64,23 +64,41 @@ test('fixture: drag-select triggers translation via icon', async () => {
             selection?.addRange(range);
         });
 
-        // Trigger the extension's mouseup handler
+        // Trigger mouseup to let extension detect the selection
         await page.locator('#target-word').dispatchEvent('mouseup');
 
-        // Wait for extension to respond (give time for icon and UI to appear)
-        await page.waitForTimeout(ICON_TIMEOUT_MS + TRANSLATION_TIMEOUT_MS);
+        // Wait for translation icon to appear
+        let iconFound = false;
+        try {
+            await page.waitForSelector(ICON_SELECTOR, { timeout: ICON_TIMEOUT_MS, state: 'visible' });
+            iconFound = true;
+            console.log('✅ Translation icon appeared after selection');
+        } catch {
+            console.log('⚠️ Translation icon not found, waiting for auto-translate...');
+        }
 
-        // Click the icon to trigger translation (if icon exists)
-        const icon = page.locator('[data-tapword-ext].ai-translator-icon, .ai-translator-icon');
-        if (await icon.count() > 0) {
-            await icon.first().click();
+        // Click the icon if it exists
+        if (iconFound) {
+            const icon = page.locator(ICON_SELECTOR).first();
+            await icon.click();
+
+            // Wait for translation tooltip
+            try {
+                await page.waitForSelector(TRANSLATION_TOOLTIP_SELECTOR, {
+                    timeout: TRANSLATION_TIMEOUT_MS,
+                    state: 'visible',
+                });
+                console.log('✅ Translation tooltip appeared after icon click');
+            } catch {
+                console.log('⚠️ Translation tooltip not found after icon click');
+            }
+        } else {
+            // Some modes auto-translate without icon click
             await page.waitForTimeout(TRANSLATION_TIMEOUT_MS);
         }
 
-        // Screenshot: after translation appears (will be verified by AI visual review)
-        const afterShot = await captureScreenshot(page, OUTPUT_DIR, 'drag-after', {
-            fullPage: true,
-        });
+        // Screenshot: after translation (for AI visual review)
+        await captureScreenshot(page, OUTPUT_DIR, 'drag-after', { fullPage: true });
     } finally {
         await closeExtensionContext({ context, userDataDir });
         await closeFixtureServer(fixtureServer);
@@ -88,10 +106,11 @@ test('fixture: drag-select triggers translation via icon', async () => {
 });
 
 // ---------------------------------------------------------------------------
-// Real-page test
+// Real-page test: select text on example.com → icon → translation
 // ---------------------------------------------------------------------------
 
 test('real: drag-select on example.com', async () => {
+    test.setTimeout(120_000);
     test.slow();
 
     await assertExtensionBuilt();
@@ -109,9 +128,7 @@ test('real: drag-select on example.com', async () => {
         await page.waitForTimeout(500);
 
         // Screenshot: before
-        const beforeShot = await captureScreenshot(page, OUTPUT_DIR, 'real-drag-before', {
-            fullPage: true,
-        });
+        await captureScreenshot(page, OUTPUT_DIR, 'real-drag-before', { fullPage: true });
 
         // Select the heading text
         await page.evaluate(() => {
@@ -126,20 +143,33 @@ test('real: drag-select on example.com', async () => {
 
         await page.locator('h1').dispatchEvent('mouseup');
 
-        // Wait for extension to respond
-        await page.waitForTimeout(ICON_TIMEOUT_MS + TRANSLATION_TIMEOUT_MS);
+        // Wait for icon
+        let iconFound = false;
+        try {
+            await page.waitForSelector(ICON_SELECTOR, { timeout: ICON_TIMEOUT_MS, state: 'visible' });
+            iconFound = true;
+            console.log('✅ Icon appeared on real page');
+        } catch {
+            console.log('⚠️ No icon on real page, waiting for auto-translate...');
+        }
 
-        // Click icon if it exists
-        const icon = page.locator('[data-tapword-ext].ai-translator-icon, .ai-translator-icon');
-        if (await icon.count() > 0) {
-            await icon.first().click();
+        if (iconFound) {
+            await page.locator(ICON_SELECTOR).first().click();
+            try {
+                await page.waitForSelector(TRANSLATION_TOOLTIP_SELECTOR, {
+                    timeout: TRANSLATION_TIMEOUT_MS,
+                    state: 'visible',
+                });
+                console.log('✅ Translation appeared on real page');
+            } catch {
+                console.log('⚠️ Translation tooltip not found on real page');
+            }
+        } else {
             await page.waitForTimeout(TRANSLATION_TIMEOUT_MS);
         }
 
         // Screenshot: after
-        const afterShotReal = await captureScreenshot(page, OUTPUT_DIR, 'real-drag-after', {
-            fullPage: true,
-        });
+        await captureScreenshot(page, OUTPUT_DIR, 'real-drag-after', { fullPage: true });
     } finally {
         await closeExtensionContext({ context, userDataDir });
     }

@@ -14,9 +14,11 @@ export default defineConfig({
     fullyParallel: false,
     workers: 1,
     reporter: [['list']],
+    // Prevent Playwright from wiping output dir between test files
+    // so screenshots from earlier tests survive for AI visual review.
     use: {
-        trace: 'on-first-retry',
-        screenshot: 'on',
+        trace: 'retain-on-failure',
+        screenshot: 'off',
         video: 'retain-on-failure',
         ignoreHTTPSErrors: true,
     },

@@ -49,8 +49,11 @@ npm run test:ai-e2e:real
 
 | 场景 | Fixture 层 | Real 层 |
 |------|-----------|---------|
-| 单击翻译 | `click-translate.html` | `https://example.com` |
-| 划词翻译 | `drag-select.html` | `https://example.com` |
+| 单击翻译 | `click-translate.html` | wikipedia.org |
+| 划词翻译 | `drag-select.html` | example.com |
+| 全文翻译 | `fullpage-translate.html` | wikipedia.org |
+| Popup 面板 | — | chrome-extension popup.html |
+| 设置页 | — | chrome-extension options.html |
 
 ## 开发说明
 
@@ -62,7 +65,8 @@ npm run test:ai-e2e:real
 
 ### 添加新场景
 
-1. 在 `fixtures/` 下创建测试 HTML 页面
+1. 在 `fixtures/` 下创建测试 HTML 页面（如需要）
 2. 在 `specs/` 下创建新的 `.spec.ts` 文件
 3. 遵循 `shared/browser.ts` 中的初始化模式
-4. 使用 `captureScreenshot()` + `verifyWithAI()` 进行验证
+4. 使用 `captureScreenshot()` 捕获操作前后截图
+5. 截图路径输出到 console，供多模态 Agent（叶欣）视觉验收
