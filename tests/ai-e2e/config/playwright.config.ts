@@ -13,6 +13,9 @@ export default defineConfig({
     timeout: 120_000,
     fullyParallel: false,
     workers: 1,
+    // microsoftFree / googleFree are free services with occasional rate-limit failures.
+    // Retry once to absorb transient translation errors.
+    retries: 1,
     reporter: [['list']],
     // Prevent Playwright from wiping output dir between test files
     // so screenshots from earlier tests survive for AI visual review.
