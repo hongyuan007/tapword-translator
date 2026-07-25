@@ -107,6 +107,82 @@ const WORD_PROVIDERS = [
     { id: 'microsoftFree', label: 'Microsoft Free' },
 ] as const;
 
+// ---------------------------------------------------------------------------
+// Test 1.5: Single-click translation (core default feature, three engines)
+// ---------------------------------------------------------------------------
+
+for (const provider of WORD_PROVIDERS) {
+    test(`fixture: single-click [${provider.label}] outputs Traditional Chinese`, async () => {
+        test.setTimeout(90_000);
+        await assertExtensionBuilt();
+
+        const { context, userDataDir } = await createExtensionContext();
+        const fixtureServer = await createFixtureServer(FIXTURES_DIR);
+
+        try {
+            await waitForExtensionServiceWorker(context);
+
+            // Enable single-click mode (default core feature) + set provider
+            const worker = context.serviceWorkers()[0];
+            expect(worker).toBeTruthy();
+            await worker.evaluate(async (pid) => {
+                const syncData = await chrome.storage.sync.get('userSettings');
+                const userSettings = syncData.userSettings || {};
+                userSettings.targetLanguage = 'zh-Hant';
+                userSettings.wordTranslationProvider = pid;
+                await chrome.storage.sync.set({ userSettings });
+                // Mutual exclusion: single-click ON, double-click OFF
+                await chrome.storage.sync.set({ singleClickTranslate: true, doubleClickTranslateV2: false });
+            }, provider.id);
+
+            const page = await context.newPage();
+            page.on('console', (msg) => console.log(`[PAGE ${msg.type().toUpperCase()}] ${msg.text()}`));
+
+            await page.goto(`${fixtureServer.baseUrl}/traditional-chinese.html`, {
+                waitUntil: 'domcontentloaded',
+            });
+            await waitForContentScript(page);
+            await page.waitForTimeout(2000);
+
+            await captureScreenshot(page, OUTPUT_DIR, `zh-hant-single-${provider.id}-before`, { fullPage: true });
+
+            // Click exact center of "quality" (质量→品質, clear simp/trad difference)
+            const coords = await page.evaluate(() => {
+                const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+                while (walker.nextNode()) {
+                    const node = walker.currentNode;
+                    const text = node.textContent || '';
+                    const idx = text.indexOf('quality');
+                    if (idx >= 0 && node.parentElement) {
+                        const range = document.createRange();
+                        range.setStart(node, idx);
+                        range.setEnd(node, idx + 'quality'.length);
+                        const rect = range.getBoundingClientRect();
+                        return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+                    }
+                }
+                return null;
+            });
+            expect(coords, 'quality word coords should be found').not.toBeNull();
+            await page.mouse.click(coords!.x, coords!.y);
+            await page.waitForTimeout(TRANSLATION_WAIT_MS);
+
+            await captureScreenshot(page, OUTPUT_DIR, `zh-hant-single-${provider.id}-after`, { fullPage: true });
+
+            // Assert: translation appeared and did NOT fail
+            const tooltip = page.locator('.ai-translator-tooltip, [data-tapword-ext].ai-translator-tooltip');
+            await expect(tooltip, 'Translation tooltip should appear').toBeVisible({ timeout: 5000 });
+            const tooltipText = await tooltip.textContent() || '';
+            expect(tooltipText.includes('失败') || tooltipText.includes('失敗'), 'Translation should not show failure message').toBe(false);
+            expect(/[\u4e00-\u9fff]/.test(tooltipText), 'Tooltip should contain Chinese characters').toBe(true);
+            console.log(`✅ [${provider.label}] Single-click translation succeeded`);
+        } finally {
+            await closeExtensionContext({ context, userDataDir });
+            await closeFixtureServer(fixtureServer);
+        }
+    });
+}
+
 for (const provider of WORD_PROVIDERS) {
     test(`fixture: double-click [${provider.label}] outputs Traditional Chinese`, async () => {
         test.setTimeout(90_000);
@@ -170,95 +246,97 @@ for (const provider of WORD_PROVIDERS) {
 }
 
 // ---------------------------------------------------------------------------
-// Test 3: Drag-select translation outputs Traditional Chinese
+// Test 3: Drag-select translation outputs Traditional Chinese (three engines)
 // ---------------------------------------------------------------------------
 
-test('fixture: drag-select translation outputs Traditional Chinese', async () => {
-    test.setTimeout(90_000);
-    await assertExtensionBuilt();
+for (const provider of WORD_PROVIDERS) {
+    test(`fixture: drag-select [${provider.label}] outputs Traditional Chinese`, async () => {
+        test.setTimeout(90_000);
+        await assertExtensionBuilt();
 
-    const { context, userDataDir } = await createExtensionContext();
-    const fixtureServer = await createFixtureServer(FIXTURES_DIR);
+        const { context, userDataDir } = await createExtensionContext();
+        const fixtureServer = await createFixtureServer(FIXTURES_DIR);
 
-    try {
-        await waitForExtensionServiceWorker(context);
-        
-        // Set target language + switch word translation provider (avoid helper instability)
-        const worker = context.serviceWorkers()[0];
-        expect(worker).toBeTruthy();
-        await worker.evaluate(async () => {
-            const syncData = await chrome.storage.sync.get('userSettings');
-            const userSettings = syncData.userSettings || {};
-            userSettings.targetLanguage = 'zh-Hant';
-            userSettings.wordTranslationProvider = 'googleFree';
-            await chrome.storage.sync.set({ userSettings });
-        });
+        try {
+            await waitForExtensionServiceWorker(context);
+            
+            // Set target language + word translation provider
+            const worker = context.serviceWorkers()[0];
+            expect(worker).toBeTruthy();
+            await worker.evaluate(async (pid) => {
+                const syncData = await chrome.storage.sync.get('userSettings');
+                const userSettings = syncData.userSettings || {};
+                userSettings.targetLanguage = 'zh-Hant';
+                userSettings.wordTranslationProvider = pid;
+                await chrome.storage.sync.set({ userSettings });
+            }, provider.id);
 
-        const page = await context.newPage();
-        page.on('console', (msg) => console.log(`[PAGE ${msg.type().toUpperCase()}] ${msg.text()}`));
+            const page = await context.newPage();
+            page.on('console', (msg) => console.log(`[PAGE ${msg.type().toUpperCase()}] ${msg.text()}`));
 
-        await page.goto(`${fixtureServer.baseUrl}/traditional-chinese.html`, {
-            waitUntil: 'domcontentloaded',
-        });
-        await waitForContentScript(page);
-        await page.waitForTimeout(2000);
+            await page.goto(`${fixtureServer.baseUrl}/traditional-chinese.html`, {
+                waitUntil: 'domcontentloaded',
+            });
+            await waitForContentScript(page);
+            await page.waitForTimeout(2000);
 
-        await captureScreenshot(page, OUTPUT_DIR, 'zh-hant-drag-before', { fullPage: true });
+            await captureScreenshot(page, OUTPUT_DIR, `zh-hant-drag-${provider.id}-before`, { fullPage: true });
 
-        // Select "collection"
-        await page.evaluate(() => {
-            const el = document.querySelector('.highlight:nth-of-type(3)');
-            if (!el) {
-                const all = document.querySelectorAll('.highlight');
-                const target = Array.from(all).find(e => e.textContent?.includes('collection'));
-                if (!target) throw new Error('collection not found');
+            // Select "collection"
+            await page.evaluate(() => {
+                const el = document.querySelector('.highlight:nth-of-type(3)');
+                if (!el) {
+                    const all = document.querySelectorAll('.highlight');
+                    const target = Array.from(all).find(e => e.textContent?.includes('collection'));
+                    if (!target) throw new Error('collection not found');
+                    const range = document.createRange();
+                    range.selectNodeContents(target);
+                    const sel = window.getSelection();
+                    sel?.removeAllRanges();
+                    sel?.addRange(range);
+                    return;
+                }
                 const range = document.createRange();
-                range.selectNodeContents(target);
+                range.selectNodeContents(el);
                 const sel = window.getSelection();
                 sel?.removeAllRanges();
                 sel?.addRange(range);
-                return;
+            });
+            await page.locator('body').dispatchEvent('mouseup');
+            
+            // Wait for icon and click it
+            const ICON_SELECTOR = '[data-tapword-ext].ai-translator-icon, .ai-translator-icon';
+            let iconFound = false;
+            try {
+                await page.waitForSelector(ICON_SELECTOR, { timeout: 5000, state: 'visible' });
+                iconFound = true;
+                console.log('✅ Translation icon appeared');
+            } catch {
+                console.log('⚠️ Icon not found, waiting for auto-translate...');
             }
-            const range = document.createRange();
-            range.selectNodeContents(el);
-            const sel = window.getSelection();
-            sel?.removeAllRanges();
-            sel?.addRange(range);
-        });
-        await page.locator('body').dispatchEvent('mouseup');
-        
-        // Wait for icon and click it (like drag-select.spec.ts)
-        const ICON_SELECTOR = '[data-tapword-ext].ai-translator-icon, .ai-translator-icon';
-        let iconFound = false;
-        try {
-            await page.waitForSelector(ICON_SELECTOR, { timeout: 5000, state: 'visible' });
-            iconFound = true;
-            console.log('✅ Translation icon appeared');
-        } catch {
-            console.log('⚠️ Icon not found, waiting for auto-translate...');
-        }
-        
-        if (iconFound) {
-            await page.locator(ICON_SELECTOR).first().click();
-            await page.waitForTimeout(8000); // Wait longer for translation to load
-        }
-        
-        await page.waitForTimeout(TRANSLATION_WAIT_MS);
+            
+            if (iconFound) {
+                await page.locator(ICON_SELECTOR).first().click();
+                await page.waitForTimeout(8000);
+            }
+            
+            await page.waitForTimeout(TRANSLATION_WAIT_MS);
 
-        await captureScreenshot(page, OUTPUT_DIR, 'zh-hant-drag-after', { fullPage: true });
-        
-        // Assert: translation tooltip should appear AND not be a failure message
-        const tooltip = page.locator('.ai-translator-tooltip, [data-tapword-ext].ai-translator-tooltip');
-        await expect(tooltip, 'Translation tooltip should appear after clicking icon').toBeVisible({ timeout: 10000 });
-        const tooltipText = await tooltip.textContent() || '';
-        expect(tooltipText.includes('失败') || tooltipText.includes('失敗'), 'Translation should not show failure message').toBe(false);
-        expect(/[\u4e00-\u9fff]/.test(tooltipText), 'Tooltip should contain Chinese characters').toBe(true);
-        console.log('✅ Translation tooltip appeared with Chinese output');
-    } finally {
-        await closeExtensionContext({ context, userDataDir });
-        await closeFixtureServer(fixtureServer);
-    }
-});
+            await captureScreenshot(page, OUTPUT_DIR, `zh-hant-drag-${provider.id}-after`, { fullPage: true });
+            
+            // Assert: translation tooltip should appear AND not be a failure message
+            const tooltip = page.locator('.ai-translator-tooltip, [data-tapword-ext].ai-translator-tooltip');
+            await expect(tooltip, 'Translation tooltip should appear after clicking icon').toBeVisible({ timeout: 10000 });
+            const tooltipText = await tooltip.textContent() || '';
+            expect(tooltipText.includes('失败') || tooltipText.includes('失敗'), 'Translation should not show failure message').toBe(false);
+            expect(/[\u4e00-\u9fff]/.test(tooltipText), 'Tooltip should contain Chinese characters').toBe(true);
+            console.log(`✅ [${provider.label}] Drag-select translation succeeded`);
+        } finally {
+            await closeExtensionContext({ context, userDataDir });
+            await closeFixtureServer(fixtureServer);
+        }
+    });
+}
 
 // ---------------------------------------------------------------------------
 // Test 4: Full-page translation outputs Traditional Chinese (three engines)
