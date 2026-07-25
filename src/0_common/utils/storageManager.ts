@@ -249,7 +249,7 @@ function detectBrowserLanguage(): string {
 
     // Precise match for Traditional Chinese browser languages before split fallback
     const lowerBrowserLang = browserLang.toLowerCase()
-    if (lowerBrowserLang === "zh-tw" || lowerBrowserLang === "zh-hk" || lowerBrowserLang === "zh-hant") {
+    if (lowerBrowserLang === "zh-tw" || lowerBrowserLang === "zh-hk" || lowerBrowserLang === "zh-mo" || lowerBrowserLang === "zh-hant") {
         logger.info("Browser language matched Traditional Chinese:", browserLang)
         return "zh-Hant"
     }

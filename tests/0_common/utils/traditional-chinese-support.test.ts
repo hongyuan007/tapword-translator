@@ -102,6 +102,17 @@ describe("Traditional Chinese Support — Storage and Display", () => {
             const settings = await getUserSettings()
             expect(settings.targetLanguage).toBe("zh-Hant")
         })
+
+        it("navigator.language = 'zh-MO' → targetLanguage = 'zh-Hant'", async () => {
+            // zh-MO (Macau) uses Traditional Chinese; requirement background explicitly mentions Macau users.
+            vi.stubGlobal("navigator", {
+                language: "zh-MO",
+                languages: ["zh-MO", "zh", "en"],
+            })
+
+            const settings = await getUserSettings()
+            expect(settings.targetLanguage).toBe("zh-Hant")
+        })
     })
 
     describe("detectBrowserLanguage — regression for existing languages", () => {
