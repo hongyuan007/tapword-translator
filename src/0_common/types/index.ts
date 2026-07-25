@@ -306,6 +306,8 @@ export interface CustomAiProvider {
     endpoint: string
     apiKey: string
     model: string
+    /** Use max_completion_tokens instead of max_tokens (OpenAI gpt-5/o-series). Default: false */
+    useMaxCompletionTokens?: boolean
 }
 
 export interface UserSettings {

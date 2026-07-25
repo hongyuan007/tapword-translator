@@ -246,6 +246,20 @@ function buildFormElement(provider: CustomAiProvider): HTMLElement {
     grid.appendChild(makeField("options.translationEngine.aiProviders.form.endpoint", "API Endpoint", "text", "inline-form-endpoint", provider.endpoint, true))
     grid.appendChild(makeField("options.translationEngine.aiProviders.form.apiKey", "API Key", "password", "inline-form-apikey", provider.apiKey, true))
 
+    // Max completion tokens checkbox (for OpenAI gpt-5 / o-series)
+    const checkboxRow = document.createElement("div")
+    checkboxRow.style.cssText = "display: flex; align-items: center; gap: 8px; margin-bottom: 10px;"
+    const cb = document.createElement("input")
+    cb.type = "checkbox"
+    cb.className = "inline-form-use-max-completion"
+    cb.checked = provider.useMaxCompletionTokens ?? false
+    const cbLabel = document.createElement("label")
+    cbLabel.textContent = "Use max_completion_tokens (OpenAI gpt-5 / o-series)"
+    cbLabel.style.cssText = "font-size: 12px; color: #666; cursor: pointer;"
+    cbLabel.addEventListener("click", () => cb.click())
+    checkboxRow.appendChild(cb)
+    checkboxRow.appendChild(cbLabel)
+
     const actions = document.createElement("div")
     actions.style.cssText = "display: flex; justify-content: flex-end; gap: 8px; align-items: center;"
 
@@ -296,6 +310,7 @@ async function handleInlineFormSave(formEl: HTMLElement): Promise<void> {
     const model = ((formEl.querySelector(".inline-form-model") as HTMLInputElement)?.value ?? "").trim()
     const endpoint = ((formEl.querySelector(".inline-form-endpoint") as HTMLInputElement)?.value ?? "").trim()
     const apiKey = ((formEl.querySelector(".inline-form-apikey") as HTMLInputElement)?.value ?? "").trim()
+    const useMaxCompletionTokens = (formEl.querySelector(".inline-form-use-max-completion") as HTMLInputElement)?.checked ?? false
 
     if (!name || !endpoint || !apiKey || !model) {
         logger.warn("AI provider inline form: all fields are required")
@@ -306,7 +321,7 @@ async function handleInlineFormSave(formEl: HTMLElement): Promise<void> {
     const providers: CustomAiProvider[] = [...(settings.customProviders ?? [])]
     const index = providers.findIndex((p) => p.id === id)
     if (index !== -1) {
-        providers[index] = { id, name, endpoint, apiKey, model }
+        providers[index] = { id, name, endpoint, apiKey, model, useMaxCompletionTokens }
     }
 
     await saveProviders(providers)
