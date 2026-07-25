@@ -261,65 +261,67 @@ test('fixture: drag-select translation outputs Traditional Chinese', async () =>
 });
 
 // ---------------------------------------------------------------------------
-// Test 4: Full-page translation outputs Traditional Chinese
+// Test 4: Full-page translation outputs Traditional Chinese (three engines)
 // ---------------------------------------------------------------------------
 
-test('fixture: full-page translation outputs Traditional Chinese', async () => {
-    test.setTimeout(120_000);
-    await assertExtensionBuilt();
+for (const provider of WORD_PROVIDERS) {
+    test(`fixture: full-page [${provider.label}] outputs Traditional Chinese`, async () => {
+        test.setTimeout(120_000);
+        await assertExtensionBuilt();
 
-    const { context, userDataDir } = await createExtensionContext();
-    const fixtureServer = await createFixtureServer(FIXTURES_DIR);
+        const { context, userDataDir } = await createExtensionContext();
+        const fixtureServer = await createFixtureServer(FIXTURES_DIR);
 
-    try {
-        await waitForExtensionServiceWorker(context);
+        try {
+            await waitForExtensionServiceWorker(context);
 
-        // Enable floating ball + set zh-Hant + microsoftFree provider
-        const worker = context.serviceWorkers()[0];
-        expect(worker).toBeTruthy();
-        await worker.evaluate(async () => {
-            await chrome.storage.local.set({
-                floatingButtonConfig: { enabled: true, position: 0.66, disabledSites: [], iconVariant: 'v5', iconColor: '#ED6D8F' },
+            // Enable floating ball + set zh-Hant + provider
+            const worker = context.serviceWorkers()[0];
+            expect(worker).toBeTruthy();
+            await worker.evaluate(async (pid) => {
+                await chrome.storage.local.set({
+                    floatingButtonConfig: { enabled: true, position: 0.66, disabledSites: [], iconVariant: 'v5', iconColor: '#ED6D8F' },
+                });
+                const syncData = await chrome.storage.sync.get('userSettings');
+                const userSettings = syncData.userSettings || {};
+                userSettings.targetLanguage = 'zh-Hant';
+                userSettings.fullPageTranslationProvider = pid;
+                await chrome.storage.sync.set({ userSettings });
+            }, provider.id);
+
+            const page = await context.newPage();
+            page.on('console', (msg) => console.log(`[PAGE ${msg.type().toUpperCase()}] ${msg.text()}`));
+
+            await page.goto(`${fixtureServer.baseUrl}/traditional-chinese.html`, {
+                waitUntil: 'domcontentloaded',
             });
-            const syncData = await chrome.storage.sync.get('userSettings');
-            const userSettings = syncData.userSettings || {};
-            userSettings.targetLanguage = 'zh-Hant';
-            userSettings.fullPageTranslationProvider = 'googleFree';
-            await chrome.storage.sync.set({ userSettings });
-        });
+            await waitForContentScript(page);
+            await page.waitForTimeout(3000);
 
-        const page = await context.newPage();
-        page.on('console', (msg) => console.log(`[PAGE ${msg.type().toUpperCase()}] ${msg.text()}`));
+            await captureScreenshot(page, OUTPUT_DIR, `zh-hant-fullpage-${provider.id}-before`, { fullPage: true });
 
-        await page.goto(`${fixtureServer.baseUrl}/traditional-chinese.html`, {
-            waitUntil: 'domcontentloaded',
-        });
-        await waitForContentScript(page);
-        await page.waitForTimeout(3000);
+            // Click floating ball
+            await page.waitForSelector('.tw-fab-container', { timeout: 8000, state: 'visible' });
+            await page.locator('.tw-fab-main').click();
+            console.log('🖱️ Clicked floating ball');
 
-        await captureScreenshot(page, OUTPUT_DIR, 'zh-hant-fullpage-before', { fullPage: true });
+            await page.waitForTimeout(30000);
 
-        // Click floating ball
-        await page.waitForSelector('.tw-fab-container', { timeout: 8000, state: 'visible' });
-        await page.locator('.tw-fab-main').click();
-        console.log('🖱️ Clicked floating ball');
+            await captureScreenshot(page, OUTPUT_DIR, `zh-hant-fullpage-${provider.id}-after`, { fullPage: true });
 
-        await page.waitForTimeout(30000);
-
-        await captureScreenshot(page, OUTPUT_DIR, 'zh-hant-fullpage-after', { fullPage: true });
-
-        // Assert: translated content wrapper should exist with Chinese text
-        const wrapper = page.locator('.tapword-translated-content-wrapper').first();
-        await expect(wrapper, 'Translated content should appear').toBeVisible({ timeout: 15000 });
-        const wrapperText = await wrapper.textContent() || '';
-        expect(wrapperText.includes('失败') || wrapperText.includes('失敗'), 'Full-page translation should not fail').toBe(false);
-        expect(/[\u4e00-\u9fff]/.test(wrapperText), 'Translated content should contain Chinese characters').toBe(true);
-        console.log('✅ Full-page translation produced Chinese output');
-    } finally {
-        await closeExtensionContext({ context, userDataDir });
-        await closeFixtureServer(fixtureServer);
-    }
-});
+            // Assert: translated content wrapper should exist with Chinese text
+            const wrapper = page.locator('.tapword-translated-content-wrapper').first();
+            await expect(wrapper, 'Translated content should appear').toBeVisible({ timeout: 15000 });
+            const wrapperText = await wrapper.textContent() || '';
+            expect(wrapperText.includes('失败') || wrapperText.includes('失敗'), 'Full-page translation should not fail').toBe(false);
+            expect(/[\u4e00-\u9fff]/.test(wrapperText), 'Translated content should contain Chinese characters').toBe(true);
+            console.log(`✅ [${provider.label}] Full-page translation produced Chinese output`);
+        } finally {
+            await closeExtensionContext({ context, userDataDir });
+            await closeFixtureServer(fixtureServer);
+        }
+    });
+}
 
 // ---------------------------------------------------------------------------
 // Test 5: Native suppression — Traditional Chinese page should NOT translate
