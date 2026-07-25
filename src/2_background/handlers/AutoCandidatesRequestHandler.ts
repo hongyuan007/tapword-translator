@@ -75,6 +75,7 @@ export async function handleAutoCandidatesRequest(
                 temperature: CUSTOM_API_FIXED_PARAMS.temperature,
                 maxTokens: CUSTOM_API_FIXED_PARAMS.maxTokens,
                 timeout: CUSTOM_API_FIXED_PARAMS.timeout,
+                useMaxCompletionTokens: customProvider.useMaxCompletionTokens ?? false,
             }
 
             const result = await generateModule.generateAutoCandidates(message.data, llmConfig)

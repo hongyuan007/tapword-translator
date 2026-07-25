@@ -113,6 +113,7 @@ async function translateWithCustomApi(
         temperature: CUSTOM_API_FIXED_PARAMS.temperature,
         maxTokens: generateModule.MAX_TOKENS_FULL_TEXT_BATCH,
         timeout: CUSTOM_API_FIXED_PARAMS.timeout,
+        useMaxCompletionTokens: customProvider.useMaxCompletionTokens ?? false,
     }
 
     const translations = await generateModule.generateFullTextBatch(data.texts, data.sourceLang, data.targetLang, llmConfig)

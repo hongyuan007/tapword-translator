@@ -69,6 +69,7 @@ export async function initTranslationEngineSection(): Promise<void> {
             getEndpoint: () => (document.getElementById("aiProviderEndpoint") as HTMLInputElement | null)?.value ?? "",
             getApiKey: () => (document.getElementById("aiProviderApiKey") as HTMLInputElement | null)?.value ?? "",
             getModel: () => (document.getElementById("aiProviderModel") as HTMLInputElement | null)?.value ?? "",
+            getUseMaxCompletionTokens: () => false, // Bottom form doesn't have checkbox yet
         })
     }
 }
@@ -277,6 +278,7 @@ function buildFormElement(provider: CustomAiProvider): HTMLElement {
         getEndpoint: () => ((form.querySelector(".inline-form-endpoint") as HTMLInputElement | null)?.value ?? ""),
         getApiKey: () => ((form.querySelector(".inline-form-apikey") as HTMLInputElement | null)?.value ?? ""),
         getModel: () => ((form.querySelector(".inline-form-model") as HTMLInputElement | null)?.value ?? ""),
+        getUseMaxCompletionTokens: () => (form.querySelector(".inline-form-use-max-completion") as HTMLInputElement)?.checked ?? false,
     })
 
     const cancelBtn = document.createElement("button")
@@ -430,6 +432,7 @@ type ProviderTestActionOptions = {
     getEndpoint: () => string
     getApiKey: () => string
     getModel: () => string
+    getUseMaxCompletionTokens: () => boolean
 }
 
 function bindProviderTestAction(options: ProviderTestActionOptions): void {
@@ -450,10 +453,14 @@ async function runProviderConnectionTest(options: ProviderTestActionOptions): Pr
     const url = endpoint.endsWith("/chat/completions") ? endpoint : endpoint.replace(/\/$/, "") + "/chat/completions"
 
     try {
+        const body = options.getUseMaxCompletionTokens()
+            ? { model, messages: [{ role: "user", content: "hi" }], max_completion_tokens: 10 }
+            : { model, messages: [{ role: "user", content: "hi" }], max_tokens: 10 }
+
         const response = await fetch(url, {
             method: "POST",
             headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ model, messages: [{ role: "user", content: "hi" }], max_tokens: 10 }),
+            body: JSON.stringify(body),
         })
 
         if (response.ok) {

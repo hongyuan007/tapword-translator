@@ -100,6 +100,7 @@ function normalizeUserSettings(
             endpoint: typeof p.endpoint === "string" ? p.endpoint.trim() : "",
             apiKey: typeof p.apiKey === "string" ? p.apiKey.trim() : "",
             model: typeof p.model === "string" ? p.model.trim() : "",
+            useMaxCompletionTokens: typeof p.useMaxCompletionTokens === "boolean" ? p.useMaxCompletionTokens : undefined,
         }
     }
 
