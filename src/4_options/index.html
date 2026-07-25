@@ -7,45 +7,48 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="logo">
-        <img src="/resources/icons/icon-128.png" alt="TapWord logo" class="logo-image" />
-        <div class="logo-text">
-          <div class="title-wrapper">
-            <h1 class="app-name" data-i18n-key="popup.title">TapWord</h1>
-            <span class="app-subtitle" id="communitySubtitle" data-i18n-key="popup.communityEdition" style="display: none;">Community Edition</span>
-            <span class="version" id="versionDisplay"></span>
-          </div>
-        </div>
+  <div class="settings-wrap">
+
+    <!-- ════════════════════════════════════════════════════════════
+         Navigation
+         ════════════════════════════════════════════════════════════ -->
+    <nav class="settings-nav">
+      <div class="nav-brand">
+        <div class="nav-brand-icon">T</div>
+        <span class="nav-brand-text">TapWord</span>
+        <span class="app-subtitle" id="communitySubtitle" data-i18n-key="popup.communityEdition" style="display: none;"></span>
       </div>
-      <div class="header-actions">
-        <button class="secondary-button" id="documentationButton" data-i18n-key="popup.websiteLink">访问官网</button>
-        <button class="secondary-button github-button" id="githubButton" title="GitHub">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path>
-          </svg>
-          <span>GitHub</span>
-        </button>
+
+      <div class="nav-section-label">配置</div>
+      <a href="#general-settings" class="nav-item active" data-section="general-settings" data-i18n-key="popup.section.general">General</a>
+      <a href="#appearance-settings" class="nav-item" data-section="appearance-settings" data-i18n-key="popup.section.appearance">Appearance</a>
+      <a href="#translation-engine-settings" class="nav-item" data-section="translation-engine-settings" data-i18n-key="options.translationEngine.title">Translation Engine</a>
+      <a href="#display-settings" class="nav-item" data-section="display-settings" data-i18n-key="popup.section.text">Text</a>
+      <a href="#audio-settings" class="nav-item" data-section="audio-settings" data-i18n-key="popup.section.audio">Audio</a>
+      <div class="nav-section-label">系统</div>
+      <a href="#advanced-settings" class="nav-item" data-section="advanced-settings" data-i18n-key="popup.section.advanced">Advanced</a>
+
+      <div class="nav-actions">
+        <button class="ghost-button" id="documentationButton" data-i18n-key="popup.websiteLink">Website</button>
+        <button class="ghost-button" id="githubButton">GitHub</button>
       </div>
-    </header>
-    <main class="main-content">
-      <aside class="sidebar">
-        <nav class="nav-menu">
-          <a href="#general-settings" class="nav-item active" data-section="general-settings" data-i18n-key="popup.section.general">General</a>
-          <a href="#appearance-settings" class="nav-item" data-section="appearance-settings" data-i18n-key="popup.section.appearance">Appearance</a>
-          <a href="#translation-engine-settings" class="nav-item" data-section="translation-engine-settings" data-i18n-key="options.translationEngine.title">Translation Engine</a>
-          <a href="#display-settings" class="nav-item" data-section="display-settings" data-i18n-key="popup.section.text">Text</a>
-          <a href="#audio-settings" class="nav-item" data-section="audio-settings" data-i18n-key="popup.section.audio">Audio</a>
-          <a href="#advanced-settings" class="nav-item" data-section="advanced-settings" data-i18n-key="popup.section.advanced">Advanced</a>
-        </nav>
-      </aside>
-      <section class="content">
-        <div id="general-settings" class="settings-section active">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.general">General</h2>
-          </div>
-          <div class="card settings-card" style="margin-bottom: 32px;">
+
+      <div class="nav-footer"><span id="versionDisplay"></span></div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════
+         Content
+         ════════════════════════════════════════════════════════════ -->
+    <main class="settings-content">
+
+      <!-- ─── General ─────────────────────────────────────────────── -->
+      <section id="general-settings" class="settings-section active">
+        <h1 class="page-title" data-i18n-key="popup.section.general">General</h1>
+
+        <!-- Master switch -->
+        <div class="section-group">
+          <div class="section-group-title">Master Switch</div>
+          <div class="card settings-card">
             <div class="setting-item setting-item-master">
               <div class="setting-info">
                 <label class="setting-label master-label" for="enableTapWord">
@@ -59,7 +62,13 @@
               </label>
             </div>
           </div>
+        </div>
+
+        <!-- Behavior -->
+        <div class="section-group">
+          <div class="section-group-title">Behavior</div>
           <div class="card settings-card">
+            <!-- Target Language -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="targetLanguage" data-i18n-key="popup.targetLanguage.label">Target Language</label>
@@ -78,6 +87,8 @@
                 </select>
               </div>
             </div>
+
+            <!-- Show Icon -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="showIcon">
@@ -90,6 +101,8 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+
+            <!-- Single Click Translate (feature-dot) -->
             <div class="setting-item">
               <span class="feature-dot" title="Important feature"></span>
               <div class="setting-info">
@@ -100,6 +113,8 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+
+            <!-- Double Click Translate -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="doubleClickTranslateV2" data-i18n-key="popup.doubleClickTranslate.label">Double-click to Translate</label>
@@ -109,11 +124,13 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+
+            <!-- Double Click Sentence Translate + Trigger Key -->
             <div class="setting-item" id="settingItem-doubleClickSentence">
               <div class="setting-info">
-                <div class="trigger-key-container" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                  <select id="doubleClickSentenceTriggerKey" data-setting="doubleClickSentenceTriggerKey" class="select-input trigger-key-select" style="width: auto; padding: 4px 8px;">
-                    <!-- Options populated by JS -->
+                <div class="trigger-key-container">
+                  <select id="doubleClickSentenceTriggerKey" data-setting="doubleClickSentenceTriggerKey" class="select-input trigger-key-select">
+                    <!-- Options populated by JS based on OS -->
                   </select>
                   <span class="plus-separator">+</span>
                   <label class="setting-label" for="doubleClickSentenceTranslate" data-i18n-key="popup.doubleClickSentenceTranslate.label" style="margin-bottom: 0;">Double-click Sentence</label>
@@ -125,6 +142,8 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+
+            <!-- Suppress Native Language -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="suppressNativeLanguage">
@@ -137,6 +156,8 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+
+            <!-- Floating Button Enabled (no data-setting, independent binding) -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="floatingButtonEnabledOptions">
@@ -150,12 +171,17 @@
             </div>
           </div>
         </div>
+      </section>
 
-        <div id="appearance-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.appearance">Appearance Settings</h2>
-          </div>
+      <!-- ─── Appearance ──────────────────────────────────────────── -->
+      <section id="appearance-settings" class="settings-section">
+        <h1 class="page-title" data-i18n-key="popup.section.appearance">Appearance</h1>
+
+        <!-- Icon Group -->
+        <div class="section-group">
+          <div class="section-group-title">Icon</div>
           <div class="card settings-card">
+            <!-- Icon Color (8 SVG radios) -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" data-i18n-key="popup.iconColor.label">Icon Color</label>
@@ -236,7 +262,7 @@
               </label>
             </div>
 
-            <!-- Floating Button Icon Style -->
+            <!-- Floating Button Style (JS-populated empty container) -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" data-i18n-key="popup.floatingButtonIcon.label">Floating Button Style</label>
@@ -295,12 +321,19 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
+        <!-- Underline Group -->
+        <div class="section-group">
+          <div class="section-group-title">Underline</div>
+          <div class="card settings-card">
+            <!-- Word Underline Color -->
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="wordUnderlineColor" data-i18n-key="popup.wordUnderlineColor.label">Word Underline Color</label>
+                <label class="setting-label" for="wordUnderlineColorSelect" data-i18n-key="popup.wordUnderlineColor.label">Word Underline Color</label>
               </div>
-              <div class="setting-control color-setting-control">
+              <div class="setting-control">
                 <div class="custom-select-wrapper custom-select-wrapper-wide" id="wordUnderlineColorSelect" data-setting="wordUnderlineColorV2">
                   <div class="custom-select-trigger">
                     <span class="color-dot" id="wordUnderlineColorPreview"></span>
@@ -308,64 +341,29 @@
                     <span class="custom-select-arrow"></span>
                   </div>
                   <div class="custom-select-options">
-                    <div class="custom-option" data-value="#2A9D8F">
-                      <span class="color-dot" style="background-color: #2A9D8F;"></span>
-                      <span data-i18n-key="popup.color.teal">Teal</span>
-                    </div>
-                    <div class="custom-option" data-value="#6366F1">
-                      <span class="color-dot" style="background-color: #6366F1;"></span>
-                      <span data-i18n-key="popup.color.indigo">Indigo</span>
-                    </div>
-                    <div class="custom-option" data-value="#0EA5E9">
-                      <span class="color-dot" style="background-color: #0EA5E9;"></span>
-                      <span data-i18n-key="popup.color.skyBlue">Sky Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#1F7FDB">
-                      <span class="color-dot" style="background-color: #1F7FDB;"></span>
-                      <span data-i18n-key="popup.color.standardBlue">Standard Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#E9C46A">
-                      <span class="color-dot" style="background-color: #E9C46A;"></span>
-                      <span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span>
-                    </div>
-                    <div class="custom-option" data-value="#F59E0B">
-                      <span class="color-dot" style="background-color: #F59E0B;"></span>
-                      <span data-i18n-key="popup.color.amber">Amber</span>
-                    </div>
-                    <div class="custom-option" data-value="#8B5CF6">
-                      <span class="color-dot" style="background-color: #8B5CF6;"></span>
-                      <span data-i18n-key="popup.color.softViolet">Soft Violet</span>
-                    </div>
-                    <div class="custom-option" data-value="#F4A261">
-                      <span class="color-dot" style="background-color: #F4A261;"></span>
-                      <span data-i18n-key="popup.color.goldenSand">Golden Sand</span>
-                    </div>
-                    <div class="custom-option" data-value="#D4A373">
-                      <span class="color-dot" style="background-color: #D4A373;"></span>
-                      <span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span>
-                    </div>
-                    <div class="custom-option" data-value="#FFB703">
-                      <span class="color-dot" style="background-color: #FFB703;"></span>
-                      <span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span>
-                    </div>
-                    <div class="custom-option" data-value="#C1A162">
-                      <span class="color-dot" style="background-color: #C1A162;"></span>
-                      <span data-i18n-key="popup.color.mutedGold">Muted Gold</span>
-                    </div>
-                    <div class="custom-option" data-value="#E59E47">
-                      <span class="color-dot" style="background-color: #E59E47;"></span>
-                      <span data-i18n-key="popup.color.standardOrange">Standard Orange</span>
-                    </div>
+                    <div class="custom-option" data-value="#2A9D8F"><span class="color-dot" style="background-color: #2A9D8F;"></span><span data-i18n-key="popup.color.teal">Teal</span></div>
+                    <div class="custom-option" data-value="#6366F1"><span class="color-dot" style="background-color: #6366F1;"></span><span data-i18n-key="popup.color.indigo">Indigo</span></div>
+                    <div class="custom-option" data-value="#0EA5E9"><span class="color-dot" style="background-color: #0EA5E9;"></span><span data-i18n-key="popup.color.skyBlue">Sky Blue</span></div>
+                    <div class="custom-option" data-value="#1F7FDB"><span class="color-dot" style="background-color: #1F7FDB;"></span><span data-i18n-key="popup.color.standardBlue">Standard Blue</span></div>
+                    <div class="custom-option" data-value="#E9C46A"><span class="color-dot" style="background-color: #E9C46A;"></span><span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span></div>
+                    <div class="custom-option" data-value="#F59E0B"><span class="color-dot" style="background-color: #F59E0B;"></span><span data-i18n-key="popup.color.amber">Amber</span></div>
+                    <div class="custom-option" data-value="#8B5CF6"><span class="color-dot" style="background-color: #8B5CF6;"></span><span data-i18n-key="popup.color.softViolet">Soft Violet</span></div>
+                    <div class="custom-option" data-value="#F4A261"><span class="color-dot" style="background-color: #F4A261;"></span><span data-i18n-key="popup.color.goldenSand">Golden Sand</span></div>
+                    <div class="custom-option" data-value="#D4A373"><span class="color-dot" style="background-color: #D4A373;"></span><span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span></div>
+                    <div class="custom-option" data-value="#FFB703"><span class="color-dot" style="background-color: #FFB703;"></span><span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span></div>
+                    <div class="custom-option" data-value="#C1A162"><span class="color-dot" style="background-color: #C1A162;"></span><span data-i18n-key="popup.color.mutedGold">Muted Gold</span></div>
+                    <div class="custom-option" data-value="#E59E47"><span class="color-dot" style="background-color: #E59E47;"></span><span data-i18n-key="popup.color.standardOrange">Standard Orange</span></div>
                   </div>
                 </div>
               </div>
             </div>
 
+            <!-- Sentence Underline Color -->
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="sentenceUnderlineColor" data-i18n-key="popup.sentenceUnderlineColor.label">Sentence Underline Color</label>
+                <label class="setting-label" for="sentenceUnderlineColorSelect" data-i18n-key="popup.sentenceUnderlineColor.label">Sentence Underline Color</label>
               </div>
-              <div class="setting-control color-setting-control">
+              <div class="setting-control">
                 <div class="custom-select-wrapper custom-select-wrapper-wide" id="sentenceUnderlineColorSelect" data-setting="sentenceUnderlineColor">
                   <div class="custom-select-trigger">
                     <span class="color-dot" id="sentenceUnderlineColorPreview"></span>
@@ -373,59 +371,30 @@
                     <span class="custom-select-arrow"></span>
                   </div>
                   <div class="custom-select-options">
-                    <div class="custom-option" data-value="#2A9D8F">
-                      <span class="color-dot" style="background-color: #2A9D8F;"></span>
-                      <span data-i18n-key="popup.color.teal">Teal</span>
-                    </div>
-                    <div class="custom-option" data-value="#6366F1">
-                      <span class="color-dot" style="background-color: #6366F1;"></span>
-                      <span data-i18n-key="popup.color.indigo">Indigo</span>
-                    </div>
-                    <div class="custom-option" data-value="#0EA5E9">
-                      <span class="color-dot" style="background-color: #0EA5E9;"></span>
-                      <span data-i18n-key="popup.color.skyBlue">Sky Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#1F7FDB">
-                      <span class="color-dot" style="background-color: #1F7FDB;"></span>
-                      <span data-i18n-key="popup.color.standardBlue">Standard Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#E9C46A">
-                      <span class="color-dot" style="background-color: #E9C46A;"></span>
-                      <span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span>
-                    </div>
-                    <div class="custom-option" data-value="#F59E0B">
-                      <span class="color-dot" style="background-color: #F59E0B;"></span>
-                      <span data-i18n-key="popup.color.amber">Amber</span>
-                    </div>
-                    <div class="custom-option" data-value="#8B5CF6">
-                      <span class="color-dot" style="background-color: #8B5CF6;"></span>
-                      <span data-i18n-key="popup.color.softViolet">Soft Violet</span>
-                    </div>
-                    <div class="custom-option" data-value="#F4A261">
-                      <span class="color-dot" style="background-color: #F4A261;"></span>
-                      <span data-i18n-key="popup.color.goldenSand">Golden Sand</span>
-                    </div>
-                    <div class="custom-option" data-value="#D4A373">
-                      <span class="color-dot" style="background-color: #D4A373;"></span>
-                      <span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span>
-                    </div>
-                    <div class="custom-option" data-value="#FFB703">
-                      <span class="color-dot" style="background-color: #FFB703;"></span>
-                      <span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span>
-                    </div>
-                    <div class="custom-option" data-value="#C1A162">
-                      <span class="color-dot" style="background-color: #C1A162;"></span>
-                      <span data-i18n-key="popup.color.mutedGold">Muted Gold</span>
-                    </div>
-                    <div class="custom-option" data-value="#E59E47">
-                      <span class="color-dot" style="background-color: #E59E47;"></span>
-                      <span data-i18n-key="popup.color.standardOrange">Standard Orange</span>
-                    </div>
+                    <div class="custom-option" data-value="#2A9D8F"><span class="color-dot" style="background-color: #2A9D8F;"></span><span data-i18n-key="popup.color.teal">Teal</span></div>
+                    <div class="custom-option" data-value="#6366F1"><span class="color-dot" style="background-color: #6366F1;"></span><span data-i18n-key="popup.color.indigo">Indigo</span></div>
+                    <div class="custom-option" data-value="#0EA5E9"><span class="color-dot" style="background-color: #0EA5E9;"></span><span data-i18n-key="popup.color.skyBlue">Sky Blue</span></div>
+                    <div class="custom-option" data-value="#1F7FDB"><span class="color-dot" style="background-color: #1F7FDB;"></span><span data-i18n-key="popup.color.standardBlue">Standard Blue</span></div>
+                    <div class="custom-option" data-value="#E9C46A"><span class="color-dot" style="background-color: #E9C46A;"></span><span data-i18n-key="popup.color.mustardYellow">Mustard Yellow</span></div>
+                    <div class="custom-option" data-value="#F59E0B"><span class="color-dot" style="background-color: #F59E0B;"></span><span data-i18n-key="popup.color.amber">Amber</span></div>
+                    <div class="custom-option" data-value="#8B5CF6"><span class="color-dot" style="background-color: #8B5CF6;"></span><span data-i18n-key="popup.color.softViolet">Soft Violet</span></div>
+                    <div class="custom-option" data-value="#F4A261"><span class="color-dot" style="background-color: #F4A261;"></span><span data-i18n-key="popup.color.goldenSand">Golden Sand</span></div>
+                    <div class="custom-option" data-value="#D4A373"><span class="color-dot" style="background-color: #D4A373;"></span><span data-i18n-key="popup.color.earthyOchre">Earthy Ochre</span></div>
+                    <div class="custom-option" data-value="#FFB703"><span class="color-dot" style="background-color: #FFB703;"></span><span data-i18n-key="popup.color.brightMarigold">Bright Marigold</span></div>
+                    <div class="custom-option" data-value="#C1A162"><span class="color-dot" style="background-color: #C1A162;"></span><span data-i18n-key="popup.color.mutedGold">Muted Gold</span></div>
+                    <div class="custom-option" data-value="#E59E47"><span class="color-dot" style="background-color: #E59E47;"></span><span data-i18n-key="popup.color.standardOrange">Standard Orange</span></div>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- Full Page Translation Text Color (Light) -->
+          </div>
+        </div>
+
+        <!-- Full Translate Group -->
+        <div class="section-group">
+          <div class="section-group-title">Full Translation</div>
+          <div class="card settings-card">
+            <!-- Full Translate Light Color -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" data-i18n-key="options.fullTranslateLightColor.label">Full Translate Text Color (Light)</label>
@@ -438,60 +407,24 @@
                     <span class="custom-select-arrow"></span>
                   </div>
                   <div class="custom-select-options">
-                    <div class="custom-option" data-value="#000000">
-                      <span class="color-dot" style="background-color: #000000;"></span>
-                      <span data-i18n-key="options.color.black">Black</span>
-                    </div>
-                    <div class="custom-option" data-value="#1e3a5f">
-                      <span class="color-dot" style="background-color: #1e3a5f;"></span>
-                      <span data-i18n-key="options.color.darkBlue">Dark Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#064e3b">
-                      <span class="color-dot" style="background-color: #064e3b;"></span>
-                      <span data-i18n-key="options.color.darkGreen">Dark Green</span>
-                    </div>
-                    <div class="custom-option" data-value="#0f766e">
-                      <span class="color-dot" style="background-color: #0f766e;"></span>
-                      <span data-i18n-key="options.color.deepTeal">Deep Teal</span>
-                    </div>
-                    <div class="custom-option" data-value="#1d4ed8">
-                      <span class="color-dot" style="background-color: #1d4ed8;"></span>
-                      <span data-i18n-key="options.color.cobaltBlue">Cobalt Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#1e40af">
-                      <span class="color-dot" style="background-color: #1e40af;"></span>
-                      <span data-i18n-key="options.color.royalBlue">Royal Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#166534">
-                      <span class="color-dot" style="background-color: #166534;"></span>
-                      <span data-i18n-key="options.color.forestGreen">Forest Green</span>
-                    </div>
-                    <div class="custom-option" data-value="#6d28d9">
-                      <span class="color-dot" style="background-color: #6d28d9;"></span>
-                      <span data-i18n-key="options.color.purple">Purple</span>
-                    </div>
-                    <div class="custom-option" data-value="#7c2d12">
-                      <span class="color-dot" style="background-color: #7c2d12;"></span>
-                      <span data-i18n-key="options.color.burntSienna">Burnt Sienna</span>
-                    </div>
-                    <div class="custom-option" data-value="#3b0764">
-                      <span class="color-dot" style="background-color: #3b0764;"></span>
-                      <span data-i18n-key="options.color.eggplant">Eggplant</span>
-                    </div>
-                    <div class="custom-option" data-value="#0c4a6e">
-                      <span class="color-dot" style="background-color: #0c4a6e;"></span>
-                      <span data-i18n-key="options.color.deepSkyBlue">Deep Sky Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#059669">
-                      <span class="color-dot" style="background-color: #059669;"></span>
-                      <span data-i18n-key="options.color.emeraldGreen">Emerald Green</span>
-                    </div>
+                    <div class="custom-option" data-value="#000000"><span class="color-dot" style="background-color: #000000;"></span><span data-i18n-key="options.color.black">Black</span></div>
+                    <div class="custom-option" data-value="#1e3a5f"><span class="color-dot" style="background-color: #1e3a5f;"></span><span data-i18n-key="options.color.darkBlue">Dark Blue</span></div>
+                    <div class="custom-option" data-value="#064e3b"><span class="color-dot" style="background-color: #064e3b;"></span><span data-i18n-key="options.color.darkGreen">Dark Green</span></div>
+                    <div class="custom-option" data-value="#0f766e"><span class="color-dot" style="background-color: #0f766e;"></span><span data-i18n-key="options.color.deepTeal">Deep Teal</span></div>
+                    <div class="custom-option" data-value="#1d4ed8"><span class="color-dot" style="background-color: #1d4ed8;"></span><span data-i18n-key="options.color.cobaltBlue">Cobalt Blue</span></div>
+                    <div class="custom-option" data-value="#1e40af"><span class="color-dot" style="background-color: #1e40af;"></span><span data-i18n-key="options.color.royalBlue">Royal Blue</span></div>
+                    <div class="custom-option" data-value="#166534"><span class="color-dot" style="background-color: #166534;"></span><span data-i18n-key="options.color.forestGreen">Forest Green</span></div>
+                    <div class="custom-option" data-value="#6d28d9"><span class="color-dot" style="background-color: #6d28d9;"></span><span data-i18n-key="options.color.purple">Purple</span></div>
+                    <div class="custom-option" data-value="#7c2d12"><span class="color-dot" style="background-color: #7c2d12;"></span><span data-i18n-key="options.color.burntSienna">Burnt Sienna</span></div>
+                    <div class="custom-option" data-value="#3b0764"><span class="color-dot" style="background-color: #3b0764;"></span><span data-i18n-key="options.color.eggplant">Eggplant</span></div>
+                    <div class="custom-option" data-value="#0c4a6e"><span class="color-dot" style="background-color: #0c4a6e;"></span><span data-i18n-key="options.color.deepSkyBlue">Deep Sky Blue</span></div>
+                    <div class="custom-option" data-value="#059669"><span class="color-dot" style="background-color: #059669;"></span><span data-i18n-key="options.color.emeraldGreen">Emerald Green</span></div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Full Page Translation Text Color (Dark) -->
+            <!-- Full Translate Dark Color -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" data-i18n-key="options.fullTranslateDarkColor.label">Full Translate Text Color (Dark)</label>
@@ -504,114 +437,80 @@
                     <span class="custom-select-arrow"></span>
                   </div>
                   <div class="custom-select-options">
-                    <div class="custom-option" data-value="#ffffff">
-                      <span class="color-dot" style="background-color: #ffffff;"></span>
-                      <span data-i18n-key="options.color.white">White</span>
-                    </div>
-                    <div class="custom-option" data-value="#6ee7b7">
-                      <span class="color-dot" style="background-color: #6ee7b7;"></span>
-                      <span data-i18n-key="options.color.lightGreen">Light Green</span>
-                    </div>
-                    <div class="custom-option" data-value="#93c5fd">
-                      <span class="color-dot" style="background-color: #93c5fd;"></span>
-                      <span data-i18n-key="options.color.lightBlue">Light Blue</span>
-                    </div>
-                    <div class="custom-option" data-value="#5eead4">
-                      <span class="color-dot" style="background-color: #5eead4;"></span>
-                      <span data-i18n-key="options.color.mint">Mint</span>
-                    </div>
-                    <div class="custom-option" data-value="#fde68a">
-                      <span class="color-dot" style="background-color: #fde68a;"></span>
-                      <span data-i18n-key="options.color.lightYellow">Light Yellow</span>
-                    </div>
-                    <div class="custom-option" data-value="#f0abfc">
-                      <span class="color-dot" style="background-color: #f0abfc;"></span>
-                      <span data-i18n-key="options.color.lightPurple">Light Purple</span>
-                    </div>
-                    <div class="custom-option" data-value="#fdba74">
-                      <span class="color-dot" style="background-color: #fdba74;"></span>
-                      <span data-i18n-key="options.color.lightOrange">Light Orange</span>
-                    </div>
-                    <div class="custom-option" data-value="#fca5a5">
-                      <span class="color-dot" style="background-color: #fca5a5;"></span>
-                      <span data-i18n-key="options.color.lightRed">Light Red</span>
-                    </div>
-                    <div class="custom-option" data-value="#e2e8f0">
-                      <span class="color-dot" style="background-color: #e2e8f0;"></span>
-                      <span data-i18n-key="options.color.lightGray">Light Gray</span>
-                    </div>
-                    <div class="custom-option" data-value="#a5f3fc">
-                      <span class="color-dot" style="background-color: #a5f3fc;"></span>
-                      <span data-i18n-key="options.color.lightCyan">Light Cyan</span>
-                    </div>
-                    <div class="custom-option" data-value="#bef264">
-                      <span class="color-dot" style="background-color: #bef264;"></span>
-                      <span data-i18n-key="options.color.yellowGreen">Yellow Green</span>
-                    </div>
+                    <div class="custom-option" data-value="#ffffff"><span class="color-dot" style="background-color: #ffffff;"></span><span data-i18n-key="options.color.white">White</span></div>
+                    <div class="custom-option" data-value="#6ee7b7"><span class="color-dot" style="background-color: #6ee7b7;"></span><span data-i18n-key="options.color.lightGreen">Light Green</span></div>
+                    <div class="custom-option" data-value="#93c5fd"><span class="color-dot" style="background-color: #93c5fd;"></span><span data-i18n-key="options.color.lightBlue">Light Blue</span></div>
+                    <div class="custom-option" data-value="#5eead4"><span class="color-dot" style="background-color: #5eead4;"></span><span data-i18n-key="options.color.mint">Mint</span></div>
+                    <div class="custom-option" data-value="#fde68a"><span class="color-dot" style="background-color: #fde68a;"></span><span data-i18n-key="options.color.lightYellow">Light Yellow</span></div>
+                    <div class="custom-option" data-value="#f0abfc"><span class="color-dot" style="background-color: #f0abfc;"></span><span data-i18n-key="options.color.lightPurple">Light Purple</span></div>
+                    <div class="custom-option" data-value="#fdba74"><span class="color-dot" style="background-color: #fdba74;"></span><span data-i18n-key="options.color.lightOrange">Light Orange</span></div>
+                    <div class="custom-option" data-value="#fca5a5"><span class="color-dot" style="background-color: #fca5a5;"></span><span data-i18n-key="options.color.lightRed">Light Red</span></div>
+                    <div class="custom-option" data-value="#e2e8f0"><span class="color-dot" style="background-color: #e2e8f0;"></span><span data-i18n-key="options.color.lightGray">Light Gray</span></div>
+                    <div class="custom-option" data-value="#a5f3fc"><span class="color-dot" style="background-color: #a5f3fc;"></span><span data-i18n-key="options.color.lightCyan">Light Cyan</span></div>
+                    <div class="custom-option" data-value="#bef264"><span class="color-dot" style="background-color: #bef264;"></span><span data-i18n-key="options.color.yellowGreen">Yellow Green</span></div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Appearance Preview -->
-            <div class="appearance-preview">
-
-              <!-- Light Panel -->
-              <div class="ap-panel ap-panel--light">
-                <p class="ap-label" data-i18n-key="options.appearancePreview.lightLabel">Light</p>
-                <div class="ap-stage">
-                  <p class="ap-para">Machine learning models are transforming how
-                    we process information. These systems can recognize patterns
-                    in vast datasets with remarkable accuracy.</p>
-                  <!-- Underline preview rows -->
-                  <div class="ap-underline-demo">
-                    <div class="ap-underline-row">
-                      <span class="ap-underline-text">learning</span>
-                      <div class="ap-word-tooltip" id="ap-word-tooltip-light">学习</div>
-                    </div>
-                    <div class="ap-underline-row">
-                      <span class="ap-underline-text">recognize patterns</span>
-                      <div class="ap-sent-tooltip" id="ap-sent-tooltip-light">识别模式</div>
-                    </div>
-                  </div>
-                  <p class="ap-full-trans" id="ap-full-trans-light">机器学习模型正在改变我们处理信息的方式。这些系统能以惊人的准确率识别大量数据集中的模式。</p>
-                </div>
-              </div>
-
-              <!-- Dark Panel -->
-              <div class="ap-panel ap-panel--dark">
-                <p class="ap-label" data-i18n-key="options.appearancePreview.darkLabel">Dark</p>
-                <div class="ap-stage">
-                  <p class="ap-para">Machine learning models are transforming how
-                    we process information. These systems can recognize patterns
-                    in vast datasets with remarkable accuracy.</p>
-                  <!-- Underline preview rows -->
-                  <div class="ap-underline-demo">
-                    <div class="ap-underline-row">
-                      <span class="ap-underline-text">learning</span>
-                      <div class="ap-word-tooltip" id="ap-word-tooltip-dark">学习</div>
-                    </div>
-                    <div class="ap-underline-row">
-                      <span class="ap-underline-text">recognize patterns</span>
-                      <div class="ap-sent-tooltip" id="ap-sent-tooltip-dark">识别模式</div>
-                    </div>
-                  </div>
-                  <p class="ap-full-trans" id="ap-full-trans-dark">机器学习模型正在改变我们处理信息的方式。这些系统能以惊人的准确率识别大量数据集中的模式。</p>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
 
-        <div id="translation-engine-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="options.translationEngine.title">Translation Engine</h2>
+        <!-- Appearance Preview -->
+        <div class="section-group">
+          <div class="section-group-title">Preview</div>
+          <div class="appearance-preview">
+            <!-- Light Panel -->
+            <div class="ap-panel ap-panel--light">
+              <p class="ap-label" data-i18n-key="options.appearancePreview.lightLabel">Light</p>
+              <div class="ap-stage">
+                <p class="ap-para">Machine learning models are transforming how
+                  we process information. These systems can recognize patterns
+                  in vast datasets with remarkable accuracy.</p>
+                <div class="ap-underline-demo">
+                  <div class="ap-underline-row">
+                    <span class="ap-underline-text">learning</span>
+                    <div class="ap-word-tooltip" id="ap-word-tooltip-light">学习</div>
+                  </div>
+                  <div class="ap-underline-row">
+                    <span class="ap-underline-text">recognize patterns</span>
+                    <div class="ap-sent-tooltip" id="ap-sent-tooltip-light">识别模式</div>
+                  </div>
+                </div>
+                <p class="ap-full-trans" id="ap-full-trans-light">机器学习模型正在改变我们处理信息的方式。这些系统能以惊人的准确率识别大量数据集中的模式。</p>
+              </div>
+            </div>
+            <!-- Dark Panel -->
+            <div class="ap-panel ap-panel--dark">
+              <p class="ap-label" data-i18n-key="options.appearancePreview.darkLabel">Dark</p>
+              <div class="ap-stage">
+                <p class="ap-para">Machine learning models are transforming how
+                  we process information. These systems can recognize patterns
+                  in vast datasets with remarkable accuracy.</p>
+                <div class="ap-underline-demo">
+                  <div class="ap-underline-row">
+                    <span class="ap-underline-text">learning</span>
+                    <div class="ap-word-tooltip" id="ap-word-tooltip-dark">学习</div>
+                  </div>
+                  <div class="ap-underline-row">
+                    <span class="ap-underline-text">recognize patterns</span>
+                    <div class="ap-sent-tooltip" id="ap-sent-tooltip-dark">识别模式</div>
+                  </div>
+                </div>
+                <p class="ap-full-trans" id="ap-full-trans-dark">机器学习模型正在改变我们处理信息的方式。这些系统能以惊人的准确率识别大量数据集中的模式。</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <!-- Sub-section 1: Engine Selectors -->
-          <h3 class="card-title" style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: var(--text-primary); padding-left: 2px;" data-i18n-key="options.translationEngine.engineSelect.title">Engine Selection</h3>
-          <div class="card settings-card" style="margin-bottom: 32px;">
+      <!-- ─── Translation Engine ─────────────────────────────────── -->
+      <section id="translation-engine-settings" class="settings-section">
+        <h1 class="page-title" data-i18n-key="options.translationEngine.title">Translation Engine</h1>
+
+        <!-- Engine Selection -->
+        <div class="section-group">
+          <div class="section-group-title" data-i18n-key="options.translationEngine.engineSelect.title">Engine Selection</div>
+          <div class="card settings-card">
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="fullPageTranslationProviderSelect" data-i18n-key="options.translationEngine.fullPage.label">Full Page Translation</label>
@@ -623,7 +522,6 @@
                   <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
                   <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
                   <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
-                  <!-- Custom providers injected by JS -->
                 </select>
               </div>
             </div>
@@ -638,65 +536,68 @@
                   <option value="microsoftFree" data-i18n-key="popup.translationProvider.microsoftFree">Microsoft Translate</option>
                   <option value="bingTranslate" data-i18n-key="popup.translationProvider.bingTranslate">Bing Translate</option>
                   <option value="googleFree" data-i18n-key="popup.translationProvider.googleFree">Google Translate</option>
-                  <!-- Custom providers injected by JS -->
                 </select>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Sub-section 2: AI Providers -->
-          <div style="margin-bottom: 12px; padding-left: 2px;">
-            <h3 class="card-title" style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;" data-i18n-key="options.translationEngine.aiProviders.label">AI Translation Providers</h3>
-            <p class="section-subtitle" style="margin: 0; font-size: 13px; color: var(--text-secondary);" data-i18n-key="options.translationEngine.aiProviders.description">Add custom OpenAI-compatible API providers</p>
-          </div>
+        <!-- AI Providers -->
+        <div class="section-group">
+          <div class="section-group-title" data-i18n-key="options.translationEngine.aiProviders.label">AI Translation Providers</div>
+          <p class="page-desc" data-i18n-key="options.translationEngine.aiProviders.description">Add custom OpenAI-compatible API providers</p>
           <div class="card settings-card">
-            <!-- Provider list: populated by JS -->
+            <!-- Provider list (JS-populated) -->
             <div id="aiProviderList"></div>
 
-            <!-- Add/edit form (hidden by default) -->
-            <div id="aiProviderForm" style="display:none; padding: 16px; border-top: 1px solid rgba(0,0,0,0.06); background: #f9faff;">
+            <!-- Add/edit form (hidden) -->
+            <div id="aiProviderForm" class="ai-form" style="display:none;">
               <input type="hidden" id="aiProviderFormId">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.name">Name</label>
+              <div class="ai-form-grid">
+                <div class="ai-form-field">
+                  <label class="ai-form-label" data-i18n-key="options.translationEngine.aiProviders.form.name">Name</label>
                   <input type="text" id="aiProviderName" class="text-input" placeholder="e.g. My GPT-4o">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.model">Model</label>
+                <div class="ai-form-field">
+                  <label class="ai-form-label" data-i18n-key="options.translationEngine.aiProviders.form.model">Model</label>
                   <input type="text" id="aiProviderModel" class="text-input" placeholder="gpt-4o-mini">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 5px; grid-column: 1 / -1;">
-                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.endpoint">API Endpoint</label>
+                <div class="ai-form-field ai-form-field--full">
+                  <label class="ai-form-label" data-i18n-key="options.translationEngine.aiProviders.form.endpoint">API Endpoint</label>
                   <input type="text" id="aiProviderEndpoint" class="text-input" placeholder="https://api.openai.com/v1">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 5px; grid-column: 1 / -1;">
-                  <label style="font-size: 12px; font-weight: 500; color: #555;" data-i18n-key="options.translationEngine.aiProviders.form.apiKey">API Key</label>
+                <div class="ai-form-field ai-form-field--full">
+                  <label class="ai-form-label" data-i18n-key="options.translationEngine.aiProviders.form.apiKey">API Key</label>
                   <input type="password" id="aiProviderApiKey" class="text-input" placeholder="sk-...">
                 </div>
               </div>
-              <div style="display: flex; justify-content: flex-end; gap: 8px;">
-                <button id="aiProviderFormTest" class="secondary-button" style="margin-right: auto;" data-i18n-key="options.translationEngine.aiProviders.form.test">Test</button>
-                <span id="aiProviderFormTestResult" style="font-size: 12px; margin-right: 4px;"></span>
+              <div class="ai-form-actions">
+                <button id="aiProviderFormTest" class="secondary-button" data-i18n-key="options.translationEngine.aiProviders.form.test">Test</button>
+                <span id="aiProviderFormTestResult" style="font-size: 12px;"></span>
                 <button id="aiProviderFormCancel" class="secondary-button" data-i18n-key="options.translationEngine.aiProviders.form.cancel">Cancel</button>
                 <button id="aiProviderFormSave" class="primary-button" data-i18n-key="options.translationEngine.aiProviders.form.save">Save</button>
               </div>
             </div>
 
-            <!-- Card footer: Add button -->
-            <div style="padding: 12px 16px; border-top: 1px solid rgba(0,0,0,0.06); background: #fafafa;">
+            <!-- Add button -->
+            <div class="ai-form-footer">
               <button id="addAiProviderBtn" class="secondary-button" data-i18n-key="options.translationEngine.aiProviders.addBtn">+ Add AI Provider</button>
             </div>
           </div>
         </div>
+      </section>
 
-        <div id="display-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.text">Text Settings</h2>
-          </div>
+      <!-- ─── Text ───────────────────────────────────────────────── -->
+      <section id="display-settings" class="settings-section">
+        <h1 class="page-title" data-i18n-key="popup.section.text">Text</h1>
+
+        <!-- Typography -->
+        <div class="section-group">
+          <div class="section-group-title">Typography</div>
           <div class="card settings-card">
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="translationFontSizePreset" data-i18n-key="popup.translationFontSize.label">Translation Font Size</label>
+                <label class="setting-label" for="translationFontSizePresetV2" data-i18n-key="popup.translationFontSize.label">Translation Font Size</label>
               </div>
               <div class="setting-control">
                 <select id="translationFontSizePresetV2" data-setting="translationFontSizePresetV2" class="select-input">
@@ -719,7 +620,6 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
-
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="restoreLineHeightOnClear">
@@ -732,7 +632,14 @@
                 <span class="toggle-slider"></span>
               </label>
             </div>
+          </div>
+        </div>
 
+        <!-- Fine-tune -->
+        <div class="section-group">
+          <div class="section-group-title">Fine-tune</div>
+          <div class="card settings-card">
+            <!-- Bottom Spacing -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="tooltipBottomSpacingPxV3" data-i18n-key="popup.tooltipBottomSpacingPxV3.label">Tooltip Bottom Spacing (px)</label>
@@ -747,7 +654,7 @@
                 </div>
               </div>
             </div>
-
+            <!-- Text Offset -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="tooltipTextOffsetPxV3" data-i18n-key="popup.tooltipTextOffsetPxV3.label">Translation Vertical Position (px)</label>
@@ -762,7 +669,7 @@
                 </div>
               </div>
             </div>
-
+            <!-- Underline Offset -->
             <div class="setting-item">
               <div class="setting-info">
                 <label class="setting-label" for="tooltipUnderlineOffsetPxV3" data-i18n-key="popup.tooltipUnderlineOffsetPxV3.label">Underline Offset (px)</label>
@@ -778,6 +685,7 @@
               </div>
             </div>
 
+            <!-- Tooltip Preview -->
             <div class="tooltip-preview" id="tooltipPreview">
               <div class="tooltip-preview-stage" id="tooltipPreviewStage">
                 <p class="tooltip-preview-paragraph" id="tooltipPreviewParagraph">
@@ -795,11 +703,13 @@
             </div>
           </div>
         </div>
+      </section>
 
-        <div id="audio-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.audio">Audio Settings</h2>
-          </div>
+      <!-- ─── Audio ──────────────────────────────────────────────── -->
+      <section id="audio-settings" class="settings-section">
+        <h1 class="page-title" data-i18n-key="popup.section.audio">Audio</h1>
+        <div class="section-group">
+          <div class="section-group-title">Pronunciation</div>
           <div class="card settings-card">
             <div class="setting-item" id="autoPlayAudioSettingItem">
               <div class="setting-info">
@@ -813,15 +723,15 @@
             </div>
           </div>
         </div>
+      </section>
 
-        <div id="advanced-settings" class="settings-section">
-          <div class="section-header">
-            <h2 data-i18n-key="popup.section.advanced">Advanced</h2>
-          </div>
-
-          <h3 class="card-title" id="connectionCardTitle" data-i18n-key="popup.section.network" style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: var(--text-primary); padding-left: 2px;">Connection</h3>
-          <div class="card settings-card" id="connectionCard" style="margin-bottom: 32px; padding: 16px;">
-            <p class="section-subtitle" data-i18n-key="popup.networkRegion.helper" style="margin: 0 0 12px 0;">Choose a specific network route to bypass connection issues.</p>
+      <!-- ─── Advanced ───────────────────────────────────────────── -->
+      <section id="advanced-settings" class="settings-section">
+        <h1 class="page-title" data-i18n-key="popup.section.advanced">Advanced</h1>
+        <div class="section-group">
+          <h3 class="section-group-title" id="connectionCardTitle" data-i18n-key="popup.section.network">Connection</h3>
+          <p class="page-desc" data-i18n-key="popup.networkRegion.helper">Choose a specific network route to bypass connection issues.</p>
+          <div class="card settings-card" id="connectionCard">
             <div class="radio-group">
               <label class="radio-card">
                 <input type="radio" name="networkRegion" value="auto" data-setting="networkRegion">
@@ -848,6 +758,7 @@
           </div>
         </div>
       </section>
+
     </main>
   </div>
   <script type="module" src="index.ts"></script>
