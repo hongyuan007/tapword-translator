@@ -300,6 +300,7 @@ function buildFormElement(provider: CustomAiProvider): HTMLElement {
 
     form.appendChild(hiddenId)
     form.appendChild(grid)
+    form.appendChild(checkboxRow)
     form.appendChild(actions)
     return form
 }

@@ -24,6 +24,12 @@ export class OpenAICompatibleClient {
     private maxTokens: number
     private useMaxCompletionTokens: boolean
 
+    private get tokenParam(): Record<string, number> {
+        return this.useMaxCompletionTokens
+            ? { max_completion_tokens: this.maxTokens }
+            : { max_tokens: this.maxTokens }
+    }
+
     /**
      * Create a new LLM client instance
      * @param config LLM provider configuration
@@ -59,15 +65,11 @@ export class OpenAICompatibleClient {
         try {
             logger.debug(`Sending request to LLM (model: ${this.model}, messages: ${messages.length})`)
 
-            const tokenParam = this.useMaxCompletionTokens
-                ? { max_completion_tokens: this.maxTokens } as const
-                : { max_tokens: this.maxTokens } as const
-
             const completion = await this.client.chat.completions.create({
                 model: this.model,
                 messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
                 temperature: this.temperature,
-                ...tokenParam,
+                ...this.tokenParam,
                 response_format: { type: "json_object" },
             })
 
@@ -118,15 +120,11 @@ export class OpenAICompatibleClient {
         try {
             logger.debug(`Sending text request to LLM (model: ${this.model}, messages: ${messages.length})`)
 
-            const tokenParam = this.useMaxCompletionTokens
-                ? { max_completion_tokens: this.maxTokens } as const
-                : { max_tokens: this.maxTokens } as const
-
             const completion = await this.client.chat.completions.create({
                 model: this.model,
                 messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
                 temperature: this.temperature,
-                ...tokenParam,
+                ...this.tokenParam,
             })
 
             const content = completion.choices[0]?.message?.content

@@ -139,4 +139,14 @@ describe("OpenAICompatibleClient — useMaxCompletionTokens flag", () => {
         expect(callArg).toHaveProperty("max_completion_tokens", 1200)
         expect(callArg).not.toHaveProperty("max_tokens")
     })
+
+    it("generateText without flag uses max_tokens", async () => {
+        mockCreate.mockResolvedValue({ choices: [{ message: { content: "plain text" } }] })
+        const client = makeClient()
+        await client.generateText(messages)
+
+        const callArg = mockCreate.mock.calls[0][0]
+        expect(callArg).toHaveProperty("max_tokens", 1200)
+        expect(callArg).not.toHaveProperty("max_completion_tokens")
+    })
 })
