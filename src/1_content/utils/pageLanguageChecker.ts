@@ -5,6 +5,11 @@
  */
 
 import * as loggerModule from '@/0_common/utils/logger';
+import {
+    normalizeLanguageTagFull as normalizeLangTag,
+    normalizeLocaleMeta,
+    isSameLanguage,
+} from '@/0_common/utils/languageTagUtils';
 
 const logger = loggerModule.createLogger('pageLanguageChecker');
 
@@ -20,7 +25,7 @@ const REGEX_CYRILLIC = /\p{Script=Cyrillic}/u;
 
 /**
  * Detect the page's declared language from HTML metadata.
- * Returns a normalized base language code (e.g., "zh", "en", "ja").
+ * Returns a normalized full language code preserving subtags (e.g., "zh-cn", "zh-tw", "en", "ja").
  */
 function getPageDeclaredLanguage(): string {
     if (typeof document === 'undefined') return '';
@@ -31,12 +36,17 @@ function getPageDeclaredLanguage(): string {
     const xmlLang = normalizeLangTag(document.documentElement.getAttribute('xml:lang'));
     if (xmlLang) return xmlLang;
 
-    const ogLocale = normalizeLangTag(
+    const ogLocale = normalizeLocaleMeta(
         document.querySelector('meta[property="og:locale"]')?.getAttribute('content')
     );
-    const contentLanguage = normalizeLangTag(
+    const contentLanguage = normalizeLocaleMeta(
         document.querySelector('meta[http-equiv="content-language"]')?.getAttribute('content')
     );
+
+    // Only trust meta tags when they agree; conflicting signals are unreliable
+    if (ogLocale && contentLanguage) {
+        return ogLocale === contentLanguage ? ogLocale : '';
+    }
 
     return ogLocale || contentLanguage || '';
 }
@@ -78,17 +88,17 @@ function detectLanguageFromContent(): string {
  * 1. HTML metadata (lang attribute, og:locale, content-language meta)
  * 2. Script-based content sampling (for CJK and Cyrillic scripts)
  *
- * @param targetLanguage - User's target translation language (e.g., "zh", "ja", "en")
+ * @param targetLanguage - User's target translation language (e.g., "zh", "zh-Hant", "ja", "en")
  * @returns true if the page appears to be in the target language
  */
 export function isPageLanguageSameAsTarget(targetLanguage: string): boolean {
-    const tgt = targetLanguage.toLowerCase().split('-')[0] ?? '';
+    const tgt = (targetLanguage || '').toLowerCase();
     if (!tgt) return false;
 
     // Signal 1: declared language from metadata
     const declared = getPageDeclaredLanguage();
     if (declared) {
-        const match = declared === tgt;
+        const match = isSameLanguage(declared, tgt);
         logger.debug(`Page declared language: "${declared}", target: "${tgt}", match: ${match}`);
         return match;
     }
@@ -96,16 +106,11 @@ export function isPageLanguageSameAsTarget(targetLanguage: string): boolean {
     // Signal 2: script-based content sampling
     const detected = detectLanguageFromContent();
     if (detected) {
-        const match = detected === tgt;
+        const match = isSameLanguage(detected, tgt);
         logger.debug(`Page detected language (content sampling): "${detected}", target: "${tgt}", match: ${match}`);
         return match;
     }
 
     logger.debug(`Page language undetermined, assuming not same as target: "${tgt}"`);
     return false;
-}
-
-function normalizeLangTag(tag: string | null | undefined): string {
-    if (!tag) return '';
-    return tag.toLowerCase().split(/[-_]/)[0]?.trim() ?? '';
 }

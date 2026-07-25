@@ -130,10 +130,23 @@ export function shouldTranslateParagraph(
  * Chinese-target optimization for full-page translation.
  * Skips blocks that are already clearly Chinese, while mixed-language blocks
  * still go to the backend so the model can translate the non-Chinese parts.
+ *
+ * For zh-Hant target: only skip text that is already Traditional Chinese.
+ * Simplified or script-neutral text should still be translated (simp→trad).
  */
 function shouldSkipChineseTargetLanguageText(text: string, targetLanguage?: string): boolean {
     const normalizedTarget = (targetLanguage || '').toLowerCase().split(/[-_]/)[0] ?? '';
     if (normalizedTarget !== CHINESE_TARGET_LANG) return false;
+
+    // For Traditional Chinese target, don't skip text that might be Simplified.
+    // The full-page translator should handle both directions (simp→trad and trad→simp).
+    // Only skip text that is clearly already in the target script.
+    // For now, keep the original behavior for plain "zh" target,
+    // but for "zh-Hant", only skip if the text contains Traditional characters.
+    const fullTarget = (targetLanguage || '').toLowerCase();
+    const isTraditionalTarget = fullTarget.includes('hant') ||
+                                fullTarget.includes('tw') ||
+                                fullTarget.includes('hk');
 
     const trimmed = text.trim();
     if (!trimmed) return false;
@@ -142,6 +155,16 @@ function shouldSkipChineseTargetLanguageText(text: string, targetLanguage?: stri
     const hanCount = trimmed.match(REGEX_HAN)?.length ?? 0;
     if (hanCount < CHINESE_TARGET_MIN_HAN_COUNT) return false;
 
+    // For zh-Hant target: only skip if text is already Traditional
+    if (isTraditionalTarget) {
+        // Check if text contains any Traditional-only characters
+        const hasTraditional = checkHasTraditionalChars(trimmed);
+        if (hasTraditional) return true;  // Already traditional, skip
+        // Text is simplified or neutral — don't skip, needs translation
+        return false;
+    }
+
+    // For plain zh target: original behavior
     const latinCount = trimmed.match(REGEX_LATIN)?.length ?? 0;
     if (latinCount === 0) return true;
 
@@ -149,6 +172,16 @@ function shouldSkipChineseTargetLanguageText(text: string, targetLanguage?: stri
     const hanRatio = comparableCount === 0 ? 0 : hanCount / comparableCount;
     return hanCount >= CHINESE_TARGET_DOMINANT_MIN_HAN_COUNT
         && hanRatio >= CHINESE_TARGET_DOMINANT_HAN_RATIO;
+}
+
+// Traditional Chinese indicator characters (subset for quick check)
+const TRADITIONAL_INDICATOR_CHARS = new Set("愛礙罷備筆畢邊變標佈測廠場暢車陳塵遲醜從達帶單當黨導敵電釣東動獨頓發罰煩訪費廢奮複負蓋幹剛綱個給宮貢構購穀顧僱掛廣歸龜貴國號轟鴻後護劃懷壞歡還匯會渾獲貨禍擊機積飢膚雞級幾計記際劑濟夾鉀價駕堅鉛儉劍漸礁膠腳較節莖驚經頸競舊劇據鋸覺決殼塊寬礦曠況虧來賴藍攔欄覽勞澇樂離禮歷勵隸連憐蓮聯鐮倆糧兩遼裂獵臨鄰靈領嶺劉陸錄慮論腦鬧釀鳥農盤龐賠噴騙貧評撲鋪樸氣遷僑橋竊欽親輕慶區權勸熱認灑傘喪掃澀殺曬閃陝賞燒設審聲勝聖詩時識實適釋壽書術樹雙誰絲鬆蘇雖隨歲損鎖態嘆討騰體塗團脫馱彎萬網衛穩務烏無膽鐘轉壯狀齊維穢濁興譽軒選學醫郵魚圓緣遠雲雜災髒戰張趙鎮爭鄭證織職執質滯種眾軸駐專莊裝髮準濟".split(""))
+
+function checkHasTraditionalChars(text: string): boolean {
+    for (const char of text) {
+        if (TRADITIONAL_INDICATOR_CHARS.has(char)) return true
+    }
+    return false
 }
 
 /** Flush accumulated inline nodes into a TranslationUnit if they have text content */
