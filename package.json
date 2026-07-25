@@ -34,6 +34,9 @@
         "test": "vitest --config config/vitest.config.ts",
         "test:e2e": "playwright test -c config/playwright.config.ts",
         "test:e2e:headed": "playwright test -c config/playwright.config.ts --headed",
+        "test:ai-e2e": "playwright test -c tests/ai-e2e/config/playwright.config.ts --headed",
+        "test:ai-e2e:fixture": "playwright test -c tests/ai-e2e/config/playwright.config.ts --headed --grep fixture",
+        "test:ai-e2e:real": "playwright test -c tests/ai-e2e/config/playwright.config.ts --headed --grep real",
         "format": "prettier --config config/.prettierrc.json --write \"src/**/*.ts\"",
         "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint --config config/.eslintrc.json \"src/**/*.ts\""
     },
