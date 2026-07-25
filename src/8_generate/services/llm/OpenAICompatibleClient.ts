@@ -22,6 +22,7 @@ export class OpenAICompatibleClient {
     private model: string
     private temperature: number
     private maxTokens: number
+    private useMaxCompletionTokens: boolean
 
     /**
      * Create a new LLM client instance
@@ -42,6 +43,7 @@ export class OpenAICompatibleClient {
         this.model = config.model
         this.temperature = config.temperature ?? constants.DEFAULT_TEMPERATURE
         this.maxTokens = config.maxTokens ?? constants.DEFAULT_MAX_TOKENS
+        this.useMaxCompletionTokens = config.useMaxCompletionTokens ?? false
 
         logger.info(`Initialized OpenAICompatibleClient with model: ${this.model}`)
     }
@@ -57,11 +59,15 @@ export class OpenAICompatibleClient {
         try {
             logger.debug(`Sending request to LLM (model: ${this.model}, messages: ${messages.length})`)
 
+            const tokenParam = this.useMaxCompletionTokens
+                ? { max_completion_tokens: this.maxTokens } as const
+                : { max_tokens: this.maxTokens } as const
+
             const completion = await this.client.chat.completions.create({
                 model: this.model,
                 messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
                 temperature: this.temperature,
-                max_tokens: this.maxTokens,
+                ...tokenParam,
                 response_format: { type: "json_object" },
             })
 
@@ -112,11 +118,15 @@ export class OpenAICompatibleClient {
         try {
             logger.debug(`Sending text request to LLM (model: ${this.model}, messages: ${messages.length})`)
 
+            const tokenParam = this.useMaxCompletionTokens
+                ? { max_completion_tokens: this.maxTokens } as const
+                : { max_tokens: this.maxTokens } as const
+
             const completion = await this.client.chat.completions.create({
                 model: this.model,
                 messages: messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
                 temperature: this.temperature,
-                max_tokens: this.maxTokens,
+                ...tokenParam,
             })
 
             const content = completion.choices[0]?.message?.content

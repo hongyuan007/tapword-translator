@@ -29,6 +29,8 @@ export interface LLMConfig {
     temperature?: number
     /** Maximum tokens to generate (default: 1200) */
     maxTokens?: number
+    /** Use max_completion_tokens instead of max_tokens. Required for OpenAI gpt-5 and o-series models. Default: false */
+    useMaxCompletionTokens?: boolean
     /** Request timeout in milliseconds (default: 10000) */
     timeout?: number
 }

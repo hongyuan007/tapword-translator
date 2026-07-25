@@ -71,6 +71,7 @@ function buildLocalLlmConfig(customProvider: CustomAiProvider): LLMConfig {
         temperature: CUSTOM_API_FIXED_PARAMS.temperature,
         maxTokens: CUSTOM_API_FIXED_PARAMS.maxTokens,
         timeout: CUSTOM_API_FIXED_PARAMS.timeout,
+        useMaxCompletionTokens: customProvider.useMaxCompletionTokens ?? false,
     }
 }
 
