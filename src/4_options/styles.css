@@ -126,7 +126,7 @@ body {
 .nav-item.active {
   color: var(--brand-pink-deep);
   border-left-color: var(--brand-pink);
-  background: var(--brand-pink-soft);
+  background: color-mix(in srgb, var(--brand-pink-soft) 60%, transparent); /* 弱化选中底 */
   font-weight: 500;
 }
 
@@ -143,11 +143,27 @@ body {
   font-size: 11px;
   color: var(--ink-tertiary);
   font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.nav-footer .ghost-button {
+  padding: 4px 8px 4px 0;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.nav-footer .btn-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
 /* ── Content Area ──────────────────────────────────────────────── */
 .settings-content {
   flex: 1;
+  max-width: 483px; /* mockup 内容列宽（683 总宽 - 200 导航） */
   padding: 28px 32px 60px;
   min-width: 0;
 }
@@ -175,7 +191,7 @@ body {
 }
 
 .section-group {
-  margin-bottom: 24px;
+  margin-bottom: 36px; /* mockup 组间节奏（原 24px 偏紧） */
 }
 
 .section-group-title {
@@ -188,10 +204,11 @@ body {
 }
 
 .card {
-  background: #fff;
-  border: 1px solid var(--paper-border);
-  border-radius: var(--radius-card);
-  padding: 4px 16px;
+  /* Flat paper style: no white card boxes — groups sit directly on paper bg */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .settings-card {
@@ -206,11 +223,11 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 13px 0;
+  padding: 15px 0; /* mockup 行距（原 13px 偏紧） */
 }
 
 .setting-item + .setting-item {
-  border-top: 1px solid var(--paper-border);
+  border-top: 1px solid color-mix(in srgb, var(--paper-border) 55%, transparent); /* 分隔线减淡 */
 }
 
 .setting-item.is-disabled {
@@ -252,12 +269,31 @@ body {
 .setting-control {
   flex-shrink: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
 }
 
-/* ── Trigger Key Container ─────────────────────────────────────── */
+/* ── Trigger Key Inline Control ────────────────────────────────── */
+.trigger-control {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.trigger-control .trigger-key-select {
+  min-width: 100px;
+  width: auto;
+  font-size: 13px;
+}
+
+/* ── Keyboard Hint ─────────────────────────────────────────────── */
+.kbd-hint {
+  font-size: 13px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+
+/* ── Plus Separator (deprecated) ────────────────────────────────── */
 .trigger-key-container {
   display: flex;
   align-items: center;
@@ -391,6 +427,51 @@ body {
   border-color: var(--ink-tertiary);
 }
 
+/* ── Segmented Control (Font Size Preset) ──────────────────────── */
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--paper-border);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.segmented-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-right: 1px solid var(--paper-border);
+  transition: all 0.15s;
+}
+
+.segmented-option:last-child {
+  border-right: none;
+}
+
+.segmented-option input[type="radio"] {
+  display: none;
+}
+
+.segmented-option span {
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+
+.segmented-option:has(input:checked) span {
+  background: var(--brand-pink);
+  color: #fff;
+  font-weight: 500;
+}
+
+.segmented-option:hover span {
+  background: var(--paper-bg-inset);
+}
+
+.segmented-option:has(input:checked):hover span {
+  background: var(--brand-pink-deep);
+}
+
 /* ── Range Input ───────────────────────────────────────────────── */
 .range-setting {
   width: 200px;
@@ -417,17 +498,19 @@ body {
 }
 
 .range-input {
-  --range-progress: 50%;
+  --range-progress: 50;
+  --range-thumb-size: 16px;
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
   height: 4px;
   border-radius: 999px;
+  /* 填充终点 = 按钮中心位置：thumb半径 + (100% - thumb宽) * progress/100 */
   background: linear-gradient(
     to right,
     var(--brand-pink) 0%,
-    var(--brand-pink) var(--range-progress),
-    var(--paper-border) var(--range-progress),
+    var(--brand-pink) calc(var(--range-thumb-size) / 2 + (100% - var(--range-thumb-size)) * var(--range-progress) / 100),
+    var(--paper-border) calc(var(--range-thumb-size) / 2 + (100% - var(--range-thumb-size)) * var(--range-progress) / 100),
     var(--paper-border) 100%
   );
   outline: none;
@@ -444,6 +527,7 @@ body {
   border: 2px solid var(--brand-pink);
   box-shadow: 0 1px 4px rgba(244, 114, 182, 0.25);
   cursor: pointer;
+  margin-top: -6px; /* (track 4px - thumb 16px) / 2，垂直居中 */
 }
 
 .range-input::-moz-range-thumb {
@@ -582,38 +666,55 @@ body {
 
 /* ── Icon Picker ───────────────────────────────────────────────── */
 .icon-picker-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end; /* mockup：右侧紧凑簇 */
+  gap: 6px;
   padding: 8px 0;
 }
 
+/* 划词图标颜色：mockup 4×2 紧凑簇（浮动球样式变体由 JS 生成，不限宽） */
+.icon-picker-container:not(#icon-variant-picker) {
+  max-width: 216px; /* 4×(48px) + 3×6px gap */
+  margin-left: auto;
+}
+
 .icon-option {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 6px;
+  padding: 4px;
   border: 2px solid transparent;
-  border-radius: var(--radius-control);
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: var(--paper-bg-inset);
+  background: transparent;
+}
+
+.icon-option .icon-preview svg {
+  width: 28px;
+  height: 28px;
 }
 
 .icon-option:hover {
-  background: var(--paper-bg);
-  border-color: var(--paper-border);
+  background: var(--paper-bg-inset);
 }
 
 .icon-option input[type="radio"] {
-  display: none;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .icon-option:has(input[type="radio"]:checked),
 .icon-option:has(input:checked) {
-  background: var(--brand-pink-soft);
+  background: transparent;
   border-color: var(--brand-pink);
 }
 
@@ -669,6 +770,7 @@ body {
 }
 
 .radio-card {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -676,7 +778,7 @@ body {
   padding: 10px 12px;
   border: 1px solid var(--paper-border);
   border-radius: var(--radius-control);
-  background: #fff;
+  background: transparent;
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 0;
@@ -693,11 +795,11 @@ body {
 }
 
 .radio-card input[type="radio"] {
-  margin: 0 0 6px 0;
-  width: 14px;
-  height: 14px;
-  accent-color: var(--brand-pink);
-  cursor: pointer;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .radio-info {
@@ -963,7 +1065,7 @@ body {
   transform: translateY(-50%);
   width: 8px;
   height: 8px;
-  background-color: #ef4444;
+  background-color: var(--brand-pink); /* 品牌粉（原红色 #ef4444 偏色） */
   border-radius: 50%;
   transition: all 0.3s ease;
   z-index: 1;
@@ -1037,9 +1139,27 @@ body {
 }
 
 .ai-form-footer {
-  padding: 10px 16px;
-  border-top: 1px solid var(--paper-border);
-  background: var(--paper-bg);
+  padding: 0;
+  border-top: none;
+  background: transparent;
+  margin-top: 10px;
+}
+
+/* Add AI Provider — dashed full-width button (mockup style) */
+#addAiProviderBtn {
+  display: block;
+  width: 100%;
+  padding: 11px 0;
+  border: 1px dashed var(--ink-tertiary);
+  background: transparent;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+
+#addAiProviderBtn:hover {
+  border-color: var(--brand-pink);
+  color: var(--brand-pink-deep);
+  background: var(--brand-pink-soft);
 }
 
 /* ── Provider Panels Container (JS height-animated) ────────────── */

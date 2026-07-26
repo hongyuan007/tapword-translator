@@ -118,7 +118,7 @@ function bindRangeValue(input: HTMLInputElement | null, valueElementId: string):
         const max = Number(input.max || 100)
         const value = Number(input.value)
         const percent = max > min ? ((value - min) / (max - min)) * 100 : 0
-        input.style.setProperty("--range-progress", `${percent}%`)
+        input.style.setProperty("--range-progress", `${percent}`)
     }
 
     update()
@@ -259,7 +259,8 @@ async function setupTooltipSpacingPreview(): Promise<void> {
 
         const autoAdjustHeight = autoAdjustHeightInput.checked
 
-        const resolved = translationFontSizeModule.resolveTranslationFontSize(fontPresetSelect.value as types.TranslationFontSizePreset)
+        const checkedPreset = fontPresetSelect.querySelector<HTMLInputElement>("input[type=\"radio\"]:checked")
+        const resolved = translationFontSizeModule.resolveTranslationFontSize((checkedPreset?.value ?? "medium") as types.TranslationFontSizePreset)
 
         paragraph.style.fontSize = `${PREVIEW_ORIGINAL_FONT_PX}px`
 

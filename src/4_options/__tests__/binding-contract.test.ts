@@ -65,7 +65,7 @@ describe('绑定契约测试', () => {
       { name: 'sentenceUnderlineColor', type: 'custom-select', description: '句子下划线颜色' },
       { name: 'fullTranslateLightColor', type: 'custom-select', description: '全文译文颜色（亮色）' },
       { name: 'fullTranslateDarkColor', type: 'custom-select', description: '全文译文颜色（暗色）' },
-      { name: 'translationFontSizePresetV2', type: 'select', description: '译文字号' },
+      { name: 'translationFontSizePresetV2', type: 'radio', radioCount: 4, description: '译文字号' },
       { name: 'autoAdjustHeight', type: 'checkbox', description: '自动调行高' },
       { name: 'restoreLineHeightOnClear', type: 'checkbox', description: '清除时还原行高' },
       { name: 'tooltipBottomSpacingPxV3', type: 'range', description: 'Tooltip 底部间距' },
@@ -310,7 +310,9 @@ describe('绑定契约测试', () => {
       { className: 'feature-dot', description: 'singleClick 红点标记' },
       { className: 'community-note', description: '社区版提示' },
       { className: 'trigger-key-select', description: '触发键 select 紧凑样式' },
-      { className: 'plus-separator', description: '触发键 + 文字之间的加号' },
+      { className: 'kbd-hint', description: '触发键行快捷键提示文字（按住/+ 双击）' },
+      { className: 'trigger-control', description: '触发键内联控件容器' },
+      { className: 'segmented', description: '字号分段选择器容器' },
     ];
 
     staticClasses.forEach(({ className, description }) => {

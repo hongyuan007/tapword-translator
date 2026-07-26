@@ -231,5 +231,13 @@
   "options.group.preview": "Предпросмотр",
   "options.group.typography": "Типографика",
   "options.group.fineTune": "Точная настройка",
-  "options.group.pronunciation": "Произношение"
+  "options.group.pronunciation": "Произношение",
+  "options.pageDesc.general": "Основное поведение перевода и языковые предпочтения",
+  "options.pageDesc.appearance": "Персонализация значков и цветов перевода",
+  "options.pageDesc.engine": "Выбор сервисов для разных сценариев перевода",
+  "options.pageDesc.text": "Типографика и тонкая настройка положения",
+  "options.pageDesc.audio": "Поведение озвучивания",
+  "options.pageDesc.advanced": "Сеть и подключение",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "Удерживайте",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ двойной клик"
 }

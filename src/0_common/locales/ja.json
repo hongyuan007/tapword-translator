@@ -231,5 +231,13 @@
   "options.group.preview": "プレビュー",
   "options.group.typography": "タイポグラフィ",
   "options.group.fineTune": "微調整",
-  "options.group.pronunciation": "発音"
+  "options.group.pronunciation": "発音",
+  "options.pageDesc.general": "基本的な翻訳動作と言語設定",
+  "options.pageDesc.appearance": "アイコンと翻訳カラーのカスタマイズ",
+  "options.pageDesc.engine": "翻訳シーンごとにサービスを選択",
+  "options.pageDesc.text": "翻訳のタイポグラフィと位置調整",
+  "options.pageDesc.audio": "音声読み上げの動作",
+  "options.pageDesc.advanced": "ネットワークと接続",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "長押し",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ ダブルクリック"
 }

@@ -28,12 +28,11 @@
       <div class="nav-section-label">系统</div>
       <a href="#advanced-settings" class="nav-item" data-section="advanced-settings" data-i18n-key="popup.section.advanced">Advanced</a>
 
-      <div class="nav-actions">
-        <button class="ghost-button" id="documentationButton" data-i18n-key="popup.websiteLink">Website</button>
-        <button class="ghost-button" id="githubButton">GitHub</button>
+      <div class="nav-footer">
+        <button class="ghost-button" id="documentationButton"><svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span data-i18n-key="popup.websiteLink">Website</span></button>
+        <button class="ghost-button" id="githubButton"><svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg><span>GitHub</span></button>
+        <span id="versionDisplay"></span>
       </div>
-
-      <div class="nav-footer"><span id="versionDisplay"></span></div>
     </nav>
 
     <!-- ════════════════════════════════════════════════════════════
@@ -44,6 +43,7 @@
       <!-- ─── General ─────────────────────────────────────────────── -->
       <section id="general-settings" class="settings-section active">
         <h1 class="page-title" data-i18n-key="popup.section.general">General</h1>
+        <p class="page-desc" data-i18n-key="options.pageDesc.general">Basic translation behavior and language preferences</p>
 
         <!-- Master switch -->
         <div class="section-group">
@@ -128,19 +128,20 @@
             <!-- Double Click Sentence Translate + Trigger Key -->
             <div class="setting-item" id="settingItem-doubleClickSentence">
               <div class="setting-info">
-                <div class="trigger-key-container">
-                  <select id="doubleClickSentenceTriggerKey" data-setting="doubleClickSentenceTriggerKey" class="select-input trigger-key-select">
-                    <!-- Options populated by JS based on OS -->
-                  </select>
-                  <span class="plus-separator">+</span>
-                  <label class="setting-label" for="doubleClickSentenceTranslate" data-i18n-key="popup.doubleClickSentenceTranslate.label" style="margin-bottom: 0;">Double-click Sentence</label>
-                </div>
+                <label class="setting-label" for="doubleClickSentenceTranslate" data-i18n-key="popup.doubleClickSentenceTranslate.label">Double-click Sentence</label>
                 <p class="setting-helper" data-i18n-key="popup.doubleClickSentenceTranslate.tooltip">Translate the whole sentence when double-clicking with a modifier key.</p>
               </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="doubleClickSentenceTranslate" data-setting="doubleClickSentenceTranslate">
-                <span class="toggle-slider"></span>
-              </label>
+              <div class="setting-control trigger-control">
+                <span class="kbd-hint" data-i18n-key="popup.doubleClickSentenceTranslate.holdPrefix">Hold</span>
+                <select id="doubleClickSentenceTriggerKey" data-setting="doubleClickSentenceTriggerKey" class="select-input trigger-key-select">
+                  <!-- Options populated by JS based on OS -->
+                </select>
+                <span class="kbd-hint" data-i18n-key="popup.doubleClickSentenceTranslate.holdSuffix">+ double-click</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="doubleClickSentenceTranslate" data-setting="doubleClickSentenceTranslate">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
             </div>
 
             <!-- Suppress Native Language -->
@@ -176,6 +177,7 @@
       <!-- ─── Appearance ──────────────────────────────────────────── -->
       <section id="appearance-settings" class="settings-section">
         <h1 class="page-title" data-i18n-key="popup.section.appearance">Appearance</h1>
+        <p class="page-desc" data-i18n-key="options.pageDesc.appearance">Personalize icons and translation colors</p>
 
         <!-- Icon Group -->
         <div class="section-group">
@@ -506,6 +508,7 @@
       <!-- ─── Translation Engine ─────────────────────────────────── -->
       <section id="translation-engine-settings" class="settings-section">
         <h1 class="page-title" data-i18n-key="options.translationEngine.title">Translation Engine</h1>
+        <p class="page-desc" data-i18n-key="options.pageDesc.engine">Choose services for different translation scenarios</p>
 
         <!-- Engine Selection -->
         <div class="section-group">
@@ -590,6 +593,7 @@
       <!-- ─── Text ───────────────────────────────────────────────── -->
       <section id="display-settings" class="settings-section">
         <h1 class="page-title" data-i18n-key="popup.section.text">Text</h1>
+        <p class="page-desc" data-i18n-key="options.pageDesc.text">Typography and position fine-tuning</p>
 
         <!-- Typography -->
         <div class="section-group">
@@ -597,15 +601,15 @@
           <div class="card settings-card">
             <div class="setting-item">
               <div class="setting-info">
-                <label class="setting-label" for="translationFontSizePresetV2" data-i18n-key="popup.translationFontSize.label">Translation Font Size</label>
+                <label class="setting-label" data-i18n-key="popup.translationFontSize.label">Translation Font Size</label>
               </div>
               <div class="setting-control">
-                <select id="translationFontSizePresetV2" data-setting="translationFontSizePresetV2" class="select-input">
-                  <option value="small" data-i18n-key="popup.translationFontSize.small">Small</option>
-                  <option value="medium" data-i18n-key="popup.translationFontSize.medium">Medium</option>
-                  <option value="large" data-i18n-key="popup.translationFontSize.large">Large</option>
-                  <option value="extraLarge" data-i18n-key="popup.translationFontSize.extraLarge">Extra Large</option>
-                </select>
+                <div class="segmented" id="translationFontSizePresetV2">
+                  <label class="segmented-option"><input type="radio" name="translationFontSizePresetV2" value="small" data-setting="translationFontSizePresetV2"><span data-i18n-key="popup.translationFontSize.small">Small</span></label>
+                  <label class="segmented-option"><input type="radio" name="translationFontSizePresetV2" value="medium" data-setting="translationFontSizePresetV2"><span data-i18n-key="popup.translationFontSize.medium">Medium</span></label>
+                  <label class="segmented-option"><input type="radio" name="translationFontSizePresetV2" value="large" data-setting="translationFontSizePresetV2"><span data-i18n-key="popup.translationFontSize.large">Large</span></label>
+                  <label class="segmented-option"><input type="radio" name="translationFontSizePresetV2" value="extraLarge" data-setting="translationFontSizePresetV2"><span data-i18n-key="popup.translationFontSize.extraLarge">Extra Large</span></label>
+                </div>
               </div>
             </div>
             <div class="setting-item">
@@ -708,6 +712,7 @@
       <!-- ─── Audio ──────────────────────────────────────────────── -->
       <section id="audio-settings" class="settings-section">
         <h1 class="page-title" data-i18n-key="popup.section.audio">Audio</h1>
+        <p class="page-desc" data-i18n-key="options.pageDesc.audio">Pronunciation behavior</p>
         <div class="section-group">
           <div class="section-group-title" data-i18n-key="options.group.pronunciation">Pronunciation</div>
           <div class="card settings-card">
@@ -728,6 +733,7 @@
       <!-- ─── Advanced ───────────────────────────────────────────── -->
       <section id="advanced-settings" class="settings-section">
         <h1 class="page-title" data-i18n-key="popup.section.advanced">Advanced</h1>
+        <p class="page-desc" data-i18n-key="options.pageDesc.advanced">Network and connection</p>
         <div class="section-group">
           <h3 class="section-group-title" id="connectionCardTitle" data-i18n-key="popup.section.network">Connection</h3>
           <p class="page-desc" data-i18n-key="popup.networkRegion.helper">Choose a specific network route to bypass connection issues.</p>

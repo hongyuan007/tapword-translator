@@ -284,5 +284,13 @@
   "options.group.preview": "Preview",
   "options.group.typography": "Typography",
   "options.group.fineTune": "Fine-tune",
-  "options.group.pronunciation": "Pronunciation"
+  "options.group.pronunciation": "Pronunciation",
+  "options.pageDesc.general": "Basic translation behavior and language preferences",
+  "options.pageDesc.appearance": "Personalize icons and translation colors",
+  "options.pageDesc.engine": "Choose services for different translation scenarios",
+  "options.pageDesc.text": "Typography and position fine-tuning",
+  "options.pageDesc.audio": "Pronunciation behavior",
+  "options.pageDesc.advanced": "Network and connection",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "Hold",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ double-click"
 }

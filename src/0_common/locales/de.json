@@ -231,5 +231,13 @@
   "options.group.preview": "Vorschau",
   "options.group.typography": "Typografie",
   "options.group.fineTune": "Feineinstellung",
-  "options.group.pronunciation": "Aussprache"
+  "options.group.pronunciation": "Aussprache",
+  "options.pageDesc.general": "Grundlegendes Übersetzungsverhalten und Spracheinstellungen",
+  "options.pageDesc.appearance": "Symbole und Übersetzungsfarben anpassen",
+  "options.pageDesc.engine": "Dienste für verschiedene Übersetzungsszenarien wählen",
+  "options.pageDesc.text": "Typografie und Positionsfeinabstimmung",
+  "options.pageDesc.audio": "Ausspracheverhalten",
+  "options.pageDesc.advanced": "Netzwerk und Verbindung",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "Halten",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ Doppelklick"
 }

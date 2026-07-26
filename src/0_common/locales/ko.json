@@ -231,5 +231,13 @@
   "options.group.preview": "미리보기",
   "options.group.typography": "타이포그래피",
   "options.group.fineTune": "미세 조정",
-  "options.group.pronunciation": "발음"
+  "options.group.pronunciation": "발음",
+  "options.pageDesc.general": "기본 번역 동작 및 언어 환경 설정",
+  "options.pageDesc.appearance": "아이콘 및 번역 색상 개인 설정",
+  "options.pageDesc.engine": "번역 시나리오별 서비스 선택",
+  "options.pageDesc.text": "번역문 타이포그래피 및 위치 미세 조정",
+  "options.pageDesc.audio": "음성 낭독 동작",
+  "options.pageDesc.advanced": "네트워크 및 연결",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "길게 누르기",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ 더블클릭"
 }
