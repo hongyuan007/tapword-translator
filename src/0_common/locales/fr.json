@@ -222,5 +222,22 @@
   "options.color.yellowGreen": "Yellow Green",
   "options.color.emeraldGreen": "Emerald Green",
   "options.translationEngine.engineSelect.title": "Sélection du moteur",
-  "popup.translationProvider.bingTranslate": "Bing Traduction"
+  "popup.translationProvider.bingTranslate": "Bing Traduction",
+  "options.group.masterSwitch": "Commutateur principal",
+  "options.group.behavior": "Comportement",
+  "options.group.icon": "Icône",
+  "options.group.underline": "Soulignement",
+  "options.group.fullTranslation": "Traduction complète",
+  "options.group.preview": "Aperçu",
+  "options.group.typography": "Typographie",
+  "options.group.fineTune": "Réglage fin",
+  "options.group.pronunciation": "Prononciation",
+  "options.pageDesc.general": "Comportement de traduction de base et préférences linguistiques",
+  "options.pageDesc.appearance": "Personnaliser les icônes et les couleurs de traduction",
+  "options.pageDesc.engine": "Choisir les services selon les scénarios de traduction",
+  "options.pageDesc.text": "Typographie et ajustement de position",
+  "options.pageDesc.audio": "Comportement de prononciation",
+  "options.pageDesc.advanced": "Réseau et connexion",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "Maintenez",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ double-clic"
 }

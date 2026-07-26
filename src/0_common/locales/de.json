@@ -222,5 +222,22 @@
   "options.color.yellowGreen": "Yellow Green",
   "options.color.emeraldGreen": "Emerald Green",
   "options.translationEngine.engineSelect.title": "Engine-Auswahl",
-  "popup.translationProvider.bingTranslate": "Bing Übersetzer"
+  "popup.translationProvider.bingTranslate": "Bing Übersetzer",
+  "options.group.masterSwitch": "Hauptschalter",
+  "options.group.behavior": "Verhalten",
+  "options.group.icon": "Symbol",
+  "options.group.underline": "Unterstreichung",
+  "options.group.fullTranslation": "Vollständige Übersetzung",
+  "options.group.preview": "Vorschau",
+  "options.group.typography": "Typografie",
+  "options.group.fineTune": "Feineinstellung",
+  "options.group.pronunciation": "Aussprache",
+  "options.pageDesc.general": "Grundlegendes Übersetzungsverhalten und Spracheinstellungen",
+  "options.pageDesc.appearance": "Symbole und Übersetzungsfarben anpassen",
+  "options.pageDesc.engine": "Dienste für verschiedene Übersetzungsszenarien wählen",
+  "options.pageDesc.text": "Typografie und Positionsfeinabstimmung",
+  "options.pageDesc.audio": "Ausspracheverhalten",
+  "options.pageDesc.advanced": "Netzwerk und Verbindung",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "Halten",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ Doppelklick"
 }

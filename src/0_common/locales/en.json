@@ -275,5 +275,22 @@
   "options.translationEngine.aiProviders.form.edit": "Edit",
   "options.translationEngine.aiProviders.form.delete": "Delete",
   "popup.translationProvider.officialExhausted": "TapWord Cloud Service quota exhausted",
-  "popup.translationProvider.bingTranslate": "Bing Translate"
+  "popup.translationProvider.bingTranslate": "Bing Translate",
+  "options.group.masterSwitch": "Master Switch",
+  "options.group.behavior": "Behavior",
+  "options.group.icon": "Icon",
+  "options.group.underline": "Underline",
+  "options.group.fullTranslation": "Full Translation",
+  "options.group.preview": "Preview",
+  "options.group.typography": "Typography",
+  "options.group.fineTune": "Fine-tune",
+  "options.group.pronunciation": "Pronunciation",
+  "options.pageDesc.general": "Basic translation behavior and language preferences",
+  "options.pageDesc.appearance": "Personalize icons and translation colors",
+  "options.pageDesc.engine": "Choose services for different translation scenarios",
+  "options.pageDesc.text": "Typography and position fine-tuning",
+  "options.pageDesc.audio": "Pronunciation behavior",
+  "options.pageDesc.advanced": "Network and connection",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "Hold",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ double-click"
 }

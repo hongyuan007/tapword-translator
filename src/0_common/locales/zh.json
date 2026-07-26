@@ -275,5 +275,22 @@
   "options.translationEngine.aiProviders.form.edit": "编辑",
   "options.translationEngine.aiProviders.form.delete": "删除",
   "popup.translationProvider.officialExhausted": "TapWord 云服务额度已用完",
-  "popup.translationProvider.bingTranslate": "必应翻译"
+  "popup.translationProvider.bingTranslate": "必应翻译",
+  "options.group.masterSwitch": "翻译开关",
+  "options.group.behavior": "翻译行为",
+  "options.group.icon": "图标",
+  "options.group.underline": "下划线",
+  "options.group.fullTranslation": "全文翻译",
+  "options.group.preview": "预览",
+  "options.group.typography": "排版",
+  "options.group.fineTune": "位置微调（像素）",
+  "options.group.pronunciation": "发音",
+  "options.pageDesc.general": "基础翻译行为与语言偏好",
+  "options.pageDesc.appearance": "图标与译文颜色的个性化",
+  "options.pageDesc.engine": "为不同翻译场景选择服务",
+  "options.pageDesc.text": "译文排版与位置微调",
+  "options.pageDesc.audio": "语音朗读行为",
+  "options.pageDesc.advanced": "网络与连接",
+  "popup.doubleClickSentenceTranslate.holdPrefix": "按住",
+  "popup.doubleClickSentenceTranslate.holdSuffix": "+ 双击"
 }
