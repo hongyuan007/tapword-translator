@@ -222,5 +222,14 @@
   "options.color.yellowGreen": "Yellow Green",
   "options.color.emeraldGreen": "Emerald Green",
   "options.translationEngine.engineSelect.title": "Sélection du moteur",
-  "popup.translationProvider.bingTranslate": "Bing Traduction"
+  "popup.translationProvider.bingTranslate": "Bing Traduction",
+  "options.group.masterSwitch": "Commutateur principal",
+  "options.group.behavior": "Comportement",
+  "options.group.icon": "Icône",
+  "options.group.underline": "Soulignement",
+  "options.group.fullTranslation": "Traduction complète",
+  "options.group.preview": "Aperçu",
+  "options.group.typography": "Typographie",
+  "options.group.fineTune": "Réglage fin",
+  "options.group.pronunciation": "Prononciation"
 }

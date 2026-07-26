@@ -222,5 +222,14 @@
   "options.color.yellowGreen": "Yellow Green",
   "options.color.emeraldGreen": "Emerald Green",
   "options.translationEngine.engineSelect.title": "エンジン選択",
-  "popup.translationProvider.bingTranslate": "Bing翻訳"
+  "popup.translationProvider.bingTranslate": "Bing翻訳",
+  "options.group.masterSwitch": "メインスイッチ",
+  "options.group.behavior": "動作",
+  "options.group.icon": "アイコン",
+  "options.group.underline": "下線",
+  "options.group.fullTranslation": "全文翻訳",
+  "options.group.preview": "プレビュー",
+  "options.group.typography": "タイポグラフィ",
+  "options.group.fineTune": "微調整",
+  "options.group.pronunciation": "発音"
 }

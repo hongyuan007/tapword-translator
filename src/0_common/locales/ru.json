@@ -222,5 +222,14 @@
   "options.color.yellowGreen": "Yellow Green",
   "options.color.emeraldGreen": "Emerald Green",
   "options.translationEngine.engineSelect.title": "Выбор движка",
-  "popup.translationProvider.bingTranslate": "Bing Переводчик"
+  "popup.translationProvider.bingTranslate": "Bing Переводчик",
+  "options.group.masterSwitch": "Главный переключатель",
+  "options.group.behavior": "Поведение",
+  "options.group.icon": "Значок",
+  "options.group.underline": "Подчеркивание",
+  "options.group.fullTranslation": "Полный перевод",
+  "options.group.preview": "Предпросмотр",
+  "options.group.typography": "Типографика",
+  "options.group.fineTune": "Точная настройка",
+  "options.group.pronunciation": "Произношение"
 }
