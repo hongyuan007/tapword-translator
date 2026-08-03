@@ -79,6 +79,7 @@ playwright-report/
 test-results/
 tests/e2e/test-results/
 tests/e2e/screenshots/
+tests/ai-e2e/output/
 
 # Agent related files
 .agents/

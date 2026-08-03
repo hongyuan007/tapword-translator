@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag Select Fixture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #0056b3;
+        }
+
+        p {
+            margin-bottom: 12px;
+        }
+
+        #target-word {
+            font-weight: bold;
+            color: #0056b3;
+        }
+
+        #darkModeToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            z-index: 10000;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ccc;
+        }
+
+        body.dark-mode h1 {
+            color: #5c9be0;
+        }
+
+        body.dark-mode #target-word {
+            color: #5c9be0;
+        }
+
+        body.dark-mode #darkModeToggle {
+            background-color: #333;
+            color: #fff;
+            border-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <div class="container">
+        <h1>Drag Select Test Page</h1>
+
+        <p>This page is designed for testing drag-to-select translation. Select any text below to trigger the translation icon.</p>
+
+        <h2>Primary Selection Targets</h2>
+        <p>The quick brown fox jumps over the lazy dog near the <span id="target-word">riverbank</span> while watching the sunset.</p>
+
+        <p>Another paragraph with a different <span id="target-word-2">technology</span> related word for selection testing.</p>
+
+        <h2>English Paragraphs</h2>
+        <p>Artificial intelligence has transformed the way we interact with technology. From voice assistants to recommendation systems, AI is everywhere in our daily lives.</p>
+
+        <p>The weather forecast predicts rain for tomorrow. You should bring an umbrella if you plan to go outside. The temperature will drop significantly in the evening.</p>
+
+        <p>Learning a new language requires dedication and consistent practice. It is important to immerse yourself in the language through reading, listening, and speaking regularly.</p>
+
+        <h2>Multilingual Content</h2>
+        <p><span lang="ja">今日はとても良い天気ですね。公園を散歩しながら、自然の美しさを楽しみましょう。</span> (Japanese)</p>
+        <p><span lang="fr">Le soleil brille dans le ciel bleu. C'est une belle journée pour se promener dans le parc.</span> (French)</p>
+        <p><span lang="de">Das Wetter ist heute wunderschön. Wir sollten einen Spaziergang im Park machen.</span> (German)</p>
+    </div>
+
+    <script>
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+
+</html>
