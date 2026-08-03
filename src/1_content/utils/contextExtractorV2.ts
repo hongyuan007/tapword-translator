@@ -78,17 +78,17 @@ export function expandRangeToSentence(range: Range, options: ContextV2Options = 
         return range.cloneRange()
     }
 
-    // 1. Find the "Hard" limits (Absolute Sandbox)
-    const hardStart = findSentenceStartWithin(root, startPos.node, startPos.offset, hardTerminators)
-    const hardEnd = findSentenceEndWithin(root, endPos.node, endPos.offset, hardTerminators)
+    // 1. Find the "Hard" limits (Absolute Sandbox) — skip numeric periods (e.g., 3.14)
+    const hardStart = findSentenceStartWithin(root, startPos.node, startPos.offset, hardTerminators, true)
+    const hardEnd = findSentenceEndWithin(root, endPos.node, endPos.offset, hardTerminators, true)
 
     if (!hardStart || !hardEnd) {
         return range.cloneRange()
     }
 
     // 2. Start with the tightest "Soft" boundaries around the selection
-    let softStart = findSentenceStartWithin(root, startPos.node, startPos.offset, allTerminators)
-    let softEnd = findSentenceEndWithin(root, endPos.node, endPos.offset, allTerminators)
+    let softStart = findSentenceStartWithin(root, startPos.node, startPos.offset, allTerminators, true)
+    let softEnd = findSentenceEndWithin(root, endPos.node, endPos.offset, allTerminators, true)
 
     // Fallbacks if soft search fails
     if (!softStart) softStart = hardStart
@@ -108,7 +108,7 @@ export function expandRangeToSentence(range: Range, options: ContextV2Options = 
         }
 
         // Search for next boundary starting from current safeEnd
-        const nextEnd = findSentenceEndWithin(root, safeEnd.node, safeEnd.offset, allTerminators)
+        const nextEnd = findSentenceEndWithin(root, safeEnd.node, safeEnd.offset, allTerminators, true)
 
         if (!nextEnd || comparePositions(nextEnd, hardEnd) >= 0) {
             safeEnd = hardEnd
@@ -153,7 +153,7 @@ export function expandRangeToSentence(range: Range, options: ContextV2Options = 
             searchOffset = textLength(prev)
         }
 
-        const prevStart = findSentenceStartWithin(root, searchNode, searchOffset, allTerminators)
+        const prevStart = findSentenceStartWithin(root, searchNode, searchOffset, allTerminators, true)
 
         if (!prevStart || comparePositions(prevStart, hardStart) <= 0) {
             safeStart = hardStart
@@ -363,11 +363,11 @@ function normalizeToTextPosition(root: Node, node: Node, offset: number): NodePo
 
 
 
-function findSentenceEndWithin(root: Node, node: Text, offset: number, terminators: Set<string>): NodePosition | null {
+function findSentenceEndWithin(root: Node, node: Text, offset: number, terminators: Set<string>, skipNumeric: boolean = false): NodePosition | null {
     // Inspect current node after offset
     const text = node.textContent || ""
     const after = text.substring(offset)
-    const idx = firstTerminatorIndex(after, terminators)
+    const idx = firstTerminatorIndex(after, terminators, skipNumeric)
     if (idx >= 0) return { node, offset: offset + idx + 1 }
 
     // Traverse forward across text nodes within root
@@ -382,7 +382,7 @@ function findSentenceEndWithin(root: Node, node: Text, offset: number, terminato
         }
 
         const s = cur.textContent || ""
-        const j = firstTerminatorIndex(s, terminators)
+        const j = firstTerminatorIndex(s, terminators, skipNumeric)
         if (j >= 0) return { node: cur, offset: j + 1 }
         
         prev = cur
@@ -393,11 +393,11 @@ function findSentenceEndWithin(root: Node, node: Text, offset: number, terminato
     return last ? { node: last, offset: textLength(last) } : null
 }
 
-function findSentenceStartWithin(root: Node, node: Text, offset: number, terminators: Set<string>): NodePosition | null {
+function findSentenceStartWithin(root: Node, node: Text, offset: number, terminators: Set<string>, skipNumeric: boolean = false): NodePosition | null {
     // Inspect current node before offset
     const text = node.textContent || ""
     const before = text.substring(0, offset)
-    const idx = lastTerminatorIndex(before, terminators)
+    const idx = lastTerminatorIndex(before, terminators, skipNumeric)
     if (idx >= 0) return { node, offset: idx + 1 }
 
     // Traverse backwards across text nodes within root
@@ -412,7 +412,7 @@ function findSentenceStartWithin(root: Node, node: Text, offset: number, termina
         }
 
         const s = cur.textContent || ""
-        const j = lastTerminatorIndex(s, terminators)
+        const j = lastTerminatorIndex(s, terminators, skipNumeric)
         if (j >= 0) return { node: cur, offset: j + 1 }
         
         prev = cur
@@ -473,22 +473,59 @@ function extractTextBetween(start: NodePosition, end: NodePosition): string {
     return collapseWhitespace(raw)
 }
 
-function lastTerminatorIndex(s: string, terminators: Set<string>): number {
+/**
+ * Check if a comma at `index` in `text` is part of a number pattern (e.g., 10,000, 1,500,000).
+ * Only returns true when digits appear on both sides of the comma.
+ */
+function isCommaInsideNumber(text: string, index: number): boolean {
+    const ch = text[index]
+    if (ch !== ',' && ch !== '\uff0c') return false
+    const before = text[index - 1]
+    const after = text[index + 1]
+    return /\d/.test(before ?? '') && /\d/.test(after ?? '')
+}
+
+/**
+ * Check if a period at `index` in `text` is part of a decimal number (e.g., 3.14, 0.5).
+ */
+function isPeriodInsideNumber(text: string, index: number): boolean {
+    if (text[index] !== '.') return false
+    const before = text[index - 1]
+    const after = text[index + 1]
+    return /\d/.test(before ?? '') && /\d/.test(after ?? '')
+}
+
+function lastTerminatorIndex(s: string, terminators: Set<string>, skipNumeric: boolean = false): number {
     let best = -1
     for (const ch of terminators) {
-        const i = s.lastIndexOf(ch)
-        if (i > best) best = i
+        let idx = s.length - 1
+        while (idx >= 0) {
+            const found = s.lastIndexOf(ch, idx)
+            if (found === -1) break
+            if (skipNumeric && isCommaInsideNumber(s, found)) {
+                idx = found - 1
+                continue
+            }
+            if (skipNumeric && isPeriodInsideNumber(s, found)) {
+                idx = found - 1
+                continue
+            }
+            if (found > best) best = found
+            break
+        }
     }
     return best
 }
 
-function firstTerminatorIndex(s: string, terminators: Set<string>): number {
-    let best = Number.POSITIVE_INFINITY
-    for (const ch of terminators) {
-        const i = s.indexOf(ch)
-        if (i !== -1 && i < best) best = i
+function firstTerminatorIndex(s: string, terminators: Set<string>, skipNumeric: boolean = false): number {
+    for (let i = 0; i < s.length; i++) {
+        const ch = s[i]!
+        if (!terminators.has(ch)) continue
+        if (skipNumeric && isCommaInsideNumber(s, i)) continue
+        if (skipNumeric && isPeriodInsideNumber(s, i)) continue
+        return i
     }
-    return best === Number.POSITIVE_INFINITY ? -1 : best
+    return -1
 }
 
 function buildSplitRegex(terminators: Set<string>): RegExp {
